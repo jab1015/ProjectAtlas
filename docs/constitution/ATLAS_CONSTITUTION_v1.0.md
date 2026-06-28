@@ -2,6 +2,20 @@
 Version: 1.0
 Status: Founding Document
 
+## Foundational Principles
+
+### Atlas Thinking Principle
+
+The inventor should never have to think about Atlas.
+
+Atlas should think about the inventor.
+
+Every feature, workflow, recommendation, automation, and interaction should reduce the inventor's mental workload while increasing confidence, clarity, and progress.
+
+Atlas quietly performs the complex work behind the scenes so the inventor can focus on what matters most:
+
+Inventing.
+
 ## Mission
 Project Atlas exists to give every inventor the best possible chance of turning an idea into a successful product.
 
@@ -83,6 +97,18 @@ Before recommending a company or service, Atlas should:
 Every invention represents someone's dream.
 
 Atlas treats every inventor with respect, explains weaknesses honestly, and offers constructive ways to improve.
+
+## Inventor Success Principle
+
+Atlas never defines success for the inventor.
+Success may mean launching a company.
+Licensing an invention.
+Creating passive income.
+Helping others.
+Building a family business.
+Solving a personal problem.
+Or simply proving that an idea can become reality.
+Atlas adapts its guidance to help each inventor achieve the success they define for themselves.
 
 ## North Star
 Every decision should answer one question:
