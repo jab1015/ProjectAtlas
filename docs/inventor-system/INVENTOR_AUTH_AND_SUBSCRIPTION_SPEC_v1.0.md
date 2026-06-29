@@ -1,138 +1,140 @@
-# INVENTOR AUTHENTICATION & SUBSCRIPTION SPECIFICATION v1.0
+# INVENTOR AUTHENTICATION & SUBSCRIPTION SPECIFICATION v1.1
 
-## 1. PURPOSE
+## Purpose
 
-This document defines authentication, user management, authorization, subscriptions, billing, and feature access for the Inventor Journey platform.
+This specification defines authentication, authorization, subscriptions, billing, and feature access for the Inventor Journey platform.
 
-It is the authoritative specification for identity and monetization.
+**Business Principle:** Users pay to advance their invention through the Inventor Journey—not simply to create additional projects.
 
 ---
 
-## 2. AUTHENTICATION
+## Authentication
 
 Supported providers:
+
 - Email & Password
 - Google Sign-In
-- Apple Sign-In (iOS)
+- Apple Sign-In
 - Password Reset
 - Email Verification
 
-Every user must authenticate before creating or accessing projects.
+---
+
+## Subscription Tiers
+
+### Explorer (Free)
+
+Designed to let an inventor validate one invention.
+
+Features:
+
+- 1 active invention
+- Idea stage
+- Validation stage
+- Basic Research tools
+- Limited monthly AI credits
+- Basic document storage
+- Basic PDF export
+
+Locked until upgrade:
+
+- IP Protection
+- Design
+- Prototype Planning
+- Manufacturing
+- Funding
+- Branding
+- Marketing
+- Sales
+- Growth
 
 ---
 
-## 3. USER PROFILE
+### Inventor Pro
 
-```json
-{
-  "uid": "",
-  "displayName": "",
-  "email": "",
-  "photoUrl": "",
-  "subscriptionTier": "FREE | PRO | ENTERPRISE",
-  "createdAt": "",
-  "lastLogin": "",
-  "settings": {}
-}
-```
+Includes everything in Explorer plus:
 
----
-
-## 4. SUBSCRIPTION TIERS
-
-### FREE
-- 1 active project
-- Basic Engine
-- Limited AI usage
-- Limited storage
-
-### PRO
-- Unlimited projects
-- Full Engine
+- Unlimited inventions
+- Full Inventor Journey
 - All AI Agents
+- IP guidance
+- Design workspace
+- Prototype planning
+- Manufacturing planning
+- Funding preparation
+- Branding
+- Marketing
+- Sales
+- Growth
 - Advanced exports
 - Priority support
 
-### ENTERPRISE
+---
+
+### Enterprise
+
+Includes everything in Inventor Pro plus:
+
 - Team workspaces
-- Shared projects
-- Admin controls
+- Shared inventions
+- Organization billing
+- Administrative controls
 - API access
+- Enterprise support
 
 ---
 
-## 5. FEATURE GATING
+## Feature Gating
 
-The backend determines feature availability.
-Do not enforce permissions only in the frontend.
+Explorer:
+- Idea
+- Validation
+- Basic Research
+
+Inventor Pro:
+- IP
+- Design
+- Prototype
+- Manufacturing
+- Funding
+- Branding
+- Marketing
+- Sales
+- Growth
+
+Permissions are enforced by the backend only.
 
 ---
 
-## 6. BILLING
+## Upgrade Trigger
 
-Recommended:
+After Validation is completed:
+
+'Congratulations! Your invention is ready for IP Protection, Design, and Prototype Planning. Upgrade to Inventor Pro to continue your Inventor Journey.'
+
+---
+
+## Billing
+
 - Stripe (Web)
 - Apple In-App Purchase (iOS)
 - Google Play Billing (Android)
 
-The backend stores the authoritative subscription status.
+Backend stores the authoritative subscription status.
 
 ---
 
-## 7. FIRESTORE STRUCTURE
+## Security
 
-users/
-- uid
-- displayName
-- email
-- subscriptionTier
-- settings
-
-subscriptions/
-- uid
-- provider
-- status
-- plan
-
-projects/
-- ownerUid
-- stage
-- readinessScore
+- Authentication required
+- Users only access their own inventions
+- Backend authorizes premium features
+- Firestore Security Rules mirror backend authorization
 
 ---
 
-## 8. SECURITY
+## Principles
 
-- Users access only their own projects.
-- All writes require authentication.
-- Authorization is enforced server-side.
-- Firestore Security Rules must mirror backend rules.
-
----
-
-## 9. USER LIFECYCLE
-
-Visitor
-→ Sign Up
-→ Email Verification
-→ Free
-→ Upgrade (optional)
-→ Active Subscriber
-
----
-
-## 10. IMPLEMENTATION
-
-- Firebase Authentication
-- Firestore Security Rules
-- Backend authorization
-- Audit authentication and billing events
-
----
-
-## 11. PRINCIPLES
-
-- Identity is required.
-- Backend is the source of truth.
-- Subscription controls features.
-- UI reflects backend decisions.
+- Engine = source of truth
+- Backend = permission authority
+- Users pay for progression, not project quantity
