@@ -1,0 +1,255 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-surface: var(--surface);
+  --color-surface-foreground: var(--surface-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-text-default: var(--text-default);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+
+  --font-family-heading: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+  --font-family-body: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Base token fallbacks — overridden by MAD-146 block below */
+:root {
+  --radius: 0.5rem;
+  --background: oklch(98.2% 0.005 95);
+  --foreground: oklch(16% 0.010 240);
+  --card: oklch(100% 0 0);
+  --card-foreground: oklch(16% 0.010 240);
+  --popover: oklch(100% 0 0);
+  --popover-foreground: oklch(16% 0.010 240);
+  --primary: oklch(44% 0.155 147);
+  --primary-foreground: oklch(99% 0.005 147);
+  --secondary: oklch(94% 0.008 95);
+  --secondary-foreground: oklch(24% 0.010 240);
+  --muted: oklch(95% 0.006 95);
+  --muted-foreground: oklch(48% 0.012 240);
+  --accent: oklch(95% 0.008 147);
+  --accent-foreground: oklch(36% 0.130 147);
+  --destructive: oklch(55% 0.22 27);
+  --destructive-foreground: oklch(99% 0.005 27);
+  --border: oklch(89% 0.008 95);
+  --input: oklch(89% 0.008 95);
+  --ring: oklch(44% 0.155 147);
+}
+/* MAD-146:design-tokens:start */
+/* Atlas Brand Identity — June 2026
+   Primary accent: Atlas Green (deep, confident sage-green)
+   Palette: off-white backgrounds, pure-white cards, charcoal text
+   Typography: Space Grotesk (headings) + IBM Plex Sans (body)
+   Philosophy: calm, spacious, light — Notion / Linear / Stripe feel */
+:root {
+  /* ── Backgrounds — off-white canvas, pure-white cards ── */
+  --background: oklch(98.2% 0.005 95);
+  --foreground: oklch(16% 0.010 240);
+
+  --card: oklch(100% 0 0);
+  --card-foreground: oklch(16% 0.010 240);
+
+  --popover: oklch(100% 0 0);
+  --popover-foreground: oklch(16% 0.010 240);
+
+  /* ── Atlas Green — primary accent ── */
+  --primary: oklch(44% 0.155 147);
+  --primary-hover: oklch(39% 0.155 147);
+  --primary-foreground: oklch(99% 0.005 147);
+
+  /* ── Surface (alias for card — white panels) ── */
+  --surface: oklch(100% 0 0);
+  --surface-foreground: oklch(16% 0.010 240);
+
+  /* ── Secondary — warm stone ── */
+  --secondary: oklch(94% 0.008 95);
+  --secondary-foreground: oklch(24% 0.010 240);
+
+  /* ── Muted — warm light gray ── */
+  --muted: oklch(95% 0.006 95);
+  --muted-foreground: oklch(48% 0.012 240);
+
+  /* ── Accent — hover / interactive surfaces ── */
+  --accent: oklch(95% 0.008 147);
+  --accent-foreground: oklch(36% 0.130 147);
+
+  /* ── Destructive ── */
+  --destructive: oklch(55% 0.22 27);
+  --destructive-foreground: oklch(99% 0.005 27);
+
+  /* ── Success ── */
+  --success: oklch(52% 0.160 152);
+  --success-foreground: oklch(99% 0.005 152);
+
+  /* ── Warning ── */
+  --warning: oklch(72% 0.16 75);
+  --warning-foreground: oklch(20% 0.010 75);
+
+  /* ── Text scale ── */
+  --text-default: oklch(16% 0.010 240);
+  --text-muted: oklch(48% 0.012 240);
+  --text-subtle: oklch(62% 0.008 240);
+
+  /* ── Scrim — for overlays on images/video (replaces raw bg-black) ── */
+  --scrim: oklch(0% 0 0 / 0.72);
+  --scrim-light: oklch(0% 0 0 / 0.42);
+
+  /* ── Borders & inputs — warm, subtle ── */
+  --border: oklch(89% 0.008 95);
+  --input: oklch(89% 0.008 95);
+  --ring: oklch(44% 0.155 147);
+
+  /* ── Typography ── */
+  --font-heading: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* ── Radius — varied intentionally ── */
+  --radius: 0.5rem;            /* base — inputs, small elements */
+  --radius-sm: 0.375rem;       /* tags, badges */
+  --radius-md: 0.5rem;         /* buttons */
+  --radius-lg: 0.75rem;        /* cards */
+  --radius-xl: 1rem;           /* hero cards, overlays */
+
+  /* ── Elevation ── */
+  --shadow-sm: 0 1px 2px 0 oklch(0% 0 0 / 0.04);
+  --shadow-md: 0 4px 12px -2px oklch(0% 0 0 / 0.08);
+  --shadow-lg: 0 12px 32px -8px oklch(0% 0 0 / 0.12);
+
+  /* ── Brand gradient — green tonality only, no blue/purple ── */
+  --gradient-brand: linear-gradient(135deg, oklch(44% 0.155 147), oklch(52% 0.140 155));
+  --gradient-subtle: linear-gradient(180deg, oklch(98.2% 0.005 95), oklch(95% 0.006 95));
+
+  /* ── Rating / star accent (warm amber — semantic UI only) ── */
+  --star: oklch(76% 0.160 75);
+}
+
+/* Dark mode intentionally minimal — app stays light by default */
+.dark {
+  --background: oklch(14% 0.006 240);
+  --foreground: oklch(96% 0.005 240);
+  --card: oklch(16.5% 0.006 240);
+  --card-foreground: oklch(96% 0.005 240);
+  --popover: oklch(16.5% 0.006 240);
+  --popover-foreground: oklch(96% 0.005 240);
+  --primary: oklch(58% 0.155 147);
+  --primary-hover: oklch(53% 0.155 147);
+  --primary-foreground: oklch(14% 0.006 240);
+  --surface: oklch(16.5% 0.006 240);
+  --surface-foreground: oklch(96% 0.005 240);
+  --secondary: oklch(21% 0.008 240);
+  --secondary-foreground: oklch(92% 0.005 240);
+  --accent: oklch(22% 0.020 147);
+  --accent-foreground: oklch(65% 0.130 147);
+  --muted: oklch(20% 0.006 240);
+  --muted-foreground: oklch(68% 0.008 240);
+  --border: oklch(24% 0.006 240);
+  --input: oklch(24% 0.006 240);
+  --ring: oklch(58% 0.155 147);
+  --destructive: oklch(62% 0.21 25);
+  --destructive-foreground: oklch(18% 0.005 25);
+  --success: oklch(58% 0.160 152);
+  --success-foreground: oklch(14% 0.005 152);
+  --warning: oklch(76% 0.15 75);
+  --warning-foreground: oklch(18% 0.010 75);
+  --text-default: oklch(96% 0.005 240);
+  --text-muted: oklch(68% 0.008 240);
+  --text-subtle: oklch(52% 0.008 240);
+  --scrim: oklch(0% 0 0 / 0.80);
+  --scrim-light: oklch(0% 0 0 / 0.50);
+  --star: oklch(76% 0.160 75);
+  --gradient-brand: linear-gradient(135deg, oklch(58% 0.155 147), oklch(60% 0.140 155));
+  --gradient-subtle: linear-gradient(180deg, oklch(14% 0.006 240), oklch(20% 0.006 240));
+}
+/* MAD-146:design-tokens:end */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    line-height: 1.6;
+  }
+
+  /* ── Headings — Space Grotesk, tight tracking, editorial weight ── */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--foreground);
+  }
+
+  h1 { font-size: 2.5rem; font-weight: 700; }
+  h2 { font-size: 1.875rem; font-weight: 700; }
+  h3 { font-size: 1.5rem; }
+  h4 { font-size: 1.25rem; }
+  h5 { font-size: 1.125rem; }
+  h6 { font-size: 1rem; }
+
+  /* ── Links — semantic token, no raw blue ── */
+  a {
+    color: var(--primary);
+    text-decoration-line: none;
+    text-underline-offset: 3px;
+    transition: color 0.15s ease;
+  }
+  a:hover {
+    color: var(--primary-hover);
+    text-decoration-line: underline;
+  }
+  a:visited {
+    color: var(--primary);
+  }
+
+  /* ── Focus states — WCAG AA, driven by brand token ── */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+/* Atlas utility classes */
+.font-heading {
+  font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-body {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}

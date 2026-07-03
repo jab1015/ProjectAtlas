@@ -1,0 +1,164 @@
+/**
+ * Atlas Validation Research — Session Mutations
+ *
+ * Internal mutations that manage the validation research session lifecycle.
+ * These run in Convex's default V8 runtime (no "use node").
+ *
+ * Exported for use by validationResearchOrchestration.ts (the Node.js action).
+ */
+
+import { internalMutation } from "./_generated/server";
+import { v } from "convex/values";
+import { MockValidationResearchProvider } from "./mockValidationResearchProvider";
+
+const DEFAULT_PROVIDER = new MockValidationResearchProvider();
+
+// ── initValidationResearchSession ─────────────────────────────────────────────
+
+export const initValidationResearchSession = internalMutation({
+  args: {
+    inventionId: v.id("inventions"),
+  },
+  returns: v.union(
+    v.object({
+      status: v.literal("existing"),
+      researchId: v.id("validationResearch"),
+    }),
+    v.object({
+      status: v.literal("created"),
+      researchId: v.id("validationResearch"),
+      inventionTitle: v.string(),
+      problemStatement: v.string(),
+      inventionDescription: v.string(),
+    })
+  ),
+  handler: async (ctx, { inventionId }) => {
+    const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+    const now = Date.now();
+
+    const invention = await ctx.db.get(inventionId);
+    if (!invention) throw new Error("Invention not found");
+
+    // 24h cache: reuse COMPLETED research within the last 24 hours
+    const existing = await ctx.db
+      .query("validationResearch")
+      .withIndex("by_inventionId_status", (q) =>
+        q.eq("inventionId", inventionId).eq("researchStatus", "completed")
+      )
+      .order("desc")
+      .first();
+
+    if (
+      existing &&
+      existing.completedAt !== undefined &&
+      existing.completedAt >= now - TWENTY_FOUR_HOURS_MS
+    ) {
+      console.log(`[Stage2] Cached record reused: researchId=${existing._id} inventionId=${inventionId} completedAt=${existing.completedAt}`);
+      return { status: "existing" as const, researchId: existing._id };
+    }
+
+    // Create a new PENDING research row
+    const researchId = await ctx.db.insert("validationResearch", {
+      inventionId,
+      stageId: "2",
+      researchStatus: "pending",
+      overallStatus: "PENDING",
+      sections: {} as Record<string, unknown>,
+      totalSectionCount: 11,
+      completedSectionCount: 0,
+      startedAt: now,
+      updatedAt: now,
+      providerVersion: DEFAULT_PROVIDER.getProviderVersion(),
+      researchVersion: 1,
+    });
+
+    console.log(`[Stage2] Research record created: researchId=${researchId} inventionId=${inventionId}`);
+    return {
+      status: "created" as const,
+      researchId,
+      inventionTitle: invention.title,
+      problemStatement: invention.problemStatement ?? "",
+      inventionDescription: invention.solutionDescription ?? "",
+    };
+  },
+});
+
+// ── patchValidationSection ────────────────────────────────────────────────────
+
+export const patchValidationSection = internalMutation({
+  args: {
+    researchId: v.id("validationResearch"),
+    sectionKey: v.string(),
+    sectionEntry: v.any(),
+    completedSectionCount: v.number(),
+    lastCompletedSection: v.string(),
+    overallStatus: v.string(),
+    updatedAt: v.number(),
+  },
+  handler: async (
+    ctx,
+    {
+      researchId,
+      sectionKey,
+      sectionEntry,
+      completedSectionCount,
+      lastCompletedSection,
+      overallStatus,
+      updatedAt,
+    }
+  ) => {
+    const record = await ctx.db.get(researchId);
+    if (!record) return;
+
+    const currentSections: Record<string, unknown> =
+      (record.sections as Record<string, unknown>) ?? {};
+
+    const updatedSections = {
+      ...currentSections,
+      [sectionKey]: sectionEntry,
+    };
+
+    await ctx.db.patch(researchId, {
+      sections: updatedSections,
+      completedSectionCount,
+      lastCompletedSection,
+      overallStatus,
+      updatedAt,
+    });
+  },
+});
+
+// ── markValidationResearchInProgress ─────────────────────────────────────────
+
+export const markValidationResearchInProgress = internalMutation({
+  args: {
+    researchId: v.id("validationResearch"),
+    updatedAt: v.number(),
+  },
+  handler: async (ctx, { researchId, updatedAt }) => {
+    await ctx.db.patch(researchId, {
+      overallStatus: "IN_PROGRESS",
+      researchStatus: "running",
+      updatedAt,
+    });
+  },
+});
+
+// ── finaliseValidationResearch ────────────────────────────────────────────────
+
+export const finaliseValidationResearch = internalMutation({
+  args: {
+    researchId: v.id("validationResearch"),
+    overallStatus: v.string(),
+    completedAt: v.number(),
+    researchStatus: v.string(),
+  },
+  handler: async (ctx, { researchId, overallStatus, completedAt, researchStatus }) => {
+    await ctx.db.patch(researchId, {
+      overallStatus,
+      researchStatus,
+      completedAt,
+      updatedAt: completedAt,
+    });
+  },
+});
