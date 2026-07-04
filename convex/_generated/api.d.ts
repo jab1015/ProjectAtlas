@@ -17,6 +17,7 @@ import type * as filesInternal from "../filesInternal.js";
 import type * as http from "../http.js";
 import type * as journeyEngine from "../journeyEngine.js";
 import type * as mockValidationResearchProvider from "../mockValidationResearchProvider.js";
+import type * as openaiValidationResearchProvider from "../openaiValidationResearchProvider.js";
 import type * as productFiles from "../productFiles.js";
 import type * as products from "../products.js";
 import type * as productsAdmin from "../productsAdmin.js";
@@ -54,6 +55,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   journeyEngine: typeof journeyEngine;
   mockValidationResearchProvider: typeof mockValidationResearchProvider;
+  openaiValidationResearchProvider: typeof openaiValidationResearchProvider;
   productFiles: typeof productFiles;
   products: typeof products;
   productsAdmin: typeof productsAdmin;

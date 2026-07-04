@@ -22,6 +22,7 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 
 import { MockValidationResearchProvider } from "./mockValidationResearchProvider";
+import { tryCreateOpenAIProvider } from "./openaiValidationResearchProvider";
 import type {
   InventionContext,
   ValidationResearchProvider,
@@ -45,11 +46,19 @@ const SECTION_ORDER: ValidationSectionKey[] = [
   VALIDATION_SECTION_KEYS.RECOMMENDATIONS,
 ];
 
-// ── Default provider instance ─────────────────────────────────────────────────
-// Swapping to a real provider later means changing this one line.
+// ── Provider selection ────────────────────────────────────────────────────────
+// Use OpenAI when OPENAI_API_KEY is present; fall back to mock if unavailable.
 
-const DEFAULT_PROVIDER: ValidationResearchProvider =
-  new MockValidationResearchProvider();
+function selectProvider(): ValidationResearchProvider {
+  const openaiProvider = tryCreateOpenAIProvider();
+  if (openaiProvider) {
+    return openaiProvider;
+  }
+  console.warn(
+    "[ValidationResearch] Using MockValidationResearchProvider as fallback"
+  );
+  return new MockValidationResearchProvider();
+}
 
 // ── Main orchestration action ─────────────────────────────────────────────────
 
@@ -72,6 +81,10 @@ export const runValidationResearchOrchestration = internalAction({
   handler: async (ctx, { inventionId }) => {
     console.log(`[Stage2] triggerValidationResearch invoked: inventionId=${inventionId}`);
     console.log(`[Orchestration] Starting validation research for inventionId=${inventionId}`);
+
+    // Select provider at runtime so OPENAI_API_KEY is read from live env
+    const provider = selectProvider();
+    console.log(`[Orchestration] Provider selected: ${provider.getProviderName()}`);
 
     // Step 1: initialise session (idempotent 24h cache)
     const initResult = await ctx.runMutation(
@@ -126,7 +139,7 @@ export const runValidationResearchOrchestration = internalAction({
       try {
         // Generate via provider
         console.log(`[Orchestration] Provider invoked: sectionKey=${sectionKey} researchId=${researchId}`);
-        const result = await DEFAULT_PROVIDER.generateSection(
+        const result = await provider.generateSection(
           inventionContext,
           sectionKey
         );
