@@ -6,7 +6,7 @@
  */
 
 import { mutation, query, internalMutation, internalQuery } from "./_generated/server";
-import { v } from "convex/values";
+import { v, ConvexError } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
@@ -392,6 +392,77 @@ export const advanceStage = mutation({
     // Future stages: add additional onStageEnter hooks here.
 
     return nextStage.id;
+  },
+});
+
+/**
+ * Deletes an invention and all owned child records.
+ * Only the owning user may call this mutation.
+ * Cleans up: stageProgress, conversations, documents, validationResearch, notifications.
+ */
+export const deleteInvention = mutation({
+  args: { inventionId: v.id("inventions") },
+  handler: async (ctx, { inventionId }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Not authenticated");
+
+    const invention = await ctx.db.get(inventionId);
+    if (!invention) throw new ConvexError("Invention not found");
+    if (invention.userId !== userId) throw new ConvexError("Not authorized to delete this invention");
+
+    // ── Delete owned child records ───────────────────────────────────────────
+
+    // 1. stageProgress rows
+    const stageProgressRows = await ctx.db
+      .query("stageProgress")
+      .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
+      .collect();
+    for (const row of stageProgressRows) {
+      await ctx.db.delete(row._id);
+    }
+
+    // 2. conversations rows
+    const conversationRows = await ctx.db
+      .query("conversations")
+      .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
+      .collect();
+    for (const row of conversationRows) {
+      await ctx.db.delete(row._id);
+    }
+
+    // 3. documents rows
+    const documentRows = await ctx.db
+      .query("documents")
+      .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
+      .collect();
+    for (const row of documentRows) {
+      await ctx.db.delete(row._id);
+    }
+
+    // 4. validationResearch rows
+    const validationResearchRows = await ctx.db
+      .query("validationResearch")
+      .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
+      .collect();
+    for (const row of validationResearchRows) {
+      await ctx.db.delete(row._id);
+    }
+
+    // 5. notifications referencing this invention
+    const notificationRows = await ctx.db
+      .query("notifications")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .collect();
+    for (const row of notificationRows) {
+      if (row.inventionId === inventionId) {
+        await ctx.db.delete(row._id);
+      }
+    }
+
+    // ── Delete the invention itself ──────────────────────────────────────────
+    await ctx.db.delete(inventionId);
+
+    return { success: true };
   },
 });
 

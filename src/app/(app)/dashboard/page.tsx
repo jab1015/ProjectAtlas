@@ -13,6 +13,7 @@ import { JourneyMap } from "@/components/atlas/journey-map";
 import { ArrowRight, Lock } from "lucide-react";
 import { trackContinueClicked } from "@/lib/analytics";
 import Link from "next/link";
+import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
 
 function DashboardSkeleton() {
   return (
@@ -94,13 +95,20 @@ export default function DashboardPage() {
         <div className="mx-auto max-w-3xl px-4 sm:px-6 py-12 space-y-12">
 
           {/* ── Primary card ─────────────────────────────────────────────── */}
-          <div className="rounded-2xl border border-border bg-card p-8 sm:p-10 space-y-6">
-            {/* Stage label */}
+          <div className="rounded-2xl border border-border bg-card p-8 sm:p-10 space-y-6 group">
+            {/* Stage label + context menu */}
             <div className="flex items-center justify-between">
               <p className="text-xs font-medium uppercase tracking-widest text-primary">
                 Stage {currentStage.id} — {currentStage.name}
               </p>
-              <ReadinessBadge state={readinessState} />
+              <div className="flex items-center gap-2">
+                <ReadinessBadge state={readinessState} />
+                <InventionCardMenu
+                  inventionId={invention._id}
+                  inventionTitle={invention.title}
+                  onDeleted={() => router.push("/onboarding")}
+                />
+              </div>
             </div>
 
             {/* Invention title */}

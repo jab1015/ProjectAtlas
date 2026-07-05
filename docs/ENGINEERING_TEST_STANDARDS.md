@@ -80,6 +80,38 @@ List all automated regression tests here as they are added.
 
 ---
 
+### MRT-002: Delete Invention Project (Critical)
+
+**Date added**: 2026-07-05
+**Covers**: Delete invention from dashboard card context menu and invention workspace
+**Trigger**: Run after any change to `deleteInvention` mutation, `InventionCardMenu` component, dashboard page, inventions list page, or invention workspace page
+
+**Steps**:
+1. Sign in and navigate to `/dashboard`
+2. Click the ⋮ (three-dot) icon on the primary project card
+3. Select **Delete**
+4. Verify the confirmation dialog appears with the correct invention name
+5. Click **Cancel** — verify the dialog closes and the invention is unchanged
+6. Click the ⋮ icon again and select **Delete**
+7. Click **Delete Project** (red button) to confirm
+8. Verify the dashboard redirects to `/onboarding` immediately
+9. Navigate to `/inventions` — verify the deleted project is no longer listed
+10. Optionally verify in Convex dashboard: no `inventions`, `stageProgress`, `validationResearch`, `conversations`, `documents`, or `notifications` rows remain for the deleted `inventionId`
+
+**Expected results**:
+- [ ] ⋮ icon appears on the card (always on mobile, on hover on desktop)
+- [ ] Confirmation dialog shows correct invention title
+- [ ] Cancel preserves the invention
+- [ ] Successful delete shows "Project deleted successfully." toast
+- [ ] Dashboard redirects to `/onboarding` after delete
+- [ ] No orphan records in any related table
+- [ ] Unauthorized users cannot delete (mutation throws ConvexError)
+- [ ] Build passes; no TypeScript errors
+
+**Pass criteria**: All eight checkboxes satisfied with no console errors.
+
+---
+
 ### Writing New Manual Regression Tests
 
 When automation isn't feasible, add an entry here following the MRT-001 template. Include: date added, what it covers, what changes should trigger a re-run, numbered steps, and explicit pass criteria.

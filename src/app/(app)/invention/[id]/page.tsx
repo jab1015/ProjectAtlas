@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, ArrowRight, Lock, PartyPopper } from "lucide-react";
 import Link from "next/link";
 import { trackStageCompleted, trackContinueClicked, trackUpgradePromptShown } from "@/lib/analytics";
+import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
 
 // ── Congratulations screen (Stage 4 completion) ──────────────────────────────
 
@@ -301,9 +302,16 @@ export default function InventionWorkspacePage() {
 
             {/* Status screen */}
             <div className="space-y-4 max-w-xl">
-              <p className="text-xs font-medium uppercase tracking-widest text-primary">
-                Stage 2 — Validation
-              </p>
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium uppercase tracking-widest text-primary">
+                  Stage 2 — Validation
+                </p>
+                <InventionCardMenu
+                  inventionId={inventionId}
+                  inventionTitle={invention.title}
+                  onDeleted={() => router.push("/onboarding")}
+                />
+              </div>
               <h1
                 className="text-2xl font-bold text-foreground"
                 style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
@@ -526,9 +534,16 @@ export default function InventionWorkspacePage() {
             {/* ── Left panel: status ──────────────────────────────────────── */}
             <div className="space-y-6">
               <div>
-                <p className="text-xs font-medium uppercase tracking-widest text-primary mb-1">
-                  Stage {stageId}
-                </p>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-xs font-medium uppercase tracking-widest text-primary">
+                    Stage {stageId}
+                  </p>
+                  <InventionCardMenu
+                    inventionId={inventionId}
+                    inventionTitle={invention.title}
+                    onDeleted={() => router.push("/onboarding")}
+                  />
+                </div>
                 <h1
                   className="text-2xl font-bold text-foreground"
                   style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}

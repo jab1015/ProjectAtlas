@@ -11,6 +11,7 @@ import { ReadinessBadge } from "@/components/atlas/readiness-badge";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
 
 function formatRelativeDate(ts: number): string {
   const now = Date.now();
@@ -84,34 +85,47 @@ export default function InventionsPage() {
           ) : (
             <div className="space-y-3">
               {inventions.map((invention) => (
-                <Link
+                <div
                   key={invention._id}
-                  href={`/invention/${invention._id}`}
-                  className="block rounded-xl border border-border bg-card p-5 hover:border-primary/30 hover:shadow-sm transition-all group"
+                  className="relative rounded-xl border border-border bg-card hover:border-primary/30 hover:shadow-sm transition-all group"
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs text-primary font-medium">
-                          Stage {invention.currentStageId} — {invention.stageName}
-                        </span>
+                  {/* Clickable area — navigates to workspace */}
+                  <Link
+                    href={`/invention/${invention._id}`}
+                    className="block p-5"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0 pr-8">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs text-primary font-medium">
+                            Stage {invention.currentStageId} — {invention.stageName}
+                          </span>
+                        </div>
+                        <h2
+                          className="text-lg font-semibold text-foreground truncate"
+                          style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
+                        >
+                          {invention.title}
+                        </h2>
+                        <div className="flex items-center gap-3 mt-2">
+                          <ReadinessBadge state={invention.readinessState} />
+                          <span className="text-xs text-muted-foreground">
+                            Updated {formatRelativeDate(invention.updatedAt)}
+                          </span>
+                        </div>
                       </div>
-                      <h2
-                        className="text-lg font-semibold text-foreground truncate"
-                        style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
-                      >
-                        {invention.title}
-                      </h2>
-                      <div className="flex items-center gap-3 mt-2">
-                        <ReadinessBadge state={invention.readinessState} />
-                        <span className="text-xs text-muted-foreground">
-                          Updated {formatRelativeDate(invention.updatedAt)}
-                        </span>
-                      </div>
+                      <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground shrink-0 mt-1 transition-colors" />
                     </div>
-                    <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground shrink-0 mt-1 transition-colors" />
+                  </Link>
+
+                  {/* Context menu — positioned top-right, outside the <Link> */}
+                  <div className="absolute top-3 right-10">
+                    <InventionCardMenu
+                      inventionId={invention._id}
+                      inventionTitle={invention.title}
+                    />
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
           )}
