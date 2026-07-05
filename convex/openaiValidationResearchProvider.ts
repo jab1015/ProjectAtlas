@@ -5,12 +5,15 @@
  * AI-backed research for each validation section.
  *
  * Rules:
+ *  - "use node" is REQUIRED here — process.env is only accessible in Node.js
+ *    actions, not in Convex's default V8 runtime. Without this directive,
+ *    process.env.OPENAI_API_KEY will always be undefined and the provider
+ *    will silently fall back to mock.
  *  - Only instantiated when OPENAI_API_KEY is present and client init succeeds.
  *  - Drop-in replacement for MockValidationResearchProvider — same interface.
  *  - If init fails, the caller falls back to MockValidationResearchProvider.
- *
- * "use node" is inherited from the importing action file.
  */
+"use node";
 
 import OpenAI from "openai";
 import {
