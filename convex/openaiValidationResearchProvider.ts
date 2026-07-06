@@ -151,7 +151,7 @@ End with a preliminary go/no-go status and what evidence is needed to change it.
 export class OpenAIValidationResearchProvider
   implements ValidationResearchProvider
 {
-  private static readonly VERSION = "openai-gpt4o-1.0.0";
+  private static readonly VERSION = "openai-gpt4o-mini-1.2.0";
   private static readonly NAME = "OpenAIValidationResearchProvider";
   private readonly client: OpenAI;
 
