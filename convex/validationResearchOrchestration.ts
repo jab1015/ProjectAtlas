@@ -21,8 +21,7 @@ import { internalAction } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 
-import { MockValidationResearchProvider } from "./mockValidationResearchProvider";
-import { tryCreateOpenAIProvider } from "./openaiValidationResearchProvider";
+import { OpenAIValidationResearchProvider } from "./openaiValidationResearchProvider";
 import type {
   InventionContext,
   ValidationResearchProvider,
@@ -47,17 +46,20 @@ const SECTION_ORDER: ValidationSectionKey[] = [
 ];
 
 // ── Provider selection ────────────────────────────────────────────────────────
-// Use OpenAI when OPENAI_API_KEY is present; fall back to mock if unavailable.
+// Always use OpenAI — OPENAI_API_KEY is confirmed set on the Convex deployment.
+// Throws at runtime if the key is missing so failures are loud, not silent.
 
 function selectProvider(): ValidationResearchProvider {
-  const openaiProvider = tryCreateOpenAIProvider();
-  if (openaiProvider) {
-    return openaiProvider;
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      "[ValidationResearch] OPENAI_API_KEY is not set on this Convex deployment. " +
+      "Set it with: npx convex env set OPENAI_API_KEY <key> --deployment first-lion-585"
+    );
   }
-  console.warn(
-    "[ValidationResearch] Using MockValidationResearchProvider as fallback"
-  );
-  return new MockValidationResearchProvider();
+  const provider = new OpenAIValidationResearchProvider(apiKey);
+  console.log("[ValidationResearch] OpenAIValidationResearchProvider selected");
+  return provider;
 }
 
 // ── Main orchestration action ─────────────────────────────────────────────────
