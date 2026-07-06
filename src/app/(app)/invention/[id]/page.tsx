@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { useConvexAuth } from "convex/react";
@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, ArrowRight, Lock, PartyPopper } from "lucide-react";
+import { ArrowLeft, ArrowRight, Lock, PartyPopper, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { trackStageCompleted, trackContinueClicked, trackUpgradePromptShown } from "@/lib/analytics";
 import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
@@ -172,10 +172,14 @@ export default function InventionWorkspacePage() {
   const updateStageProgress = useMutation(api.journeyEngine.updateStageProgress);
   const updateInventionField = useMutation(api.journeyEngine.updateInventionField);
   const advanceStage = useMutation(api.journeyEngine.advanceStage);
+  const forceRegenerateValidation = useMutation(api.validationResearchSessionMutations.forceRegenerateValidation);
 
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
   const [advancing, setAdvancing] = useState(false);
   const [showCongrats, setShowCongrats] = useState(false);
+  const [rebuilding, setRebuilding] = useState(false);
+  const [rebuildError, setRebuildError] = useState<string | null>(null);
+  const rebuildTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const initializedRef = useRef(false);
 
   useEffect(() => {
@@ -243,19 +247,75 @@ export default function InventionWorkspacePage() {
   const stageId = currentStage.id;
   const fields = STAGE_FIELDS[stageId];
 
+  // ── Stage 2: Rebuild Validation handler ──────────────────────────────────────
+  const handleRebuildValidation = useCallback(async () => {
+    setRebuildError(null);
+    setRebuilding(true);
+    // Safety timeout: stop spinning after 120s even if something hangs
+    if (rebuildTimeoutRef.current) clearTimeout(rebuildTimeoutRef.current);
+    rebuildTimeoutRef.current = setTimeout(() => setRebuilding(false), 120_000);
+    try {
+      await forceRegenerateValidation({ inventionId });
+      // Keep rebuilding=true — the reactive query will update as sections come in
+    } catch (err) {
+      console.error("Rebuild failed:", err);
+      const msg = err instanceof Error ? err.message : "Rebuild failed. Please try again.";
+      setRebuildError(msg);
+      setRebuilding(false);
+      if (rebuildTimeoutRef.current) clearTimeout(rebuildTimeoutRef.current);
+    }
+  }, [forceRegenerateValidation, inventionId]);
+
+  const TOTAL_SECTIONS = 11;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sectionsList = (validationResearch?.sections ?? []) as Array<any>;
+  const completedSectionCount = sectionsList.filter((s) => s.status !== "pending").length;
+
+  // When rebuilding: switch off once all sections are back (via useEffect to avoid setState-during-render)
+  useEffect(() => {
+    if (rebuilding && completedSectionCount >= TOTAL_SECTIONS) {
+      setRebuilding(false);
+      if (rebuildTimeoutRef.current) clearTimeout(rebuildTimeoutRef.current);
+    }
+  }, [rebuilding, completedSectionCount]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (rebuildTimeoutRef.current) clearTimeout(rebuildTimeoutRef.current);
+    };
+  }, []);
+
   // ── Stage 2: Validation Research Status (replaces questionnaire) ─────────────
   if (stageId === 2) {
-    let statusLabel = "Waiting to begin";
-    if (validationResearch?.status === "running") {
-      statusLabel = "Research in progress";
-    } else if (validationResearch?.status === "complete") {
-      statusLabel = "Validation complete";
-    }
-
     // Sections that have been generated (not still pending)
-    const completedSections = (validationResearch?.sections ?? []).filter(
-      (s: { status: string }) => s.status !== "pending"
+    const completedSections = sectionsList.filter(
+      (s) => s.status !== "pending"
     );
+
+    // Progress bar state
+    const isGenerating =
+      rebuilding ||
+      validationResearch?.status === "running" ||
+      (validationResearch && completedSections.length < TOTAL_SECTIONS);
+    const progressCount = completedSections.length;
+    const progressPct = Math.round((progressCount / TOTAL_SECTIONS) * 100);
+
+    // Determine if all sections are errors
+    const allSectionsError =
+      completedSections.length === TOTAL_SECTIONS &&
+      completedSections.every((s: { content: string }) =>
+        s.content?.includes("OPENAI_API_KEY") ||
+        s.content?.includes("Unable to generate") ||
+        s.content?.includes("Error:")
+      );
+
+    let statusLabel = "Waiting to begin";
+    if (isGenerating) {
+      statusLabel = "Research in progress";
+    } else if (validationResearch?.status === "complete" || completedSections.length === TOTAL_SECTIONS) {
+      statusLabel = allSectionsError ? "Validation failed" : "Validation complete";
+    }
 
     // Summary stats
     const sectionsWithConf = completedSections.filter(
@@ -319,12 +379,28 @@ export default function InventionWorkspacePage() {
                 Atlas is validating your invention.
               </h1>
               <p className="text-muted-foreground">
-                Research has started automatically.
-                Please wait while Atlas prepares your validation report.
+                {isGenerating
+                  ? "Research is running. Sections will appear as they complete."
+                  : "Research has completed. Click Rebuild to regenerate with updated information."}
               </p>
               <p className="text-sm text-foreground">
                 Status: <span className="font-medium">{statusLabel}</span>
               </p>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRebuildValidation}
+                  disabled={rebuilding}
+                  className="gap-1.5 text-sm w-fit"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5${rebuilding ? " animate-spin" : ""}`} />
+                  {rebuilding ? "Rebuilding…" : "Rebuild Validation"}
+                </Button>
+                {rebuildError && (
+                  <p className="text-xs text-destructive">{rebuildError}</p>
+                )}
+              </div>
             </div>
 
             {/* Validation Summary card — appears only when research data exists */}
@@ -337,9 +413,11 @@ export default function InventionWorkspacePage() {
                   Validation Summary
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  {validationResearch.status === "complete"
-                    ? "Atlas has completed the first round of validation research for your invention."
-                    : "Atlas is continuing to research your invention. New sections will appear automatically."}
+                  {isGenerating
+                    ? "Atlas is researching your invention. New sections will appear automatically."
+                    : allSectionsError
+                    ? "Validation encountered errors. Click Rebuild to try again."
+                    : "Atlas has completed the first round of validation research for your invention."}
                 </p>
                 <dl className="grid grid-cols-2 gap-3">
                   <div>
@@ -353,7 +431,7 @@ export default function InventionWorkspacePage() {
                   <div>
                     <dt className="text-xs text-muted-foreground">Sections Completed</dt>
                     <dd className="text-sm font-medium text-foreground mt-0.5">
-                      {completedSections.length} of 11
+                      {completedSections.length} of {TOTAL_SECTIONS}
                     </dd>
                   </div>
                   <div>
@@ -368,15 +446,63 @@ export default function InventionWorkspacePage() {
               </div>
             )}
 
+            {/* ── Progress status bar ─────────────────────────────────────── */}
+            {validationResearch && (
+              <div className="mt-6 max-w-xl space-y-2">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  {isGenerating ? (
+                    <span className="font-medium text-foreground">
+                      Generating validation research… {progressCount} of {TOTAL_SECTIONS} sections complete
+                    </span>
+                  ) : allSectionsError ? (
+                    <span className="text-destructive font-medium">
+                      {TOTAL_SECTIONS} of {TOTAL_SECTIONS} sections — validation failed. Click Rebuild to regenerate.
+                    </span>
+                  ) : (
+                    <span className="text-primary font-medium">
+                      Validation complete — {TOTAL_SECTIONS} of {TOTAL_SECTIONS} sections
+                    </span>
+                  )}
+                  {isGenerating && (
+                    <span>{progressPct}%</span>
+                  )}
+                </div>
+                <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      allSectionsError
+                        ? "bg-destructive"
+                        : isGenerating
+                        ? "bg-primary"
+                        : "bg-primary"
+                    }`}
+                    style={{ width: `${progressPct}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Research section cards */}
             {completedSections.length > 0 && (
               <div className="mt-10 space-y-4">
-                <h2
-                  className="text-lg font-semibold text-foreground"
-                  style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
-                >
-                  Validation Research
-                </h2>
+                <div className="flex items-center justify-between gap-4">
+                  <h2
+                    className="text-lg font-semibold text-foreground"
+                    style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
+                  >
+                    Validation Research
+                  </h2>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRebuildValidation}
+                    disabled={rebuilding}
+                    className="gap-1.5 text-sm"
+                  >
+                    <RefreshCw className={`h-3.5 w-3.5${rebuilding ? " animate-spin" : ""}`} />
+                    {rebuilding ? "Rebuilding…" : "Rebuild Validation"}
+                  </Button>
+                </div>
                 {completedSections.map((section: {
                   sectionId: string;
                   title: string;

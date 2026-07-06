@@ -7,11 +7,63 @@
  * Exported for use by validationResearchOrchestration.ts (the Node.js action).
  */
 
-import { internalMutation } from "./_generated/server";
+import { internalMutation, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { internal } from "./_generated/api";
 
 // Provider version written into new research rows (must match OpenAIValidationResearchProvider.VERSION)
 const PROVIDER_VERSION = "openai-gpt4o-mini-1.2.0";
+
+// ── forceRegenerateValidation ─────────────────────────────────────────────────
+
+/**
+ * Public mutation called by the "Rebuild Validation" button in the UI.
+ *
+ * Marks all existing research rows for this invention as stale (researchStatus="stale"),
+ * then schedules a fresh runValidationResearchOrchestration action.
+ * Auth-gated: only the owning user can trigger regeneration.
+ */
+export const forceRegenerateValidation = mutation({
+  args: {
+    inventionId: v.id("inventions"),
+  },
+  handler: async (ctx, { inventionId }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const invention = await ctx.db.get(inventionId);
+    if (!invention || invention.userId !== userId) {
+      throw new Error("Invention not found or access denied");
+    }
+
+    const now = Date.now();
+
+    // Mark all existing research rows for this invention as stale so the
+    // 24h cache is bypassed on the next orchestration run.
+    const existingRows = await ctx.db
+      .query("validationResearch")
+      .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
+      .collect();
+
+    for (const row of existingRows) {
+      await ctx.db.patch(row._id, {
+        researchStatus: "stale",
+        overallStatus: "STALE",
+        updatedAt: now,
+      });
+    }
+
+    // Schedule fresh orchestration (bypasses 24h cache since rows are now stale)
+    await ctx.scheduler.runAfter(
+      0,
+      internal.validationResearchOrchestration.runValidationResearchOrchestration,
+      { inventionId }
+    );
+
+    return { queued: true };
+  },
+});
 
 // ── initValidationResearchSession ─────────────────────────────────────────────
 
