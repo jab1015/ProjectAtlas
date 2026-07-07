@@ -216,38 +216,8 @@ export default function InventionWorkspacePage() {
     }
   }, [inventionState]);
 
-  if (isLoading || !isAuthenticated || inventionState === undefined) {
-    return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <AppNav />
-        <main className="flex-1 flex items-center justify-center">
-          <div className="text-muted-foreground text-sm">Loading…</div>
-        </main>
-      </div>
-    );
-  }
-
-  if (!inventionState) {
-    return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <AppNav />
-        <main className="flex-1 flex items-center justify-center">
-          <div className="text-center space-y-4">
-            <p className="text-muted-foreground">Invention not found.</p>
-            <Button asChild>
-              <Link href="/inventions">My Inventions</Link>
-            </Button>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  const { invention, currentStage, readinessState, nextAction, completedFields } = inventionState;
-  const stageId = currentStage.id;
-  const fields = STAGE_FIELDS[stageId];
-
   // ── Stage 2: Rebuild Validation handler ──────────────────────────────────────
+  // IMPORTANT: hooks must be called before any conditional early returns (Rules of Hooks).
   const handleRebuildValidation = useCallback(async () => {
     setRebuildError(null);
     setRebuilding(true);
@@ -285,6 +255,37 @@ export default function InventionWorkspacePage() {
       if (rebuildTimeoutRef.current) clearTimeout(rebuildTimeoutRef.current);
     };
   }, []);
+
+  if (isLoading || !isAuthenticated || inventionState === undefined) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <AppNav />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-muted-foreground text-sm">Loading…</div>
+        </main>
+      </div>
+    );
+  }
+
+  if (!inventionState) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <AppNav />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <p className="text-muted-foreground">Invention not found.</p>
+            <Button asChild>
+              <Link href="/inventions">My Inventions</Link>
+            </Button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  const { invention, currentStage, readinessState, nextAction, completedFields } = inventionState;
+  const stageId = currentStage.id;
+  const fields = STAGE_FIELDS[stageId];
 
   // ── Stage 2: Validation Research Status (replaces questionnaire) ─────────────
   if (stageId === 2) {
