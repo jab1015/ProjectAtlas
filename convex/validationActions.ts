@@ -12,19 +12,29 @@
 import { internalAction } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { OpenAIValidationResearchProvider } from "./providers/OpenAIValidationResearchProvider";
-import type { InventionContext as NewInventionContext, ValidationSectionKey } from "./validationResearchProvider";
-import type { ValidationSection } from "./validation/researchProvider";
+import { OpenAIValidationResearchProvider } from "./openaiValidationResearchProvider";
+import type { InventionContext, ValidationSectionKey } from "./validationResearchProvider";
 import { VALIDATION_SECTION_KEYS } from "./validationResearchTypes";
 
-const openaiProvider = new OpenAIValidationResearchProvider();
+// Provider selection at call time so process.env is read after Convex injects env vars.
+// Throws loudly if OPENAI_API_KEY is missing so failures are never silent.
+function selectProvider(): OpenAIValidationResearchProvider {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      "[validationActions] OPENAI_API_KEY is not set on this Convex deployment. " +
+      "Set it with: npx convex env set OPENAI_API_KEY <key> --deployment first-lion-585"
+    );
+  }
+  return new OpenAIValidationResearchProvider(apiKey);
+}
 
 const ALL_SECTION_KEYS = Object.values(VALIDATION_SECTION_KEYS) as ValidationSectionKey[];
 
 // ── runValidationResearchAction ──────────────────────────────────────────────
 
 /**
- * Internal action: runs the OpenAI research provider and writes results.
+ * Internal action: runs the OpenAI research provider section-by-section and writes results.
  * Called by the triggerValidationResearch mutation after creating the "running" row.
  */
 export const runValidationResearchAction = internalAction({
@@ -38,7 +48,11 @@ export const runValidationResearchAction = internalAction({
     description: v.string(),
   },
   handler: async (ctx, args) => {
-    const context: NewInventionContext = {
+    // Select provider at call time (not module-load time) so env vars are available
+    const provider = selectProvider();
+    console.log(`[runValidationResearchAction] provider=${provider.getProviderName()} inventionId=${args.inventionId}`);
+
+    const context: InventionContext = {
       inventionId: args.inventionId,
       title: args.title,
       problemStatement: args.problemStatement,
@@ -46,43 +60,42 @@ export const runValidationResearchAction = internalAction({
     };
 
     try {
-      const sections: ValidationSection[] = [];
+      const now = Date.now();
+      const sectionsMap: Record<string, unknown> = {};
 
       for (const sectionKey of ALL_SECTION_KEYS) {
         try {
-          const result = await openaiProvider.generateSection(context, sectionKey);
-          sections.push({
-            sectionId: result.sectionKey,
-            title: result.sectionKey,
-            content: result.generatedContent,
+          const result = await provider.generateSection(context, sectionKey);
+          sectionsMap[sectionKey] = {
+            sectionKey: result.sectionKey,
+            title: sectionKey,
+            generatedContent: result.generatedContent,
             confidence: result.confidence,
-            generatedAt: result.generatedAt,
-            status: "generated",
-          });
+            evidenceSummary: result.evidenceSummary,
+            assumptions: result.assumptions,
+            missingInformation: result.missingInformation,
+            approvalStatus: "pending",
+            sectionStatus: "COMPLETED",
+            lastGeneratedAt: result.generatedAt,
+            providerVersion: result.providerVersion,
+          };
         } catch (sectionErr) {
           // Section failures are isolated — continue with remaining sections
           console.error(`[runValidationResearchAction] Section "${sectionKey}" failed:`, sectionErr);
-          sections.push({
-            sectionId: sectionKey,
-            title: sectionKey,
-            content: `Section generation failed: ${sectionErr instanceof Error ? sectionErr.message : String(sectionErr)}`,
-            confidence: {
-              score: 0,
-              level: "very_low",
-              evidenceSummary: "Section generation failed — no content available.",
-              assumptions: [],
-              missingInformation: ["Retry to generate content."],
-            },
-            generatedAt: Date.now(),
-            status: "generated",
-          });
+          sectionsMap[sectionKey] = {
+            sectionKey,
+            approvalStatus: "pending",
+            sectionStatus: "FAILED",
+            lastGeneratedAt: now,
+            error: sectionErr instanceof Error ? sectionErr.message : "Section generation failed",
+          };
         }
       }
 
       await ctx.runMutation(internal.validationMutations.markResearchComplete, {
         researchRunDocId: args.researchRunDocId,
         completedAt: Date.now(),
-        sectionsJson: JSON.stringify(sections),
+        sectionsJson: JSON.stringify(sectionsMap),
       });
     } catch (err) {
       const errorMessage =
@@ -110,7 +123,10 @@ export const refreshValidationSectionAction = internalAction({
     description: v.string(),
   },
   handler: async (ctx, args) => {
-    const context: NewInventionContext = {
+    // Select provider at call time (not module-load time) so env vars are available
+    const provider = selectProvider();
+
+    const context: InventionContext = {
       inventionId: args.inventionId,
       title: args.title,
       problemStatement: args.problemStatement,
@@ -119,21 +135,26 @@ export const refreshValidationSectionAction = internalAction({
 
     try {
       const sectionKey = args.sectionId as ValidationSectionKey;
-      const result = await openaiProvider.generateSection(context, sectionKey);
+      const result = await provider.generateSection(context, sectionKey);
 
-      const updatedSection: ValidationSection = {
-        sectionId: result.sectionKey,
-        title: result.sectionKey,
-        content: result.generatedContent,
+      const sectionEntry = {
+        sectionKey: result.sectionKey,
+        title: args.sectionId,
+        generatedContent: result.generatedContent,
         confidence: result.confidence,
-        generatedAt: result.generatedAt,
-        status: "generated",
+        evidenceSummary: result.evidenceSummary,
+        assumptions: result.assumptions,
+        missingInformation: result.missingInformation,
+        approvalStatus: "pending",
+        sectionStatus: "COMPLETED",
+        lastGeneratedAt: result.generatedAt,
+        providerVersion: result.providerVersion,
       };
 
       await ctx.runMutation(internal.validationMutations.patchResearchSection, {
         researchRunDocId: args.researchRunDocId,
         sectionId: args.sectionId,
-        sectionJson: JSON.stringify(updatedSection),
+        sectionJson: JSON.stringify(sectionEntry),
       });
     } catch (err) {
       // Refresh failures are non-fatal — log but don't fail the row

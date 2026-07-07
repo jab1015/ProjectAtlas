@@ -11,7 +11,7 @@
  *  - Section failures are isolated; remaining sections continue
  *  - Status flow: PENDING → IN_PROGRESS → COMPLETED (or FAILED if all fail)
  *
- * "use node" required because MockValidationResearchProvider uses setTimeout.
+ * "use node" required because OpenAIValidationResearchProvider uses the OpenAI SDK.
  * Only the action is defined here; mutations live in validationResearchSessionMutations.ts
  * (Convex constraint: mutations cannot be defined in "use node" files).
  */
@@ -47,6 +47,9 @@ const SECTION_ORDER: ValidationSectionKey[] = [
 
 // ── Provider selection ────────────────────────────────────────────────────────
 // Always use OpenAI — OPENAI_API_KEY is confirmed set on the Convex deployment.
+// Provider is selected INSIDE the handler (not at module load time) so that
+// process.env.OPENAI_API_KEY is read at call time — not at cold-start when the
+// env var may not yet be visible to the module initialiser.
 // Throws at runtime if the key is missing so failures are loud, not silent.
 
 function selectProvider(): ValidationResearchProvider {
@@ -81,12 +84,11 @@ export const runValidationResearchOrchestration = internalAction({
     inventionId: v.id("inventions"),
   },
   handler: async (ctx, { inventionId }) => {
-    console.log(`[Stage2] triggerValidationResearch invoked: inventionId=${inventionId}`);
-    console.log(`[Orchestration] Starting validation research for inventionId=${inventionId}`);
-
-    // Select provider at runtime so OPENAI_API_KEY is read from live env
+    // Select provider at call time (not module-load time) so env vars are available
     const provider = selectProvider();
-    console.log(`[Orchestration] Provider selected: ${provider.getProviderName()}`);
+
+    console.log(`[Stage2] triggerValidationResearch invoked: inventionId=${inventionId}`);
+    console.log(`[Orchestration] Starting validation research for inventionId=${inventionId} provider=${provider.getProviderName()}`);
 
     // Step 1: initialise session (idempotent 24h cache)
     const initResult = await ctx.runMutation(
