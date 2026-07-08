@@ -18,6 +18,7 @@ import { ArrowLeft, ArrowRight, Lock, PartyPopper, RefreshCw } from "lucide-reac
 import Link from "next/link";
 import { trackStageCompleted, trackContinueClicked, trackUpgradePromptShown } from "@/lib/analytics";
 import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
+import { getValidationResearchViewState } from "@/lib/validationResearchView";
 
 // ── Congratulations screen (Stage 4 completion) ──────────────────────────────
 
@@ -289,46 +290,25 @@ export default function InventionWorkspacePage() {
 
   // ── Stage 2: Validation Research Status (replaces questionnaire) ─────────────
   if (stageId === 2) {
-    // Sections that have been generated (not still pending)
-    const completedSections = sectionsList.filter(
-      (s) => s.status !== "pending"
-    );
-
-    // Progress bar state
-    const isGenerating =
-      rebuilding ||
-      validationResearch?.status === "running" ||
-      (validationResearch && completedSections.length < TOTAL_SECTIONS);
-    const progressCount = completedSections.length;
-    const progressPct = Math.round((progressCount / TOTAL_SECTIONS) * 100);
-
-    // Determine if all sections are errors
-    const allSectionsError =
-      completedSections.length === TOTAL_SECTIONS &&
-      completedSections.every((s: { content: string }) =>
-        s.content?.includes("OPENAI_API_KEY") ||
-        s.content?.includes("Unable to generate") ||
-        s.content?.includes("Error:")
-      );
-
-    let statusLabel = "Waiting to begin";
-    if (isGenerating) {
-      statusLabel = "Research in progress";
-    } else if (validationResearch?.status === "complete" || completedSections.length === TOTAL_SECTIONS) {
-      statusLabel = allSectionsError ? "Validation failed" : "Validation complete";
-    }
+    const {
+      finishedSections: completedSections,
+      failedSections,
+      isGenerating,
+      allSectionsError,
+      progressCount,
+      progressPct,
+      statusLabel,
+    } = getValidationResearchViewState(validationResearch, rebuilding, TOTAL_SECTIONS);
 
     // Summary stats
     const sectionsWithConf = completedSections.filter(
-      (s: { confidence?: { score: number } }) =>
-        typeof (s as { confidence?: { score: number } }).confidence?.score === "number"
+      (s) => typeof s.confidence?.score === "number"
     );
     const avgConfidence =
       sectionsWithConf.length > 0
         ? `${Math.round(
             (sectionsWithConf.reduce(
-              (sum: number, s: { confidence?: { score: number } }) =>
-                sum + ((s.confidence?.score ?? 0)),
+              (sum, s) => sum + (s.confidence?.score ?? 0),
               0
             ) /
               sectionsWithConf.length) *
@@ -433,6 +413,7 @@ export default function InventionWorkspacePage() {
                     <dt className="text-xs text-muted-foreground">Sections Completed</dt>
                     <dd className="text-sm font-medium text-foreground mt-0.5">
                       {completedSections.length} of {TOTAL_SECTIONS}
+                      {failedSections.length > 0 ? ` (${failedSections.length} failed)` : ""}
                     </dd>
                   </div>
                   <div>
@@ -457,11 +438,11 @@ export default function InventionWorkspacePage() {
                     </span>
                   ) : allSectionsError ? (
                     <span className="text-destructive font-medium">
-                      {TOTAL_SECTIONS} of {TOTAL_SECTIONS} sections — validation failed. Click Rebuild to regenerate.
+                      Validation failed. Click Rebuild to regenerate.
                     </span>
                   ) : (
                     <span className="text-primary font-medium">
-                      Validation complete — {TOTAL_SECTIONS} of {TOTAL_SECTIONS} sections
+                      Validation complete — {completedSections.length} of {TOTAL_SECTIONS} sections
                     </span>
                   )}
                   {isGenerating && (
@@ -504,39 +485,27 @@ export default function InventionWorkspacePage() {
                     {rebuilding ? "Rebuilding…" : "Rebuild Validation"}
                   </Button>
                 </div>
-                {completedSections.map((section: {
-                  sectionId: string;
-                  title: string;
-                  content: string;
-                  editedContent?: string;
-                  confidence?: {
-                    score: number;
-                    level: string;
-                    evidenceSummary: string;
-                    assumptions: string[];
-                    missingInformation: string[];
-                  };
-                }) => (
+                {completedSections.map((section) => (
                   <div
-                    key={section.sectionId}
+                    key={section.sectionId ?? section.title ?? "validation-section"}
                     className="rounded-lg border border-border bg-muted/20 p-5 space-y-3"
                   >
                     <h3
                       className="text-base font-semibold text-foreground"
                       style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
                     >
-                      {section.title}
+                      {section.title ?? section.sectionId ?? "Validation Section"}
                     </h3>
 
                     <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
-                      {section.editedContent ?? section.content}
+                      {section.editedContent ?? section.content ?? ""}
                     </p>
 
                     {section.confidence && (
                       <div className="space-y-2 pt-2 border-t border-border/60">
                         <p className="text-xs text-muted-foreground">
                           <span className="font-medium text-foreground">Confidence:</span>{" "}
-                          {section.confidence.level.replace("_", " ")} ({Math.round(section.confidence.score * 100)}%)
+                          {(section.confidence.level ?? "low").replace("_", " ")} ({Math.round((section.confidence.score ?? 0) * 100)}%)
                         </p>
 
                         {section.confidence.evidenceSummary && (

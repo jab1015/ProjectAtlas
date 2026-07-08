@@ -162,7 +162,9 @@ export const patchValidationSection = internalMutation({
     }
   ) => {
     const record = await ctx.db.get(researchId);
-    if (!record) return;
+    if (!record) {
+      throw new Error(`Validation research row not found: ${researchId}`);
+    }
 
     const currentSections: Record<string, unknown> =
       (record.sections as Record<string, unknown>) ?? {};
@@ -213,6 +215,50 @@ export const finaliseValidationResearch = internalMutation({
       researchStatus,
       completedAt,
       updatedAt: completedAt,
+    });
+  },
+});
+
+// ── recordValidationResearchFailure ──────────────────────────────────────────
+
+export const recordValidationResearchFailure = internalMutation({
+  args: {
+    inventionId: v.id("inventions"),
+    researchId: v.optional(v.id("validationResearch")),
+    error: v.string(),
+    failedAt: v.number(),
+  },
+  handler: async (ctx, { inventionId, researchId, error, failedAt }) => {
+    if (researchId) {
+      await ctx.db.patch(researchId, {
+        researchStatus: "failed",
+        overallStatus: "FAILED",
+        error,
+        completedAt: failedAt,
+        updatedAt: failedAt,
+      });
+      return researchId;
+    }
+
+    const invention = await ctx.db.get(inventionId);
+    if (!invention) {
+      throw new Error(`Invention not found while recording validation failure: ${inventionId}`);
+    }
+
+    return await ctx.db.insert("validationResearch", {
+      inventionId,
+      stageId: "2",
+      researchStatus: "failed",
+      overallStatus: "FAILED",
+      sections: {} as Record<string, unknown>,
+      totalSectionCount: 11,
+      completedSectionCount: 0,
+      startedAt: failedAt,
+      completedAt: failedAt,
+      updatedAt: failedAt,
+      providerVersion: PROVIDER_VERSION,
+      researchVersion: 1,
+      error,
     });
   },
 });

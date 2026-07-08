@@ -20,6 +20,7 @@
 import { internalAction } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
 
 import { OpenAIValidationResearchProvider } from "./openaiValidationResearchProvider";
 import type {
@@ -28,6 +29,10 @@ import type {
   ValidationSectionKey,
 } from "./validationResearchProvider";
 import { VALIDATION_SECTION_KEYS } from "./validationResearchTypes";
+import {
+  getErrorMessage,
+  runValidationSections,
+} from "./validationResearchOrchestrationRunner";
 
 // ── Section order (canonical) ─────────────────────────────────────────────────
 
@@ -84,156 +89,135 @@ export const runValidationResearchOrchestration = internalAction({
     inventionId: v.id("inventions"),
   },
   handler: async (ctx, { inventionId }) => {
-    // Select provider at call time (not module-load time) so env vars are available
-    const provider = selectProvider();
+    let researchId: Id<"validationResearch"> | null = null;
 
-    console.log(`[Stage2] triggerValidationResearch invoked: inventionId=${inventionId}`);
-    console.log(`[Orchestration] Starting validation research for inventionId=${inventionId} provider=${provider.getProviderName()}`);
+    try {
+      // Select provider at call time (not module-load time) so env vars are available
+      const provider = selectProvider();
 
-    // Step 1: initialise session (idempotent 24h cache)
-    const initResult = await ctx.runMutation(
-      internal.validationResearchSessionMutations.initValidationResearchSession,
-      { inventionId }
-    ).catch((err: unknown) => {
-      console.error(`[Orchestration] initValidationResearchSession failed for inventionId=${inventionId}:`, err);
-      return null;
-    });
+      console.log(`[Stage2] triggerValidationResearch invoked: inventionId=${inventionId}`);
+      console.log(`[Orchestration] Starting validation research for inventionId=${inventionId} provider=${provider.getProviderName()}`);
 
-    if (!initResult) {
-      console.error(`[Orchestration] Aborting — session init returned null for inventionId=${inventionId}`);
-      return;
-    }
+      // Step 1: initialise session (idempotent 24h cache)
+      const initResult = await ctx.runMutation(
+        internal.validationResearchSessionMutations.initValidationResearchSession,
+        { inventionId }
+      );
 
-    // Step 2: cache hit — reuse existing research
-    if (initResult.status === "existing") {
-      console.log(`[Orchestration] Cache hit — reusing existing research for inventionId=${inventionId}`);
-      return;
-    }
+      // Step 2: cache hit — reuse existing research
+      if (initResult.status === "existing") {
+        console.log(`[Orchestration] Cache hit — reusing existing research for inventionId=${inventionId}`);
+        return;
+      }
 
-    const { researchId, inventionTitle, problemStatement, inventionDescription } =
-      initResult;
+      ({ researchId } = initResult);
+      const { inventionTitle, problemStatement, inventionDescription } = initResult;
 
-    console.log(`[Orchestration] New research session created: researchId=${researchId}`);
+      console.log(`[Orchestration] New research session created: researchId=${researchId}`);
 
-    // Build InventionContext for the provider
-    const inventionContext: InventionContext = {
-      inventionId: inventionId as string,
-      title: inventionTitle,
-      problemStatement,
-      inventionDescription,
-    };
+      // Build InventionContext for the provider
+      const inventionContext: InventionContext = {
+        inventionId: inventionId as string,
+        title: inventionTitle,
+        problemStatement,
+        inventionDescription,
+      };
 
-    // Step 3: transition to IN_PROGRESS
-    const startTs = Date.now();
-    await ctx.runMutation(
-      internal.validationResearchSessionMutations.markValidationResearchInProgress,
-      { researchId, updatedAt: startTs }
-    ).catch((err: unknown) => {
-      console.error(`[Orchestration] markValidationResearchInProgress failed: researchId=${researchId}`, err);
-    });
-    console.log(`[Orchestration] researchStatus → IN_PROGRESS: researchId=${researchId}`);
+      // Step 3: transition to IN_PROGRESS
+      const startTs = Date.now();
+      await ctx.runMutation(
+        internal.validationResearchSessionMutations.markValidationResearchInProgress,
+        { researchId, updatedAt: startTs }
+      );
+      console.log(`[Orchestration] researchStatus -> IN_PROGRESS: researchId=${researchId}`);
 
-    let completedCount = 0;
-    let failedCount = 0;
-
-    // Step 4: generate + persist each section independently
-    for (let i = 0; i < SECTION_ORDER.length; i++) {
-      const sectionKey = SECTION_ORDER[i];
-
-      try {
-        // Generate via provider
-        console.log(`[Orchestration] Provider invoked: sectionKey=${sectionKey} researchId=${researchId}`);
-        const result = await provider.generateSection(
-          inventionContext,
-          sectionKey
-        );
-        console.log(`[Orchestration] Section generated: sectionKey=${sectionKey} researchId=${researchId}`);
-
-        completedCount += 1;
-        const now = Date.now();
-
-        // Build the section entry to persist
-        const sectionEntry = {
-          sectionKey: result.sectionKey,
-          title: sectionKey,
-          generatedContent: result.generatedContent,
-          confidence: result.confidence,
-          evidenceSummary: result.evidenceSummary,
-          assumptions: result.assumptions,
-          missingInformation: result.missingInformation,
-          approvalStatus: "pending",
-          sectionStatus: "COMPLETED",
-          lastGeneratedAt: result.generatedAt,
-          providerVersion: result.providerVersion,
-        };
-
-        // Persist immediately
-        await ctx.runMutation(
-          internal.validationResearchSessionMutations.patchValidationSection,
-          {
-            researchId,
-            sectionKey,
-            sectionEntry,
-            completedSectionCount: completedCount,
-            lastCompletedSection: sectionKey,
-            overallStatus: "IN_PROGRESS",
-            updatedAt: now,
-          }
-        );
-        console.log(`[Orchestration] Section persisted: sectionKey=${sectionKey} completedCount=${completedCount} researchId=${researchId}`);
-      } catch (err) {
-        // Section failure is isolated — mark FAILED, continue
-        failedCount += 1;
-        const now = Date.now();
-        console.error(`[Orchestration] Section "${sectionKey}" failed for researchId=${researchId}:`, err);
-
-        const failedEntry = {
+      // Step 4: generate + persist each section independently
+      const sectionSummary = await runValidationSections({
+        sectionOrder: SECTION_ORDER,
+        provider,
+        inventionContext,
+        now: Date.now,
+        onError: (message, error) => {
+          console.error(`[Orchestration] ${message}: researchId=${researchId}`, error);
+        },
+        persistCompletedSection: async ({
           sectionKey,
-          approvalStatus: "pending",
-          sectionStatus: "FAILED",
-          lastGeneratedAt: now,
-          error:
-            err instanceof Error ? err.message : "Section generation failed",
-        };
-
-        // Best-effort patch for the failed section
-        try {
+          sectionEntry,
+          completedSectionCount,
+          lastCompletedSection,
+          overallStatus,
+          updatedAt,
+        }) => {
           await ctx.runMutation(
             internal.validationResearchSessionMutations.patchValidationSection,
             {
-              researchId,
+              researchId: researchId as Id<"validationResearch">,
               sectionKey,
-              sectionEntry: failedEntry,
-              completedSectionCount: completedCount,
-              lastCompletedSection: sectionKey,
-              overallStatus: "IN_PROGRESS",
-              updatedAt: now,
+              sectionEntry,
+              completedSectionCount,
+              lastCompletedSection,
+              overallStatus,
+              updatedAt,
             }
           );
-        } catch (patchErr) {
-          console.error(`[Orchestration] Failed to patch failed section "${sectionKey}":`, patchErr);
+          console.log(`[Orchestration] Section persisted: sectionKey=${sectionKey} completedCount=${completedSectionCount} researchId=${researchId}`);
+        },
+        persistFailedSection: async ({
+          sectionKey,
+          sectionEntry,
+          completedSectionCount,
+          lastCompletedSection,
+          overallStatus,
+          updatedAt,
+        }) => {
+          await ctx.runMutation(
+            internal.validationResearchSessionMutations.patchValidationSection,
+            {
+              researchId: researchId as Id<"validationResearch">,
+              sectionKey,
+              sectionEntry,
+              completedSectionCount,
+              lastCompletedSection,
+              overallStatus,
+              updatedAt,
+            }
+          );
+        },
+      });
+
+      // Step 5: finalise
+      const finalTs = Date.now();
+
+      console.log(
+        `[Orchestration] Finalising: researchId=${researchId} status=${sectionSummary.finalResearchStatus} completed=${sectionSummary.completedCount} failed=${sectionSummary.failedCount}`
+      );
+
+      await ctx.runMutation(
+        internal.validationResearchSessionMutations.finaliseValidationResearch,
+        {
+          researchId,
+          overallStatus: sectionSummary.finalOverallStatus,
+          completedAt: finalTs,
+          researchStatus: sectionSummary.finalResearchStatus,
         }
+      );
+    } catch (err) {
+      const error = getErrorMessage(err);
+      console.error(`[Orchestration] Validation research failed for inventionId=${inventionId}:`, err);
+      try {
+        await ctx.runMutation(
+          internal.validationResearchSessionMutations.recordValidationResearchFailure,
+          {
+            inventionId,
+            researchId: researchId ?? undefined,
+            error,
+            failedAt: Date.now(),
+          }
+        );
+      } catch (recordErr) {
+        console.error(`[Orchestration] Failed to record validation failure for inventionId=${inventionId}:`, recordErr);
       }
+      throw err;
     }
-
-    // Step 5: finalise
-    const finalTs = Date.now();
-    const allFailed = failedCount === SECTION_ORDER.length;
-    const finalOverallStatus = allFailed ? "FAILED" : "COMPLETED";
-    const finalResearchStatus = allFailed ? "failed" : "completed";
-
-    console.log(`[Orchestration] Finalising: researchId=${researchId} status=${finalResearchStatus} completed=${completedCount} failed=${failedCount}`);
-
-    await ctx.runMutation(
-      internal.validationResearchSessionMutations.finaliseValidationResearch,
-      {
-        researchId,
-        overallStatus: finalOverallStatus,
-        completedAt: finalTs,
-        researchStatus: finalResearchStatus,
-      }
-    ).catch((err: unknown) => {
-      console.error(`[Orchestration] finaliseValidationResearch failed: researchId=${researchId}`, err);
-    });
   },
 });

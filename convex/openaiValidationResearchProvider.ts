@@ -175,32 +175,45 @@ export class OpenAIValidationResearchProvider
     context: InventionContext,
     sectionKey: ValidationSectionKey
   ): Promise<SectionGenerationResult> {
-    const prompt = buildSectionPrompt(context, sectionKey);
+    try {
+      const prompt = buildSectionPrompt(context, sectionKey);
 
-    const response = await this.client.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "user",
-          content: prompt,
+      const response = await this.client.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 1500,
+      });
+
+      const generatedContent = response.choices[0]?.message?.content?.trim();
+      if (!generatedContent) {
+        throw new Error(`OpenAI returned empty content for section: ${sectionKey}`);
+      }
+
+      return {
+        sectionKey,
+        generatedContent,
+        confidence: {
+          score: 0.75,
+          level: "high",
+          evidenceSummary:
+            "AI-generated analysis based on the invention context provided in Stage 1. Evidence quality improves as founder completes validation activities.",
+          assumptions: [
+            "The problem statement accurately represents the target market pain.",
+            "The invention description reflects the intended solution mechanism.",
+          ],
+          missingInformation: [
+            "Primary customer interview data not yet collected.",
+            "Competitor research not yet confirmed with live market data.",
+          ],
         },
-      ],
-      temperature: 0.7,
-      max_tokens: 1500,
-    });
-
-    const generatedContent =
-      response.choices[0]?.message?.content ??
-      `[OpenAI returned empty content for section: ${sectionKey}]`;
-
-    return {
-      sectionKey,
-      generatedContent,
-      confidence: {
-        score: 0.75,
-        level: "high",
         evidenceSummary:
-          "AI-generated analysis based on the invention context provided in Stage 1. Evidence quality improves as founder completes validation activities.",
+          "AI-generated analysis based on the invention context provided in Stage 1.",
         assumptions: [
           "The problem statement accurately represents the target market pain.",
           "The invention description reflects the intended solution mechanism.",
@@ -209,20 +222,20 @@ export class OpenAIValidationResearchProvider
           "Primary customer interview data not yet collected.",
           "Competitor research not yet confirmed with live market data.",
         ],
-      },
-      evidenceSummary:
-        "AI-generated analysis based on the invention context provided in Stage 1.",
-      assumptions: [
-        "The problem statement accurately represents the target market pain.",
-        "The invention description reflects the intended solution mechanism.",
-      ],
-      missingInformation: [
-        "Primary customer interview data not yet collected.",
-        "Competitor research not yet confirmed with live market data.",
-      ],
-      generatedAt: Date.now(),
-      providerVersion: OpenAIValidationResearchProvider.VERSION,
-    };
+        generatedAt: Date.now(),
+        providerVersion: OpenAIValidationResearchProvider.VERSION,
+      };
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Unknown error from OpenAI provider";
+      console.error(
+        `[OpenAIValidationResearchProvider] Section "${sectionKey}" failed:`,
+        message
+      );
+      throw new Error(
+        `OpenAI validation section "${sectionKey}" failed: ${message}`
+      );
+    }
   }
 }
 

@@ -24,7 +24,7 @@ import {
 import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { internal } from "./_generated/api";
-import type { ValidationSection } from "./validation/researchProvider";
+import type { ValidationSection, ValidationSectionConfidence } from "./validation/researchProvider";
 
 // ── Helper: 24h window check ─────────────────────────────────────────────────
 
@@ -292,12 +292,75 @@ export const getValidationResearch = query({
     // The legacy path stores an array as JSON in `row.sectionsJson`.
     // Convert either to the ValidationSection[] array the UI expects.
 
-    let sections: ValidationSection[] = [];
+    type NormalisedSection = Omit<ValidationSection, "status"> & {
+      status: ValidationSection["status"] | "failed";
+    };
+
+    const normaliseConfidenceLevel = (level: unknown): ValidationSectionConfidence["level"] => {
+      const validLevels: ValidationSectionConfidence["level"][] = [
+        "very_high",
+        "high",
+        "moderate",
+        "low",
+        "very_low",
+      ];
+      return validLevels.includes(level as ValidationSectionConfidence["level"])
+        ? (level as ValidationSectionConfidence["level"])
+        : "very_low";
+    };
+
+    const normaliseSectionEntry = (entry: unknown): NormalisedSection => {
+      const s = entry as Record<string, unknown>;
+      const sectionStatus = s.sectionStatus as string | undefined;
+      const content =
+        typeof s.generatedContent === "string"
+          ? s.generatedContent
+          : typeof s.content === "string"
+          ? s.content
+          : typeof s.error === "string"
+          ? `Section generation failed: ${s.error}`
+          : JSON.stringify(s.generatedContent ?? "");
+      const confidence = s.confidence
+        ? {
+            score: (s.confidence as { score: number }).score ?? 0,
+            level: normaliseConfidenceLevel((s.confidence as { level?: unknown }).level),
+            evidenceSummary: (s.evidenceSummary as string) ?? (s.confidence as { evidenceSummary?: string }).evidenceSummary ?? "",
+            assumptions: (s.assumptions as string[]) ?? [],
+            missingInformation: (s.missingInformation as string[]) ?? [],
+          }
+        : {
+            score: 0,
+            level: "very_low" as const,
+            evidenceSummary: sectionStatus === "FAILED" ? "Section generation failed." : "No confidence data.",
+            assumptions: [],
+            missingInformation: typeof s.error === "string" ? [s.error] : [],
+          };
+
+      return {
+        sectionId: (s.sectionId as string) ?? (s.sectionKey as string) ?? "",
+        title: (s.title as string) ?? (s.sectionKey as string) ?? (s.sectionId as string) ?? "",
+        content,
+        status: sectionStatus === "COMPLETED"
+          ? "generated"
+          : sectionStatus === "FAILED"
+          ? "failed"
+          : (s.status as NormalisedSection["status"]) ?? "pending",
+        confidence,
+        generatedAt: (s.generatedAt as number) ?? (s.lastGeneratedAt as number) ?? Date.now(),
+      };
+    };
+
+    let sections: NormalisedSection[] = [];
 
     if (row.sectionsJson) {
-      // Legacy path: JSON string of ValidationSection[]
+      // Legacy path: JSON string of either ValidationSection[] or a keyed section map.
       try {
-        sections = JSON.parse(row.sectionsJson) as ValidationSection[];
+        const parsed = JSON.parse(row.sectionsJson) as unknown;
+        sections = Array.isArray(parsed)
+          ? parsed.map(normaliseSectionEntry)
+          : parsed && typeof parsed === "object"
+          ? Object.values(parsed as Record<string, unknown>).map(normaliseSectionEntry)
+          : [];
       } catch (e) {
         console.error("getValidationResearch: failed to parse sectionsJson", e);
       }
@@ -306,35 +369,7 @@ export const getValidationResearch = query({
       const sectionsMap = row.sections as Record<string, unknown>;
       sections = Object.values(sectionsMap)
         .filter(Boolean)
-        .map((entry) => {
-          // entry shape from patchValidationSection / validationResearchOrchestration:
-          // { sectionKey, title, generatedContent, confidence, evidenceSummary,
-          //   assumptions, missingInformation, approvalStatus, sectionStatus,
-          //   lastGeneratedAt, providerVersion }
-          const s = entry as Record<string, unknown>;
-          return {
-            sectionId: (s.sectionKey as string) ?? "",
-            title: (s.title as string) ?? (s.sectionKey as string) ?? "",
-            content: typeof s.generatedContent === "string"
-              ? s.generatedContent
-              : JSON.stringify(s.generatedContent ?? ""),
-            status: s.sectionStatus === "COMPLETED"
-              ? "generated"
-              : s.sectionStatus === "FAILED"
-              ? "generated" // still show what we have; failed sections have no content
-              : "pending",
-            confidence: s.confidence
-              ? {
-                  score: (s.confidence as { score: number }).score ?? 0,
-                  level: (s.confidence as { level: string }).level ?? "low",
-                  evidenceSummary: (s.evidenceSummary as string) ?? (s.confidence as { evidenceSummary?: string }).evidenceSummary ?? "",
-                  assumptions: (s.assumptions as string[]) ?? [],
-                  missingInformation: (s.missingInformation as string[]) ?? [],
-                }
-              : undefined,
-            generatedAt: (s.lastGeneratedAt as number) ?? Date.now(),
-          } as ValidationSection;
-        });
+        .map(normaliseSectionEntry);
     }
 
     return {

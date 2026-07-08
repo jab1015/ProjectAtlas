@@ -35,6 +35,7 @@ import type * as validationActions from "../validationActions.js";
 import type * as validationMutations from "../validationMutations.js";
 import type * as validationResearchMutations from "../validationResearchMutations.js";
 import type * as validationResearchOrchestration from "../validationResearchOrchestration.js";
+import type * as validationResearchOrchestrationRunner from "../validationResearchOrchestrationRunner.js";
 import type * as validationResearchProvider from "../validationResearchProvider.js";
 import type * as validationResearchSessionMutations from "../validationResearchSessionMutations.js";
 import type * as validationResearchTypes from "../validationResearchTypes.js";
@@ -73,6 +74,7 @@ declare const fullApi: ApiFromModules<{
   validationMutations: typeof validationMutations;
   validationResearchMutations: typeof validationResearchMutations;
   validationResearchOrchestration: typeof validationResearchOrchestration;
+  validationResearchOrchestrationRunner: typeof validationResearchOrchestrationRunner;
   validationResearchProvider: typeof validationResearchProvider;
   validationResearchSessionMutations: typeof validationResearchSessionMutations;
   validationResearchTypes: typeof validationResearchTypes;

@@ -48,20 +48,21 @@ export const runValidationResearchAction = internalAction({
     description: v.string(),
   },
   handler: async (ctx, args) => {
-    // Select provider at call time (not module-load time) so env vars are available
-    const provider = selectProvider();
-    console.log(`[runValidationResearchAction] provider=${provider.getProviderName()} inventionId=${args.inventionId}`);
-
-    const context: InventionContext = {
-      inventionId: args.inventionId,
-      title: args.title,
-      problemStatement: args.problemStatement,
-      inventionDescription: args.description,
-    };
-
     try {
+      // Select provider at call time (not module-load time) so env vars are available
+      const provider = selectProvider();
+      console.log(`[runValidationResearchAction] provider=${provider.getProviderName()} inventionId=${args.inventionId}`);
+
+      const context: InventionContext = {
+        inventionId: args.inventionId,
+        title: args.title,
+        problemStatement: args.problemStatement,
+        inventionDescription: args.description,
+      };
+
       const now = Date.now();
       const sectionsMap: Record<string, unknown> = {};
+      let failedCount = 0;
 
       for (const sectionKey of ALL_SECTION_KEYS) {
         try {
@@ -81,6 +82,7 @@ export const runValidationResearchAction = internalAction({
           };
         } catch (sectionErr) {
           // Section failures are isolated — continue with remaining sections
+          failedCount += 1;
           console.error(`[runValidationResearchAction] Section "${sectionKey}" failed:`, sectionErr);
           sectionsMap[sectionKey] = {
             sectionKey,
@@ -92,12 +94,17 @@ export const runValidationResearchAction = internalAction({
         }
       }
 
+      if (failedCount > 0) {
+        throw new Error(`Validation research failed for ${failedCount} section(s).`);
+      }
+
       await ctx.runMutation(internal.validationMutations.markResearchComplete, {
         researchRunDocId: args.researchRunDocId,
         completedAt: Date.now(),
         sectionsJson: JSON.stringify(sectionsMap),
       });
     } catch (err) {
+      console.error("[runValidationResearchAction] Validation research failed:", err);
       const errorMessage =
         err instanceof Error ? err.message : "Unknown research error";
       await ctx.runMutation(internal.validationMutations.markResearchFailed, {
@@ -123,17 +130,17 @@ export const refreshValidationSectionAction = internalAction({
     description: v.string(),
   },
   handler: async (ctx, args) => {
-    // Select provider at call time (not module-load time) so env vars are available
-    const provider = selectProvider();
-
-    const context: InventionContext = {
-      inventionId: args.inventionId,
-      title: args.title,
-      problemStatement: args.problemStatement,
-      inventionDescription: args.description,
-    };
-
     try {
+      // Select provider at call time (not module-load time) so env vars are available
+      const provider = selectProvider();
+
+      const context: InventionContext = {
+        inventionId: args.inventionId,
+        title: args.title,
+        problemStatement: args.problemStatement,
+        inventionDescription: args.description,
+      };
+
       const sectionKey = args.sectionId as ValidationSectionKey;
       const result = await provider.generateSection(context, sectionKey);
 
