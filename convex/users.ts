@@ -69,3 +69,28 @@ export const ensureUserProfile = mutation({
     return { userId };
   },
 });
+
+export const getUserProfile = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
+    const user = await ctx.db.get(userId);
+    if (!user) return null;
+
+    const activeInventions = await ctx.db
+      .query("inventions")
+      .withIndex("by_userId_status", (q) =>
+        q.eq("userId", userId).eq("status", "active")
+      )
+      .collect();
+
+    return {
+      name: user.name,
+      email: user.email,
+      subscriptionTier: normalizeSubscriptionTier(user.subscriptionTier),
+      activeInventionCount: activeInventions.length,
+    };
+  },
+});

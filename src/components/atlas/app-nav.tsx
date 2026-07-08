@@ -5,7 +5,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { useQuery, useMutation } from "convex/react";
 import { useConvexAuth } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { LogOut, ScrollText } from "lucide-react";
+import { LogOut, ScrollText, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AtlasLogo } from "@/components/atlas/atlas-logo";
 import { useEffect } from "react";
@@ -58,6 +58,14 @@ export function AppNav({ className }: AppNavProps) {
             <Link href="/inventions">
               <ScrollText className="h-4 w-4" />
               <span className="hidden sm:inline">My Inventions</span>
+            </Link>
+          </Button>
+
+          {/* Account */}
+          <Button asChild variant="ghost" size="sm" className="gap-1.5">
+            <Link href="/account">
+              <UserRound className="h-4 w-4" />
+              <span className="hidden sm:inline">Account</span>
             </Link>
           </Button>
 
