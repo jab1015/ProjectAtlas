@@ -46,7 +46,7 @@ export function JourneyMap({ currentStageId, inventionId }: JourneyMapProps) {
               <div
                 key={stage.id}
                 className="flex items-center gap-1.5 rounded-full border border-border bg-muted/50 px-3 py-1.5 text-xs text-muted-foreground/50 cursor-not-allowed select-none"
-                title="Coming Soon — Inventor Pro"
+                title="Coming Soon — Pro"
               >
                 <Lock className="h-3 w-3 shrink-0" />
                 <span>{stage.name}</span>

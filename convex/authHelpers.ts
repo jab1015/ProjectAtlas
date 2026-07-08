@@ -9,6 +9,41 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { query } from "./_generated/server";
 
 type AuthCtx = QueryCtx | MutationCtx;
+type SubscriptionTier = "free" | "inventor" | "pro" | "enterprise";
+
+const ACTIVE_INVENTION_LIMITS: Record<SubscriptionTier, number> = {
+  free: 1,
+  inventor: 3,
+  pro: 10,
+  enterprise: Number.POSITIVE_INFINITY,
+};
+
+function normalizeSubscriptionTier(tier: unknown): SubscriptionTier {
+  switch (tier) {
+    case "free":
+    case "inventor":
+    case "pro":
+    case "enterprise":
+      return tier;
+    case "explorer":
+      return "free";
+    case "starter":
+      return "inventor";
+    case "inventor_pro":
+      return "pro";
+    default:
+      return "free";
+  }
+}
+
+function canTierAccessPaidStages(tier: unknown): boolean {
+  const normalizedTier = normalizeSubscriptionTier(tier);
+  return normalizedTier === "pro" || normalizedTier === "enterprise";
+}
+
+function getActiveInventionLimit(tier: unknown): number {
+  return ACTIVE_INVENTION_LIMITS[normalizeSubscriptionTier(tier)];
+}
 
 export async function isAdmin(ctx: AuthCtx): Promise<boolean> {
   const userId = await getAuthUserId(ctx);
@@ -29,9 +64,8 @@ export async function canAccessStage(ctx: AuthCtx, stageId: number): Promise<boo
   // Stages 1–4: available to all tiers
   if (stageId <= 4) return true;
 
-  // Stages 5+: require inventor_pro or enterprise
-  const tier = user.subscriptionTier ?? "explorer";
-  return tier === "inventor_pro" || tier === "enterprise";
+  // Stages 5+: require Pro or Enterprise.
+  return canTierAccessPaidStages(user.subscriptionTier);
 }
 
 export async function canCreateInvention(ctx: AuthCtx): Promise<boolean> {
@@ -40,12 +74,10 @@ export async function canCreateInvention(ctx: AuthCtx): Promise<boolean> {
   const user = await ctx.db.get(userId);
   if (!user) return false;
 
-  // Admin/pro: unlimited
+  // Admin bypass
   if (user.role === "admin") return true;
-  const tier = user.subscriptionTier ?? "explorer";
-  if (tier === "inventor_pro" || tier === "enterprise") return true;
+  const inventionLimit = getActiveInventionLimit(user.subscriptionTier);
 
-  // Explorer: max 1 active invention
   const existing = await ctx.db
     .query("inventions")
     .withIndex("by_userId_status", (q) =>
@@ -53,7 +85,7 @@ export async function canCreateInvention(ctx: AuthCtx): Promise<boolean> {
     )
     .collect();
 
-  return existing.length === 0;
+  return existing.length < inventionLimit;
 }
 
 // ── Public query for current user with role/tier ─────────────────────────────
@@ -71,7 +103,7 @@ export const getCurrentUser = query({
       email: user.email,
       image: user.image,
       role: user.role ?? "user",
-      subscriptionTier: user.subscriptionTier ?? "explorer",
+      subscriptionTier: normalizeSubscriptionTier(user.subscriptionTier),
     };
   },
 });

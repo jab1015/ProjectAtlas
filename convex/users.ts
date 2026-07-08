@@ -1,8 +1,26 @@
 import { query, mutation } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { v } from "convex/values";
 
 const ADMIN_EMAIL = "jerry.brown1015@gmail.com";
+const ADMIN_SUBSCRIPTION_TIER = "enterprise";
+
+function normalizeSubscriptionTier(tier: unknown): "free" | "inventor" | "pro" | "enterprise" {
+  switch (tier) {
+    case "free":
+    case "inventor":
+    case "pro":
+    case "enterprise":
+      return tier;
+    case "explorer":
+      return "free";
+    case "starter":
+      return "inventor";
+    case "inventor_pro":
+      return "pro";
+    default:
+      return "free";
+  }
+}
 
 export const getCurrent = query({
   args: {},
@@ -33,10 +51,15 @@ export const ensureUserProfile = mutation({
 
     if (isAdminEmail) {
       if (user.role !== "admin") updates.role = "admin";
-      if (user.subscriptionTier !== "inventor_pro") updates.subscriptionTier = "inventor_pro";
+      if (user.subscriptionTier !== ADMIN_SUBSCRIPTION_TIER) {
+        updates.subscriptionTier = ADMIN_SUBSCRIPTION_TIER;
+      }
     } else {
       if (!user.role) updates.role = "user";
-      if (!user.subscriptionTier) updates.subscriptionTier = "explorer";
+      const normalizedTier = normalizeSubscriptionTier(user.subscriptionTier);
+      if (!user.subscriptionTier || user.subscriptionTier !== normalizedTier) {
+        updates.subscriptionTier = normalizedTier;
+      }
     }
 
     if (Object.keys(updates).length > 0) {

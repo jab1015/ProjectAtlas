@@ -15,8 +15,9 @@ export default defineSchema({
     role: v.optional(v.union(v.literal("admin"), v.literal("user"))),
     subscriptionTier: v.optional(
       v.union(
-        v.literal("explorer"),
-        v.literal("inventor_pro"),
+        v.literal("free"),
+        v.literal("inventor"),
+        v.literal("pro"),
         v.literal("enterprise")
       )
     ),

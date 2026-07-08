@@ -4,6 +4,78 @@ import { MadeThisBadge } from "@/components/atlas/made-this-badge";
 import { AtlasLogo } from "@/components/atlas/atlas-logo";
 import { Check } from "lucide-react";
 
+const TIERS = [
+  {
+    name: "Explorer",
+    price: "$0",
+    cadence: "/forever",
+    description: "Start with the foundation for one invention.",
+    features: [
+      "1 active invention",
+      "Idea capture",
+      "Competitive research",
+      "Patent research",
+    ],
+    cta: "Get started free",
+    href: "/sign-up",
+    featured: false,
+  },
+  {
+    name: "Inventor",
+    price: "$39",
+    cadence: "/month",
+    description: "Research and validate more ideas with Atlas.",
+    features: [
+      "3 active inventions",
+      "10 AI tasks/day",
+      "150 credits/month",
+      "Validation and market research",
+      "Document upload/download",
+      "Agent chat",
+      "No design or legal features",
+    ],
+    cta: "Choose Inventor",
+    href: "/sign-up",
+    featured: true,
+  },
+  {
+    name: "Pro",
+    price: "$79",
+    cadence: "/month",
+    description: "Move from validated idea to market-ready assets.",
+    features: [
+      "10 active inventions",
+      "25 AI tasks/day",
+      "400 credits/month",
+      "Legal team: NDAs, patent drafts, contracts",
+      "Pitch decks",
+      "Logo, branding, and product design",
+      "Manufacturing and investor outreach",
+      "No CAD or blueprints",
+    ],
+    cta: "Choose Pro",
+    href: "/sign-up",
+    featured: false,
+  },
+  {
+    name: "Enterprise",
+    price: "$149",
+    cadence: "/month",
+    description: "Unlimited execution for serious invention teams.",
+    features: [
+      "Unlimited active inventions",
+      "Unlimited AI tasks and credits",
+      "CAD: 2D and 3D",
+      "Explosion blueprints",
+      "Team workspaces",
+      "API access",
+    ],
+    cta: "Choose Enterprise",
+    href: "/sign-up",
+    featured: false,
+  },
+];
+
 export default function PricingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -44,80 +116,47 @@ export default function PricingPage() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
-            {/* Explorer */}
-            <div className="rounded-2xl border border-border bg-card p-8 space-y-6">
-              <div>
-                <h2
-                  className="text-xl font-bold text-foreground"
-                  style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
-                >
-                  Explorer
-                </h2>
-                <div className="mt-3 flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-foreground">$0</span>
-                  <span className="text-muted-foreground">/forever</span>
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {TIERS.map((tier) => (
+              <div
+                key={tier.name}
+                className={`rounded-2xl border bg-card p-6 space-y-6 ${
+                  tier.featured ? "border-primary shadow-sm" : "border-border"
+                }`}
+              >
+                <div>
+                  {tier.featured && (
+                    <span className="mb-3 inline-flex rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
+                      Recommended
+                    </span>
+                  )}
+                  <h2
+                    className="text-xl font-bold text-foreground"
+                    style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
+                  >
+                    {tier.name}
+                  </h2>
+                  <div className="mt-3 flex items-baseline gap-1">
+                    <span className="text-4xl font-bold text-foreground">{tier.price}</span>
+                    <span className="text-muted-foreground">{tier.cadence}</span>
+                  </div>
+                  <p className="mt-2 min-h-10 text-sm text-muted-foreground">
+                    {tier.description}
+                  </p>
                 </div>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Capture and validate your first idea.
-                </p>
+                <ul className="space-y-3">
+                  {tier.features.map((feature) => (
+                    <li key={feature} className="flex items-start gap-2 text-sm text-foreground">
+                      <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button asChild variant={tier.featured ? "default" : "outline"} className="w-full">
+                  <Link href={tier.href}>{tier.cta}</Link>
+                </Button>
               </div>
-              <ul className="space-y-3">
-                {[
-                  "1 active invention",
-                  "Stages 1–4 (Foundation of the journey)",
-                  "Readiness engine",
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-foreground">
-                    <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Button asChild variant="outline" className="w-full">
-                <Link href="/sign-up">Get started free</Link>
-              </Button>
-            </div>
-
-            {/* Inventor Pro */}
-            <div className="rounded-2xl border-2 border-primary bg-card p-8 space-y-6 relative">
-              <span className="absolute -top-3 left-8 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
-                Coming soon
-              </span>
-              <div>
-                <h2
-                  className="text-xl font-bold text-foreground"
-                  style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
-                >
-                  Inventor Pro
-                </h2>
-                <div className="mt-3 flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-foreground">$29</span>
-                  <span className="text-muted-foreground">/month</span>
-                </div>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  The complete journey — all 15 stages, idea to market.
-                </p>
-              </div>
-              <ul className="space-y-3">
-                {[
-                  "Unlimited inventions",
-                  "All 15 stages",
-                  "Full readiness engine",
-                  "IP protection roadmap",
-                  "Product design & prototype",
-                  "Funding & launch stages",
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-foreground">
-                    <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Button disabled className="w-full">
-                Coming Soon
-              </Button>
-            </div>
+            ))}
           </div>
         </div>
       </main>

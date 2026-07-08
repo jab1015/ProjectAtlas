@@ -10,12 +10,48 @@
 
 // ── Stage Configuration ──────────────────────────────────────────────────────
 
+export type SubscriptionTier = "free" | "inventor" | "pro" | "enterprise";
+
+export const ACTIVE_INVENTION_LIMITS: Record<SubscriptionTier, number> = {
+  free: 1,
+  inventor: 3,
+  pro: 10,
+  enterprise: Number.POSITIVE_INFINITY,
+};
+
+export function normalizeSubscriptionTier(tier: unknown): SubscriptionTier {
+  switch (tier) {
+    case "free":
+    case "inventor":
+    case "pro":
+    case "enterprise":
+      return tier;
+    case "explorer":
+      return "free";
+    case "starter":
+      return "inventor";
+    case "inventor_pro":
+      return "pro";
+    default:
+      return "free";
+  }
+}
+
+export function canTierAccessPaidStages(tier: unknown): boolean {
+  const normalizedTier = normalizeSubscriptionTier(tier);
+  return normalizedTier === "pro" || normalizedTier === "enterprise";
+}
+
+export function getActiveInventionLimit(tier: unknown): number {
+  return ACTIVE_INVENTION_LIMITS[normalizeSubscriptionTier(tier)];
+}
+
 export const stageConfig = [
   {
     id: 1,
     name: "Idea Capture",
     enabled: true,
-    requiredTier: "explorer",
+    requiredTier: "free",
     completionCriteria: ["title", "problemStatement", "targetAudience", "solutionDescription"],
     nextAction: "Describe your invention — what problem does it solve and who is it for?",
     comingSoon: false,
@@ -24,7 +60,7 @@ export const stageConfig = [
     id: 2,
     name: "Validation",
     enabled: true,
-    requiredTier: "explorer",
+    requiredTier: "free",
     completionCriteria: ["validationMethod", "targetMarketSize", "competitorAnalysis"],
     nextAction: "Validate your idea — confirm there's a real market and real demand.",
     comingSoon: false,
@@ -33,7 +69,7 @@ export const stageConfig = [
     id: 3,
     name: "Market Research",
     enabled: true,
-    requiredTier: "explorer",
+    requiredTier: "free",
     completionCriteria: ["marketSegment", "customerPersona", "pricePoint"],
     nextAction: "Define your market — who will buy this, and at what price?",
     comingSoon: false,
@@ -42,22 +78,22 @@ export const stageConfig = [
     id: 4,
     name: "Patent Research",
     enabled: true,
-    requiredTier: "explorer",
+    requiredTier: "free",
     completionCriteria: ["priorArtSearch", "patentabilityAssessment", "inventionDisclosure"],
     nextAction: "Research patents — ensure your invention is novel and protectable.",
     comingSoon: false,
   },
-  { id: 5, name: "Product Design", enabled: false, requiredTier: "inventor_pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 6, name: "Engineering", enabled: false, requiredTier: "inventor_pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 7, name: "Prototype", enabled: false, requiredTier: "inventor_pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 8, name: "Testing", enabled: false, requiredTier: "inventor_pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 9, name: "IP Protection", enabled: false, requiredTier: "inventor_pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 10, name: "Manufacturing", enabled: false, requiredTier: "inventor_pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 11, name: "Funding", enabled: false, requiredTier: "inventor_pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 12, name: "Branding", enabled: false, requiredTier: "inventor_pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 13, name: "Marketing", enabled: false, requiredTier: "inventor_pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 14, name: "Sales", enabled: false, requiredTier: "inventor_pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 15, name: "Growth", enabled: false, requiredTier: "inventor_pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
+  { id: 5, name: "Product Design", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
+  { id: 6, name: "Engineering", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
+  { id: 7, name: "Prototype", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
+  { id: 8, name: "Testing", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
+  { id: 9, name: "IP Protection", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
+  { id: 10, name: "Manufacturing", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
+  { id: 11, name: "Funding", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
+  { id: 12, name: "Branding", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
+  { id: 13, name: "Marketing", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
+  { id: 14, name: "Sales", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
+  { id: 15, name: "Growth", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
 ];
 
 // ── Readiness Helpers ────────────────────────────────────────────────────────

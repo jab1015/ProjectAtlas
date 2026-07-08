@@ -11,7 +11,7 @@ import { trackUpgradeCompleted } from "@/lib/analytics";
 function SuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const plan = searchParams.get("plan") ?? "Inventor Pro";
+  const plan = searchParams.get("plan") ?? "Pro";
 
   useEffect(() => {
     trackUpgradeCompleted(plan);
@@ -32,7 +32,7 @@ function SuccessContent() {
           className="text-3xl font-bold tracking-tight text-foreground"
           style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
         >
-          Welcome to Inventor Pro
+          Welcome to {plan}
         </h1>
         <p className="mt-3 text-muted-foreground">
           Thank you for upgrading. Your full inventor journey is now unlocked.

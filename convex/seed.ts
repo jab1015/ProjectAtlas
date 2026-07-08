@@ -1,5 +1,5 @@
 /**
- * Atlas seed: ensures jerry.brown1015@gmail.com has admin + inventor_pro role.
+ * Atlas seed: ensures jerry.brown1015@gmail.com has admin + enterprise tier.
  * Runs idempotently — safe to call multiple times.
  *
  * This is an internalMutation so it can only be triggered from trusted contexts
@@ -10,6 +10,7 @@
 import { internalMutation } from "./_generated/server";
 
 const ADMIN_EMAIL = "jerry.brown1015@gmail.com";
+const ADMIN_SUBSCRIPTION_TIER = "enterprise";
 
 export const ensureAdminUser = internalMutation({
   args: {},
@@ -22,10 +23,10 @@ export const ensureAdminUser = internalMutation({
 
     if (existing) {
       // Update role and tier if not already set correctly
-      if (existing.role !== "admin" || existing.subscriptionTier !== "inventor_pro") {
+      if (existing.role !== "admin" || existing.subscriptionTier !== ADMIN_SUBSCRIPTION_TIER) {
         await ctx.db.patch(existing._id, {
           role: "admin",
-          subscriptionTier: "inventor_pro",
+          subscriptionTier: ADMIN_SUBSCRIPTION_TIER,
         });
       }
       return { updated: true, userId: existing._id };
@@ -39,7 +40,7 @@ export const ensureAdminUser = internalMutation({
     const userId = await ctx.db.insert("users", {
       email: ADMIN_EMAIL,
       role: "admin",
-      subscriptionTier: "inventor_pro",
+      subscriptionTier: ADMIN_SUBSCRIPTION_TIER,
       createdAt: Date.now(),
     });
 

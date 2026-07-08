@@ -14,6 +14,9 @@ import { describe, it, expect } from "vitest";
 import {
   validateOnboardingPayload,
   computeStage1ProgressAfterOnboarding,
+  canTierAccessPaidStages,
+  getActiveInventionLimit,
+  normalizeSubscriptionTier,
   stageConfig,
   computeReadinessScore,
   scoreToReadinessState,
@@ -95,6 +98,39 @@ describe("computeStage1ProgressAfterOnboarding", () => {
   it("readinessScore 100 maps to 'Ready to Move Forward'", () => {
     const { readinessScore } = computeStage1ProgressAfterOnboarding(VALID_PAYLOAD);
     expect(scoreToReadinessState(readinessScore)).toBe("Ready to Move Forward");
+  });
+});
+
+// ── Subscription tier configuration ─────────────────────────────────────────
+
+describe("subscription tier configuration", () => {
+  it("uses the refined tier keys in stageConfig", () => {
+    const tierKeys = new Set(stageConfig.map((stage) => stage.requiredTier));
+
+    expect(tierKeys).toEqual(new Set(["free", "pro"]));
+    expect(tierKeys).not.toContain("starter");
+    expect(tierKeys).not.toContain("inventor_pro");
+    expect(tierKeys).not.toContain("explorer");
+  });
+
+  it("normalizes legacy tier keys to the refined model", () => {
+    expect(normalizeSubscriptionTier("explorer")).toBe("free");
+    expect(normalizeSubscriptionTier("starter")).toBe("inventor");
+    expect(normalizeSubscriptionTier("inventor_pro")).toBe("pro");
+  });
+
+  it("applies active invention limits by tier", () => {
+    expect(getActiveInventionLimit("free")).toBe(1);
+    expect(getActiveInventionLimit("inventor")).toBe(3);
+    expect(getActiveInventionLimit("pro")).toBe(10);
+    expect(getActiveInventionLimit("enterprise")).toBe(Number.POSITIVE_INFINITY);
+  });
+
+  it("limits paid stage access to Pro and Enterprise", () => {
+    expect(canTierAccessPaidStages("free")).toBe(false);
+    expect(canTierAccessPaidStages("inventor")).toBe(false);
+    expect(canTierAccessPaidStages("pro")).toBe(true);
+    expect(canTierAccessPaidStages("enterprise")).toBe(true);
   });
 });
 

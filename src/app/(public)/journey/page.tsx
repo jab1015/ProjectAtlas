@@ -34,7 +34,7 @@ export default function JourneyPage() {
         <p className="text-lg text-muted-foreground leading-relaxed max-w-xl mb-4">
           15 stages. Idea to Market. Atlas guides you through every one — from your first spark to a
           product that sells. Stages 1–4 are live today. Stages 5–15 are already designed and
-          arriving with Inventor Pro.
+          arriving with Pro.
         </p>
         <p className="text-sm text-muted-foreground leading-relaxed max-w-xl">
           Atlas is growing into the complete operating system for inventors. Every stage you see below
@@ -81,7 +81,7 @@ export default function JourneyPage() {
 
       {/* Coming soon label */}
       <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">
-        Coming with Inventor Pro — Stages 5–15
+        Coming with Pro — Stages 5–15
       </p>
 
       {/* Stages 5–15 */}
@@ -103,7 +103,7 @@ export default function JourneyPage() {
                   {stage.name}
                 </h2>
                 <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground border border-border">
-                  Coming with Inventor Pro
+                  Coming with Pro
                 </span>
               </div>
               <p className="mt-1 text-sm text-muted-foreground leading-relaxed">

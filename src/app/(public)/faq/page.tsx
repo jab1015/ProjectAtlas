@@ -43,22 +43,27 @@ const FAQ_ITEMS = [
   {
     question: "What does the Explorer plan include?",
     answer:
-      "The Explorer plan is free and includes access to Stages 1 through 4: Idea Capture, Validation, Market Research, and Patent Readiness. These four stages give you the foundation you need before moving into product development, manufacturing, and launch.",
+      "The Explorer plan is free and includes idea capture, competitive research, patent research, and 1 active invention. It gives you the foundation you need before upgrading into validation, market research, design, legal, and launch support.",
   },
   {
-    question: "What is Inventor Pro?",
+    question: "What is the Inventor plan?",
     answer:
-      "Inventor Pro unlocks the full 15-stage Inventor Journey — including Product Design, Engineering, Prototype, IP Protection, Manufacturing, Funding, Branding, Marketing, Sales, and Growth. It's for inventors who are ready to take their idea all the way to market.",
+      "Inventor is $39/month and includes 3 active inventions, 10 AI tasks/day, 150 credits/month, validation and market research, document upload/download, and agent chat. It does not include design or legal features.",
+  },
+  {
+    question: "What do Pro and Enterprise add?",
+    answer:
+      "Pro is $79/month and adds legal paperwork, patent drafts, contracts, pitch decks, logo and branding, product design, manufacturing outreach, and investor outreach for up to 10 active inventions. Enterprise is $149/month and adds unlimited usage, CAD, explosion blueprints, team workspaces, and API access.",
   },
   {
     question: "Can I cancel anytime?",
     answer:
-      "Yes. There are no long-term commitments. You can cancel your Inventor Pro subscription at any time from your account settings.",
+      "Yes. There are no long-term commitments. You can cancel your subscription at any time from your account settings.",
   },
   {
     question: "What happens after Patent Readiness?",
     answer:
-      "Patent readiness is Stage 4 of 15 — a major milestone, but not the finish line. After Stage 4, you move into product development, IP protection, manufacturing, branding, funding, and launch. Stages 5 through 15 are available with Inventor Pro and guide you all the way to market.",
+      "Patent readiness is Stage 4 of 15 — a major milestone, but not the finish line. After Stage 4, you move into product development, IP protection, manufacturing, branding, funding, and launch. Stages 5 through 15 are available with Pro and guide you all the way to market.",
   },
 ];
 

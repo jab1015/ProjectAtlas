@@ -130,15 +130,15 @@ export default function InventionsPage() {
             </div>
           )}
 
-          {/* Explorer tier gate — show if can't create */}
+          {/* Free tier gate — show if can't create */}
           {canCreate === false && (
             <div className="mt-6 rounded-xl border border-border bg-muted/30 p-5 text-center space-y-3">
               <p className="text-sm text-muted-foreground">
                 Explorer plan includes 1 active invention.{" "}
                 <Link href="/pricing" className="text-foreground font-medium hover:underline underline-offset-4">
-                  Upgrade to Inventor Pro
+                  Upgrade to Inventor
                 </Link>{" "}
-                for unlimited inventions.
+                for 3 active inventions.
               </p>
             </div>
           )}

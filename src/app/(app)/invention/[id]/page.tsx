@@ -49,7 +49,7 @@ function CongratulatoryScreen({ inventionTitle }: { inventionTitle: string }) {
             </p>
           </div>
           <div className="rounded-xl border border-border bg-muted/30 p-5 text-left space-y-2">
-            <p className="text-sm font-medium text-foreground">Coming soon: Inventor Pro</p>
+            <p className="text-sm font-medium text-foreground">Coming soon: Pro</p>
             <p className="text-sm text-muted-foreground">
               Stages 5–15 — product design, IP protection, manufacturing,
               funding, and launch — are on the way. Upgrade when ready.
@@ -125,7 +125,7 @@ function ComingSoonStage({ stageId, stageName }: { stageId: number; stageName: s
               Stage {stageId}: {stageName}
             </h1>
             <p className="text-muted-foreground">
-              This stage is part of the Inventor Pro journey — coming soon.
+              This stage is part of the Pro journey — coming soon.
               Complete Stages 1–4 to reach patent readiness.
             </p>
           </div>
@@ -134,7 +134,7 @@ function ComingSoonStage({ stageId, stageName }: { stageId: number; stageName: s
           </Button>
           <div>
             <Link href="/pricing" className="text-sm text-primary hover:underline underline-offset-4">
-              Learn about Inventor Pro →
+              Learn about Pro →
             </Link>
           </div>
         </div>

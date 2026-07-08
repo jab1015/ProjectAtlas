@@ -245,7 +245,7 @@ export default function HomePage() {
                 },
                 {
                   headline: "Built for where you're going, not just where you start",
-                  body: "Begin free through Stage 4. Stages 5–15 — product design, IP protection, manufacturing, funding, and launch — unlock with Inventor Pro.",
+                  body: "Begin free with Explorer. Inventor adds validation and market research. Pro adds product design, legal paperwork, pitch decks, manufacturing, and investor outreach.",
                 },
               ].map((prop) => (
                 <div key={prop.headline} className="bg-card p-8">
@@ -379,7 +379,7 @@ export default function HomePage() {
             </div>
 
             <p className="text-center text-sm text-muted-foreground mt-6">
-              Stages 1–4 are available today. Stages 5–15 — already designed and coming in future releases — unlock with Inventor Pro.
+              Stages 1–4 are available today. Stages 5–15 — already designed and coming in future releases — unlock with Pro.
             </p>
           </div>
         </section>
