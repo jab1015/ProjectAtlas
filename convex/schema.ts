@@ -18,7 +18,11 @@ export default defineSchema({
         v.literal("free"),
         v.literal("inventor"),
         v.literal("pro"),
-        v.literal("enterprise")
+        v.literal("enterprise"),
+        // Legacy aliases remain schema-valid until existing rows are normalized.
+        v.literal("explorer"),
+        v.literal("starter"),
+        v.literal("inventor_pro")
       )
     ),
     // Extension point: Inventor Twin
