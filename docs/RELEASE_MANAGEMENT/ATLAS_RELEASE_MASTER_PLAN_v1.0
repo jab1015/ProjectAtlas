@@ -7,7 +7,19 @@ Product: Project Atlas
 Last Updated: July 2026
 
 ====================================================================
+Version History
 
+v1.0
+- Initial release roadmap created.
+
+v1.1
+- Added task numbering.
+- Added Release Blockers.
+- Added Current Project Status.
+
+v1.2
+- Reordered milestones to prioritize autonomous execution.
+====================================================================
 # PURPOSE
 
 This document is the single source of truth for Project Atlas.
