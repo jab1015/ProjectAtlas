@@ -1,0 +1,366 @@
+# ATLAS_RELEASE_MASTER_PLAN_v1.0
+
+Version: 1.0
+Status: Active
+Owner: Jerry Brown
+Product: Project Atlas
+Last Updated: July 2026
+
+====================================================================
+
+# PURPOSE
+
+This document is the single source of truth for Project Atlas.
+
+Every implementation task, prompt, feature request, and development decision must align with this document.
+
+This document exists to:
+
+• Keep development organized.
+• Prevent duplicate work.
+• Maintain architectural consistency.
+• Prioritize features based on release value.
+• Minimize wasted implementation tasks.
+• Track overall progress from concept to Version 1.0 Release.
+
+====================================================================
+
+# PRODUCT VISION
+
+Atlas is an autonomous AI operating system for inventors.
+
+Atlas is not a chatbot.
+
+Atlas is not a project management application.
+
+Atlas is not simply an assistant.
+
+Atlas functions as an AI company.
+
+Each department performs real work, collaborates with other departments, produces deliverables, and only escalates decisions that require human approval.
+
+The founder should spend time making important decisions—not managing individual tasks.
+
+====================================================================
+
+# PRODUCT PRINCIPLES
+
+The following principles are permanent.
+
+1. Atlas performs work instead of simply providing advice.
+
+2. Every department must produce measurable outputs.
+
+3. Atlas never asks the founder to perform work it can perform itself.
+
+4. Human interaction is limited to:
+   • strategic decisions
+   • legal approvals
+   • physical-world actions
+   • external relationships
+
+5. Every completed department must create structured outputs for downstream departments.
+
+6. Atlas should automatically continue work whenever dependencies are satisfied.
+
+7. Placeholder states should only exist when absolutely unavoidable.
+
+8. Every new feature must move Atlas closer to a fully autonomous inventor operating system.
+
+====================================================================
+
+# CURRENT STATUS
+
+Overall Progress
+
+Frontend:
+95%
+
+Backend:
+72%
+
+AI Departments:
+20%
+
+Autonomous Execution:
+20%
+
+Document Intelligence:
+80%
+
+Founder Experience:
+90%
+
+Overall Release Progress:
+Approximately 60%
+
+====================================================================
+
+# RELEASE GOAL
+
+Version 1.0 must allow an inventor to:
+
+✓ Create an invention
+
+✓ Upload documents
+
+✓ Receive autonomous analysis
+
+✓ Progress through invention stages
+
+✓ Receive department-generated deliverables
+
+✓ Manage invention history
+
+✓ Review executive summaries
+
+✓ Reach manufacturing readiness
+
+without requiring technical knowledge.
+
+====================================================================
+
+# DEVELOPMENT PRIORITY
+
+Priority 1
+Autonomous Execution Engine
+
+Priority 2
+Patent Intelligence
+
+Priority 3
+Design Department
+
+Priority 4
+Engineering
+
+Priority 5
+Manufacturing
+
+Priority 6
+Competitor Intelligence
+
+Priority 7
+Pricing Intelligence
+
+Priority 8
+Marketing
+
+Priority 9
+Sales
+
+Priority 10
+Licensing
+
+Priority 11
+Investor
+
+Priority 12
+Launch
+
+Priority 13
+Release Polish
+
+====================================================================
+
+# RELEASE MILESTONES
+
+□ M1 Core Platform
+
+□ M2 Founder Experience
+
+□ M3 Document Intelligence
+
+□ M4 Executive Orchestrator
+
+□ M5 Autonomous Department Framework
+
+□ M6 Patent Intelligence
+
+□ M7 Product Design
+
+□ M8 Engineering
+
+□ M9 Manufacturing
+
+□ M10 Business Departments
+
+□ M11 CEO Intelligence
+
+□ M12 Beta Release
+
+□ M13 Version 1.0 Public Release
+
+====================================================================
+
+# DEPARTMENT RULES
+
+Every department must define:
+
+Purpose
+
+Inputs
+
+Processing
+
+Outputs
+
+Dependencies
+
+Completion Criteria
+
+No department is considered complete unless it produces useful work products.
+
+====================================================================
+
+# TASK RULES
+
+Every implementation task must answer YES to all of the following:
+
+Does this move Atlas closer to release?
+
+Does this remove technical debt?
+
+Does this unblock additional departments?
+
+Does this improve autonomous execution?
+
+Can this be tested immediately?
+
+If the answer is NO, the task should be postponed unless it fixes a critical issue.
+
+====================================================================
+
+# DAILY DEVELOPMENT WORKFLOW
+
+Step 1
+
+Review this document.
+
+Step 2
+
+Identify the first unfinished milestone.
+
+Step 3
+
+Implement only that milestone unless instructed otherwise.
+
+Step 4
+
+Do not redesign completed systems.
+
+Step 5
+
+Preserve architecture.
+
+Step 6
+
+Run tests.
+
+Step 7
+
+Report:
+
+• completed work
+
+• files changed
+
+• tests
+
+• remaining blockers
+
+====================================================================
+
+# BUG TRACKER
+
+Critical
+
+High
+
+Medium
+
+Low
+
+(Updated after each review.)
+
+====================================================================
+
+# BACKLOG
+
+Future ideas are recorded here.
+
+They are NOT implemented until Version 1.0 unless they are required for release.
+
+====================================================================
+
+# CHANGE LOG
+
+Every completed implementation task is recorded here.
+
+Date
+
+Task
+
+Result
+
+Notes
+
+====================================================================
+
+# PROMPT STANDARD
+
+Every implementation prompt should begin with:
+
+"Continue Project Atlas development.
+
+Treat this Master Plan as the authoritative project roadmap.
+
+Preserve all existing architecture.
+
+Do not rewrite completed systems.
+
+Implement only the next unfinished milestone.
+
+Maintain backward compatibility.
+
+Run all tests.
+
+Report exactly what was completed, what changed, and what remains."
+
+====================================================================
+
+# FINAL OBJECTIVE
+
+Atlas Version 1.0 is complete when an inventor can:
+
+Create an invention.
+
+Validate it.
+
+Research patents.
+
+Analyze competitors.
+
+Determine pricing.
+
+Generate product specifications.
+
+Prepare manufacturing.
+
+Develop branding.
+
+Generate marketing.
+
+Prepare licensing.
+
+Prepare investor materials.
+
+Plan launch.
+
+Track progress.
+
+Receive executive guidance.
+
+All while Atlas performs the majority of the work autonomously and only requests human input when absolutely necessary.
+
+END OF DOCUMENT
