@@ -14,7 +14,7 @@
 
 The Atlas Release Master Plan defines the authoritative roadmap for Project Atlas development, milestone sequencing, engineering priorities, and platform evolution.
 
-This version updates the roadmap to align documented milestones with verified engineering execution history while preserving the original strategic direction established in previous releases.
+This version updates the roadmap to align documented milestones with verified engineering execution history while preserving the strategic direction established in previous releases.
 
 Version 1.2 introduces milestone alignment improvements based on completed engineering work, including:
 
@@ -32,8 +32,23 @@ This document remains the primary roadmap reference for future Atlas development
 | Version | Date | Status | Description |
 |---|---|---|---|
 | v1.0 | July 2026 | Historical | Initial release master plan |
-| v1.1 | July 2026 | Active | Expanded roadmap through Foundation Platform completion |
+| v1.1 | July 2026 | Historical | Expanded roadmap through Foundation Platform completion |
 | v1.2 | July 2026 | Active | Engineering execution alignment and milestone clarification |
+
+---
+
+# 2.1 Version 1.2 Changes
+
+Version 1.2 introduces the following updates:
+
+- Alignment of roadmap milestones with verified engineering execution history
+- Formal recording of AT-035 engineering milestone completion history
+- Documentation of AT-035.01 completion
+- Documentation of AT-035.02 completion
+- Governance requirements for AT-035.03 definition
+- Engineering escalation rules for future Atlas milestones
+
+Version 1.2 does not replace historical roadmap decisions. It preserves prior versions while updating the active execution reference.
 
 ---
 
@@ -43,7 +58,7 @@ The following principles govern roadmap interpretation:
 
 1. This document is the authoritative release planning reference for Project Atlas.
 2. Completed engineering milestones must be reflected in roadmap history.
-3. Future milestones must have defined objectives, scope, dependencies, and acceptance criteria before implementation begins.
+3. Future milestones must have defined objectives, scope, dependencies, acceptance criteria, and validation plans before implementation begins.
 4. Engineering execution must not proceed from assumptions or undocumented requirements.
 5. Roadmap updates must preserve historical traceability.
 
@@ -71,6 +86,14 @@ Systems must preserve:
 - Risks
 - Assumptions
 - Recommendations
+
+---
+
+## Execution Discipline
+
+Atlas engineering follows:
+No milestone should proceed through implementation without sufficient definition, approved scope, measurable acceptance criteria, and a defined validation approach.
+
 ---
 # 5. Milestone Governance Rules
 
@@ -94,9 +117,87 @@ A milestone cannot be considered complete until acceptance criteria have been ve
 
 The following escalation rules apply to all future Project Atlas milestones.
 
+---
+
 ## 6.1 Founder Input Required
 
 If implementation requires information, access, credentials, configuration, or decisions that only the founder can provide:
+Engineering must stop and identify:
+
+- The exact information required
+- Why it is required
+- Which feature or milestone is blocked
+- The action required from the founder
+
+Examples include:
+
+- API keys
+- OAuth credentials
+- Service accounts
+- Production environment variables
+- External account access
+- Business decisions
+- Approval decisions
+
+Engineering must not:
+
+- Invent credentials
+- Use fabricated production values
+- Create false integrations
+- Remove requirements without approval
+- Continue implementation based on assumptions
+
+---
+
+## 6.2 MadeThis Platform Limitation
+
+If implementation cannot proceed because of a MadeThis capability limitation, missing platform functionality, tooling restriction, or environment limitation:
+Engineering must stop and report:
+
+- What was attempted
+- What failed
+- Why the failure cannot be resolved with available capabilities
+- Whether a support ticket is recommended
+- Recommended support ticket summary
+
+Engineering must not consume additional implementation cycles attempting repeated unsuccessful workarounds.
+
+---
+
+## 6.3 External Dependency Failure
+
+If a blocker originates from an external provider, service, or dependency:
+
+Engineering must identify:
+
+- Dependency owner
+- Failure point
+- Impact
+- Required next action
+
+---
+
+## 6.4 Blocked Work Rule
+
+All blocked work follows:
+Atlas development prioritizes correct execution over unnecessary activity.
+
+---
+
+# 7. Roadmap Alignment Update
+
+Version 1.2 introduces roadmap alignment between documented release planning and verified engineering execution history.
+
+The purpose of this update is not to redefine Atlas strategy, but to ensure that completed milestones and future milestones are accurately represented.
+
+This alignment preserves:
+
+- Historical accuracy
+- Engineering traceability
+- Acceptance evidence
+- Future milestone clarity
+
+---
 # 8. Current Platform State
 
 Project Atlas has progressed from foundational platform development into autonomous founder operating system capabilities.
@@ -179,7 +280,6 @@ Validated scenarios:
 6. Retry exhaustion
 
 ---
-
 # 10. AT-035.02 Validation Evidence
 
 Validation completed:
@@ -198,10 +298,9 @@ Verified safeguards:
 - Artifact references stored using opaque identifiers
 
 AT-035.02 is formally closed and must not be reopened unless a new verified defect requires corrective action.
-Status:
-## Execution Discipline
 
-Atlas engineering follows:
+---
+
 # 11. AT-035 — Cross-Department Intelligence
 
 **Status:** ACTIVE  
@@ -293,6 +392,8 @@ Atlas must identify situations where:
 - Assumptions change
 
 Conflicts must be surfaced transparently and handled through deterministic processes.
+
+---
 # 14. AT-035 Dependencies
 
 AT-035 depends on the successful completion and availability of Atlas foundational intelligence systems.
@@ -410,6 +511,8 @@ Implementation must prioritize:
 3. Cross-department coordination
 4. Conflict awareness
 5. Advanced autonomous intelligence
+
+---
 # 16. AT-035 Engineering Milestone Breakdown
 
 Version 1.2 introduces an engineering alignment layer to connect roadmap objectives with verified implementation history.
@@ -473,7 +576,9 @@ Capabilities validated:
 
 ## Purpose
 
-Establish the next engineering phase of AT-035 by enabling validated knowledge sharing, coordinated recommendations, and cross-department intelligence capabilities.
+Establish the next engineering phase of AT-035 through a formally defined implementation plan that enables validated knowledge sharing, coordinated recommendations, and cross-department intelligence capabilities.
+
+The exact implementation scope must be approved through the AT-035.03 definition process.
 
 ## Definition Requirement
 
@@ -494,6 +599,9 @@ The milestone definition must be approved before engineering execution begins.
 # 17. Milestone Execution Controls
 
 All AT-035 milestones follow:
+A milestone cannot advance without verified completion of the previous phase.
+
+---
 # 18. AT-035.03 Definition Requirements
 
 AT-035.03 is the next planned engineering phase following the successful completion of AT-035.02.
@@ -586,6 +694,29 @@ AT-035.03 implementation may begin only after:
 5. No unresolved blockers remain.
 
 If implementation requires missing information:
+must be reported.
+
+If implementation cannot proceed due to MadeThis capability limitations:
+must be reported.
+
+Engineering must not continue while either condition remains unresolved.
+
+---
+
+# 21. Milestone Traceability
+
+AT-035.03 must maintain traceability between:
+
+- Roadmap objective
+- Engineering changes
+- Acceptance evidence
+- Validation results
+- Production behavior
+
+Every completed capability must be traceable back to the approved milestone definition.
+
+---
+
 # 22. Production Readiness Standards
 
 All Atlas milestones that introduce production capabilities must satisfy production readiness standards before completion.
@@ -604,8 +735,6 @@ Production readiness requires verification across:
 # 23. Validation Standards
 
 Each milestone validation process must include appropriate verification activities.
-
-Required validation categories include:
 
 ## Functional Validation
 
@@ -673,9 +802,6 @@ Validation may include:
 - Full automated test suite
 - Type validation
 - Production build validation
-
----
-
 # 24. Operational Evidence Requirements
 
 Production milestone completion requires evidence.
@@ -707,6 +833,10 @@ Production deployments must maintain:
 - Rollback awareness
 
 Deployment records must connect implementation changes with validated production behavior.
+
+The required deployment lifecycle is:
+---
+
 # 26. Roadmap Maintenance and Version Control
 
 The Atlas Release Master Plan must evolve as the platform evolves while preserving historical accuracy.
@@ -793,6 +923,9 @@ The platform must continue evolving without sacrificing:
 # 29. Project Atlas Development Commitment
 
 Project Atlas development follows the principle:
+All future milestones must maintain the standards established in this release plan.
+
+---
 # 30. Final Document Status
 
 **Document:** ATLAS_RELEASE_MASTER_PLAN_v1.2.md  
@@ -822,14 +955,23 @@ No milestone should proceed through implementation without:
 
 All future Atlas engineering work follows these escalation paths.
 
+---
+
 ## Missing Founder Requirement
 
-Engineering stops and identifies the exact information, access, or decision required.
+Status:
+Engineering stops and identifies:
+
+- The exact information, access, or decision required
+- Why it is required
+- The milestone or capability affected
+- The required founder action
 
 ---
 
 ## MadeThis Capability Limitation
 
+Status:
 Engineering stops and documents:
 
 - Attempted action
@@ -837,13 +979,27 @@ Engineering stops and documents:
 - Platform limitation
 - Recommended support action
 
+Engineering must not continue consuming implementation cycles while a verified platform limitation remains unresolved.
+
+---
+
+## External Dependency Failure
+
+If a blocker originates from an external provider, service, or dependency:
+
+Engineering must identify:
+
+- Dependency owner
+- Failure point
+- Impact
+- Required next action
+
 ---
 
 ## Blocked Work Rule
 
 All blocked work follows:
-
-This prevents wasted engineering cycles and ensures Atlas development remains controlled and transparent.
+This prevents wasted engineering cycles and ensures Atlas development remains controlled, transparent, and traceable.
 
 ---
 
