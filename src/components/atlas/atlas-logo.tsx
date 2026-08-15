@@ -14,7 +14,7 @@ interface AtlasMarkProps {
 export function AtlasMark({ className, size = 32 }: AtlasMarkProps) {
   return (
     <Image
-      src="/logo.PNG"
+      src="/Logo.png"
       alt="InventSmith"
       width={size}
       height={size}
@@ -51,7 +51,7 @@ export function AtlasLogo({ className, size = "md", markOnly = false }: AtlasLog
   return (
     <span className={cn("inline-flex items-center", className)} aria-label="InventSmith — The Inventor OS">
       <Image
-        src="/logo.PNG"
+        src="/Logo.png"
         alt="InventSmith — The Inventor OS"
         width={dimensions.width}
         height={dimensions.height}
