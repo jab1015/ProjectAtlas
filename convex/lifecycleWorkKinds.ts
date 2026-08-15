@@ -2,6 +2,7 @@ export const FULL_JOURNEY_PRO_WORK_KINDS = [
   "prototype_strategy",
   "prototype_sourcing_plan",
   "prototype_test_plan",
+  "prototype_physical_evidence",
   "prototype_evidence_assessment",
   "prototype_design_gap_analysis",
   "prototype_readiness",
