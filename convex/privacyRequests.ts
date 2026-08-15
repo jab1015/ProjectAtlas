@@ -3,8 +3,7 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { requireAdmin } from "./authHelpers";
 import { deleteAccountData } from "./accountDeletion";
-
-const PAID_OR_GRACE_STATUSES = new Set(["trialing", "active", "past_due", "canceled"]);
+import { requiresExternalBillingResolution } from "./accountDeletionPolicy";
 
 export const listMine = query({
   args: {},
@@ -86,13 +85,12 @@ export const executeAccountDeletion = mutation({
     if (!user) throw new ConvexError("Target user record is missing; investigate before closing the request");
     if (user.role === "admin") throw new ConvexError("Administrator accounts cannot be deleted through the privacy queue");
 
-    const now = Date.now();
-    const hasPotentialExternalBilling =
-      user.subscriptionTier !== undefined &&
-      user.subscriptionTier !== "free" &&
-      user.subscriptionTier !== "explorer" &&
-      PAID_OR_GRACE_STATUSES.has(user.subscriptionStatus ?? "active") &&
-      (user.subscriptionCurrentPeriodEnd === undefined || user.subscriptionCurrentPeriodEnd >= now);
+    const hasPotentialExternalBilling = requiresExternalBillingResolution(
+      user.subscriptionTier,
+      user.subscriptionStatus,
+      user.subscriptionCurrentPeriodEnd,
+      Date.now(),
+    );
 
     if (hasPotentialExternalBilling && !args.externalBillingResolved) {
       throw new ConvexError("External billing must be cancelled or otherwise resolved before account deletion");
