@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import type { Doc, Id } from "@convex/_generated/dataModel";
-import { ArrowLeft, CheckCircle2, FileUp, Play, RefreshCw, ShieldAlert, Sparkles } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Download, FileUp, Play, RefreshCw, ShieldAlert, Sparkles } from "lucide-react";
 import { AppNav } from "@/components/atlas/app-nav";
 import { MadeThisBadge } from "@/components/atlas/made-this-badge";
 import { MarkdownContent } from "@/components/markdown-content";
@@ -23,7 +23,19 @@ interface DepartmentState {
   inventorEvidenceCount: number;
 }
 
+interface ArtifactDownload {
+  deliverableId: Id<"atlasDeliverables">;
+  kind: string;
+  title: string;
+  mediaType: string;
+  artifactMaturity: string | null;
+  version: number;
+  staleReason: string | null;
+  downloadUrl: string | null;
+}
+
 const getLifecycleDepartment = makeFunctionReference<"query", { inventionId: Id<"inventions">; stageId: number }, DepartmentState>("lifecycleDepartments:getLifecycleDepartment");
+const getArtifactDownloads = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, ArtifactDownload[]>("deliverableDownloads:getInventionArtifactDownloads");
 const ensureLifecycleDepartment = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; stageId: number }, { created: number; total: number; stageName: string }>("lifecycleDepartments:ensureLifecycleDepartment");
 const kickAutonomousWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { scheduled: boolean; reason: string }>("inventionWorkspace:kickAutonomousWork");
 
@@ -45,6 +57,17 @@ function statusClass(status: string) {
   return "bg-muted text-muted-foreground";
 }
 
+function artifactLabel(mediaType: string) {
+  if (mediaType === "application/vnd.openxmlformats-officedocument.presentationml.presentation") return "Download PowerPoint";
+  if (mediaType === "model/step") return "Download STEP";
+  if (mediaType === "model/stl") return "Download STL";
+  if (mediaType === "application/dxf") return "Download DXF";
+  if (mediaType === "image/svg+xml") return "Download drawing";
+  if (mediaType.startsWith("image/")) return "Download image";
+  if (mediaType === "application/pdf") return "Download PDF";
+  return "Download artifact";
+}
+
 export default function LifecycleDepartmentPage() {
   const params = useParams();
   const router = useRouter();
@@ -52,7 +75,9 @@ export default function LifecycleDepartmentPage() {
   const stageId = Number(params.stageId);
   const { isAuthenticated, isLoading } = useConvexAuth();
   const validStage = Number.isInteger(stageId) && stageId >= 6 && stageId <= 15;
-  const department = useQuery(getLifecycleDepartment, isAuthenticated && inventionId && validStage ? { inventionId, stageId } : "skip");
+  const queryArgs = isAuthenticated && inventionId && validStage ? { inventionId, stageId } : "skip";
+  const department = useQuery(getLifecycleDepartment, queryArgs);
+  const artifactDownloads = useQuery(getArtifactDownloads, isAuthenticated && inventionId ? { inventionId } : "skip");
   const ensureDepartment = useMutation(ensureLifecycleDepartment);
   const kickWork = useMutation(kickAutonomousWork);
   const [starting, setStarting] = useState(false);
@@ -72,6 +97,10 @@ export default function LifecycleDepartmentPage() {
       blocked: department.workItems.filter((item) => item.status === "blocked" || item.status === "awaiting_approval").length,
     };
   }, [department]);
+
+  const downloadsByDeliverable = useMemo(() => {
+    return new Map((artifactDownloads ?? []).map((artifact) => [String(artifact.deliverableId), artifact]));
+  }, [artifactDownloads]);
 
   const startDepartment = async () => {
     setStarting(true); setMessage(null); setError(null);
@@ -137,7 +166,18 @@ export default function LifecycleDepartmentPage() {
             <div className="flex items-end justify-between gap-4"><div><h2 className="text-xl font-semibold">Department deliverables</h2><p className="mt-1 text-sm text-muted-foreground">Every completed artifact remains traceable to evidence, assumptions, limitations, revisions, and required professional review.</p></div><Button asChild variant="ghost" size="sm"><Link href={`/invention/${inventionId}/work`}>Full work library</Link></Button></div>
             {department.deliverables.length === 0 ? <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">No department deliverables have completed yet.</div> : <div className="space-y-4">{department.deliverables.map((deliverable) => {
               const readable = contentToReadableText(deliverable.content);
-              return <article key={deliverable._id} className="rounded-2xl border border-border bg-card p-6"><div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{deliverable.kind.replaceAll("_", " ")} · v{deliverable.version}</p><h3 className="mt-1 text-lg font-semibold">{deliverable.title}</h3></div>{deliverable.staleReason ? <span className="rounded-full bg-warning/10 px-3 py-1 text-xs text-warning">Refresh needed</span> : <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-3 py-1 text-xs text-success"><CheckCircle2 className="h-3 w-3" />Current</span>}</div>{deliverable.staleReason && <p className="mt-3 text-sm text-warning">{deliverable.staleReason}</p>}{readable && <MarkdownContent content={readable} className="mt-5 text-sm" />}</article>;
+              const artifact = downloadsByDeliverable.get(String(deliverable._id));
+              return <article key={deliverable._id} className="rounded-2xl border border-border bg-card p-6">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{deliverable.kind.replaceAll("_", " ")} · v{deliverable.version}</p><h3 className="mt-1 text-lg font-semibold">{deliverable.title}</h3></div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {artifact?.downloadUrl && <Button asChild size="sm" variant="outline"><a href={artifact.downloadUrl} target="_blank" rel="noreferrer" className="gap-2"><Download className="h-4 w-4" />{artifactLabel(artifact.mediaType)}</a></Button>}
+                    {deliverable.staleReason ? <span className="rounded-full bg-warning/10 px-3 py-1 text-xs text-warning">Refresh needed</span> : <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-3 py-1 text-xs text-success"><CheckCircle2 className="h-3 w-3" />Current</span>}
+                  </div>
+                </div>
+                {deliverable.staleReason && <p className="mt-3 text-sm text-warning">{deliverable.staleReason}</p>}
+                {readable && <MarkdownContent content={readable} className="mt-5 text-sm" />}
+              </article>;
             })}</div>}
           </section>
         </div>
