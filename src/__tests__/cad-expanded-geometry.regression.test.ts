@@ -87,6 +87,55 @@ describe("InventSmith expanded native CAD geometry", () => {
     expect(artifacts.step).toContain("FACETED_BREP");
   });
 
+  it("revolves a concave annular sealing profile into a closed grooved collar", () => {
+    const spec: CadAssemblySpec = {
+      name: "RiseJar Seal Collar",
+      units: "mm",
+      revision: "A",
+      assumptions: ["Seal profile dimensions are provisional"],
+      unresolvedEngineering: ["Gland fill, elastomer squeeze, contact pressure and tolerance stack require engineering/prototype validation"],
+      parts: [{
+        id: "seal-collar",
+        name: "Grooved sealing collar",
+        material: "PP",
+        finish: "Food-contact surface finish TBD",
+        manufacturingProcess: "Injection molding candidate",
+        interfaceNotes: ["Annular gland dimensions are provisional until seal selection and prototype leak testing"],
+        primitive: {
+          type: "revolvedProfile",
+          points: [[32, -6], [40, -6], [40, 6], [37, 6], [37, 2], [35, 2], [35, 4], [32, 4]],
+          segments: 32,
+        },
+      }],
+    };
+
+    const mesh = buildCadMesh(spec);
+    expect(mesh).toHaveLength(8 * 32 * 2);
+    const radii = mesh.flatMap((triangle) => [triangle.a, triangle.b, triangle.c]).map(([x, y]) => Math.hypot(x, y));
+    expect(Math.min(...radii)).toBeCloseTo(32, 4);
+    expect(Math.max(...radii)).toBeCloseTo(40, 4);
+    const artifacts = generateCadArtifacts(spec);
+    expect(artifacts.sourceJson).toContain("revolvedProfile");
+    expect(artifacts.sourceJson).toContain("Annular gland dimensions are provisional");
+    expect(artifacts.step).toContain("FACETED_BREP");
+  });
+
+  it("rejects self-crossing revolved profiles instead of emitting misleading seal geometry", () => {
+    const spec: CadAssemblySpec = {
+      name: "Invalid Seal Profile",
+      units: "mm",
+      revision: "A",
+      assumptions: [],
+      unresolvedEngineering: [],
+      parts: [{
+        id: "crossed-profile",
+        name: "Crossed profile",
+        primitive: { type: "revolvedProfile", points: [[30, -5], [40, 5], [30, 5], [40, -5]], segments: 24 },
+      }],
+    };
+    expect(() => buildCadMesh(spec)).toThrow(/simple|self-intersecting/i);
+  });
+
   it("rejects thread geometry that would be mechanically nonsensical", () => {
     const invalidExternal: CadAssemblySpec = {
       name: "Invalid Thread",
@@ -136,7 +185,7 @@ describe("InventSmith expanded native CAD geometry", () => {
     expect(artifacts.triangleCount).toBe(mesh.length);
   });
 
-  it("rejects concave profiles rather than generating misleading closed geometry", () => {
+  it("rejects concave profiles rather than generating misleading closed extrusion geometry", () => {
     const spec: CadAssemblySpec = {
       name: "Unsafe Concave",
       units: "mm",
@@ -157,18 +206,21 @@ describe("InventSmith expanded native CAD geometry", () => {
     expect(() => buildCadMesh(spec)).toThrow(/convex/i);
   });
 
-  it("preserves manufacturing metadata and mating-thread support in the editable CAD source plan", () => {
+  it("preserves manufacturing metadata, mating-thread and sealing-profile support in the editable CAD source plan", () => {
     const generation = readFileSync(join(process.cwd(), "convex/nativeCadGeneration.ts"), "utf8");
     expect(generation).toContain('finish: { type: "string" }');
     expect(generation).toContain('manufacturingProcess: { type: "string" }');
     expect(generation).toContain('interfaceNotes: { type: "array"');
     expect(generation).toContain('"threadedTube"');
+    expect(generation).toContain('"revolvedProfile"');
     expect(generation).toContain("material: part.material.trim()");
     expect(generation).toContain("finish: part.finish.trim()");
     expect(generation).toContain("manufacturingProcess: part.manufacturingProcess.trim()");
     expect(generation).toContain("interfaceNotes: part.interfaceNotes.slice");
     expect(generation).toContain("If any of those fields are unknown, say TBD or provisional");
     expect(generation).toContain("Mating external/internal thread pairs should use compatible nominal pitch");
+    expect(generation).toContain("Seal groove depth, elastomer compression/squeeze");
+    expect(generation).toContain("closed, non-self-intersecting annular cross-section");
   });
 
   it("keeps orthographic and exploded-view artifacts visible in the Design Studio", () => {
