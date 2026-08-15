@@ -38,6 +38,23 @@ const nativeCadWork: FullProductWorkPlanItem = {
   },
 };
 
+const prototypeEvidenceGate: FullProductWorkPlanItem = {
+  kind: "prototype_physical_evidence",
+  title: "Collect physical prototype test evidence",
+  priority: 59.5,
+  estimatedCostUnits: 1,
+  deliverableKind: "prototype_physical_evidence_gate",
+  dependsOnKinds: ["prototype_test_plan"],
+  inputSnapshot: {
+    department: "prototype",
+    stageId: 6,
+    physicalEvidenceGate: true,
+    instructions: "This is a real-world evidence gate, not a writing assignment. Inspect inventor-provided evidence for actual prototype/test observations, measurements, photos, videos/transcripts, failure notes, or qualified professional test results tied to the current prototype. If no actual prototype evidence exists, do not synthesize or infer results: return needsHuman=true, humanGateType=physical_work, and ask for the smallest useful action—perform the planned prototype test and upload the resulting evidence. If actual prototype evidence is present, summarize only what is evidenced, preserve provenance and limitations, and allow the downstream prototype assessment to proceed. Never represent an unbuilt or untested prototype as tested.",
+    research: false,
+    professionalGate: null,
+  },
+};
+
 const lifecycleWork: FullProductWorkPlanItem[] = lifecycleStages.flatMap((stage) =>
   stage.work.map((item) => ({
     kind: item.kind,
@@ -45,7 +62,9 @@ const lifecycleWork: FullProductWorkPlanItem[] = lifecycleStages.flatMap((stage)
     priority: item.priority,
     estimatedCostUnits: item.estimatedCostUnits,
     deliverableKind: item.deliverableKind,
-    dependsOnKinds: [...item.dependsOnKinds],
+    dependsOnKinds: item.kind === "prototype_evidence_assessment"
+      ? [...item.dependsOnKinds, "prototype_physical_evidence"]
+      : [...item.dependsOnKinds],
     inputSnapshot: {
       department: stage.name.toLowerCase().replaceAll(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""),
       stageId: stage.id,
@@ -92,6 +111,7 @@ const professionalRoutingWork: FullProductWorkPlanItem[] = [
 export const POST_CANONICAL_WORK_PLAN: readonly FullProductWorkPlanItem[] = [
   ...designWork,
   nativeCadWork,
+  prototypeEvidenceGate,
   ...lifecycleWork,
   ...professionalRoutingWork,
 ];
