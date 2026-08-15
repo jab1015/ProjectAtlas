@@ -20,7 +20,7 @@ export const captureInventorChatEvidence = mutation({
       .withIndex("by_inventionId_sourceType", (q) => q.eq("inventionId", args.inventionId).eq("sourceType", "inventor_statement"))
       .order("desc")
       .take(40);
-    const duplicate = existing.find((source) => source.metadata?.provenance === "inventor_chat" && source.excerpt === content);
+    const duplicate = existing.find((source) => source.metadata?.capturedFrom === "ask_inventsmith" && source.excerpt === content);
     if (duplicate) return { captured: false, reason: "duplicate" as const, sourceId: duplicate._id };
 
     const now = Date.now();
@@ -35,7 +35,8 @@ export const captureInventorChatEvidence = mutation({
       excerpt: content,
       reliability: "unverified",
       metadata: {
-        provenance: "inventor_chat",
+        provenance: "inventor_upload",
+        evidenceOrigin: "chat",
         evidenceKind,
         suppliedUrls: urls,
         independentlyVerified: false,
@@ -62,7 +63,7 @@ export const captureInventorChatEvidence = mutation({
       eventType: "inventor_input_received",
       actorType: "inventor",
       summary: `InventSmith recorded material inventor input from chat as unverified project evidence (${evidenceKind.replaceAll("_", " ")}).`,
-      metadata: { sourceId: String(sourceId), evidenceKind, urlCount: urls.length, provenance: "inventor_chat" },
+      metadata: { sourceId: String(sourceId), evidenceKind, urlCount: urls.length, provenance: "inventor_upload", evidenceOrigin: "chat", capturedFrom: "ask_inventsmith" },
       createdAt: now,
     });
 
