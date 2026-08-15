@@ -1,4 +1,5 @@
 import { normalizeAtlasTier, type AtlasTier } from "./usagePolicyLogic";
+import { FULL_JOURNEY_PRO_WORK_KINDS } from "./lifecycleWorkKinds";
 
 const FREE_WORK = new Set([
   "idea_capture",
@@ -36,6 +37,7 @@ const PRO_WORK = new Set([
   "cad_model_specification",
   "exploded_view_specification",
   "manufacturing_drawing_specification",
+  ...FULL_JOURNEY_PRO_WORK_KINDS,
 ]);
 
 export function canTierRunWorkKind(tier: unknown, kind: string | undefined): boolean {
