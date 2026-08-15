@@ -9,6 +9,7 @@ import { costUnitsFromTokens, shouldContinueAutonomousRun, shouldScheduleAutonom
 import { buildConceptImagePrompt, CONCEPT_IMAGE_COST_UNITS } from "./conceptImageLogic";
 import { MAX_AUTONOMOUS_RUN_BUDGET } from "./usagePolicyLogic";
 import { restrictedPilotReason, triageInventionRisk } from "./riskTriageLogic";
+import { buildPitchDeckArtifact } from "./pitchDeckArtifact";
 
 const claimNextWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; availableCostUnits: number; now: number }, { workItemId: Id<"atlasWorkItems"> | null; reason: string }>("atlasWorkState:claimNextWork");
 const getWorkContext = makeFunctionReference<"query", { workItemId: Id<"atlasWorkItems"> }, any>("atlasWorkState:getWorkContext");
@@ -165,13 +166,19 @@ export const runAvailableWork = internalAction({
           ],
           text: { format: { type: "json_schema", name: "atlas_work_result", strict: true, schema: resultSchema } },
         });
+
         const result = JSON.parse(response.output_text);
         let units = costUnitsFromTokens(response.usage?.total_tokens);
         if (result.needsHuman) {
           await ctx.runMutation(blockWorkForHuman, { workItemId: claim.workItemId, reason: result.humanReason, gateType: result.humanGateType, blockedAt: Date.now() });
           return { completed, stopReason: "human_gate", remainingBudget };
         }
+
         let storageId: Id<"_storage"> | undefined;
+        let mediaType: string | undefined;
+        let artifactMaturity: "concept_visualization" | undefined;
+        let generationPrompt: string | undefined;
+
         if (workItem.kind === "concept_image_generation") {
           const imagePrompt = String(result.conceptImagePrompt ?? "").trim();
           const imageResult = await client.images.generate({ model: process.env.ATLAS_IMAGE_MODEL ?? "gpt-image-2", prompt: buildConceptImagePrompt(imagePrompt) });
@@ -179,9 +186,32 @@ export const runAvailableWork = internalAction({
           if (!imageBase64) throw new Error("Image generation returned no image data");
           const bytes = Uint8Array.from(Buffer.from(imageBase64, "base64"));
           storageId = await ctx.storage.store(new Blob([bytes], { type: "image/png" }));
+          mediaType = "image/png";
+          artifactMaturity = "concept_visualization";
+          generationPrompt = result.conceptImagePrompt;
           units += CONCEPT_IMAGE_COST_UNITS;
+        } else if (workItem.kind === "pitch_deck_content") {
+          const deck = buildPitchDeckArtifact(String(result.markdown ?? ""), invention.title);
+          storageId = await ctx.storage.store(new Blob([deck.bytes], { type: "application/vnd.openxmlformats-officedocument.presentationml.presentation" }));
+          mediaType = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
         }
-        await ctx.runMutation(completeWork, { workItemId: claim.workItemId, summary: result.summary, deliverableTitle: result.deliverableTitle, markdown: result.markdown, findings: result.findings, assumptions: result.assumptions, limitations: result.limitations, verifiedSources: result.verifiedSources, storageId, mediaType: storageId ? "image/png" : undefined, artifactMaturity: storageId ? "concept_visualization" : undefined, generationPrompt: storageId ? result.conceptImagePrompt : undefined, actualCostUnits: units, completedAt: Date.now() });
+
+        await ctx.runMutation(completeWork, {
+          workItemId: claim.workItemId,
+          summary: result.summary,
+          deliverableTitle: result.deliverableTitle,
+          markdown: result.markdown,
+          findings: result.findings,
+          assumptions: result.assumptions,
+          limitations: result.limitations,
+          verifiedSources: result.verifiedSources,
+          storageId,
+          mediaType,
+          artifactMaturity,
+          generationPrompt,
+          actualCostUnits: units,
+          completedAt: Date.now(),
+        });
         remainingBudget = Math.max(0, remainingBudget - units);
       } catch (error) {
         const failure = await ctx.runMutation(failWork, { workItemId: claim.workItemId, error: error instanceof Error ? error.message : "Autonomous work failed", failedAt: Date.now() });
@@ -189,6 +219,7 @@ export const runAvailableWork = internalAction({
         return { completed, stopReason: "failed", remainingBudget };
       }
     }
+
     const stopReason = "turn_limit";
     if (shouldContinueAutonomousRun(stopReason, remainingBudget)) await ctx.scheduler.runAfter(500, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget });
     return { completed: 2, stopReason, remainingBudget };
