@@ -30,6 +30,12 @@ const askInventSmith = makeFunctionReference<
   Id<"conversationMessages">
 >("atlasChat:ask");
 
+const captureInventorChatEvidence = makeFunctionReference<
+  "mutation",
+  { inventionId: Id<"inventions">; content: string },
+  { captured: boolean; reason: "not_material" | "duplicate" | "captured"; sourceId?: Id<"evidenceSources"> }
+>("chatEvidenceCapture:captureInventorChatEvidence");
+
 export default function InventSmithChatPage() {
   const params = useParams();
   const router = useRouter();
@@ -40,6 +46,7 @@ export default function InventSmithChatPage() {
     isAuthenticated && inventionId ? { inventionId } : "skip"
   );
   const ask = useMutation(askInventSmith);
+  const captureEvidence = useMutation(captureInventorChatEvidence);
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +69,9 @@ export default function InventSmithChatPage() {
     setMessage("");
     try {
       await ask({ inventionId, content });
+      // Material inventor facts, evidence links, test results, quotes and status observations
+      // become governed project evidence. Capture failure never prevents the saved chat question.
+      void captureEvidence({ inventionId, content }).catch(() => undefined);
     } catch (reason) {
       setMessage(content);
       setError(reason instanceof Error ? reason.message : "InventSmith could not save your message.");
@@ -94,7 +104,7 @@ export default function InventSmithChatPage() {
             <div className="rounded-2xl border border-dashed border-border p-8 text-center">
               <Bot className="mx-auto h-8 w-8 text-primary" />
               <h2 className="mt-3 font-semibold">What would you like to know?</h2>
-              <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">Ask what InventSmith has completed, what each department is doing, what evidence supports a conclusion, what is blocked, or what happens next.</p>
+              <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">Ask what InventSmith has completed, what each department is doing, what evidence supports a conclusion, what is blocked, or what happens next. If you supply material project facts, URLs, test results, quotes, survey/interview findings, or patent-status observations, InventSmith records them as inventor-provided evidence for the project to evaluate.</p>
             </div>
           )}
           {conversation.messages.map((item) => (
@@ -132,7 +142,7 @@ export default function InventSmithChatPage() {
               <Send className="h-4 w-4" />
             </Button>
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">InventSmith can coordinate and prepare project work, but professional/legal/engineering approval remains gated where required.</p>
+          <p className="mt-2 text-xs text-muted-foreground">Material inventor input can become project evidence, but remains unverified until checked. Professional/legal/engineering approval remains gated where required.</p>
         </form>
       </main>
     </div>
