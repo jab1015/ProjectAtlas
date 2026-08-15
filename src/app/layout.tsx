@@ -1,21 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, IBM_Plex_Sans } from "next/font/google";
 import { Providers } from "@/lib/convex";
 import { PostHogProvider } from "@/lib/posthog";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-heading",
-  weight: ["400", "500", "600", "700"],
-});
-
-const ibmPlexSans = IBM_Plex_Sans({
-  subsets: ["latin"],
-  variable: "--font-body",
-  weight: ["400", "500", "600"],
-});
 
 export const metadata: Metadata = {
   title: "Atlas — The Operating System for Inventors",
@@ -45,9 +32,7 @@ export default function RootLayout({
           />
         </head>
       )}
-      <body
-        className={`${spaceGrotesk.variable} ${ibmPlexSans.variable} font-body antialiased`}
-      >
+      <body className="font-body antialiased">
         <PostHogProvider>
           <Providers>
             {children}
