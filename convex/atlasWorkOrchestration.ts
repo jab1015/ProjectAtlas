@@ -6,7 +6,7 @@ import { internalAction } from "./_generated/server";
 import { makeFunctionReference } from "convex/server";
 import type { Id } from "./_generated/dataModel";
 import { costUnitsFromTokens, shouldContinueAutonomousRun, shouldScheduleAutonomousRetry } from "./workOrchestratorLogic";
-import { buildConceptImagePrompt, CONCEPT_IMAGE_COST_UNITS } from "./conceptImageLogic";
+import { buildConceptImagePrompt, buildProductRenderPrompt, CONCEPT_IMAGE_COST_UNITS, PRODUCT_RENDER_COST_UNITS } from "./conceptImageLogic";
 import { MAX_AUTONOMOUS_RUN_BUDGET } from "./usagePolicyLogic";
 import { restrictedPilotReason, triageInventionRisk } from "./riskTriageLogic";
 import { buildPitchDeckArtifact } from "./pitchDeckArtifact";
@@ -99,6 +99,7 @@ function contextDeliverableLimit(kind: string) {
     "design_candidate_generation",
     "design_candidate_scoring",
     "product_design_specification",
+    "product_render_generation",
     "manufacturer_rfq_package",
     "pitch_deck_content",
   ]).has(kind) ? 30 : 16;
@@ -179,9 +180,12 @@ export const runAvailableWork = internalAction({
         let artifactMaturity: "concept_visualization" | undefined;
         let generationPrompt: string | undefined;
 
-        if (workItem.kind === "concept_image_generation") {
+        if (workItem.kind === "concept_image_generation" || workItem.kind === "product_render_generation") {
           const imagePrompt = String(result.conceptImagePrompt ?? "").trim();
-          const imageResult = await client.images.generate({ model: process.env.ATLAS_IMAGE_MODEL ?? "gpt-image-2", prompt: buildConceptImagePrompt(imagePrompt) });
+          const prompt = workItem.kind === "product_render_generation"
+            ? buildProductRenderPrompt(imagePrompt)
+            : buildConceptImagePrompt(imagePrompt);
+          const imageResult = await client.images.generate({ model: process.env.ATLAS_IMAGE_MODEL ?? "gpt-image-2", prompt });
           const imageBase64 = imageResult.data?.[0]?.b64_json;
           if (!imageBase64) throw new Error("Image generation returned no image data");
           const bytes = Uint8Array.from(Buffer.from(imageBase64, "base64"));
@@ -189,7 +193,7 @@ export const runAvailableWork = internalAction({
           mediaType = "image/png";
           artifactMaturity = "concept_visualization";
           generationPrompt = result.conceptImagePrompt;
-          units += CONCEPT_IMAGE_COST_UNITS;
+          units += workItem.kind === "product_render_generation" ? PRODUCT_RENDER_COST_UNITS : CONCEPT_IMAGE_COST_UNITS;
         } else if (workItem.kind === "pitch_deck_content") {
           const deck = buildPitchDeckArtifact(String(result.markdown ?? ""), invention.title);
           storageId = await ctx.storage.store(new Blob([deck.bytes], { type: "application/vnd.openxmlformats-officedocument.presentationml.presentation" }));
