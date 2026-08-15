@@ -20,7 +20,7 @@ export const FULL_JOURNEY_STAGES: FullJourneyStageDefinition[] = [
   { id: 11, name: "Marketing", routeType: "department", requiredWorkKinds: ["marketing_messaging", "marketing_channel_strategy", "marketing_plan", "marketing_asset_package", "prelaunch_marketing_calendar"], dependsOnStageIds: [3, 8, 10] },
   { id: 12, name: "Sales", routeType: "department", requiredWorkKinds: ["sales_channel_strategy", "sales_toolkit", "sales_funnel_model", "sales_projection", "post_purchase_experience"], dependsOnStageIds: [7, 10, 11] },
   { id: 13, name: "Funding", routeType: "department", requiredWorkKinds: ["funding_strategy", "funding_source_research", "financial_model", "pitch_deck_content", "investor_faq", "funding_readiness"], dependsOnStageIds: [3, 5, 7, 8, 9, 10] },
-  { id: 14, name: "Launch", routeType: "department", requiredWorkKinds: ["launch_readiness", "launch_playbook", "customer_feedback_loop", "launch_performance", "post_launch_priorities"], dependsOnStageIds: [7, 8, 9, 10, 11, 12] },
+  { id: 14, name: "Launch", routeType: "department", requiredWorkKinds: ["launch_readiness", "launch_playbook", "customer_feedback_loop", "launch_actual_evidence", "launch_performance", "post_launch_priorities"], dependsOnStageIds: [7, 8, 9, 10, 11, 12] },
   { id: 15, name: "Growth", routeType: "department", requiredWorkKinds: ["growth_audit", "growth_levers", "growth_roadmap", "retention_system", "growth_performance_reporting"], dependsOnStageIds: [14] },
 ];
 
