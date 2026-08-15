@@ -1,8 +1,8 @@
-# Atlas Build Progress
+# InventSmith Build Progress
 
 **Last updated:** August 15, 2026  
 **Release target:** Controlled pilot — Idea to Feasibility and IP Readiness  
-**Authoritative scope:** `docs/ATLAS_PRODUCT_RESET_V1.md`  
+**Authoritative scope:** `docs/ATLAS_PRODUCT_RESET_V1.md` (legacy filename retained for continuity)  
 **Overall completion:** **80%**
 
 ## How the percentage is calculated
@@ -13,70 +13,57 @@ The percentage is a weighted pilot-readiness estimate, not a count of files or s
 |---|---:|---:|---:|---|
 | Product scope and safety baseline | 10% | 100% | 10.0% | Product Reset v1 defines customer, boundaries, autonomy, trust states, release outcome, and restricted pilot categories. Restricted-category execution fails closed before model calls. |
 | Canonical invention data model | 12% | 97% | 11.6% | Core ledgers, usage, subscriptions, media metadata, deletion, privacy export, and idempotent canonical workspace migration exist. Live migration/backfill validation remains. |
-| Autonomous orchestration engine | 18% | 90% | 16.2% | Dependency queue, leases, retries, reservations, finite budgets, entitlements, human gates, stale-output rejection, continuation, scheduled recovery, and pre-model risk triage exist. Cloud runtime remains unverified. |
-| Feasibility package coverage | 18% | 66% | 11.9% | Every named package section, concept imagery, package assembly, Markdown, and browser-local PDF/DOCX export exist. Real DOCX/PDF binary generation is CI-verified; live content quality and visual layout QA remain. |
+| Autonomous orchestration engine | 18% | 90% | 16.2% | Dependency queue, leases, retries, reservations, finite budgets, entitlements, human gates, stale-output rejection, continuation, scheduled recovery, and pre-model risk triage exist. Managed cloud runtime remains unverified. |
+| Feasibility package coverage | 18% | 66% | 11.9% | Every named package section, concept imagery, package assembly, Markdown, and PDF/DOCX export exist. Real DOCX/PDF binary generation is CI-verified; live content quality and visual layout QA remain. |
 | Evidence and output trust | 12% | 68% | 8.2% | Claim typing, source ledger, verification freshness, disputes, coverage, trust promotion, dependencies, stale propagation, and professional-review gates exist. Live representative-case citation evaluation remains. |
-| Inventor experience and chat | 10% | 86% | 8.6% | Status briefing, subscriptions, work library, downloads, review queue, blocked-work response, record-aware chat, controlled pilot launcher, and self-service structured data export exist. Full usability testing remains. |
-| Security, privacy, and usage control | 8% | 100% | 8.0% | Backend authorization, signed webhooks, finite budgets, bounded exports, transactional deletion, secret-excluding structured export, restricted-category gating, CI checks, and zero known production vulnerabilities are verified in code. Deployed deletion/restoration testing remains an operations gate. |
-| Deployment and operations | 7% | 58% | 4.1% | CI, runbook, scheduled recovery, admin operations, secret-safe health checks, one-command live verification, reproducible font-independent builds, and a guarded manual development deployment workflow exist. Convex deployment, monitoring, backups, and spend alerts remain live gaps. |
-| Representative pilot evaluation | 5% | 28% | 1.4% | Deterministic quality checks and the canonical representative invention exist; the admin launcher is merged and ready to create/start the case after deployment. No live representative run or professional review has been completed. |
+| Inventor experience and chat | 10% | 86% | 8.6% | Status briefing, subscriptions, work library, downloads, review queue, blocked-work response, record-aware Ask InventSmith, controlled-pilot launcher, and self-service structured data export exist. Full usability testing remains. |
+| Security, privacy, and usage control | 8% | 100% | 8.0% | Backend authorization, signed webhooks, finite budgets, bounded exports, transactional deletion, secret-excluding structured export, restricted-category gating, CI checks, and zero known high/critical production vulnerabilities are verified in code. Deployed deletion/restoration testing remains an operations gate. |
+| Deployment and operations | 7% | 58% | 4.1% | CI, runbook, scheduled recovery, admin operations, secret-safe health checks, one-command live verification, reproducible font-independent builds, and guarded development deployment tooling exist. Managed deployment, monitoring, backups, and spend alerts remain live gaps. |
+| Representative pilot evaluation | 5% | 28% | 1.4% | Deterministic quality checks and the canonical representative invention exist; the admin launcher is ready to create/start the case after deployment. No live representative run or professional review has been completed. |
 | **Total** | **100%** |  | **80.0%** | Conservative controlled-pilot readiness estimate. |
 
 ## Current milestone
 
-**Milestone:** Deploy and run one invention safely from intake through an evidence-checked feasibility recommendation without hidden manual assembly.
+**Milestone:** Synchronize the verified InventSmith repository into the existing MadeThis-managed environment, then run one invention safely from intake through an evidence-checked feasibility recommendation without hidden manual assembly.
 
 ### Latest verified checkpoint
 
-- Root Atlas application only; reference implementations are outside this release scope.
-- GitHub `main` contains the autonomous controlled-pilot architecture and permanent Atlas CI verification.
+- Customer-facing product identity is **InventSmith — The Inventor OS**, published by Modern Methods.
+- The official InventSmith logo is committed and integrated into current product branding.
+- A permanent branding regression check prevents current customer-facing Atlas identity from being reintroduced while allowing deployment-sensitive compatibility identifiers to remain internal.
+- GitHub `main` contains the autonomous controlled-pilot architecture and permanent CI verification.
+- The final repository verification after the InventSmith rename passed both TypeScript targets, the full regression suite, the production dependency audit, and the Next.js production build.
 - Account deletion is fail-closed and transactional: invention-owned data/storage and authentication credentials are removed, retained financial/subscription records are anonymized, paid billing must be resolved first, and administrators cannot self-delete through the privacy queue.
-- Authenticated inventors can now download a bounded structured JSON export containing their Atlas workspace data while password/auth credentials, sessions, refresh tokens, verification codes, bearer download tokens, and server/API secrets are excluded. Binary file bytes remain outside the JSON package.
-- Existing inventions receive an idempotent canonical workspace migration: missing Invention Records and missing autonomous work kinds are added without overwriting or duplicating existing work.
-- Controlled-pilot safety scope is enforced before any model research/generation call. Clearly restricted categories route to professional review without incurring model cost.
-- Representative DOCX and PDF exports are generated by the real export functions in CI and checked for nontrivial binary output and valid DOCX/PDF signatures.
-- `/api/health` provides a secret-safe deployment readiness probe and checks the actual Atlas Convex Auth key material (`JWT_PRIVATE_KEY` and `JWKS`).
-- `npm run verify:live -- https://<deployment>.convex.site` performs a fail-closed live readiness check with timeout, database, AI, auth, and webhook configuration reporting.
-- The controlled representative-pilot launcher is merged. It creates the same non-safety-critical fixture used by deterministic evaluation and immediately schedules eligible autonomous work without bypassing entitlements, budgets, or human/professional gates.
-- A manual-only Convex development deployment workflow is merged. It requires the exact confirmation `DEPLOY ATLAS DEV`, requires the `atlas-development` GitHub environment, rejects missing or non-`dev:` deployment keys, runs the full CI verification matrix, and only then calls `npx convex deploy`.
-- The production build no longer downloads Google Fonts at build time, removing a network-dependent deployment failure discovered by CI.
-- The latest privacy-export CI checkpoint passed both TypeScript targets, the full regression suite, the high-severity production dependency audit with **0 production vulnerabilities**, and the Next.js production build.
+- Authenticated inventors can download a bounded structured JSON export while password/auth credentials, sessions, refresh tokens, verification codes, bearer download tokens, and server/API secrets are excluded. Binary file bytes remain outside the JSON package.
+- Existing inventions receive an idempotent canonical workspace migration without overwriting or duplicating existing work.
+- Controlled-pilot safety scope is enforced before model research/generation calls.
+- Representative DOCX and PDF exports are generated by real export functions in CI and checked for nontrivial binary output and valid signatures.
+- `/api/health` provides a secret-safe deployment readiness probe and checks Convex Auth key material without exposing values.
+- `npm run verify:live -- https://<deployment>.convex.site` performs fail-closed live readiness verification.
+- The representative-pilot launcher creates the canonical non-safety-critical fixture and schedules eligible autonomous work without bypassing entitlements, budgets, or human/professional gates.
+- The production build does not download Google Fonts at build time.
 
-### Previously completed foundation
+### Repository-only work status
 
-- Canonical invention record and ledgers for evidence, assumptions, decisions, approvals, work, deliverables, dependencies, professional review, usage, subscription events, and privacy requests.
-- Autonomous dependency-based work queue with leases, retries, budgets, entitlements, human gates, automatic continuation, 15-minute recovery, and stale-output rejection.
-- Market, competitor, prior-art, technical, materials/manufacturing, regulatory, IP-readiness, evidence-verification, concept-image, final recommendation, and package-assembly work types.
-- Evidence URL sanitation, separate verification stage, 90-day verification freshness, source coverage, confidence, limitations, missing-information metadata, and automatic stale-work regeneration.
-- Invention-aware Ask Atlas with bounded recent history and an 80,000-character model-context ceiling.
-- Inventor status briefing, decision/approval review, work library, professional-review records, execution history, and bounded daily usage display.
-- Metered concept visualization pipeline with Convex media storage and deletion cleanup.
-- Browser-local DOCX/PDF package export with evidence, trust, limitations, professional-review status, and size limits.
-- Backend authorization hardening, token-bound downloads, signed subscription reconciliation, finite plan limits, admin operations/privacy consoles, structured data export, and privacy request workflows.
+**Complete for handoff.** The remaining acceptance work requires MadeThis-managed runtime access or human/professional review. Further repository changes should be limited to defects discovered during synchronization or live acceptance so the handoff baseline remains stable.
 
-### In progress
+### Next highest-priority work — managed/live
 
-- Final code-level release audit for gaps that can be closed without a live external deployment.
-- Prepare an exact MadeThis managed-source synchronization manifest tied to the verified GitHub functional baseline.
-- Prepare the representative fixture, health verifier, deletion test, and exports for deployed end-to-end verification.
-
-### Next highest-priority work
-
-1. Create/configure a controlled Convex development deployment and the `atlas-development` GitHub environment with a masked development deploy key.
-2. Run the guarded development deployment and verify `/api/health`, auth, canonical migration, cron recovery, reservations, and the real autonomous work queue.
-3. Configure the existing OpenAI key in the Convex server environment through a masked secret flow.
+1. Have MadeThis reproduce the final GitHub `main` baseline inside its managed source while preserving Convex/auth/Vercel/domain/storage/data.
+2. Verify `/api/health`, auth/session persistence, canonical migration, recovery, reservations, and the real autonomous work queue.
+3. Verify the OpenAI key and required server-side secrets in the managed Convex environment through masked tooling.
 4. Run the standard non-safety-critical physical product through the deployed workflow, including bounded live model and concept-image smoke tests.
-5. Configure and validate the MadeThis subscription lifecycle webhook against the deployed endpoint.
-6. Render and visually inspect representative DOCX/PDF output from the live case.
-7. Run a disposable-account deletion/restoration test and configure external monitoring, spend alerts, backup ownership, and incident response.
+5. Configure/validate the MadeThis subscription lifecycle webhook against the deployed endpoint.
+6. Render and visually inspect representative InventSmith DOCX/PDF output from the live case.
+7. Run a disposable-account deletion/restoration test and configure monitoring, spend alerts, backup ownership, and incident response.
 8. Conduct inventor usability testing and patent/engineering professional review of the handoff package.
 
 ## Known release blockers
 
-- No controlled Convex deployment has yet been live-verified for the current build.
-- GitHub currently has no configured `atlas-development` deployment environment available to the connected integration, so the guarded deployment workflow cannot yet receive a development-scoped `CONVEX_DEPLOY_KEY`.
-- The OpenAI key exists securely outside source control but is not yet verified in the Convex server environment; no live paid model/image call has been made in this build cycle.
-- MadeThis has not yet been verified sending the signed subscription lifecycle contract to a deployed Atlas endpoint.
+- MadeThis synchronization against the final InventSmith GitHub baseline has not yet been completed.
+- No controlled managed Convex deployment has been live-verified for the current build.
+- The OpenAI key and required secrets are not yet verified in the MadeThis-managed Convex server environment for this build cycle.
+- MadeThis has not yet been verified sending the signed subscription lifecycle contract to the deployed endpoint.
 - No professional patent/engineering reviewer has evaluated a generated handoff package.
 - Account-deletion execution is implemented and CI-verified, but a disposable deployed account deletion/restoration test remains required.
 - DOCX/PDF binary generation is structurally CI-verified, but representative rendered layout/content has not yet been visually inspected from a live case.
@@ -84,4 +71,4 @@ The percentage is a weighted pilot-readiness estimate, not a count of files or s
 
 ## Progress-update rule
 
-Update this document whenever a milestone closes, a release blocker changes, a new end-to-end verification is completed, or the weighted completion estimate changes materially. Every user-facing closeout should repeat the current percentage and distinguish verified work from work that only exists in code.
+Update this document whenever a managed synchronization milestone closes, a release blocker changes, a new end-to-end verification is completed, or the weighted completion estimate changes materially. Every closeout should distinguish repository-verified work from managed/live acceptance.
