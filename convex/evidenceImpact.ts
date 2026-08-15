@@ -21,6 +21,12 @@ function evidenceGateRelease(input: { action: "uploaded" | "removed"; evidenceKi
       summary: "InventSmith released the manufacturer quote-evidence gate because a real quote/RFQ response was supplied.",
     };
   }
+  if (input.evidenceKind === "sales_evidence" && item.kind === "launch_actual_evidence") {
+    return {
+      lastError: "Actual sales/launch evidence was supplied; InventSmith can evaluate the post-launch evidence gate again.",
+      summary: "InventSmith released the launch evidence gate because actual sales/launch analytics were supplied.",
+    };
+  }
   return null;
 }
 
