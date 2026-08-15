@@ -48,6 +48,22 @@ describe("InventSmith full idea-to-market journey", () => {
     ]);
   });
 
+  it("requires patent/prior-art intelligence before strategic product design begins", () => {
+    const patent = stageById.get(4);
+    const design = stageById.get(5);
+    expect(patent?.requiredWorkKinds).toEqual(expect.arrayContaining([
+      "preliminary_prior_art",
+      "feature_prior_art_comparison",
+      "distinguishing_features",
+    ]));
+    expect(design?.requiredWorkKinds).toEqual(expect.arrayContaining([
+      "design_candidate_generation",
+      "design_candidate_scoring",
+      "product_design_specification",
+    ]));
+    expect(design?.dependsOnStageIds).toContain(4);
+  });
+
   it("locks prototype evidence and design feedback into stage 6", () => {
     expectStageWork(6, [
       "prototype_strategy",
