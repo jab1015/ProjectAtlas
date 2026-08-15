@@ -11,44 +11,44 @@ import { Button } from "@/components/ui/button";
 
 const FAQ_ITEMS = [
   {
-    question: "What is Atlas?",
+    question: "What is InventSmith?",
     answer:
-      "Atlas is an autonomous invention-development assistant. The controlled-pilot release focuses on idea capture, feasibility, preliminary prior-art research, and IP-readiness preparation. Later product-development and market stages remain on the roadmap.",
+      "InventSmith is The Inventor OS from Modern Methods. It is an autonomous invention-development system designed to research, organize evidence, prepare work, and advance an invention while escalating only the genuine human decisions, authorizations, professional reviews, payments, private inputs, or physical-world actions it cannot safely complete itself.",
   },
   {
-    question: "Who is Atlas for?",
+    question: "Who is InventSmith for?",
     answer:
-      "Atlas is for independent inventors, entrepreneurs, and anyone with an idea they want to bring to life. You don't need a technical background or prior invention experience. You just need an idea and the commitment to develop it.",
+      "InventSmith is for independent inventors, entrepreneurs, and anyone with an idea they want to develop seriously. You do not need a technical background or prior invention experience. You bring the invention; InventSmith becomes the workshop around it.",
   },
   {
-    question: "How does Atlas work?",
+    question: "How does InventSmith work?",
     answer:
-      "You capture the invention once. Atlas creates a structured record, runs useful work in dependency order, shows its evidence and limitations, and pauses only for a decision, authorization, private information, professional review, payment, or physical-world action that genuinely requires you.",
+      "You capture the invention once. InventSmith creates a structured record, runs useful work in dependency order, shows its evidence and limitations, and keeps going until a real human gate is reached. If InventSmith can safely do the work, it should do the work instead of turning it into an inventor task.",
   },
   {
     question: "Is my invention private?",
     answer:
-      "Atlas uses authenticated, owner-scoped workspaces and does not authorize external sharing without your approval. Like any hosted service, approved infrastructure and AI processors may handle data to provide the service; final privacy terms and the pilot data-processing review must be completed before public launch.",
+      "InventSmith uses authenticated, owner-scoped workspaces and does not authorize external sharing without your approval. Like any hosted service, approved infrastructure and AI processors may handle data to provide the service; final privacy terms and the pilot data-processing review must be completed before public launch.",
   },
   {
     question: "Who owns my invention?",
     answer:
-      "You do. Always. Atlas makes no claim of ownership over anything you create, share, or develop using the platform. Your invention is yours.",
+      "You do. Always. InventSmith makes no claim of ownership over anything you create, share, or develop using the platform. The human remains the inventor; your invention remains yours.",
   },
   {
-    question: "Do I need a patent before using Atlas?",
+    question: "Do I need a patent before using InventSmith?",
     answer:
-      "No. Atlas can prepare a preliminary prior-art landscape and an organized patent-professional handoff. It does not determine patentability, freedom to operate, validity, or infringement, and it does not replace a patent professional.",
+      "No. InventSmith can prepare a preliminary prior-art landscape and an organized patent-professional handoff. It does not determine patentability, freedom to operate, validity, or infringement, and it does not replace a patent professional.",
   },
   {
     question: "What does the Explorer plan include?",
     answer:
-      "Explorer is free for one active invention and includes a limited feasibility preview, 25 autonomous cost units per day, and 30 Ask Atlas questions per day. Research remains draft until it passes the applicable evidence checks.",
+      "Explorer is free for one active invention and includes a limited feasibility preview, 25 autonomous cost units per day, and 30 Ask InventSmith questions per day. Research remains draft until it passes the applicable evidence checks.",
   },
   {
     question: "What is the Inventor plan?",
     answer:
-      "The current Inventor pricing hypothesis is $39/month for 3 active inventions, 125 autonomous cost units per day, 100 Ask Atlas questions per day, and the feasibility/IP-readiness workspace. Pricing remains subject to controlled-pilot validation.",
+      "The current Inventor pricing hypothesis is $39/month for 3 active inventions, 125 autonomous cost units per day, 100 Ask InventSmith questions per day, and the feasibility/IP-readiness workspace. Pricing remains subject to controlled-pilot validation.",
   },
   {
     question: "What do Pro and Enterprise add?",
@@ -77,7 +77,7 @@ export default function FaqPage() {
         Frequently Asked Questions
       </h1>
       <p className="text-muted-foreground mb-12 text-lg leading-relaxed">
-        Everything you need to know before you start.
+        Everything you need to know before you put your invention into the Workshop.
       </p>
 
       <Accordion type="single" collapsible className="w-full">
@@ -95,7 +95,6 @@ export default function FaqPage() {
         ))}
       </Accordion>
 
-      {/* Bottom CTA */}
       <div className="mt-16 rounded-2xl border border-border bg-muted/30 p-10 text-center">
         <h2
           className="text-xl font-semibold text-foreground mb-2"
