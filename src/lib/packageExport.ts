@@ -59,7 +59,7 @@ export interface AtlasPackageExport {
   deliverables: ExportDeliverable[];
 }
 
-const DISCLAIMER = "Atlas provides research and drafting assistance only. This package is not a patentability or freedom-to-operate opinion, legal advice, regulatory approval, production-release engineering, or a guarantee of funding or market success. Required professionals must review applicable work before external reliance, filing, manufacture, or sale.";
+const DISCLAIMER = "InventSmith provides research and drafting assistance only. This package is not a patentability or freedom-to-operate opinion, legal advice, regulatory approval, production-release engineering, or a guarantee of funding or market success. Required professionals must review applicable work before external reliance, filing, manufacture, or sale.";
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -94,10 +94,11 @@ export async function exportAtlasPackageDocx(input: AtlasPackageExport) {
   if (sizeError) throw new Error(sizeError);
   const children: Array<Paragraph | Table> = [
     new Paragraph({
-      text: "ATLAS FEASIBILITY & IP-READINESS PACKAGE",
+      text: "INVENTSMITH FEASIBILITY & IP-READINESS PACKAGE",
       heading: HeadingLevel.TITLE,
       spacing: { after: 120 },
     }),
+    new Paragraph({ text: "The Inventor OS — Modern Methods", spacing: { after: 80 } }),
     new Paragraph({ text: input.inventionTitle, style: "Subtitle", spacing: { after: 280 } }),
     new Table({
       width: { size: 9360, type: WidthType.DXA },
@@ -163,7 +164,7 @@ export async function exportAtlasPackageDocx(input: AtlasPackageExport) {
     },
     sections: [{
       properties: { page: { margin: { top: 1440, right: 1440, bottom: 1440, left: 1440, header: 708, footer: 708 } } },
-      footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun("Atlas package | Page "), new TextRun({ children: [PageNumber.CURRENT] })] })] }) },
+      footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun("InventSmith package | Page "), new TextRun({ children: [PageNumber.CURRENT] })] })] }) },
       children,
     }],
   });
@@ -207,7 +208,8 @@ export async function exportAtlasPackagePdf(input: AtlasPackageExport) {
     y -= options.gap ?? 5;
   };
   newPage();
-  addText("ATLAS FEASIBILITY & IP-READINESS PACKAGE", { size: 18, font: bold, color: rgb(0.04, 0.15, 0.27), gap: 8 });
+  addText("INVENTSMITH FEASIBILITY & IP-READINESS PACKAGE", { size: 18, font: bold, color: rgb(0.04, 0.15, 0.27), gap: 8 });
+  addText("The Inventor OS — Modern Methods", { size: 10, font: bold, gap: 8 });
   addText(input.inventionTitle, { size: 15, font: bold, gap: 18 });
   addText(`Generated: ${new Date(input.generatedAt).toLocaleString()}`);
   addText(`Automated package checks: ${input.qualityPassed ? "Passed - professional review requirements still apply" : "Not passed"}`, { font: bold, gap: 12 });
@@ -236,7 +238,7 @@ export async function exportAtlasPackagePdf(input: AtlasPackageExport) {
     }
   }
   const pages = pdf.getPages();
-  pages.forEach((pdfPage, index) => pdfPage.drawText(`Atlas package | Page ${index + 1} of ${pages.length}`, { x: width - margin - 120, y: 28, size: 8, font: regular, color: rgb(0.4, 0.4, 0.4) }));
+  pages.forEach((pdfPage, index) => pdfPage.drawText(`InventSmith package | Page ${index + 1} of ${pages.length}`, { x: width - margin - 140, y: 28, size: 8, font: regular, color: rgb(0.4, 0.4, 0.4) }));
   const bytes = await pdf.save();
   downloadBlob(new Blob([bytes as BlobPart], { type: "application/pdf" }), buildAtlasPackageFilename(input.inventionTitle, "pdf"));
 }
