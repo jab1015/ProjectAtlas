@@ -2,6 +2,9 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { requireAdmin } from "./authHelpers";
+import { deleteAccountData } from "./accountDeletion";
+
+const PAID_OR_GRACE_STATUSES = new Set(["trialing", "active", "past_due", "canceled"]);
 
 export const listMine = query({
   args: {},
@@ -51,11 +54,64 @@ export const resolve = mutation({
     if ((args.status === "completed" || args.status === "declined") && (!notes || notes.length < 10)) {
       throw new ConvexError("Completion or decline requires auditable resolution notes");
     }
+    if (request.requestType === "account_deletion" && args.status === "completed") {
+      throw new ConvexError("Account deletion requests must be completed through executeAccountDeletion");
+    }
     await ctx.db.patch(request._id, {
       status: args.status,
       resolutionNotes: notes || undefined,
       completedAt: args.status === "completed" || args.status === "declined" ? Date.now() : undefined,
     });
     return { success: true };
+  },
+});
+
+export const executeAccountDeletion = mutation({
+  args: {
+    requestId: v.id("privacyRequests"),
+    externalBillingResolved: v.boolean(),
+    resolutionNotes: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+    const request = await ctx.db.get(args.requestId);
+    if (!request) throw new ConvexError("Privacy request not found");
+    if (request.requestType !== "account_deletion") throw new ConvexError("Request is not an account deletion request");
+    if (request.status === "completed" || request.status === "declined") throw new ConvexError("Privacy request is already terminal");
+
+    const notes = args.resolutionNotes.trim();
+    if (notes.length < 10) throw new ConvexError("Deletion requires auditable resolution notes");
+
+    const user = await ctx.db.get(request.userId);
+    if (!user) throw new ConvexError("Target user record is missing; investigate before closing the request");
+    if (user.role === "admin") throw new ConvexError("Administrator accounts cannot be deleted through the privacy queue");
+
+    const now = Date.now();
+    const hasPotentialExternalBilling =
+      user.subscriptionTier !== undefined &&
+      user.subscriptionTier !== "free" &&
+      user.subscriptionTier !== "explorer" &&
+      PAID_OR_GRACE_STATUSES.has(user.subscriptionStatus ?? "active") &&
+      (user.subscriptionCurrentPeriodEnd === undefined || user.subscriptionCurrentPeriodEnd >= now);
+
+    if (hasPotentialExternalBilling && !args.externalBillingResolved) {
+      throw new ConvexError("External billing must be cancelled or otherwise resolved before account deletion");
+    }
+
+    await ctx.db.patch(request._id, {
+      status: "in_progress",
+      resolutionNotes: notes,
+      completedAt: undefined,
+    });
+
+    const summary = await deleteAccountData(ctx, request.userId);
+
+    await ctx.db.patch(request._id, {
+      status: "completed",
+      completedAt: Date.now(),
+      resolutionNotes: `${notes}\nDeletion summary: ${JSON.stringify(summary)}`,
+    });
+
+    return { success: true, summary };
   },
 });
