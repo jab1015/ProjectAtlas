@@ -37,8 +37,11 @@ describe("InventSmith full idea-to-market journey", () => {
     ]);
   });
 
-  it("keeps Patent Readiness directly inspectable instead of hiding it in the generic invention page", () => {
+  it("keeps Market Research and Patent Readiness directly inspectable", () => {
+    const market = stageById.get(3);
     const patent = stageById.get(4);
+    expect(market?.routeType).toBe("market");
+    expect(routeForJourneyStage("risejar", market!)).toBe("/invention/risejar/market");
     expect(patent?.routeType).toBe("patent");
     expect(routeForJourneyStage("risejar", patent!)).toBe("/invention/risejar/patent");
   });
