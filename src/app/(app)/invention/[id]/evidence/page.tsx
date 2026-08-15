@@ -31,6 +31,7 @@ const EVIDENCE_KINDS = [
   ["competitor", "Competitor material"],
   ["prior_art", "Patent / prior-art document"],
   ["manufacturer_quote", "Manufacturer quote / RFQ"],
+  ["sales_evidence", "Sales / launch analytics"],
   ["professional_report", "Professional report"],
   ["design_reference", "Sketch / drawing / design reference"],
   ["pitch_deck", "Pitch deck / funding material"],
@@ -184,7 +185,7 @@ export default function InventionEvidencePage() {
           <p className="text-xs font-medium uppercase tracking-widest text-primary">Evidence Locker</p>
           <h1 className="text-3xl font-bold text-foreground">Give InventSmith the evidence you already have.</h1>
           <p className="max-w-3xl text-muted-foreground leading-relaxed">
-            Upload survey results, interview notes, prototype tests, patents, quotes, drawings, professional reports,
+            Upload survey results, interview notes, prototype tests, patents, quotes, sales/launch analytics, drawings, professional reports,
             pitch decks, contracts, or other invention material. CSV survey results and text evidence are structured at intake;
             supported binary files are preserved first and then structured server-side so Validation and downstream departments
             can reason from the evidence while preserving its provenance.
