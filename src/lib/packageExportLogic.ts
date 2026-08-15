@@ -1,6 +1,6 @@
 export function buildAtlasPackageFilename(title: string, extension: "docx" | "pdf") {
   const stem = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "invention";
-  return `${stem}-atlas-feasibility-package.${extension}`;
+  return `${stem}-inventsmith-feasibility-package.${extension}`;
 }
 
 export function selectLatestDeliverables<T extends { kind: string; version: number }>(deliverables: T[]): T[] {

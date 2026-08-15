@@ -9,15 +9,14 @@ interface StoreFooterProps {
 }
 
 export function StoreFooter({
-  storeName = "Atlas",
-  footerText = "The operating system for inventors. A clear path from idea to market.",
+  storeName = "InventSmith",
+  footerText = "The Inventor OS. You invent. InventSmith does the work. Published by Modern Methods.",
   className,
 }: StoreFooterProps) {
   return (
     <footer className={cn("border-t border-border bg-background", className)}>
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
-          {/* Left — wordmark + tagline */}
           <div>
             <AtlasLogo size="sm" className="text-foreground" />
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
@@ -25,7 +24,6 @@ export function StoreFooter({
             </p>
           </div>
 
-          {/* Middle — product links */}
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">
               Explore
@@ -49,14 +47,13 @@ export function StoreFooter({
             </ul>
           </div>
 
-          {/* Right — legal + contact */}
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">
               Legal
             </p>
             <ul className="space-y-3">
               {[
-                { label: "Privacy Policy", href: "/privacy" },
+                { label: "Privacy Notice", href: "/privacy" },
                 { label: "Terms of Service", href: "/terms" },
               ].map((link) => (
                 <li key={link.href}>
@@ -80,10 +77,9 @@ export function StoreFooter({
           </div>
         </div>
 
-        {/* Bottom bar */}
         <div className="mt-10 border-t border-border pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
-            &copy; 2025 Atlas. All rights reserved.
+            &copy; 2026 Modern Methods. {storeName} — The Inventor OS.
           </p>
           <div className="opacity-50 text-xs">
             <a

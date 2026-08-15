@@ -14,7 +14,7 @@ const TIERS = [
       "1 active invention",
       "Idea capture",
       "25 autonomous cost units/day",
-      "30 Ask Atlas questions/day",
+      "30 Ask InventSmith questions/day",
       "Limited feasibility preview",
     ],
     cta: "Get started free",
@@ -29,10 +29,10 @@ const TIERS = [
     features: [
       "3 active inventions",
       "125 autonomous cost units/day",
-      "100 Ask Atlas questions/day",
+      "100 Ask InventSmith questions/day",
       "Feasibility and preliminary IP-readiness work",
       "Evidence and decision ledgers",
-      "Versioned Atlas draft deliverables",
+      "Versioned InventSmith draft deliverables",
     ],
     cta: "Choose Inventor",
     href: "/sign-up",
@@ -46,7 +46,7 @@ const TIERS = [
     features: [
       "10 active inventions",
       "350 autonomous cost units/day",
-      "200 Ask Atlas questions/day",
+      "200 Ask InventSmith questions/day",
       "Deeper feasibility and prior-art research",
       "Professional handoff preparation",
       "Expanded exports and collaboration as released",
@@ -64,7 +64,7 @@ const TIERS = [
     features: [
       "25 active inventions",
       "600 autonomous cost units/day",
-      "300 Ask Atlas questions/day",
+      "300 Ask InventSmith questions/day",
       "Priority onboarding and support",
       "No unlimited expensive operations",
       "Custom services separately scoped",
@@ -78,7 +78,6 @@ const TIERS = [
 export default function PricingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Minimal header */}
       <header className="border-b border-border">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="no-underline hover:opacity-80 transition-opacity">
@@ -104,6 +103,7 @@ export default function PricingPage() {
       <main className="flex-1">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 py-16">
           <div className="text-center mb-12">
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">InventSmith — The Inventor OS</p>
             <h1
               className="text-3xl sm:text-4xl font-bold text-foreground mb-4"
               style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
@@ -111,7 +111,7 @@ export default function PricingPage() {
               Bounded plans for measurable progress
             </h1>
             <p className="text-muted-foreground text-lg">
-              Start free. Research and generation are metered so Atlas can work persistently without hidden runaway costs.
+              Start free. Research and generation are metered so InventSmith can work persistently without hidden runaway costs.
             </p>
           </div>
 
@@ -164,7 +164,7 @@ export default function PricingPage() {
         <div className="mx-auto max-w-5xl px-4 sm:px-6 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-xs text-muted-foreground">
-              &copy; 2025 Atlas. All rights reserved.
+              &copy; 2026 Modern Methods. InventSmith — The Inventor OS.
             </p>
             <nav className="flex items-center gap-6">
               {[

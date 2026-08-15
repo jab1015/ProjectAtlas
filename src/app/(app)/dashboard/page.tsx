@@ -36,7 +36,7 @@ const kickAutonomousWork = makeFunctionReference<
 
 function DashboardSkeleton() {
   return (
-    <div className="animate-pulse space-y-8" aria-label="Loading your Atlas briefing">
+    <div className="animate-pulse space-y-8" aria-label="Loading your InventSmith briefing">
       <div className="space-y-3">
         <div className="h-4 w-32 rounded bg-muted" />
         <div className="h-11 w-2/3 rounded bg-muted" />
@@ -116,7 +116,7 @@ export default function DashboardPage() {
         <AppNav />
         <main className="flex min-h-[70vh] items-center justify-center px-4">
           <div className="space-y-4 text-center">
-            <p className="text-muted-foreground">Atlas could not load this invention.</p>
+            <p className="text-muted-foreground">InventSmith could not load this invention.</p>
             <Button asChild><Link href="/inventions">My Inventions</Link></Button>
           </div>
         </main>
@@ -145,7 +145,7 @@ export default function DashboardPage() {
             </div>
             <h1 className="max-w-3xl text-3xl font-bold leading-tight text-foreground sm:text-5xl">{invention.title}</h1>
             <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
-              Atlas is organizing the work around your invention. Review what changed, provide input when needed, and let Atlas keep moving the work forward.
+              InventSmith is organizing the Workshop around your invention. Review what changed, provide input only when needed, and let InventSmith keep the work moving.
             </p>
           </header>
 

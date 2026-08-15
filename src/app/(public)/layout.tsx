@@ -9,12 +9,12 @@ export default function PublicLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <StoreHeader
-        storeName="Atlas"
+        storeName="InventSmith"
       />
       <main className="flex-1">{children}</main>
       <StoreFooter
-        storeName="Atlas"
-        footerText="The operating system for inventors. A clear path from idea to market."
+        storeName="InventSmith"
+        footerText="The Inventor OS. You invent. InventSmith does the work. Published by Modern Methods."
       />
     </div>
   );

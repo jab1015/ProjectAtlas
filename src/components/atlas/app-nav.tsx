@@ -56,7 +56,7 @@ export function AppNav({ className }: AppNavProps) {
           </Button>
 
           <Button asChild variant="ghost" size="sm" className="gap-1.5">
-            <Link href="/account/data-export" title="Download your Atlas data">
+            <Link href="/account/data-export" title="Download your InventSmith data">
               <Download className="h-4 w-4" />
               <span className="hidden lg:inline">My Data</span>
             </Link>
