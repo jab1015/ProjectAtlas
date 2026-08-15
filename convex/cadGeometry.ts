@@ -1,9 +1,12 @@
+export type Vec2 = [number, number];
 export type Vec3 = [number, number, number];
 
 export type CadPrimitive =
   | { type: "box"; size: Vec3 }
   | { type: "cylinder"; radius: number; height: number; segments?: number }
-  | { type: "tube"; outerRadius: number; innerRadius: number; height: number; segments?: number };
+  | { type: "tube"; outerRadius: number; innerRadius: number; height: number; segments?: number }
+  | { type: "frustum"; bottomRadius: number; topRadius: number; height: number; segments?: number }
+  | { type: "extrudedConvexPolygon"; points: Vec2[]; height: number };
 
 export interface CadPartSpec {
   id: string;
@@ -44,6 +47,11 @@ const EPSILON = 1e-9;
 
 function finitePositive(value: number, label: string): number {
   if (!Number.isFinite(value) || value <= 0) throw new Error(`${label} must be a finite positive number`);
+  return value;
+}
+
+function finite(value: number, label: string): number {
+  if (!Number.isFinite(value)) throw new Error(`${label} must be finite`);
   return value;
 }
 
@@ -150,6 +158,76 @@ function tubeTriangles(part: CadPartSpec, outerValue: number, innerValue: number
   return out;
 }
 
+function frustumTriangles(part: CadPartSpec, bottomValue: number, topValue: number, heightValue: number, segmentValue?: number): Triangle[] {
+  const bottomRadius = finitePositive(bottomValue, "frustum bottom radius");
+  const topRadius = finitePositive(topValue, "frustum top radius");
+  const height = finitePositive(heightValue, "frustum height");
+  const count = segments(segmentValue);
+  const z0 = -height / 2; const z1 = height / 2;
+  const out: Triangle[] = [];
+
+  for (let i = 0; i < count; i += 1) {
+    const a0 = 2 * Math.PI * i / count;
+    const a1 = 2 * Math.PI * (i + 1) / count;
+    const b0: Vec3 = [bottomRadius * Math.cos(a0), bottomRadius * Math.sin(a0), z0];
+    const b1: Vec3 = [bottomRadius * Math.cos(a1), bottomRadius * Math.sin(a1), z0];
+    const t0: Vec3 = [topRadius * Math.cos(a0), topRadius * Math.sin(a0), z1];
+    const t1: Vec3 = [topRadius * Math.cos(a1), topRadius * Math.sin(a1), z1];
+    out.push(triangle(part, b0, b1, t1), triangle(part, b0, t1, t0));
+    out.push(triangle(part, [0, 0, z0], b1, b0));
+    out.push(triangle(part, [0, 0, z1], t0, t1));
+  }
+  return out;
+}
+
+function polygonArea(points: Vec2[]): number {
+  let area = 0;
+  for (let i = 0; i < points.length; i += 1) {
+    const [x0, y0] = points[i];
+    const [x1, y1] = points[(i + 1) % points.length];
+    area += x0 * y1 - x1 * y0;
+  }
+  return area / 2;
+}
+
+function isConvexPolygon(points: Vec2[]): boolean {
+  let sign = 0;
+  for (let i = 0; i < points.length; i += 1) {
+    const [ax, ay] = points[i];
+    const [bx, by] = points[(i + 1) % points.length];
+    const [cx, cy] = points[(i + 2) % points.length];
+    const crossValue = (bx - ax) * (cy - by) - (by - ay) * (cx - bx);
+    if (Math.abs(crossValue) < EPSILON) continue;
+    const current = Math.sign(crossValue);
+    if (sign === 0) sign = current;
+    else if (current !== sign) return false;
+  }
+  return sign !== 0;
+}
+
+function extrudedConvexPolygonTriangles(part: CadPartSpec, rawPoints: Vec2[], heightValue: number): Triangle[] {
+  const height = finitePositive(heightValue, "extrusion height");
+  if (rawPoints.length < 3 || rawPoints.length > 32) throw new Error("extruded convex polygon requires 3–32 points");
+  let points = rawPoints.map(([x, y], index) => [finite(x, `polygon point ${index + 1} x`), finite(y, `polygon point ${index + 1} y`)] as Vec2);
+  if (!isConvexPolygon(points)) throw new Error("extruded polygon must be convex and non-degenerate");
+  if (polygonArea(points) < 0) points = [...points].reverse();
+
+  const z0 = -height / 2; const z1 = height / 2;
+  const out: Triangle[] = [];
+  const bottom = points.map(([x, y]) => [x, y, z0] as Vec3);
+  const top = points.map(([x, y]) => [x, y, z1] as Vec3);
+
+  for (let i = 1; i < points.length - 1; i += 1) {
+    out.push(triangle(part, bottom[0], bottom[i + 1], bottom[i]));
+    out.push(triangle(part, top[0], top[i], top[i + 1]));
+  }
+  for (let i = 0; i < points.length; i += 1) {
+    const next = (i + 1) % points.length;
+    out.push(triangle(part, bottom[i], bottom[next], top[next]), triangle(part, bottom[i], top[next], top[i]));
+  }
+  return out;
+}
+
 export function buildCadMesh(spec: CadAssemblySpec): Triangle[] {
   if (spec.units !== "mm") throw new Error("InventSmith CAD currently requires millimeter units");
   if (!spec.parts.length) throw new Error("CAD assembly must contain at least one part");
@@ -163,6 +241,8 @@ export function buildCadMesh(spec: CadAssemblySpec): Triangle[] {
       case "box": triangles.push(...boxTriangles(part, part.primitive.size)); break;
       case "cylinder": triangles.push(...cylinderTriangles(part, part.primitive.radius, part.primitive.height, part.primitive.segments)); break;
       case "tube": triangles.push(...tubeTriangles(part, part.primitive.outerRadius, part.primitive.innerRadius, part.primitive.height, part.primitive.segments)); break;
+      case "frustum": triangles.push(...frustumTriangles(part, part.primitive.bottomRadius, part.primitive.topRadius, part.primitive.height, part.primitive.segments)); break;
+      case "extrudedConvexPolygon": triangles.push(...extrudedConvexPolygonTriangles(part, part.primitive.points, part.primitive.height)); break;
       default: throw new Error("Unsupported CAD primitive");
     }
   }
