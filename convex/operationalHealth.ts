@@ -1,6 +1,24 @@
-import { query } from "./_generated/server";
+import { internalQuery, query } from "./_generated/server";
 import { requireAdmin } from "./authHelpers";
 import { classifyWorkHealth, operationalSeverity } from "./operationalHealthLogic";
+
+export const healthProbe = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    const [users, queuedWork, failedWork] = await Promise.all([
+      ctx.db.query("users").take(1),
+      ctx.db.query("atlasWorkItems").withIndex("by_status_priority", (q) => q.eq("status", "queued")).take(1),
+      ctx.db.query("atlasWorkItems").withIndex("by_status_priority", (q) => q.eq("status", "failed")).take(1),
+    ]);
+    return {
+      databaseReachable: true,
+      sampledUser: users.length > 0,
+      hasQueuedWork: queuedWork.length > 0,
+      hasFailedWork: failedWork.length > 0,
+      checkedAt: Date.now(),
+    };
+  },
+});
 
 export const getSnapshot = query({
   args: {},
