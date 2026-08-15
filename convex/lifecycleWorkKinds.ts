@@ -50,6 +50,7 @@ export const FULL_JOURNEY_PRO_WORK_KINDS = [
   "launch_readiness",
   "launch_playbook",
   "customer_feedback_loop",
+  "launch_actual_evidence",
   "launch_performance",
   "post_launch_priorities",
   "growth_audit",
