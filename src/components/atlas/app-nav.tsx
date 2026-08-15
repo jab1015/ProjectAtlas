@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useQuery, useMutation } from "convex/react";
 import { useConvexAuth } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { Download, LogOut, ScrollText, UserRound } from "lucide-react";
+import { Download, FileUp, LogOut, ScrollText, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AtlasLogo } from "@/components/atlas/atlas-logo";
 import { useEffect } from "react";
@@ -18,6 +19,9 @@ export function AppNav({ className }: AppNavProps) {
   const { signOut } = useAuthActions();
   const { isAuthenticated } = useConvexAuth();
   const user = useQuery(api.authHelpers.getCurrentUser);
+  const pathname = usePathname();
+  const inventionMatch = pathname.match(/^\/invention\/([^/]+)/);
+  const activeInventionId = inventionMatch?.[1] ?? null;
 
   const ensureProfile = useMutation(api.users.ensureUserProfile);
   useEffect(() => {
@@ -46,6 +50,15 @@ export function AppNav({ className }: AppNavProps) {
             <span className="hidden sm:inline-flex items-center rounded-full bg-foreground px-2.5 py-0.5 text-xs font-medium text-background">
               Administrator
             </span>
+          )}
+
+          {activeInventionId && (
+            <Button asChild variant="ghost" size="sm" className="gap-1.5">
+              <Link href={`/invention/${activeInventionId}/evidence`} title="Upload invention evidence">
+                <FileUp className="h-4 w-4" />
+                <span className="hidden md:inline">Evidence</span>
+              </Link>
+            </Button>
           )}
 
           <Button asChild variant="ghost" size="sm" className="gap-1.5">
