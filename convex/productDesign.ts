@@ -3,7 +3,7 @@ import { v, ConvexError } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { canTierRunWorkKind } from "./entitlementPolicyLogic";
 
-const DESIGN_WORK = [
+export const DESIGN_WORK = [
   {
     kind: "design_candidate_generation",
     title: "Generate evidence-backed product design candidates",
