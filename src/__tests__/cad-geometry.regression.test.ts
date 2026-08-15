@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildCadMesh, generateCadArtifacts, type CadAssemblySpec } from "@convex/cadGeometry";
+import { generateOrthographicDrawing } from "@convex/cadDrawing";
 
 const fixture: CadAssemblySpec = {
   name: "Countertop Rack Fixture",
@@ -56,6 +57,19 @@ describe("InventSmith native CAD kernel", () => {
     expect(artifacts.dxf).toContain("$INSUNITS");
     expect(JSON.parse(artifacts.sourceJson).parts).toHaveLength(3);
     expect(artifacts.partCount).toBe(3);
+  });
+
+  it("produces dimensioned front/top/right engineering views from current geometry", () => {
+    const drawing = generateOrthographicDrawing(fixture);
+    expect(drawing).toContain("Dimensioned Orthographic Views");
+    expect(drawing).toContain("FRONT");
+    expect(drawing).toContain("TOP");
+    expect(drawing).toContain("RIGHT");
+    expect(drawing).toContain("X: 300 mm");
+    expect(drawing).toMatch(/Y: \d+(?:\.\d+)? mm/);
+    expect(drawing).toMatch(/Z: \d+(?:\.\d+)? mm/);
+    expect(drawing).toContain("overall dimensions derive from current geometry");
+    expect(drawing).toContain("verify critical dimensions, tolerances, fits, interfaces");
   });
 
   it("rejects geometrically impossible tube specifications", () => {
