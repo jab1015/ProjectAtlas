@@ -10,8 +10,8 @@ const DESIGN_WORK = [
     priority: 69,
     estimatedCostUnits: 18,
     deliverableKind: "product_design_candidates",
-    dependsOnKinds: ["design_directions", "feature_prior_art_comparison", "product_requirements"],
-    instructions: "Generate at least three materially different product design candidates. Use validation evidence, user needs, prior art, product requirements, materials/manufacturing constraints, cost evidence, and regulatory/safety questions. Describe form, mechanism, parts, user interaction, materials, assembly, manufacturing process, design-around opportunities, risks, and unresolved engineering questions for each candidate.",
+    dependsOnKinds: ["patent_design_handoff", "design_directions", "product_requirements"],
+    instructions: "Generate at least three materially different product design candidates. Treat the completed patent-to-design handoff as an explicit design constraint package: consume its crowded-feature warnings, distinguishing-feature hypotheses, alternative embodiments, unresolved legal questions, and source uncertainty. Use validation evidence, user needs, prior art, product requirements, materials/manufacturing constraints, cost evidence, and regulatory/safety questions. Describe form, mechanism, parts, user interaction, materials, assembly, manufacturing process, differentiation rationale, risks, and unresolved engineering questions for each candidate. Do not claim patentability or freedom to operate; optimize for meaningful structural and functional differentiation subject to later patent-professional review.",
   },
   {
     kind: "design_candidate_scoring",
@@ -20,7 +20,7 @@ const DESIGN_WORK = [
     estimatedCostUnits: 14,
     deliverableKind: "design_candidate_scorecard",
     dependsOnKinds: ["design_candidate_generation", "preliminary_bom_cost"],
-    instructions: "Score the candidate designs using explicit evidence-backed criteria: user fit, differentiation, prior-art constraints, technical feasibility, manufacturability, estimated cost, maintainability, safety/regulatory risk, prototype complexity, and commercial potential. Explain weights, uncertainty, tradeoffs, and why the recommended candidate is strongest. Do not claim a statistically proven probability of market success.",
+    instructions: "Score the candidate designs using explicit evidence-backed criteria: user fit, differentiation from identified prior-art constraints, technical feasibility, manufacturability, estimated cost, maintainability, safety/regulatory risk, prototype complexity, and commercial potential. Penalize candidates that recreate crowded mechanisms or ignore the patent-to-design handoff. Explain weights, uncertainty, tradeoffs, and why the recommended candidate is strongest. Do not claim a statistically proven probability of market success or patentability.",
   },
   {
     kind: "product_design_specification",
@@ -29,7 +29,7 @@ const DESIGN_WORK = [
     estimatedCostUnits: 18,
     deliverableKind: "product_design_specification",
     dependsOnKinds: ["design_candidate_scoring"],
-    instructions: "Turn the selected candidate into a detailed Product Design Specification covering functional requirements, physical architecture, dimensions that are known versus TBD, components, interfaces, materials, mechanisms, ergonomics, assembly, serviceability, manufacturing assumptions, acceptance criteria, risks, and open engineering decisions. Preserve a clear boundary between preliminary design decisions and engineering-reviewed values.",
+    instructions: "Turn the selected candidate into a detailed Product Design Specification covering functional requirements, physical architecture, dimensions that are known versus TBD, components, interfaces, materials, mechanisms, ergonomics, assembly, serviceability, manufacturing assumptions, acceptance criteria, risks, patent-design constraints carried forward, and open engineering decisions. Preserve a clear boundary between preliminary design decisions and engineering-reviewed or patent-professional-reviewed values.",
   },
   {
     kind: "cad_model_specification",
@@ -38,7 +38,7 @@ const DESIGN_WORK = [
     estimatedCostUnits: 14,
     deliverableKind: "cad_model_specification",
     dependsOnKinds: ["product_design_specification"],
-    instructions: "Prepare a CAD-authoring specification for the selected product. Define assemblies, individual parts, datums, coordinate conventions, parametric variables, configurable dimensions, interfaces, mates/joints, material assignments, target manufacturing process, file outputs required (STEP/STL/DXF as appropriate), revision metadata, and every dimension/tolerance that remains unresolved. This specification is an input to the CAD generator and must not pretend that CAD files already exist.",
+    instructions: "Prepare a CAD-authoring specification for the selected product. Define assemblies, individual parts, datums, coordinate conventions, parametric variables, configurable dimensions, interfaces, mates/joints, material assignments, target manufacturing process, file outputs required (STEP/STL/DXF as appropriate), revision metadata, and every dimension/tolerance that remains unresolved. Preserve the selected design's documented differentiation constraints. This specification is an input to the CAD generator and must not pretend that CAD files already exist or are manufacturing-released.",
   },
   {
     kind: "exploded_view_specification",
@@ -47,7 +47,7 @@ const DESIGN_WORK = [
     estimatedCostUnits: 10,
     deliverableKind: "exploded_view_specification",
     dependsOnKinds: ["cad_model_specification"],
-    instructions: "Define the exploded-view sequence and assembly narrative for the selected design: every part, fastener, interface, assembly direction, subassembly, serviceable component, callout, and BOM relationship. Identify which views will be needed for inventor review, manufacturer RFQ, engineering review, and pitch materials.",
+    instructions: "Define the exploded-view sequence and assembly narrative for the selected design: every part, fastener, interface, assembly direction, subassembly, serviceable component, callout, and BOM relationship. Identify which views will be needed for inventor review, manufacturer RFQ, engineering review, patent-professional review, and pitch materials.",
   },
   {
     kind: "manufacturing_drawing_specification",
@@ -112,7 +112,7 @@ export const ensureProductDesignWorkspace = mutation({
         eventType: "work_queued",
         actorType: "system",
         summary: `InventSmith opened the Product Design department and queued ${created} design work items.`,
-        metadata: { department: "product_design", created },
+        metadata: { department: "product_design", created, requiredHandoff: "patent_design_handoff" },
         createdAt: now,
       });
     }
@@ -137,6 +137,7 @@ export const getProductDesignWorkspace = query({
       "preliminary_prior_art",
       "feature_prior_art_comparison",
       "distinguishing_features",
+      "patent_design_handoff",
       "product_requirements",
       "design_directions",
       "materials_manufacturing",
@@ -151,10 +152,21 @@ export const getProductDesignWorkspace = query({
     const designDeliverables = deliverables
       .filter((item: any) => designDeliverableKinds.has(item.kind) || relatedWorkKinds.has(item.kind))
       .sort((a: any, b: any) => b.updatedAt - a.updatedAt);
+    const handoffWork = workItems.find((item: any) => item.kind === "patent_design_handoff");
+    const handoffDeliverable = deliverables
+      .filter((item: any) => item.kind === "patent_design_handoff")
+      .sort((a: any, b: any) => b.updatedAt - a.updatedAt)[0];
 
     return {
       invention: { _id: invention._id, title: invention.title },
       initialized: designKinds.size > 0 && [...designKinds].every((kind) => workItems.some((item: any) => item.kind === kind)),
+      patentDesignHandoff: {
+        status: handoffWork?.status ?? "not_queued",
+        completed: handoffWork?.status === "completed",
+        deliverableId: handoffDeliverable?._id ?? null,
+        trustState: handoffDeliverable?.trustState ?? null,
+        updatedAt: handoffDeliverable?.updatedAt ?? handoffWork?.updatedAt ?? null,
+      },
       workItems: designWork,
       deliverables: await Promise.all(designDeliverables.map(async (deliverable: any) => ({
         ...deliverable,
