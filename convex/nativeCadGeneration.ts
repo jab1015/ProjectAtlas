@@ -10,8 +10,8 @@ import { generateCadArtifacts, type CadAssemblySpec, type CadPartSpec } from "./
 import { generateExplodedDrawing, generateOrthographicDrawing } from "./cadDrawing";
 
 const getNativeCadContext = makeFunctionReference<"query", { inventionId: Id<"inventions">; workItemId: Id<"atlasWorkItems"> }, any>("nativeCad:getNativeCadContext");
-const recordNativeCadSuccess = makeFunctionReference<"mutation", any, { discarded: boolean }>("nativeCad:recordNativeCadSuccess");
-const recordNativeCadFailure = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; workItemId: Id<"atlasWorkItems">; error: string; failedAt: number }, void>("nativeCad:recordNativeCadFailure");
+const recordNativeCadSuccess = makeFunctionReference<"mutation", any, { discarded: boolean; actualCostUnits: number }>("nativeCad:recordNativeCadSuccess");
+const recordNativeCadFailure = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; workItemId: Id<"atlasWorkItems">; error: string; failedAt: number }, { willRetry: boolean }>("nativeCad:recordNativeCadFailure");
 
 const vecSchema = { type: "array", minItems: 3, maxItems: 3, items: { type: "number" } } as const;
 const cadSpecSchema = {
@@ -79,7 +79,7 @@ export const generateNativeCad = internalAction({
         storeText(ctx, generated.step, "model/step"), storeText(ctx, generated.stl, "model/stl"), storeText(ctx, generated.dxf, "application/dxf"), storeText(ctx, generated.sourceJson, "application/json"), storeText(ctx, orthographicSvg, "image/svg+xml"), storeText(ctx, explodedSvg, "image/svg+xml"),
       ]);
       const actualCostUnits = costUnitsFromTokens(response.usage?.total_tokens);
-      return await ctx.runMutation(recordNativeCadSuccess, {
+      const result = await ctx.runMutation(recordNativeCadSuccess, {
         inventionId: args.inventionId,
         workItemId: args.workItemId,
         artifacts: [
@@ -98,9 +98,10 @@ export const generateNativeCad = internalAction({
         actualCostUnits,
         completedAt: Date.now(),
       });
+      return { ...result, failed: false, actualCostUnits };
     } catch (error) {
-      await ctx.runMutation(recordNativeCadFailure, { inventionId: args.inventionId, workItemId: args.workItemId, error: error instanceof Error ? error.message : "Native CAD generation failed", failedAt: Date.now() });
-      return { discarded: false, failed: true };
+      const failure = await ctx.runMutation(recordNativeCadFailure, { inventionId: args.inventionId, workItemId: args.workItemId, error: error instanceof Error ? error.message : "Native CAD generation failed", failedAt: Date.now() });
+      return { discarded: false, failed: true, willRetry: failure.willRetry, actualCostUnits: 0 };
     }
   },
 });
