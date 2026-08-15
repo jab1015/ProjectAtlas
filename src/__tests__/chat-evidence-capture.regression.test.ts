@@ -28,12 +28,14 @@ describe("Ask InventSmith material-input capture", () => {
     expect(shouldCaptureChatAsInventorEvidence("What is the design team doing now?")).toBe(false);
   });
 
-  it("stores captured chat material as inventor-provided unverified evidence and refreshes downstream work", () => {
+  it("stores captured chat material in the canonical inventor-provided channel while preserving its chat origin", () => {
     const capture = readFileSync(join(process.cwd(), "convex/chatEvidenceCapture.ts"), "utf8");
     const chatPage = readFileSync(join(process.cwd(), "src/app/(app)/invention/[id]/chat/page.tsx"), "utf8");
     expect(capture).toContain('sourceType: "inventor_statement"');
     expect(capture).toContain('reliability: "unverified"');
-    expect(capture).toContain('provenance: "inventor_chat"');
+    expect(capture).toContain('provenance: "inventor_upload"');
+    expect(capture).toContain('evidenceOrigin: "chat"');
+    expect(capture).toContain('capturedFrom: "ask_inventsmith"');
     expect(capture).toContain('kind: "inventor_statement"');
     expect(capture).toContain('status: "draft"');
     expect(capture).toContain("has not been independently verified");
