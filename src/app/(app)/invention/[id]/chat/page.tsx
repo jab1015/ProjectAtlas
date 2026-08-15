@@ -64,14 +64,14 @@ export default function AtlasChatPage() {
       await ask({ inventionId, content });
     } catch (reason) {
       setMessage(content);
-      setError(reason instanceof Error ? reason.message : "Atlas could not save your message.");
+      setError(reason instanceof Error ? reason.message : "InventSmith could not save your message.");
     } finally {
       setSending(false);
     }
   }
 
   if (isLoading || !isAuthenticated || conversation === undefined) {
-    return <div className="min-h-screen bg-background"><AppNav /><main className="mx-auto max-w-3xl px-4 py-12 text-sm text-muted-foreground">Loading Atlas chat…</main></div>;
+    return <div className="min-h-screen bg-background"><AppNav /><main className="mx-auto max-w-3xl px-4 py-12 text-sm text-muted-foreground">Loading InventSmith chat…</main></div>;
   }
 
   return (
@@ -83,7 +83,7 @@ export default function AtlasChatPage() {
             <Link href="/dashboard"><ArrowLeft className="h-4 w-4" /></Link>
           </Button>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Ask Atlas</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Ask InventSmith</p>
             <h1 className="text-2xl font-semibold">{conversation.invention.title}</h1>
             <p className="mt-1 text-sm text-muted-foreground">Answers use this invention’s structured record, evidence, and latest work. Draft evidence is identified as draft.</p>
           </div>
@@ -94,7 +94,7 @@ export default function AtlasChatPage() {
             <div className="rounded-2xl border border-dashed border-border p-8 text-center">
               <Bot className="mx-auto h-8 w-8 text-primary" />
               <h2 className="mt-3 font-semibold">What would you like to know?</h2>
-              <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">Ask about Atlas’s research, risks, next steps, product choices, or what still needs your decision.</p>
+              <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">Ask about InventSmith’s research, risks, next steps, product choices, or what still needs your decision.</p>
             </div>
           )}
           {conversation.messages.map((item) => (
@@ -124,15 +124,15 @@ export default function AtlasChatPage() {
                 }
               }}
               maxLength={4000}
-              placeholder="Ask Atlas about this invention…"
+              placeholder="Ask InventSmith about this invention…"
               className="min-h-12 resize-none"
-              aria-label="Message Atlas"
+              aria-label="Message InventSmith"
             />
             <Button type="submit" size="icon" disabled={!message.trim() || sending} aria-label="Send message">
               <Send className="h-4 w-4" />
             </Button>
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">Atlas assists with preparation and research; it does not guarantee patentability, compliance, funding, or market success.</p>
+          <p className="mt-2 text-xs text-muted-foreground">InventSmith assists with preparation and research; it does not guarantee patentability, compliance, funding, or market success.</p>
         </form>
       </main>
     </div>
