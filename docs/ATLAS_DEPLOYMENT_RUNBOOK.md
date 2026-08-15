@@ -14,11 +14,13 @@ Then run:
 3. `npm test`
 4. `npm run build`
 
-The normal build includes Convex code generation and therefore must target the intended deployment.
+The normal build includes Convex code generation and therefore must target the intended deployment. GitHub pull requests also run Atlas CI: both TypeScript targets, the full regression suite, the production dependency audit, and the Next production build must pass before merge.
 
 ## 2. Provision Convex
 
 Use the Convex CLI's interactive development/deployment setup or the Convex dashboard to create and select the Atlas project. Confirm that `.env.local` contains the generated `CONVEX_DEPLOYMENT` and `NEXT_PUBLIC_CONVEX_URL` entries. Do not hand-invent deployment identifiers.
+
+After deployment, call `GET https://<deployment>.convex.site/api/health`. A pilot-ready response must return HTTP 200 with `ok: true`, `ready: true`, and `databaseReachable: true`. The endpoint exposes configuration booleans only; it must never expose secret values, user data, invention data, or detailed operational errors. Use this endpoint for external uptime monitoring.
 
 ## 3. Configure secrets safely
 
@@ -59,12 +61,16 @@ Create a new non-safety-critical US consumer-product invention and verify:
 - Signed subscription events are idempotent, out-of-order events cannot overwrite newer state, canceled/past-due access follows the paid-period rule, and unrecognized free-tier claims are rejected.
 - Explorer, Inventor, and Pro accounts cannot claim work above their backend entitlement even if a client attempts to invoke the queue directly.
 - Deleting the test invention removes all invention-owned child records.
+- An account-deletion privacy request cannot be manually marked completed; it must use the deletion executor.
+- A paid account deletion fails closed until the administrator records that external billing was cancelled or otherwise resolved.
+- The deletion executor removes every invention and generated/uploaded storage object, clears usage and notifications, anonymizes retained transaction/subscription rows, invalidates auth sessions and refresh tokens, deletes auth accounts/verification codes, and finally removes the user record.
+- Run one deletion restoration test against a disposable pilot account: confirm the deleted identity cannot sign in, deleted data cannot be recovered from normal application queries, retained financial rows contain no user identity, and the privacy request retains an auditable completion summary.
 
 ## 5. Operations gate
 
 Before inviting a pilot inventor, name owners for:
 
-- Error monitoring and alert response
+- External monitoring of `/api/health` and alert response
 - OpenAI and Convex spend alerts
 - Data export/backups and restoration testing
 - Incident response and key rotation
