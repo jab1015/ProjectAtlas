@@ -12,9 +12,52 @@ const applySubscriptionEvent = makeFunctionReference<"mutation", {
   status: SubscriptionStatus; subscriptionId?: string; billingCustomerId?: string;
   currentPeriodEnd?: number; occurredAt: number;
 }, unknown>("subscriptionMutations:applySubscriptionEvent");
+const healthProbe = makeFunctionReference<"query", Record<string, never>, {
+  databaseReachable: boolean;
+  sampledUser: boolean;
+  hasQueuedWork: boolean;
+  hasFailedWork: boolean;
+  checkedAt: number;
+}>("operationalHealth:healthProbe");
 
 // ─── @convex-dev/auth routes ────────────────────────────────────────────────
 auth.addHttpRoutes(http);
+
+// Public liveness/readiness endpoint for external monitoring. It intentionally
+// exposes only booleans and never secret values, user data, invention data, or
+// operational error details.
+http.route({
+  path: "/api/health",
+  method: "GET",
+  handler: httpAction(async (ctx) => {
+    try {
+      const probe = await ctx.runQuery(healthProbe, {});
+      const configuration = {
+        ai: Boolean(process.env.OPENAI_API_KEY),
+        auth: Boolean(process.env.AUTH_SECRET),
+        fulfillmentWebhook: Boolean(process.env.PLATFORM_FULFILLMENT_SECRET),
+        subscriptionWebhook: Boolean(process.env.ATLAS_SUBSCRIPTION_WEBHOOK_SECRET),
+      };
+      const ready = probe.databaseReachable && configuration.ai && configuration.auth;
+      return new Response(JSON.stringify({
+        ok: true,
+        ready,
+        service: "atlas",
+        databaseReachable: probe.databaseReachable,
+        configuration,
+        checkedAt: probe.checkedAt,
+      }), {
+        status: ready ? 200 : 503,
+        headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+      });
+    } catch {
+      return new Response(JSON.stringify({ ok: false, ready: false, service: "atlas" }), {
+        status: 503,
+        headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+      });
+    }
+  }),
+});
 
 // ─── Platform Fulfillment Webhook ───────────────────────────────────────────
 
@@ -30,7 +73,6 @@ http.route({
       );
     }
 
-    // Verify HMAC-SHA256 signature
     const signature = request.headers.get("X-Fulfillment-Signature");
     if (!signature) {
       return new Response(
@@ -44,7 +86,6 @@ http.route({
     const bodyText = await request.text();
     if (bodyText.length > MAX_WEBHOOK_BYTES) return new Response(JSON.stringify({ error: "Payload too large" }), { status: 413, headers: { "Content-Type": "application/json" } });
 
-    // Use Web Crypto API for HMAC verification (works in Convex runtime)
     const encoder = new TextEncoder();
     const key = await crypto.subtle.importKey(
       "raw",
@@ -80,7 +121,6 @@ http.route({
       return new Response(JSON.stringify({ error: "Invalid fulfillment payload" }), { status: 400, headers: { "Content-Type": "application/json" } });
     }
 
-    // Look up the product by platformProductId
     const product = await ctx.runQuery(
       internal.productsInternal.getByPlatformProductId,
       { platformProductId: body.productId }
@@ -93,14 +133,12 @@ http.route({
       );
     }
 
-    // Generate a secure download token
     const tokenBytes = new Uint8Array(32);
     crypto.getRandomValues(tokenBytes);
     const downloadToken = Array.from(tokenBytes)
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
 
-    // Create the purchase record
     const purchaseId = await ctx.runMutation(
       internal.purchasesMutations.createFromFulfillment,
       {
@@ -115,12 +153,10 @@ http.route({
       }
     );
 
-    // Increment product sales count
     await ctx.runMutation(internal.productsMutations.incrementSales, {
       id: product._id,
     });
 
-    // Build download URL
     const origin = new URL(request.url).origin;
     const downloadUrl = `${origin}/api/download?purchaseId=${purchaseId}&token=${downloadToken}`;
 
@@ -131,7 +167,6 @@ http.route({
   }),
 });
 
-// Signed subscription lifecycle events make Atlas's backend tier authoritative.
 http.route({
   path: "/api/subscription",
   method: "POST",
@@ -162,8 +197,6 @@ http.route({
   }),
 });
 
-// ─── Download Endpoint ──────────────────────────────────────────────────────
-
 http.route({
   path: "/api/download",
   method: "GET",
@@ -180,7 +213,6 @@ http.route({
       );
     }
 
-    // Verify the purchase and token
     const purchase = await ctx.runQuery(internal.purchasesInternal.getById, {
       purchaseId: purchaseId as any,
     });
@@ -192,7 +224,6 @@ http.route({
       );
     }
 
-    // Get all files for this product
     const files = await ctx.runQuery(internal.filesInternal.getByProductId, {
       productId: purchase.productId,
     });
@@ -204,7 +235,6 @@ http.route({
       );
     }
 
-    // If fileId specified, find that specific file; otherwise use first file
     let targetFile = files[0];
     if (fileId) {
       const found = files.find((f) => f._id === fileId);
@@ -214,7 +244,6 @@ http.route({
       targetFile = found;
     }
 
-    // Get the download URL from storage
     const downloadUrl = await ctx.storage.getUrl(targetFile.storageId);
 
     if (!downloadUrl) {
@@ -224,21 +253,13 @@ http.route({
       );
     }
 
-    // Record the download
     await ctx.runMutation(internal.purchasesMutations.recordDownload, {
       purchaseId: purchase._id,
     });
 
-    // Redirect to the signed storage URL
     return Response.redirect(downloadUrl, 302);
   }),
 });
-
-// ─── Order Lookup (for /checkout/success page) ──────────────────────────────
-// Same-origin from the storefront's perspective, but the page lives on
-// Vercel and Convex HTTP runs on convex.site, so the fetch is technically
-// cross-origin. The session id is unguessable and the response only exposes
-// data the buyer already has, so allowing any origin is safe.
 
 const ORDER_CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -280,8 +301,6 @@ http.route({
     );
 
     if (!order) {
-      // Fulfillment runs after the Stripe redirect, so it's normal for the
-      // first few polls to miss. Return 404 and let the client retry.
       return new Response(
         JSON.stringify({ error: "Order not found" }),
         {
