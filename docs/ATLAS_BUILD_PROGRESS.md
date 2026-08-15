@@ -26,50 +26,56 @@ The full-product branch now materially exceeds the old feasibility-only baseline
 - evidence-backed Product Design candidate generation, scoring, selection and specification;
 - native preliminary CAD pipeline;
 - deterministic STEP, STL and DXF artifact generation for supported geometry;
+- expanded native CAD geometry including tapered/frustum and custom-profile extrusion forms in addition to boxes, cylinders and hollow tubes;
 - editable InventSmith CAD source;
 - orthographic engineering views and exploded assembly views;
+- dedicated selected-product presentation rendering grounded in Product Design/CAD state;
 - explicit CAD/design maturity and professional-review gating;
 - prototype strategy, sourcing, test planning, evidence assessment, design-gap analysis and readiness;
 - manufacturing process planning, factory requirements, manufacturer research, RFQ package, scorecard, quote comparison, unit economics, agreement checklist and readiness;
 - branding/positioning/name/trademark-screen/identity/asset-brief work;
 - IP strategy, invention disclosure, NDA draft package, contracting package, IP status tracking and legal-professional handoff;
+- professional-service planning that identifies which outside specialties are actually required, why, when, what to send, what to ask, and what to verify;
+- evidence-backed research of specific candidate professional/service providers without contacting, hiring, spending, filing or disclosing confidential material;
 - pricing evidence, pricing strategy, break-even and validation planning;
 - marketing messaging, channels, plan, assets and prelaunch calendar;
 - sales channels, toolkit, funnel, projections and post-purchase experience;
-- funding strategy/source research, financial model, pitch-deck content, investor FAQ and funding readiness;
+- funding strategy/source research, financial model, investor FAQ and funding readiness;
+- editable native PowerPoint pitch-deck generation from invention-specific evidence;
+- automatic embedding of the current generated product render into the pitch deck when available;
+- inventor-facing artifact download support for PowerPoint, CAD, images and other stored artifacts;
 - launch readiness/playbook/customer-feedback/performance/priorities;
 - growth audit/levers/roadmap/retention/performance reporting;
 - Ask InventSmith project-wide grounding across work, dependencies, evidence, deliverables, decisions, approvals, reviews, execution events, validation and journey state;
 - live-web routing for patent-status/current-research questions;
-- regression protection for cross-department verification, full-journey scope, evidence ingestion, CAD geometry, entitlement and professional-review policy.
-
-CI run #101 for the Ask InventSmith project-wide grounding checkpoint passed successfully.
+- regression protection for cross-department verification, full-journey scope, evidence ingestion, expanded CAD geometry, pitch-deck generation, entitlement, professional routing and professional-review policy.
 
 ## Mandatory capability matrix
 
 | Capability | Repository state | Remaining acceptance work |
 |---|---|---|
 | Idea intake and persistent invention record | Implemented foundation | End-to-end live acceptance |
-| Evidence/file upload | Implemented on full-product branch | Live upload/extraction/refresh acceptance with representative files |
+| Evidence/file upload | Implemented on full-product branch | Expand structured extraction beyond CSV/text; live representative-file acceptance |
 | Validation | Implemented foundation | Verify uploaded evidence materially affects validation correctly |
 | Market/competitor research | Implemented foundation | Full-journey live acceptance |
 | Patent/prior-art intelligence | Implemented foundation + project-wide Ask grounding | Verify current patent research, status refresh, design constraints and professional handoff |
 | Product design | Implemented on full-product branch | Verify patent/research constraints flow into candidate scoring and selected design |
-| CAD/3D design | Native preliminary STEP/STL/DXF generation implemented for supported primitive geometry | Expand supported geometry where needed; engineering/prototype/live acceptance before manufacturing release |
+| CAD/3D design | Native preliminary STEP/STL/DXF generation implemented with expanded deterministic geometry | Continue expanding representative geometry; engineering/prototype/live acceptance before manufacturing release |
+| Product renders | Dedicated generated selected-product presentation render implemented | Live visual-quality acceptance and multi-view/technical-image expansion |
 | Exploded/orthographic views | Implemented | Live visual/download acceptance; dimension/tolerance maturity must remain evidence-backed |
 | Engineering package | Foundation + CAD/design outputs implemented | Complete engineering-review acceptance and revision loop |
 | Prototype loop | Lifecycle department implemented | Physical prototype evidence remains a genuine human/real-world gate |
 | Manufacturing/factory guidance | Lifecycle department implemented | Verify real sourcing/RFQ/quote workflows and professional/financial gates |
 | Legal/contracts/NDAs | Lifecycle department implemented | Professional/legal review required where applicable |
-| Professional routing | Implemented through professional-review and lifecycle handoffs | Verify candidate/provider research and handoff UX |
+| Professional routing | Service plan + provider research implemented | Live provider-research/handoff UX acceptance |
 | Branding | Lifecycle department implemented | Asset-generation/live UX acceptance |
 | Pricing | Lifecycle department implemented | Real cost/market evidence acceptance |
 | Marketing | Lifecycle department implemented | Asset/export/live UX acceptance |
 | Sales | Lifecycle department implemented | Live UX and real-data acceptance |
-| Pitch deck/funding | Content/financial/funding lifecycle implemented | Format-appropriate presentation export and live investor-package acceptance remain required |
+| Pitch deck/funding | Editable native PPTX generation implemented, including available product-render embedding | Live investor-package acceptance; richer technical imagery and financial presentation polish |
 | Launch | Lifecycle department implemented | Live/real-world launch acceptance |
 | Growth | Lifecycle department implemented | Requires real post-launch data for final functional acceptance |
-| Documents/exports | PDF/DOCX foundation plus CAD artifact downloads | Expand format-appropriate exports across full journey, including presentation package |
+| Documents/exports | PDF/DOCX foundation + PPTX + CAD/image artifact downloads | Expand structured financial/tabular exports and remaining artifact-specific formats |
 | Ask InventSmith | Project-wide operational context implemented | Live authenticated conversational acceptance |
 | Correct InventSmith branding | Repository branding implementation exists | Final live replication/acceptance after GitHub build is complete |
 
@@ -77,7 +83,7 @@ CI run #101 for the Ask InventSmith project-wide grounding checkpoint passed suc
 
 InventSmith must design the product, not stop at feasibility or concept imagery. For supported physical products it must progress through real geometry and engineering artifacts.
 
-Current native CAD supports deterministic assemblies built from boxes, cylinders and hollow tubes and emits STEP/STL/DXF, editable source, orthographic views and exploded views. This is a real CAD foundation but not permission to call every generated design factory-released.
+Current native CAD supports deterministic assemblies built from boxes, cylinders, hollow tubes, tapered/frustum forms, and custom-profile extrusions and emits STEP/STL/DXF, editable source, orthographic views and exploded views. This is a real CAD foundation but not permission to call every generated design factory-released.
 
 Design maturity remains explicit:
 
@@ -93,6 +99,8 @@ Unknown dimensions/tolerances must remain provisional. Consequential engineering
 
 Evidence upload is a project input, not a passive attachment feature. SurveyMonkey studies, interview notes/transcripts, PDFs, spreadsheets, images, sketches, prototype results, factory quotes, decks and professional/legal material must retain provenance, be associated with the correct invention, become available to relevant departments, and trigger staleness/refresh when conclusions materially change.
 
+Current structured ingestion covers CSV survey data and text/Markdown evidence. Other binary file types are preserved with provenance but still require stronger structured extraction before their contents can be treated as machine-readable evidence.
+
 ## Ask InventSmith rule
 
 Ask InventSmith is the intelligence layer over the entire invention workspace. It must not claim it cannot see across the app when the requested state exists in InventSmith records.
@@ -101,13 +109,13 @@ Cross-department questions must be answered from actual work/dependency/executio
 
 ## Remaining repository priorities
 
-1. Expand CAD geometry/design capability beyond the initial primitive engine where representative products require it; strengthen dimensions, tolerances, interfaces and revision traceability without fabricating engineering certainty.
-2. Ensure patent/prior-art findings become explicit Product Design constraints and that design scoring records differentiation rationale without claiming patentability.
-3. Complete format-appropriate pitch-deck/investor-package export, not merely pitch-deck text.
-4. Strengthen file evidence extraction for DOCX/PDF/spreadsheet/interview/survey inputs and methodology/sample metadata.
-5. Verify each lifecycle department has inventor-facing outputs/actions rather than hidden backend-only work.
+1. Strengthen file evidence extraction for DOCX/PDF/spreadsheet/interview/survey inputs and methodology/sample metadata.
+2. Continue expanding native CAD geometry, interfaces, dimensions, tolerance handling and revision traceability without fabricating engineering certainty.
+3. Expand product/pitch imagery beyond the current selected-product render to richer multi-view and technical presentation assets.
+4. Expand format-appropriate exports for financial/tabular and other structured downstream artifacts.
+5. Verify every lifecycle department has inventor-facing outputs/actions and that supplemental professional-routing work is surfaced consistently.
 6. Complete automated end-to-end acceptance coverage for the representative invention journey, including department handoffs, CAD artifacts, exports and human/professional gates.
-7. Synchronize all product/progress documentation with verified branch behavior.
+7. Synchronize remaining product/progress documentation with verified branch behavior.
 8. Merge only after repository CI and acceptance gates pass.
 9. After GitHub is complete, hand the finished pinned implementation to MadeThis for replication and perform live authenticated acceptance there.
 
