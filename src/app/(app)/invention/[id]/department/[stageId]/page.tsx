@@ -23,6 +23,11 @@ interface DepartmentState {
   inventorEvidenceCount: number;
 }
 
+interface DepartmentExtensions {
+  workItems: Doc<"atlasWorkItems">[];
+  deliverables: Doc<"atlasDeliverables">[];
+}
+
 interface ArtifactDownload {
   deliverableId: Id<"atlasDeliverables">;
   kind: string;
@@ -35,6 +40,7 @@ interface ArtifactDownload {
 }
 
 const getLifecycleDepartment = makeFunctionReference<"query", { inventionId: Id<"inventions">; stageId: number }, DepartmentState>("lifecycleDepartments:getLifecycleDepartment");
+const getDepartmentExtensions = makeFunctionReference<"query", { inventionId: Id<"inventions">; stageId: number }, DepartmentExtensions>("departmentExtensions:getDepartmentExtensions");
 const getArtifactDownloads = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, ArtifactDownload[]>("deliverableDownloads:getInventionArtifactDownloads");
 const ensureLifecycleDepartment = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; stageId: number }, { created: number; total: number; stageName: string }>("lifecycleDepartments:ensureLifecycleDepartment");
 const kickAutonomousWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { scheduled: boolean; reason: string }>("inventionWorkspace:kickAutonomousWork");
@@ -68,6 +74,12 @@ function artifactLabel(mediaType: string) {
   return "Download artifact";
 }
 
+function mergeById<T extends { _id: unknown }>(primary: T[], secondary: T[]) {
+  const merged = new Map<string, T>();
+  for (const item of [...primary, ...secondary]) merged.set(String(item._id), item);
+  return [...merged.values()];
+}
+
 export default function LifecycleDepartmentPage() {
   const params = useParams();
   const router = useRouter();
@@ -77,6 +89,7 @@ export default function LifecycleDepartmentPage() {
   const validStage = Number.isInteger(stageId) && stageId >= 6 && stageId <= 15;
   const queryArgs = isAuthenticated && inventionId && validStage ? { inventionId, stageId } : "skip";
   const department = useQuery(getLifecycleDepartment, queryArgs);
+  const extensions = useQuery(getDepartmentExtensions, queryArgs);
   const artifactDownloads = useQuery(getArtifactDownloads, isAuthenticated && inventionId ? { inventionId } : "skip");
   const ensureDepartment = useMutation(ensureLifecycleDepartment);
   const kickWork = useMutation(kickAutonomousWork);
@@ -89,14 +102,23 @@ export default function LifecycleDepartmentPage() {
     if (!validStage) router.replace(`/invention/${inventionId}`);
   }, [isAuthenticated, isLoading, router, validStage, inventionId]);
 
-  const counts = useMemo(() => {
-    if (!department) return { complete: 0, active: 0, blocked: 0 };
-    return {
-      complete: department.workItems.filter((item) => item.status === "completed").length,
-      active: department.workItems.filter((item) => item.status === "queued" || item.status === "running").length,
-      blocked: department.workItems.filter((item) => item.status === "blocked" || item.status === "awaiting_approval").length,
-    };
-  }, [department]);
+  const departmentWork = useMemo(() => {
+    if (!department) return [];
+    return mergeById(department.workItems, extensions?.workItems ?? [])
+      .sort((a, b) => b.priority - a.priority || a.createdAt - b.createdAt);
+  }, [department, extensions]);
+
+  const departmentDeliverables = useMemo(() => {
+    if (!department) return [];
+    return mergeById(department.deliverables, extensions?.deliverables ?? [])
+      .sort((a, b) => b.updatedAt - a.updatedAt);
+  }, [department, extensions]);
+
+  const counts = useMemo(() => ({
+    complete: departmentWork.filter((item) => item.status === "completed").length,
+    active: departmentWork.filter((item) => item.status === "queued" || item.status === "running").length,
+    blocked: departmentWork.filter((item) => item.status === "blocked" || item.status === "awaiting_approval").length,
+  }), [departmentWork]);
 
   const downloadsByDeliverable = useMemo(() => {
     return new Map((artifactDownloads ?? []).map((artifact) => [String(artifact.deliverableId), artifact]));
@@ -117,10 +139,13 @@ export default function LifecycleDepartmentPage() {
     } finally { setStarting(false); }
   };
 
-  if (isLoading || !isAuthenticated || department === undefined) {
+  if (isLoading || !isAuthenticated || department === undefined || extensions === undefined) {
     return <div className="min-h-screen bg-background"><AppNav /><main className="mx-auto max-w-5xl px-4 py-12 text-sm text-muted-foreground sm:px-6">Loading department…</main></div>;
   }
   if (!department) return null;
+
+  const fullWorkCount = Math.max(department.stage.workCount, departmentWork.length);
+  const fullyInitialized = department.initialized && departmentWork.length >= fullWorkCount;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -136,8 +161,8 @@ export default function LifecycleDepartmentPage() {
               <p className="max-w-3xl text-muted-foreground">{department.stage.description}</p>
             </div>
             <Button size="lg" onClick={() => void startDepartment()} disabled={starting} className="gap-2">
-              {starting ? <RefreshCw className="h-4 w-4 animate-spin" /> : department.initialized ? <Play className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
-              {starting ? "Starting…" : department.initialized ? "Continue department" : `Start ${department.stage.name}`}
+              {starting ? <RefreshCw className="h-4 w-4 animate-spin" /> : fullyInitialized ? <Play className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
+              {starting ? "Starting…" : fullyInitialized ? "Continue department" : `Start ${department.stage.name}`}
             </Button>
           </header>
 
@@ -145,7 +170,7 @@ export default function LifecycleDepartmentPage() {
           {error && <div role="alert" className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{error}</div>}
 
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Work complete</p><p className="mt-2 text-2xl font-semibold">{counts.complete}/{department.stage.workCount}</p></div>
+            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Work complete</p><p className="mt-2 text-2xl font-semibold">{counts.complete}/{fullWorkCount}</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Active</p><p className="mt-2 text-2xl font-semibold">{counts.active}</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Needs action</p><p className="mt-2 text-2xl font-semibold">{counts.blocked}</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Inventor evidence</p><p className="mt-2 text-2xl font-semibold">{department.inventorEvidenceCount}</p><p className="mt-1 text-xs text-muted-foreground">of {department.evidenceCount} total sources</p></div>
@@ -157,14 +182,14 @@ export default function LifecycleDepartmentPage() {
 
           <section className="space-y-4">
             <div><h2 className="text-xl font-semibold">Department work</h2><p className="mt-1 text-sm text-muted-foreground">InventSmith performs eligible work autonomously and stops only at genuine inventor, professional, physical, payment, or external-action gates.</p></div>
-            {department.workItems.length === 0 ? <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Start the department to create its work plan.</div> : <div className="space-y-3">{department.workItems.map((item) => (
+            {departmentWork.length === 0 ? <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Start the department to create its work plan.</div> : <div className="space-y-3">{departmentWork.map((item) => (
               <article key={item._id} className="rounded-xl border border-border bg-card p-5"><div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{item.kind.replaceAll("_", " ")}</p><h3 className="mt-1 font-semibold">{item.title}</h3>{item.outputSummary && <p className="mt-2 text-sm text-muted-foreground">{item.outputSummary}</p>}{item.blockedReason && <p className="mt-2 flex items-start gap-2 text-sm text-warning"><ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />{item.blockedReason}</p>}</div><span className={`w-fit shrink-0 rounded-full px-3 py-1 text-xs font-medium ${statusClass(item.status)}`}>{STATUS_LABELS[item.status] ?? item.status}</span></div></article>
             ))}</div>}
           </section>
 
           <section className="space-y-4">
             <div className="flex items-end justify-between gap-4"><div><h2 className="text-xl font-semibold">Department deliverables</h2><p className="mt-1 text-sm text-muted-foreground">Every completed artifact remains traceable to evidence, assumptions, limitations, revisions, and required professional review.</p></div><Button asChild variant="ghost" size="sm"><Link href={`/invention/${inventionId}/work`}>Full work library</Link></Button></div>
-            {department.deliverables.length === 0 ? <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">No department deliverables have completed yet.</div> : <div className="space-y-4">{department.deliverables.map((deliverable) => {
+            {departmentDeliverables.length === 0 ? <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">No department deliverables have completed yet.</div> : <div className="space-y-4">{departmentDeliverables.map((deliverable) => {
               const readable = contentToReadableText(deliverable.content);
               const artifact = downloadsByDeliverable.get(String(deliverable._id));
               return <article key={deliverable._id} className="rounded-2xl border border-border bg-card p-6">
