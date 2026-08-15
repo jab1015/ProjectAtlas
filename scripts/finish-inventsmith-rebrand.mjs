@@ -41,3 +41,4 @@ for (const path of roots) walk(path);
 
 console.log(`InventSmith sweep updated ${changed.length} file(s).`);
 for (const file of changed) console.log(`- ${file}`);
+console.log("InventSmith brand sweep verification source: v2");
