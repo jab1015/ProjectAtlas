@@ -7,6 +7,23 @@ function staleReason(action: "uploaded" | "removed", label: string): string {
   return `Inventor evidence was ${action}: ${label}. Downstream analysis must be refreshed before relying on this output.`;
 }
 
+function evidenceGateRelease(input: { action: "uploaded" | "removed"; evidenceKind?: string }, item: { kind: string; status: string }) {
+  if (input.action !== "uploaded" || item.status !== "blocked") return null;
+  if (input.evidenceKind === "prototype_test" && item.kind === "prototype_physical_evidence") {
+    return {
+      lastError: "Prototype evidence was supplied; InventSmith can evaluate the physical-evidence gate again.",
+      summary: "InventSmith released the physical prototype-evidence gate because prototype test evidence was supplied.",
+    };
+  }
+  if (input.evidenceKind === "manufacturer_quote" && item.kind === "manufacturer_quote_evidence") {
+    return {
+      lastError: "Manufacturer quote/RFQ evidence was supplied; InventSmith can evaluate the external-evidence gate again.",
+      summary: "InventSmith released the manufacturer quote-evidence gate because a real quote/RFQ response was supplied.",
+    };
+  }
+  return null;
+}
+
 export async function applyInventorEvidenceChange(
   ctx: MutationCtx,
   inventionId: Id<"inventions">,
@@ -73,13 +90,8 @@ export async function applyInventorEvidenceChange(
     if (PRESERVE_WORK_KINDS.has(item.kind)) continue;
     if (item.status === "running" || item.status === "cancelled") continue;
 
-    const prototypeEvidenceArrived =
-      input.action === "uploaded" &&
-      input.evidenceKind === "prototype_test" &&
-      item.kind === "prototype_physical_evidence" &&
-      item.status === "blocked";
-
-    if (prototypeEvidenceArrived) {
+    const release = evidenceGateRelease(input, item);
+    if (release) {
       await ctx.db.patch(item._id, {
         status: "queued",
         attemptCount: 0,
@@ -93,7 +105,7 @@ export async function applyInventorEvidenceChange(
         outputSummary: undefined,
         blockedReason: undefined,
         humanGateType: undefined,
-        lastError: "Prototype evidence was supplied; InventSmith can evaluate the physical-evidence gate again.",
+        lastError: release.lastError,
         updatedAt: input.now,
       });
       await ctx.db.insert("atlasExecutionEvents", {
@@ -101,7 +113,7 @@ export async function applyInventorEvidenceChange(
         workItemId: item._id,
         eventType: "work_queued",
         actorType: "system",
-        summary: "InventSmith released the physical prototype-evidence gate because prototype test evidence was supplied.",
+        summary: release.summary,
         metadata: { evidenceKind: input.evidenceKind, sourceId: input.sourceId ? String(input.sourceId) : undefined },
         createdAt: input.now,
       });
