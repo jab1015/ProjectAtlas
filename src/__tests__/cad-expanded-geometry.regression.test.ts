@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { buildCadMesh, generateCadArtifacts, type CadAssemblySpec } from "../../convex/cadGeometry";
 
 describe("InventSmith expanded native CAD geometry", () => {
@@ -71,5 +73,14 @@ describe("InventSmith expanded native CAD geometry", () => {
     };
 
     expect(() => buildCadMesh(spec)).toThrow(/convex/i);
+  });
+
+  it("keeps orthographic and exploded-view artifacts visible in the Design Studio", () => {
+    const page = readFileSync(join(process.cwd(), "src/app/(app)/invention/[id]/design/page.tsx"), "utf8");
+    expect(page).toContain('kind === "cad_orthographic_views"');
+    expect(page).toContain('kind === "cad_exploded_view"');
+    expect(page).not.toContain("currentCadArtifacts.slice(0, 4)");
+    expect(page).toContain("Exploded assembly view");
+    expect(page).toContain("Orthographic views");
   });
 });
