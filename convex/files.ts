@@ -1,10 +1,13 @@
-import { query, mutation } from "./_generated/server";
-import { v } from "convex/values";
+import { query, mutation, type MutationCtx, type QueryCtx } from "./_generated/server";
+import { v, ConvexError } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { ConvexError } from "convex/values";
+import type { Id } from "./_generated/dataModel";
 import { requireAdmin } from "./authHelpers";
+import { applyInventorEvidenceChange } from "./evidenceImpact";
 
-async function requireOwnedInvention(ctx: Parameters<typeof getAuthUserId>[0] & { db: any }, inventionId: any) {
+type EvidenceCtx = MutationCtx | QueryCtx;
+
+async function requireOwnedInvention(ctx: EvidenceCtx, inventionId: Id<"inventions">) {
   const userId = await getAuthUserId(ctx);
   if (!userId) throw new ConvexError("Authentication required");
   const invention = await ctx.db.get(inventionId);
@@ -44,11 +47,13 @@ export const registerInventionEvidence = mutation({
   handler: async (ctx, args) => {
     const { userId } = await requireOwnedInvention(ctx, args.inventionId);
     const now = Date.now();
+    const evidenceKind = args.evidenceKind?.trim() || "other";
+    const title = args.title?.trim() || args.fileName;
 
     const sourceId = await ctx.db.insert("evidenceSources", {
       inventionId: args.inventionId,
       sourceType: "other",
-      title: args.title?.trim() || args.fileName,
+      title,
       locator: `convex-storage:${args.storageId}`,
       accessedAt: now,
       excerpt: args.notes?.trim() || undefined,
@@ -60,7 +65,7 @@ export const registerInventionEvidence = mutation({
         fileName: args.fileName,
         fileSize: args.fileSize,
         mimeType: args.mimeType,
-        evidenceKind: args.evidenceKind ?? "other",
+        evidenceKind,
         uploadedAt: now,
       },
       createdAt: now,
@@ -73,10 +78,18 @@ export const registerInventionEvidence = mutation({
       summary: `Uploaded evidence: ${args.fileName}`,
       metadata: {
         evidenceSourceId: sourceId,
-        evidenceKind: args.evidenceKind ?? "other",
+        evidenceKind,
         fileName: args.fileName,
       },
       createdAt: now,
+    });
+
+    await applyInventorEvidenceChange(ctx, args.inventionId, {
+      action: "uploaded",
+      sourceId,
+      label: title,
+      evidenceKind,
+      now,
     });
 
     return sourceId;
@@ -89,18 +102,18 @@ export const listInventionEvidence = query({
     await requireOwnedInvention(ctx, args.inventionId);
     const sources = await ctx.db
       .query("evidenceSources")
-      .withIndex("by_inventionId", (q: any) => q.eq("inventionId", args.inventionId))
+      .withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId))
       .collect();
 
     const inventorUploads = sources.filter(
-      (source: any) => source.metadata?.provenance === "inventor_upload"
+      (source) => source.metadata?.provenance === "inventor_upload"
     );
 
     return await Promise.all(
       inventorUploads
-        .sort((a: any, b: any) => b.createdAt - a.createdAt)
-        .map(async (source: any) => {
-          const storageId = source.metadata?.storageId;
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .map(async (source) => {
+          const storageId = source.metadata?.storageId as Id<"_storage"> | undefined;
           const downloadUrl = storageId ? await ctx.storage.getUrl(storageId) : null;
           return {
             _id: source._id,
@@ -108,10 +121,10 @@ export const listInventionEvidence = query({
             notes: source.excerpt,
             reliability: source.reliability,
             createdAt: source.createdAt,
-            fileName: source.metadata?.fileName ?? source.title,
-            fileSize: source.metadata?.fileSize ?? null,
-            mimeType: source.metadata?.mimeType ?? null,
-            evidenceKind: source.metadata?.evidenceKind ?? "other",
+            fileName: String(source.metadata?.fileName ?? source.title),
+            fileSize: typeof source.metadata?.fileSize === "number" ? source.metadata.fileSize : null,
+            mimeType: typeof source.metadata?.mimeType === "string" ? source.metadata.mimeType : null,
+            evidenceKind: typeof source.metadata?.evidenceKind === "string" ? source.metadata.evidenceKind : "other",
             downloadUrl,
           };
         })
@@ -134,7 +147,18 @@ export const removeInventionEvidence = mutation({
       throw new ConvexError("Only inventor-uploaded evidence can be removed here");
     }
 
-    const storageId = source.metadata?.storageId;
+    const now = Date.now();
+    const storageId = source.metadata?.storageId as Id<"_storage"> | undefined;
+    const evidenceKind = typeof source.metadata?.evidenceKind === "string" ? source.metadata.evidenceKind : "other";
+
+    await applyInventorEvidenceChange(ctx, args.inventionId, {
+      action: "removed",
+      sourceId: source._id,
+      label: source.title,
+      evidenceKind,
+      now,
+    });
+
     if (storageId) await ctx.storage.delete(storageId);
     await ctx.db.delete(args.evidenceSourceId);
   },
