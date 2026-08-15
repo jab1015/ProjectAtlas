@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { FULL_JOURNEY_STAGES } from "@convex/fullJourneyDefinition";
+import { FULL_JOURNEY_STAGES, routeForJourneyStage } from "@convex/fullJourneyDefinition";
 import { lifecycleStages } from "@convex/lifecycleDepartments";
 import { POST_CANONICAL_WORK_PLAN } from "@convex/fullProductWorkPlan";
 
@@ -35,6 +35,12 @@ describe("InventSmith full idea-to-market journey", () => {
       "Launch",
       "Growth",
     ]);
+  });
+
+  it("keeps Patent Readiness directly inspectable instead of hiding it in the generic invention page", () => {
+    const patent = stageById.get(4);
+    expect(patent?.routeType).toBe("patent");
+    expect(routeForJourneyStage("risejar", patent!)).toBe("/invention/risejar/patent");
   });
 
   it("locks the mandatory product-design and native-CAD destination into stage 5", () => {
