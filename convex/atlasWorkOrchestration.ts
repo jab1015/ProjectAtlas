@@ -43,13 +43,8 @@ const resultSchema = {
 } as const;
 
 const RESEARCH_WORK = new Set([
-  "competitor_discovery",
-  "market_feasibility",
-  "preliminary_prior_art",
-  "materials_manufacturing",
-  "regulatory_screening",
-  "evidence_verification",
-  "preliminary_bom_cost",
+  "competitor_discovery", "market_feasibility", "preliminary_prior_art", "materials_manufacturing",
+  "regulatory_screening", "evidence_verification", "preliminary_bom_cost",
 ]);
 
 function assignmentInstructions(kind: string): string {
@@ -81,28 +76,16 @@ function assignmentInstructions(kind: string): string {
 function workInput(workItem: any): Record<string, unknown> | null {
   return workItem.inputSnapshot && typeof workItem.inputSnapshot === "object" ? workItem.inputSnapshot as Record<string, unknown> : null;
 }
-
 function resolvedInstructions(workItem: any): string {
   const input = workInput(workItem);
   return typeof input?.instructions === "string" && input.instructions.trim() ? input.instructions.trim() : assignmentInstructions(workItem.kind);
 }
-
 function needsWebResearch(workItem: any): boolean {
   const input = workInput(workItem);
   return RESEARCH_WORK.has(workItem.kind) || input?.research === true;
 }
-
 function contextDeliverableLimit(kind: string) {
-  return new Set([
-    "package_assembly",
-    "patent_design_handoff",
-    "design_candidate_generation",
-    "design_candidate_scoring",
-    "product_design_specification",
-    "product_render_generation",
-    "manufacturer_rfq_package",
-    "pitch_deck_content",
-  ]).has(kind) ? 30 : 16;
+  return new Set(["package_assembly", "patent_design_handoff", "design_candidate_generation", "design_candidate_scoring", "product_design_specification", "product_render_generation", "manufacturer_rfq_package", "pitch_deck_content"]).has(kind) ? 30 : 16;
 }
 
 export const runAvailableWork = internalAction({
@@ -118,15 +101,9 @@ export const runAvailableWork = internalAction({
       if (!claim.workItemId) return { completed, stopReason: claim.reason, remainingBudget };
       try {
         const { workItem, invention, record, sources, findings, deliverables } = await ctx.runQuery(getWorkContext, { workItemId: claim.workItemId });
-
         const risk = triageInventionRisk(invention);
         if (risk.restricted) {
-          await ctx.runMutation(blockWorkForHuman, {
-            workItemId: claim.workItemId,
-            reason: restrictedPilotReason(risk.categories),
-            gateType: "professional_review",
-            blockedAt: Date.now(),
-          });
+          await ctx.runMutation(blockWorkForHuman, { workItemId: claim.workItemId, reason: restrictedPilotReason(risk.categories), gateType: "professional_review", blockedAt: Date.now() });
           return { completed, stopReason: "restricted_product_category", remainingBudget };
         }
 
@@ -134,9 +111,7 @@ export const runAvailableWork = internalAction({
           const cadResult = await ctx.runAction(generateNativeCad, { inventionId, workItemId: claim.workItemId });
           remainingBudget = Math.max(0, remainingBudget - (cadResult.actualCostUnits ?? 0));
           if (cadResult.failed) {
-            if (shouldScheduleAutonomousRetry(Boolean(cadResult.willRetry), remainingBudget)) {
-              await ctx.scheduler.runAfter(2_000, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget });
-            }
+            if (shouldScheduleAutonomousRetry(Boolean(cadResult.willRetry), remainingBudget)) await ctx.scheduler.runAfter(2_000, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget });
             return { completed, stopReason: "native_cad_failed", remainingBudget };
           }
           continue;
@@ -182,9 +157,7 @@ export const runAvailableWork = internalAction({
 
         if (workItem.kind === "concept_image_generation" || workItem.kind === "product_render_generation") {
           const imagePrompt = String(result.conceptImagePrompt ?? "").trim();
-          const prompt = workItem.kind === "product_render_generation"
-            ? buildProductRenderPrompt(imagePrompt)
-            : buildConceptImagePrompt(imagePrompt);
+          const prompt = workItem.kind === "product_render_generation" ? buildProductRenderPrompt(imagePrompt) : buildConceptImagePrompt(imagePrompt);
           const imageResult = await client.images.generate({ model: process.env.ATLAS_IMAGE_MODEL ?? "gpt-image-2", prompt });
           const imageBase64 = imageResult.data?.[0]?.b64_json;
           if (!imageBase64) throw new Error("Image generation returned no image data");
@@ -195,7 +168,15 @@ export const runAvailableWork = internalAction({
           generationPrompt = result.conceptImagePrompt;
           units += workItem.kind === "product_render_generation" ? PRODUCT_RENDER_COST_UNITS : CONCEPT_IMAGE_COST_UNITS;
         } else if (workItem.kind === "pitch_deck_content") {
-          const deck = buildPitchDeckArtifact(String(result.markdown ?? ""), invention.title);
+          const currentRender = deliverables
+            .filter((item: any) => item.kind === "product_render_board" && item.storageId && item.mediaType === "image/png" && !item.staleReason)
+            .sort((a: any, b: any) => b.version - a.version || b.updatedAt - a.updatedAt)[0];
+          let visual: Uint8Array | undefined;
+          if (currentRender?.storageId) {
+            const renderBlob = await ctx.storage.get(currentRender.storageId);
+            if (renderBlob) visual = new Uint8Array(await renderBlob.arrayBuffer());
+          }
+          const deck = buildPitchDeckArtifact(String(result.markdown ?? ""), invention.title, visual);
           storageId = await ctx.storage.store(new Blob([deck.bytes], { type: "application/vnd.openxmlformats-officedocument.presentationml.presentation" }));
           mediaType = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
         }
