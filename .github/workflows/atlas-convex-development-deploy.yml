@@ -1,0 +1,79 @@
+name: Atlas Convex Development Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type DEPLOY ATLAS DEV to confirm a controlled development deployment'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: atlas-convex-development-deploy
+  cancel-in-progress: false
+
+jobs:
+  verify-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: atlas-development
+    env:
+      CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
+    steps:
+      - name: Require explicit dispatch confirmation
+        shell: bash
+        run: |
+          if [[ "${{ inputs.confirm }}" != "DEPLOY ATLAS DEV" ]]; then
+            echo "Refusing deployment: confirmation text did not match."
+            exit 1
+          fi
+
+      - name: Require a development-scoped Convex deploy key
+        shell: bash
+        run: |
+          if [[ -z "$CONVEX_DEPLOY_KEY" ]]; then
+            echo "Refusing deployment: CONVEX_DEPLOY_KEY is not configured in the atlas-development GitHub environment."
+            exit 1
+          fi
+          if [[ "$CONVEX_DEPLOY_KEY" != dev:* ]]; then
+            echo "Refusing deployment: this workflow accepts only a dev-scoped Convex deploy key."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck web
+        run: npx tsc --noEmit
+
+      - name: Typecheck Convex
+        run: npx tsc -p convex --noEmit
+
+      - name: Regression tests
+        run: npm test
+
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Production build
+        run: npx next build
+
+      - name: Deploy Convex backend to development target
+        run: npx convex deploy
+
+      - name: Record deployment boundary
+        run: |
+          echo "Convex development deployment completed."
+          echo "Run npm run verify:live -- https://<deployment>.convex.site after server environment secrets are configured."
