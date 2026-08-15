@@ -113,6 +113,18 @@ describe("InventSmith expanded native CAD geometry", () => {
     expect(() => buildCadMesh(spec)).toThrow(/convex/i);
   });
 
+  it("preserves manufacturing metadata in the editable CAD source plan", () => {
+    const generation = readFileSync(join(process.cwd(), "convex/nativeCadGeneration.ts"), "utf8");
+    expect(generation).toContain('finish: { type: "string" }');
+    expect(generation).toContain('manufacturingProcess: { type: "string" }');
+    expect(generation).toContain('interfaceNotes: { type: "array"');
+    expect(generation).toContain("material: part.material.trim()");
+    expect(generation).toContain("finish: part.finish.trim()");
+    expect(generation).toContain("manufacturingProcess: part.manufacturingProcess.trim()");
+    expect(generation).toContain("interfaceNotes: part.interfaceNotes.slice");
+    expect(generation).toContain("If any of those fields are unknown, say TBD or provisional");
+  });
+
   it("keeps orthographic and exploded-view artifacts visible in the Design Studio", () => {
     const page = readFileSync(join(process.cwd(), "src/app/(app)/invention/[id]/design/page.tsx"), "utf8");
     expect(page).toContain('kind === "cad_orthographic_views"');
