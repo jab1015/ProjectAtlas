@@ -38,23 +38,13 @@ export const getEvidenceExtractionContext = internalQuery({
 });
 
 export const recordEvidenceExtraction = internalMutation({
-  args: {
-    evidenceSourceId: v.id("evidenceSources"),
-    extraction: v.any(),
-    extractedAt: v.number(),
-  },
+  args: { evidenceSourceId: v.id("evidenceSources"), extraction: v.any(), extractedAt: v.number() },
   handler: async (ctx, args) => {
     const source = await ctx.db.get(args.evidenceSourceId);
     if (!source || source.metadata?.provenance !== "inventor_upload") throw new ConvexError("Inventor evidence source not found");
     const evidenceKind = typeof source.metadata?.evidenceKind === "string" ? source.metadata.evidenceKind : "other";
     await ctx.db.patch(source._id, {
-      metadata: {
-        ...(source.metadata ?? {}),
-        extraction: args.extraction,
-        extractionStatus: "completed",
-        extractedAt: args.extractedAt,
-        extractionError: undefined,
-      },
+      metadata: { ...(source.metadata ?? {}), extraction: args.extraction, extractionStatus: "completed", extractedAt: args.extractedAt, extractionError: undefined },
     });
     await applyInventorEvidenceChange(ctx, source.inventionId, {
       action: "uploaded",
@@ -66,31 +56,22 @@ export const recordEvidenceExtraction = internalMutation({
     });
     await ctx.db.insert("atlasExecutionEvents", {
       inventionId: source.inventionId,
-      eventType: "evidence_extracted",
+      eventType: "invention_changed",
       actorType: "atlas",
       summary: `InventSmith extracted structured evidence from ${source.title}.`,
-      metadata: { evidenceSourceId: String(source._id), evidenceKind, extractionMode: "ai_file" },
+      metadata: { changeType: "evidence_extraction", evidenceSourceId: String(source._id), evidenceKind, extractionMode: "ai_file" },
       createdAt: args.extractedAt,
     });
   },
 });
 
 export const recordEvidenceExtractionFailure = internalMutation({
-  args: {
-    evidenceSourceId: v.id("evidenceSources"),
-    error: v.string(),
-    failedAt: v.number(),
-  },
+  args: { evidenceSourceId: v.id("evidenceSources"), error: v.string(), failedAt: v.number() },
   handler: async (ctx, args) => {
     const source = await ctx.db.get(args.evidenceSourceId);
     if (!source || source.metadata?.provenance !== "inventor_upload") return;
     await ctx.db.patch(source._id, {
-      metadata: {
-        ...(source.metadata ?? {}),
-        extractionStatus: "failed",
-        extractionError: args.error.slice(0, 1000),
-        extractionFailedAt: args.failedAt,
-      },
+      metadata: { ...(source.metadata ?? {}), extractionStatus: "failed", extractionError: args.error.slice(0, 1000), extractionFailedAt: args.failedAt },
     });
     await ctx.db.insert("atlasExecutionEvents", {
       inventionId: source.inventionId,
