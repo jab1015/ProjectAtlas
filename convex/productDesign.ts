@@ -58,6 +58,15 @@ export const DESIGN_WORK = [
     dependsOnKinds: ["cad_model_specification", "exploded_view_specification"],
     instructions: "Prepare a drawing-release checklist for every part and assembly. Specify required orthographic/section/detail views, dimensions, GD&T or tolerances only where justified, materials, finishes, fasteners, notes, inspection criteria, revision controls, and professional engineering decisions still required before Manufacturing Released maturity.",
   },
+  {
+    kind: "product_render_generation",
+    title: "Generate polished 3D product presentation renders",
+    priority: 62,
+    estimatedCostUnits: 30,
+    deliverableKind: "product_render_board",
+    dependsOnKinds: ["native_cad_generation", "product_design_specification", "exploded_view_specification"],
+    instructions: "Generate an image prompt for a polished product-render board based ONLY on the selected Product Design Specification, current preliminary CAD source/geometry, exploded-view specification, materials/finish intent, and patent-design differentiation constraints. The board should include a professional three-quarter hero rendering plus useful complementary product/detail or assembly views suitable for inventor review, manufacturer communication, and pitch materials. Preserve the selected mechanism and part relationships. Do not invent features, dimensions, logos, certifications, patent claims, controls, materials, interfaces, or production details that are not in the design record. Put the exact complete image-generation direction in conceptImagePrompt. The result remains a presentation rendering of preliminary design state, not engineering approval or manufacturing release.",
+  },
 ] as const;
 
 async function requireOwner(ctx: Parameters<typeof getAuthUserId>[0] & { db: any }, inventionId: any) {
@@ -94,7 +103,7 @@ export const ensureProductDesignWorkspace = mutation({
         title: item.title,
         status: "queued",
         priority: item.priority,
-        inputSnapshot: { department: "product_design", instructions: item.instructions },
+        inputSnapshot: { department: "product_design", stageId: 5, instructions: item.instructions },
         attemptCount: 0,
         maxAttempts: 3,
         estimatedCostUnits: item.estimatedCostUnits,
@@ -143,6 +152,7 @@ export const getProductDesignWorkspace = query({
       "materials_manufacturing",
       "preliminary_bom_cost",
       "concept_image_generation",
+      "native_cad_generation",
       ...designKinds,
     ]);
 
@@ -150,7 +160,7 @@ export const getProductDesignWorkspace = query({
       .filter((item: any) => relatedWorkKinds.has(item.kind))
       .sort((a: any, b: any) => b.priority - a.priority || a.createdAt - b.createdAt);
     const designDeliverables = deliverables
-      .filter((item: any) => designDeliverableKinds.has(item.kind) || relatedWorkKinds.has(item.kind))
+      .filter((item: any) => designDeliverableKinds.has(item.kind) || relatedWorkKinds.has(item.kind) || ["native_cad_step", "native_cad_stl", "native_cad_dxf", "native_cad_source", "cad_orthographic_views", "cad_exploded_view"].includes(item.kind))
       .sort((a: any, b: any) => b.updatedAt - a.updatedAt);
     const handoffWork = workItems.find((item: any) => item.kind === "patent_design_handoff");
     const handoffDeliverable = deliverables
@@ -170,7 +180,7 @@ export const getProductDesignWorkspace = query({
       workItems: designWork,
       deliverables: await Promise.all(designDeliverables.map(async (deliverable: any) => ({
         ...deliverable,
-        mediaUrl: deliverable.storageId ? await ctx.storage.getUrl(deliverable.storageId) : null,
+        mediaUrl: deliverable.storageId && deliverable.mediaType?.startsWith("image/") ? await ctx.storage.getUrl(deliverable.storageId) : null,
       }))),
       evidenceCount: evidence.length,
       inventorEvidenceCount: evidence.filter((item: any) => item.metadata?.provenance === "inventor_upload").length,
