@@ -6,6 +6,7 @@ export type CadPrimitive =
   | { type: "cylinder"; radius: number; height: number; segments?: number }
   | { type: "tube"; outerRadius: number; innerRadius: number; height: number; segments?: number }
   | { type: "frustum"; bottomRadius: number; topRadius: number; height: number; segments?: number }
+  | { type: "threadedCylinder"; radius: number; height: number; pitch: number; threadDepth: number; segments?: number }
   | { type: "extrudedConvexPolygon"; points: Vec2[]; height: number };
 
 export interface CadPartSpec {
@@ -180,6 +181,61 @@ function frustumTriangles(part: CadPartSpec, bottomValue: number, topValue: numb
   return out;
 }
 
+function wrappedPhase(value: number): number {
+  const twoPi = 2 * Math.PI;
+  const normalized = ((value + Math.PI) % twoPi + twoPi) % twoPi - Math.PI;
+  return normalized;
+}
+
+function threadedCylinderTriangles(part: CadPartSpec, radiusValue: number, heightValue: number, pitchValue: number, depthValue: number, segmentValue?: number): Triangle[] {
+  const radius = finitePositive(radiusValue, "threaded cylinder base radius");
+  const height = finitePositive(heightValue, "threaded cylinder height");
+  const pitch = finitePositive(pitchValue, "thread pitch");
+  const depth = finitePositive(depthValue, "thread depth");
+  if (depth >= radius * 0.4) throw new Error("thread depth is too large relative to the base radius");
+  if (pitch <= depth) throw new Error("thread pitch must be larger than thread depth");
+  const around = segments(segmentValue);
+  const turns = height / pitch;
+  const axialSteps = Math.max(8, Math.min(512, Math.ceil(turns * around)));
+  const z0 = -height / 2;
+  const z1 = height / 2;
+  const out: Triangle[] = [];
+
+  const surfacePoint = (angle: number, z: number): Vec3 => {
+    const phase = wrappedPhase(angle - 2 * Math.PI * (z - z0) / pitch);
+    const normalized = Math.abs(phase) / Math.PI;
+    const ridge = Math.max(0, 1 - normalized * 4);
+    const localRadius = radius + depth * ridge;
+    return [localRadius * Math.cos(angle), localRadius * Math.sin(angle), z];
+  };
+
+  for (let zi = 0; zi < axialSteps; zi += 1) {
+    const za = z0 + height * zi / axialSteps;
+    const zb = z0 + height * (zi + 1) / axialSteps;
+    for (let ai = 0; ai < around; ai += 1) {
+      const a0 = 2 * Math.PI * ai / around;
+      const a1 = 2 * Math.PI * (ai + 1) / around;
+      const p00 = surfacePoint(a0, za);
+      const p01 = surfacePoint(a1, za);
+      const p10 = surfacePoint(a0, zb);
+      const p11 = surfacePoint(a1, zb);
+      out.push(triangle(part, p00, p01, p11), triangle(part, p00, p11, p10));
+    }
+  }
+
+  for (let ai = 0; ai < around; ai += 1) {
+    const a0 = 2 * Math.PI * ai / around;
+    const a1 = 2 * Math.PI * (ai + 1) / around;
+    const b0 = surfacePoint(a0, z0);
+    const b1 = surfacePoint(a1, z0);
+    const t0 = surfacePoint(a0, z1);
+    const t1 = surfacePoint(a1, z1);
+    out.push(triangle(part, [0, 0, z0], b1, b0));
+    out.push(triangle(part, [0, 0, z1], t0, t1));
+  }
+  return out;
+}
+
 function polygonArea(points: Vec2[]): number {
   let area = 0;
   for (let i = 0; i < points.length; i += 1) {
@@ -242,6 +298,7 @@ export function buildCadMesh(spec: CadAssemblySpec): Triangle[] {
       case "cylinder": triangles.push(...cylinderTriangles(part, part.primitive.radius, part.primitive.height, part.primitive.segments)); break;
       case "tube": triangles.push(...tubeTriangles(part, part.primitive.outerRadius, part.primitive.innerRadius, part.primitive.height, part.primitive.segments)); break;
       case "frustum": triangles.push(...frustumTriangles(part, part.primitive.bottomRadius, part.primitive.topRadius, part.primitive.height, part.primitive.segments)); break;
+      case "threadedCylinder": triangles.push(...threadedCylinderTriangles(part, part.primitive.radius, part.primitive.height, part.primitive.pitch, part.primitive.threadDepth, part.primitive.segments)); break;
       case "extrudedConvexPolygon": triangles.push(...extrudedConvexPolygonTriangles(part, part.primitive.points, part.primitive.height)); break;
       default: throw new Error("Unsupported CAD primitive");
     }
