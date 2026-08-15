@@ -53,7 +53,7 @@ export const ask = mutation({
     const dateKey = utcDateKey(now);
     const dailyUsage = await ctx.db.query("atlasDailyUsage").withIndex("by_userId_dateKey", (q) => q.eq("userId", userId).eq("dateKey", dateKey)).unique();
     if (!canAskWithinDailyAllowance(user?.subscriptionTier, dailyUsage?.chatQuestions ?? 0)) {
-      throw new ConvexError("Atlas chat's daily allowance has been reached. It resets at 00:00 UTC.");
+      throw new ConvexError("InventSmith chat's daily allowance has been reached. It resets at 00:00 UTC.");
     }
     let conversation = await ctx.db
       .query("conversations")
@@ -74,7 +74,7 @@ export const ask = mutation({
       .filter((message) => message.role === "user")
       .map((message) => message.createdAt);
     if (!canAskChatQuestion(recentQuestionTimes, now)) {
-      throw new ConvexError("Atlas chat is limited to five questions per minute. Please wait briefly.");
+      throw new ConvexError("InventSmith chat is limited to five questions per minute. Please wait briefly.");
     }
 
     const userMessageId = await ctx.db.insert("conversationMessages", {
@@ -90,7 +90,7 @@ export const ask = mutation({
       conversationId: conversation._id,
       inventionId,
       role: "assistant",
-      content: "Atlas is reviewing the invention record…",
+      content: "InventSmith is reviewing the invention record…",
       status: "pending",
       createdAt: now + 1,
       updatedAt: now + 1,
@@ -99,7 +99,7 @@ export const ask = mutation({
       inventionId,
       eventType: "chat_requested",
       actorType: "inventor",
-      summary: "The inventor asked Atlas a question.",
+      summary: "The inventor asked InventSmith a question.",
       metadata: { characterCount: cleaned.length },
       createdAt: now,
     });
@@ -164,7 +164,7 @@ export const saveAnswer = internalMutation({
       inventionId: userMessage.inventionId,
       eventType: args.error ? "chat_failed" : "chat_answered",
       actorType: "atlas",
-      summary: args.error ? "Atlas chat could not complete." : "Atlas answered from the invention record.",
+      summary: args.error ? "InventSmith chat could not complete." : "InventSmith answered from the invention record.",
       createdAt: args.completedAt,
     });
     return assistantMessage._id;

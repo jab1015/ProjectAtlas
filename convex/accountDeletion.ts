@@ -105,7 +105,7 @@ export async function deleteAccountData(
   for (const row of usage) await ctx.db.delete(row._id);
 
   // Financial transaction rows may need to be retained for accounting, but
-  // Atlas does not retain the deleted user's identity on them.
+  // InventSmith does not retain the deleted user's identity on them.
   const purchases = await ctx.db
     .query("purchases")
     .withIndex("by_userId", (q) => q.eq("userId", userId))

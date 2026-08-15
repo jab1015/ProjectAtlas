@@ -5,7 +5,7 @@ export const CHAT_MODEL_CONTEXT_MAX_CHARACTERS = 80_000;
 export function truncateModelContext(value: unknown, maxCharacters: number): string {
   const text = typeof value === "string" ? value : JSON.stringify(value ?? null);
   if (text.length <= maxCharacters) return text;
-  const marker = "\n[Context truncated by Atlas]";
+  const marker = "\n[Context truncated by InventSmith]";
   return `${text.slice(0, Math.max(0, maxCharacters - marker.length))}${marker}`;
 }
 

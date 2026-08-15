@@ -1,5 +1,5 @@
 /**
- * Atlas Validation Research — Mock Provider
+ * InventSmith Validation Research — Mock Provider
  *
  * Implements ValidationResearchProvider using placeholder content derived
  * entirely from the InventionContext passed in at call time.

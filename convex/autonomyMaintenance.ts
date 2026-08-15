@@ -47,7 +47,7 @@ export const refreshExpiredEvidence = internalMutation({
           workItemId: verification._id,
           eventType: "work_queued",
           actorType: "system",
-          summary: `Atlas queued evidence refresh because ${expiredSourceIds.size} trusted source(s) require re-verification.`,
+          summary: `InventSmith queued evidence refresh because ${expiredSourceIds.size} trusted source(s) require re-verification.`,
           metadata: { expiredSourceCount: expiredSourceIds.size },
           createdAt: now,
         });

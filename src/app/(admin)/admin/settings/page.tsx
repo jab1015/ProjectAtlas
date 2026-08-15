@@ -6,7 +6,7 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <AdminHeader
         title="Settings"
-        description="Atlas branding and configuration"
+        description="InventSmith branding and configuration"
       />
 
       <div className="mx-auto max-w-2xl rounded-lg border border-border bg-card p-8 text-center">
@@ -17,7 +17,7 @@ export default function SettingsPage() {
           Managed by Your AI Co-Founder
         </h3>
         <p className="mt-2 text-sm text-muted-foreground">
-          Atlas branding, colors, and content are configured through the AI
+          InventSmith branding, colors, and content are configured through the AI
           co-founder chat. Ask your AI co-founder to update the store name,
           tagline, social links, or any other settings.
         </p>

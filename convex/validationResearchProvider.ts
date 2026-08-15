@@ -1,5 +1,5 @@
 /**
- * Atlas Validation Research — Provider Interface
+ * InventSmith Validation Research — Provider Interface
  *
  * Defines the contract that every future ValidationResearch provider must implement.
  * Provider-independent: no OpenAI, Claude, Perplexity, or any external API references.

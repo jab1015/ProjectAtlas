@@ -9,7 +9,7 @@ import {
   utcDateKey,
 } from "@convex/usagePolicyLogic";
 
-describe("Atlas usage policy", () => {
+describe("InventSmith usage policy", () => {
   it("normalizes legacy tiers without creating an unlimited plan", () => {
     expect(normalizeAtlasTier("starter")).toBe("inventor");
     expect(normalizeAtlasTier("inventor_pro")).toBe("pro");

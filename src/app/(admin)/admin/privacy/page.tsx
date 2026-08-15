@@ -50,7 +50,7 @@ export default function AdminPrivacyPage() {
   };
 
   const deleteAccount = async (requestId: string) => {
-    const confirmed = window.confirm("This permanently removes the inventor's Atlas data and authentication credentials. Continue only after any active external subscription has been cancelled or otherwise resolved.");
+    const confirmed = window.confirm("This permanently removes the inventor's InventSmith data and authentication credentials. Continue only after any active external subscription has been cancelled or otherwise resolved.");
     if (!confirmed) return;
     const externalBillingResolved = window.confirm("Confirm that external billing is cancelled/resolved, or that this account has no active paid billing relationship.");
     const notes = window.prompt("Enter auditable deletion notes (required):")?.trim();
@@ -79,7 +79,7 @@ export default function AdminPrivacyPage() {
                 <CardHeader><CardTitle className="capitalize">{request.requestType.replaceAll("_", " ")}</CardTitle></CardHeader>
                 <CardContent className="space-y-4 text-sm">
                   <p className="text-muted-foreground">User {request.userId} · Requested {new Date(request.requestedAt).toLocaleString()} · <span className="capitalize">{request.status.replaceAll("_", " ")}</span></p>
-                  {request.requestType === "account_deletion" && <p className="text-xs text-muted-foreground">Deletion is fail-closed: paid billing must be resolved first, then Atlas removes invention data, generated/uploaded storage, usage, auth credentials, and identifying billing links in one transaction.</p>}
+                  {request.requestType === "account_deletion" && <p className="text-xs text-muted-foreground">Deletion is fail-closed: paid billing must be resolved first, then InventSmith removes invention data, generated/uploaded storage, usage, auth credentials, and identifying billing links in one transaction.</p>}
                   <div className="flex flex-wrap gap-2">
                     {request.status === "pending" && <Button variant="outline" onClick={() => void update(request._id, "in_progress")}>Start work</Button>}
                     {request.requestType === "account_deletion" ? (

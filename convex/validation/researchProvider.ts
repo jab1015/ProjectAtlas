@@ -1,5 +1,5 @@
 /**
- * Atlas Validation Research Provider
+ * InventSmith Validation Research Provider
  *
  * Defines the clean interface all research providers must implement.
  * The MockValidationResearchProvider is the Phase 1 implementation.
@@ -7,7 +7,7 @@
  * UI or mutation changes required.
  *
  * Constitutional compliance:
- *  - Atlas Owns Execution (Principle 1 / Atlas Automation Constitution)
+ *  - InventSmith Owns Execution (Principle 1 / InventSmith Automation Constitution)
  *  - Generate Before Requesting (Principle 3)
  *  - Research Before Asking (Principle 4)
  *  - NO hardcoded invention content — all content is derived from InventionContext
@@ -183,7 +183,7 @@ Proposed solution summary: *"${ctx.description}"*
 function buildCustomerSegments(ctx: InventionContext, ts: number): ValidationSection {
   const content = `## Proposed Customer Segments — ${ctx.title}
 
-> **Atlas note:** These are proposed segments derived from the invention context. They should be confirmed or revised by the founder after customer interviews.
+> **InventSmith note:** These are proposed segments derived from the invention context. They should be confirmed or revised by the founder after customer interviews.
 
 ### Problem Context
 *"${ctx.problemStatement}"*
@@ -237,13 +237,13 @@ function buildCustomerSegments(ctx: InventionContext, ts: number): ValidationSec
 function buildCompetitorAnalysis(ctx: InventionContext, ts: number): ValidationSection {
   const content = `## Competitor Analysis — ${ctx.title}
 
-> **Atlas note:** This is a preliminary competitor framework. A live competitive research sweep (future Research Engine) will populate this with real competitor data. Until then, this section provides the framework for founders to complete manually.
+> **InventSmith note:** This is a preliminary competitor framework. A live competitive research sweep (future Research Engine) will populate this with real competitor data. Until then, this section provides the framework for founders to complete manually.
 
 ### Problem Being Solved
 *"${ctx.problemStatement}"*
 
 ### Competitor Research Queries (recommended)
-Atlas recommends searching the following to populate this section:
+InventSmith recommends searching the following to populate this section:
 - Google: "${ctx.title} alternative"
 - Amazon: keywords from the problem statement
 - Google Patents: invention mechanism keywords
@@ -292,7 +292,7 @@ Founder should conduct competitor research and return here to document findings 
 function buildMarketSizing(ctx: InventionContext, ts: number): ValidationSection {
   const content = `## Market Sizing — ${ctx.title}
 
-> **Atlas note:** This is a preliminary market sizing framework. A full market research sweep requires Stage 3. All figures below are illustrative placeholders — the methodology is correct, the numbers must be replaced with researched data.
+> **InventSmith note:** This is a preliminary market sizing framework. A full market research sweep requires Stage 3. All figures below are illustrative placeholders — the methodology is correct, the numbers must be replaced with researched data.
 
 ### Problem Context
 *"${ctx.problemStatement}"*
@@ -302,7 +302,7 @@ function buildMarketSizing(ctx: InventionContext, ts: number): ValidationSection
 **Step 1 — Total Addressable Market (TAM)**
 Estimate the total population who experience the problem described in the problem statement.
 - TAM = [population experiencing the problem] × [annual spend per person on related solutions]
-- Atlas estimated TAM: *Requires Stage 3 market research to populate.*
+- InventSmith estimated TAM: *Requires Stage 3 market research to populate.*
 
 **Step 2 — Serviceable Addressable Market (SAM)**
 Narrow by geography, channel access, and price point fit.
@@ -347,7 +347,7 @@ Realistic 3-year penetration target.
 function buildValidationMethods(ctx: InventionContext, ts: number): ValidationSection {
   const content = `## Suggested Validation Methods — ${ctx.title}
 
-Based on the problem *"${ctx.problemStatement}"* and solution *"${ctx.description}"*, Atlas recommends the following validation methods ranked by signal quality and implementation speed.
+Based on the problem *"${ctx.problemStatement}"* and solution *"${ctx.description}"*, InventSmith recommends the following validation methods ranked by signal quality and implementation speed.
 
 ### Tier 1 — Highest Signal (recommended for ${ctx.title})
 
@@ -410,7 +410,7 @@ function buildValidationTimeline(ctx: InventionContext, ts: number): ValidationS
 **Total estimated time:** 4–6 weeks for a rigorous validation pass.
 
 ### Week 1 — Setup and Preparation
-- [ ] Review and approve Atlas's Validation Plan and Interview Question set.
+- [ ] Review and approve InventSmith's Validation Plan and Interview Question set.
 - [ ] Identify 15–20 interview candidates from personal network and target communities.
 - [ ] Set up demand-test landing page (can use Carrd, Notion, or simple HTML).
 - [ ] Configure email capture (Mailchimp free tier or equivalent).
@@ -436,10 +436,10 @@ function buildValidationTimeline(ctx: InventionContext, ts: number): ValidationS
 ### Week 5 — Analysis and Go/No-Go Preparation
 - [ ] Compile interview findings into pattern summary.
 - [ ] Evaluate evidence against each of the 5 risk assumptions.
-- [ ] Run Atlas's Go/No-Go analysis (complete Validation Report).
+- [ ] Run InventSmith's Go/No-Go analysis (complete Validation Report).
 
 ### Week 6 — Decision and Stage Advance
-- [ ] Review Validation Report with Atlas.
+- [ ] Review Validation Report with InventSmith.
 - [ ] Make Go/No-Go decision.
 - [ ] If Go: advance to Stage 3 (Market Research).
 - [ ] If No-Go: document pivot direction and re-enter Stage 2 with revised concept.
@@ -778,9 +778,9 @@ At this stage, Risks 1 and 2 are the highest priority to address. Both can be su
 }
 
 function buildRecommendations(ctx: InventionContext, ts: number): ValidationSection {
-  const content = `## Atlas Recommendations — ${ctx.title}
+  const content = `## InventSmith Recommendations — ${ctx.title}
 
-### Atlas Assessment (Pre-Interview)
+### InventSmith Assessment (Pre-Interview)
 Based on the information collected in Stage 1, ${ctx.title} presents as a concept with a clearly articulated problem and a specific proposed solution mechanism. The following recommendations are designed to maximise the quality of the validation evidence collected before the Go/No-Go decision.
 
 ---
@@ -806,7 +806,7 @@ Follow the interview script: explore the problem freely before introducing the s
 ### Recommendation 3 — Complete the Competitor Analysis before concluding Stage 2
 **Priority: High**
 
-The Competitor Analysis section currently has low confidence because no live competitive research has been conducted. Atlas recommends spending 2–3 hours researching competitors before completing the Go/No-Go decision.
+The Competitor Analysis section currently has low confidence because no live competitive research has been conducted. InventSmith recommends spending 2–3 hours researching competitors before completing the Go/No-Go decision.
 
 *Why:* If a strong existing solution exists, you need to know that now — not after investing further in development.
 
@@ -833,10 +833,10 @@ Define in advance what constitutes sufficient evidence to advance. Recommended m
 
 ---
 
-### Atlas Go/No-Go Recommendation (preliminary)
+### InventSmith Go/No-Go Recommendation (preliminary)
 **Status: Pending validation evidence**
 
-Atlas cannot make a preliminary Go recommendation without interview and demand-test data. This section will be updated with a specific recommendation once the validation activities are complete and the founder submits findings.
+InventSmith cannot make a preliminary Go recommendation without interview and demand-test data. This section will be updated with a specific recommendation once the validation activities are complete and the founder submits findings.
 `;
   return buildSection(
     "recommendations",

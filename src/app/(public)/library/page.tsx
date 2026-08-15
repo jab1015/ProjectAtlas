@@ -3,7 +3,7 @@ import { EmptyState } from "@/components/empty-state";
 
 /**
  * Library page — legacy digital-downloads route.
- * Atlas does not use digital-download purchases; redirect to products.
+ * InventSmith does not use digital-download purchases; redirect to products.
  */
 export default function LibraryPage() {
   return (

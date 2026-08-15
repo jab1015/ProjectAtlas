@@ -57,7 +57,7 @@ export const backfillWorkspace = mutation({
         estimatedCostUnits: item.estimatedCostUnits,
         deliverableKind: item.deliverableKind,
         dependsOnKinds: item.dependsOnKinds,
-        outputSummary: completed ? "Atlas confirmed the invention brief already exists and can be used as the canonical intake source." : undefined,
+        outputSummary: completed ? "InventSmith confirmed the invention brief already exists and can be used as the canonical intake source." : undefined,
         createdAt: now,
         startedAt: completed ? now : undefined,
         completedAt: completed ? now : undefined,
@@ -70,7 +70,7 @@ export const backfillWorkspace = mutation({
         inventionId,
         eventType: "work_queued",
         actorType: "system",
-        summary: "Atlas upgraded an existing invention to the canonical autonomous workspace.",
+        summary: "InventSmith upgraded an existing invention to the canonical autonomous workspace.",
         metadata: {
           recordCreated,
           addedWorkKinds: missing.map((item) => item.kind),

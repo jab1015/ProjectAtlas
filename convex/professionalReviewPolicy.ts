@@ -9,19 +9,19 @@ export interface RequiredProfessionalReview {
 const PATENT_REVIEW: RequiredProfessionalReview = {
   specialty: "patent",
   requiredCredentials: "Licensed patent attorney or registered patent agent appropriate to the jurisdiction and scope",
-  scope: "Review search coverage, prior-art relevance, distinguishing-feature hypotheses, claim implications, disclosure, and legal next steps. No Atlas output is a patentability or freedom-to-operate opinion.",
+  scope: "Review search coverage, prior-art relevance, distinguishing-feature hypotheses, claim implications, disclosure, and legal next steps. No InventSmith output is a patentability or freedom-to-operate opinion.",
 };
 
 const ENGINEERING_REVIEW: RequiredProfessionalReview = {
   specialty: "engineering",
   requiredCredentials: "Qualified product-development engineer with experience relevant to the mechanism, materials, manufacturing process, and risk category",
-  scope: "Review requirements, mechanisms, materials, tolerances, failure modes, tests, cost assumptions, and suitability for prototype planning. Atlas work is not production-release engineering.",
+  scope: "Review requirements, mechanisms, materials, tolerances, failure modes, tests, cost assumptions, and suitability for prototype planning. InventSmith work is not production-release engineering.",
 };
 
 const REGULATORY_REVIEW: RequiredProfessionalReview = {
   specialty: "regulatory",
   requiredCredentials: "Qualified regulatory or compliance professional familiar with the product category and intended sales jurisdictions",
-  scope: "Confirm applicable regulations, standards, testing, certification, labeling, and jurisdiction-specific obligations. Atlas provides screening, not a compliance conclusion.",
+  scope: "Confirm applicable regulations, standards, testing, certification, labeling, and jurisdiction-specific obligations. InventSmith provides screening, not a compliance conclusion.",
 };
 
 export function requiredProfessionalReviews(kind: string): RequiredProfessionalReview[] {

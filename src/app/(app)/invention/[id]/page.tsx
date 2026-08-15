@@ -357,7 +357,7 @@ export default function InventionWorkspacePage() {
                 className="text-2xl font-bold text-foreground"
                 style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
               >
-                Atlas is validating your invention.
+                InventSmith is validating your invention.
               </h1>
               <p className="text-muted-foreground">
                 {isGenerating
@@ -395,10 +395,10 @@ export default function InventionWorkspacePage() {
                 </h2>
                 <p className="text-sm text-muted-foreground">
                   {isGenerating
-                    ? "Atlas is researching your invention. New sections will appear automatically."
+                    ? "InventSmith is researching your invention. New sections will appear automatically."
                     : allSectionsError
                     ? "Validation encountered errors. Click Rebuild to try again."
-                    : "Atlas has completed the first round of validation research for your invention."}
+                    : "InventSmith has completed the first round of validation research for your invention."}
                 </p>
                 <dl className="grid grid-cols-2 gap-3">
                   <div>
@@ -422,7 +422,7 @@ export default function InventionWorkspacePage() {
                   </div>
                   <div>
                     <dt className="text-xs text-muted-foreground">Provider</dt>
-                    <dd className="text-sm font-medium text-foreground mt-0.5">Atlas Research Engine</dd>
+                    <dd className="text-sm font-medium text-foreground mt-0.5">InventSmith Research Engine</dd>
                   </div>
                 </dl>
               </div>

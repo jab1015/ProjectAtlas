@@ -1,5 +1,5 @@
 /**
- * Atlas Journey Engine — pure business logic (no Convex runtime dependency).
+ * InventSmith Journey Engine — pure business logic (no Convex runtime dependency).
  *
  * Extracted here so it can be imported by:
  *   - convex/journeyEngine.ts (server-side mutations / queries)

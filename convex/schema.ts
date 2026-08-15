@@ -11,7 +11,7 @@ export default defineSchema({
     image: v.optional(v.string()),
     isAnonymous: v.optional(v.boolean()),
     createdAt: v.optional(v.number()),
-    // Atlas MVP fields
+    // InventSmith MVP fields
     role: v.optional(v.union(v.literal("admin"), v.literal("user"))),
     subscriptionTier: v.optional(
       v.union(
@@ -69,7 +69,7 @@ export default defineSchema({
     .index("by_userId_status", ["userId", "status"])
     .index("by_status", ["status"]),
 
-  // ── Atlas: Inventions ────────────────────────────────────────────────────────
+  // ── InventSmith: Inventions ────────────────────────────────────────────────────────
   inventions: defineTable({
     userId: v.id("users"),
     title: v.string(),
@@ -431,7 +431,7 @@ export default defineSchema({
     .index("by_deliverableId", ["deliverableId"])
     .index("by_inventionId_status", ["inventionId", "status"]),
 
-  // ── Atlas: Stage Progress ────────────────────────────────────────────────────
+  // ── InventSmith: Stage Progress ────────────────────────────────────────────────────
   stageProgress: defineTable({
     inventionId: v.id("inventions"),
     stageId: v.number(),
@@ -474,8 +474,8 @@ export default defineSchema({
     createdAt: v.number(),
   }).index("by_inventionId", ["inventionId"]),
 
-  // ── Atlas: Validation Research ──────────────────────────────────────────────
-  // Stores Atlas-generated validation research results for each invention.
+  // ── InventSmith: Validation Research ──────────────────────────────────────────────
+  // Stores InventSmith-generated validation research results for each invention.
   // Keyed by inventionId. Multiple rows may exist (one per run); queries return
   // the most recent by startedAt / triggeredAt.
   validationResearch: defineTable({

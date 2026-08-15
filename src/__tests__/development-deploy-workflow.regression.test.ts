@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const workflow = readFileSync(join(process.cwd(), ".github", "workflows", "atlas-convex-development-deploy.yml"), "utf8");
 
-describe("Atlas Convex development deployment workflow", () => {
+describe("InventSmith Convex development deployment workflow", () => {
   it("is manual-only and requires explicit confirmation", () => {
     expect(workflow).toContain("workflow_dispatch:");
     expect(workflow).not.toMatch(/\npush:\s*$/m);

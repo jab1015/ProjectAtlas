@@ -82,7 +82,7 @@ export const claimNextWork = internalMutation({
       workItemId,
       eventType: "work_claimed",
       actorType: "atlas",
-      summary: `Atlas claimed ${selection.selected.kind}.`,
+      summary: `InventSmith claimed ${selection.selected.kind}.`,
       attemptNumber: selection.selected.attemptCount + 1,
       createdAt: args.now,
     });
@@ -157,7 +157,7 @@ export const completeWork = internalMutation({
         workItemId: workItem._id,
         eventType: "work_failed",
         actorType: "system",
-        summary: "Atlas discarded an output because the invention changed during generation.",
+        summary: "InventSmith discarded an output because the invention changed during generation.",
         attemptNumber: workItem.attemptCount,
         costUnits: args.actualCostUnits,
         metadata: { retryScheduled: true, staleInputDiscarded: true },

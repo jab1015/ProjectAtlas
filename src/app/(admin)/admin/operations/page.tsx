@@ -38,7 +38,7 @@ export default function AtlasOperationsPage() {
   const [pilotState, setPilotState] = useState<{ inventionId?: string; message?: string; creating: boolean }>({ creating: false });
 
   const launchRepresentativePilot = async () => {
-    if (!window.confirm("Create the standard non-safety-critical Atlas representative invention and start its eligible autonomous work?")) return;
+    if (!window.confirm("Create the standard non-safety-critical InventSmith representative invention and start its eligible autonomous work?")) return;
     setPilotState({ creating: true, message: "Creating representative pilot case…" });
     try {
       const inventionId = await createPilotInvention(REPRESENTATIVE_PILOT_INTAKE);
@@ -55,11 +55,11 @@ export default function AtlasOperationsPage() {
     }
   };
 
-  if (snapshot === undefined) return <div className="space-y-6"><AdminHeader title="Atlas operations" /><Skeleton className="h-28" /><Skeleton className="h-72" /></div>;
+  if (snapshot === undefined) return <div className="space-y-6"><AdminHeader title="InventSmith operations" /><Skeleton className="h-28" /><Skeleton className="h-72" /></div>;
 
   return (
     <div className="space-y-8">
-      <AdminHeader title="Atlas operations" description="Pilot health, autonomous work exceptions, and daily cost activity" />
+      <AdminHeader title="InventSmith operations" description="Pilot health, autonomous work exceptions, and daily cost activity" />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatsCard title="Failed work" value={String(snapshot.counts.failed)} icon={OctagonX} />
         <StatsCard title="Expired leases" value={String(snapshot.counts.expired)} icon={Clock3} />
@@ -70,7 +70,7 @@ export default function AtlasOperationsPage() {
       <Card>
         <CardHeader><CardTitle className="flex items-center gap-2 text-lg"><FlaskConical className="h-5 w-5" />Controlled-pilot launcher</CardTitle></CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-sm text-muted-foreground">Creates the standard adjustable produce-rinsing rack case used by Atlas regression evaluation, then starts whatever autonomous work the signed-in administrator's plan and daily budget permit.</p>
+          <p className="text-sm text-muted-foreground">Creates the standard adjustable produce-rinsing rack case used by InventSmith regression evaluation, then starts whatever autonomous work the signed-in administrator's plan and daily budget permit.</p>
           <div className="flex flex-wrap items-center gap-3">
             <Button onClick={() => void launchRepresentativePilot()} disabled={pilotState.creating}>{pilotState.creating ? "Creating…" : "Create representative pilot"}</Button>
             {pilotState.inventionId && <Button asChild variant="outline"><Link href={`/invention/${pilotState.inventionId}/work`}>Open pilot work</Link></Button>}

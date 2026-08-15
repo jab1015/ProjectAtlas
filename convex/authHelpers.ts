@@ -1,5 +1,5 @@
 /**
- * Atlas auth helper functions.
+ * InventSmith auth helper functions.
  * These are thin wrappers called from queries/mutations that need
  * role/tier checks.
  */

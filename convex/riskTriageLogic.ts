@@ -102,5 +102,5 @@ export function triageInventionRisk(input: InventionRiskInput): InventionRiskTri
 
 export function restrictedPilotReason(categories: string[]) {
   const scope = categories.length > 0 ? categories.join(", ") : "a potentially safety-critical category";
-  return `This invention appears to involve ${scope}. The controlled Atlas pilot does not autonomously advance safety-critical or highly regulated product categories. A qualified professional must review the product category and define a safe development scope before Atlas continues.`;
+  return `This invention appears to involve ${scope}. The controlled InventSmith pilot does not autonomously advance safety-critical or highly regulated product categories. A qualified professional must review the product category and define a safe development scope before InventSmith continues.`;
 }

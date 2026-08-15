@@ -1,5 +1,5 @@
 /**
- * Atlas Inventor Journey Engine
+ * InventSmith Inventor Journey Engine
  *
  * The Engine owns progress. The UI is purely presentational.
  * All 15 stages are defined here. Enabling stage 5+ = one config change.
@@ -240,7 +240,7 @@ export const createInvention = mutation({
       title: "Capture the invention brief",
       status: "completed",
       priority: 100,
-      outputSummary: "Atlas created the first structured record of the invention.",
+      outputSummary: "InventSmith created the first structured record of the invention.",
       attemptCount: 1,
       createdAt: now,
       startedAt: now,
@@ -439,7 +439,7 @@ export const createInvention = mutation({
       inventionId,
       eventType: "work_queued",
       actorType: "system",
-      summary: "Atlas created the initial autonomous feasibility and IP-readiness work plan.",
+      summary: "InventSmith created the initial autonomous feasibility and IP-readiness work plan.",
       metadata: { queuedWorkCount: followOnWork.length + 2 },
       createdAt: now,
     });
@@ -738,7 +738,7 @@ export const deleteInvention = mutation({
       }
     }
 
-    // 6. Canonical Atlas records. Delete dependency rows before deliverables.
+    // 6. Canonical InventSmith records. Delete dependency rows before deliverables.
     const generatedMediaRows = await ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
     for (const row of generatedMediaRows) {
       if (row.storageId) await ctx.storage.delete(row.storageId);

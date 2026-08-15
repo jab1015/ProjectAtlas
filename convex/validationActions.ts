@@ -1,5 +1,5 @@
 /**
- * Atlas Validation Research — Convex Actions
+ * InventSmith Validation Research — Convex Actions
  *
  * Actions run in Node.js context and can perform async operations like
  * calling OpenAI. They call internal mutations to write results.

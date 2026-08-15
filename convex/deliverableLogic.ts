@@ -1,5 +1,5 @@
 export const DELIVERABLE_TRUST_LABELS = {
-  atlas_draft: "Atlas draft",
+  atlas_draft: "InventSmith draft",
   evidence_checked: "Evidence checked",
   inventor_approved: "Inventor approved",
   professional_review_required: "Professional review required",

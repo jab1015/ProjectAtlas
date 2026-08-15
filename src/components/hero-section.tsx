@@ -12,7 +12,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({
-  storeName = "Your Atlas",
+  storeName = "Your InventSmith",
   tagline = "Premium digital products crafted with care",
   ctaText = "Browse Products",
   ctaLink = "#products",
