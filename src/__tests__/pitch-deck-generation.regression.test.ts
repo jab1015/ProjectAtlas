@@ -35,10 +35,11 @@ describe("InventSmith pitch deck generation", () => {
 
   it("builds a real Open Packaging Convention PowerPoint container", () => {
     const artifact = buildPitchDeckArtifact(markdown, "RiseJar");
+    const bytes = new Uint8Array(artifact.bytes);
     expect(artifact.slideCount).toBeGreaterThanOrEqual(6);
-    expect(Array.from(artifact.bytes.slice(0, 4))).toEqual([0x50, 0x4b, 0x03, 0x04]);
+    expect(Array.from(bytes.slice(0, 4))).toEqual([0x50, 0x4b, 0x03, 0x04]);
 
-    const containerText = new TextDecoder().decode(artifact.bytes);
+    const containerText = new TextDecoder().decode(bytes);
     expect(containerText).toContain("[Content_Types].xml");
     expect(containerText).toContain("ppt/presentation.xml");
     expect(containerText).toContain("ppt/slides/slide1.xml");
