@@ -16,12 +16,26 @@ interface PrivacyRequest {
   requestedAt: number;
 }
 
+interface DeletionSummary {
+  inventionsDeleted: number;
+  generatedFilesDeleted: number;
+  uploadedFilesDeleted: number;
+  usageRowsDeleted: number;
+  notificationsDeleted: number;
+  purchasesAnonymized: number;
+  subscriptionEventsAnonymized: number;
+  authSessionsDeleted: number;
+  authAccountsDeleted: number;
+}
+
 const listPending = makeFunctionReference<"query", Record<string, never>, PrivacyRequest[]>("privacyRequests:listPending");
 const resolveRequest = makeFunctionReference<"mutation", { requestId: string; status: "in_progress" | "completed" | "declined"; resolutionNotes?: string }, { success: boolean }>("privacyRequests:resolve");
+const executeDeletion = makeFunctionReference<"mutation", { requestId: string; externalBillingResolved: boolean; resolutionNotes: string }, { success: boolean; summary: DeletionSummary }>("privacyRequests:executeAccountDeletion");
 
 export default function AdminPrivacyPage() {
   const requests = useQuery(listPending);
   const resolve = useMutation(resolveRequest);
+  const runDeletion = useMutation(executeDeletion);
   const [message, setMessage] = useState<string | null>(null);
 
   const update = async (requestId: string, status: "in_progress" | "completed" | "declined") => {
@@ -32,6 +46,21 @@ export default function AdminPrivacyPage() {
       setMessage(`Request marked ${status.replaceAll("_", " ")}.`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Could not update the request.");
+    }
+  };
+
+  const deleteAccount = async (requestId: string) => {
+    const confirmed = window.confirm("This permanently removes the inventor's Atlas data and authentication credentials. Continue only after any active external subscription has been cancelled or otherwise resolved.");
+    if (!confirmed) return;
+    const externalBillingResolved = window.confirm("Confirm that external billing is cancelled/resolved, or that this account has no active paid billing relationship.");
+    const notes = window.prompt("Enter auditable deletion notes (required):")?.trim();
+    if (!notes) return;
+
+    try {
+      const result = await runDeletion({ requestId, externalBillingResolved, resolutionNotes: notes });
+      setMessage(`Account deletion completed. ${result.summary.inventionsDeleted} invention(s) removed; ${result.summary.authSessionsDeleted} auth session(s) invalidated.`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not execute account deletion.");
     }
   };
 
@@ -50,10 +79,15 @@ export default function AdminPrivacyPage() {
                 <CardHeader><CardTitle className="capitalize">{request.requestType.replaceAll("_", " ")}</CardTitle></CardHeader>
                 <CardContent className="space-y-4 text-sm">
                   <p className="text-muted-foreground">User {request.userId} · Requested {new Date(request.requestedAt).toLocaleString()} · <span className="capitalize">{request.status.replaceAll("_", " ")}</span></p>
+                  {request.requestType === "account_deletion" && <p className="text-xs text-muted-foreground">Deletion is fail-closed: paid billing must be resolved first, then Atlas removes invention data, generated/uploaded storage, usage, auth credentials, and identifying billing links in one transaction.</p>}
                   <div className="flex flex-wrap gap-2">
                     {request.status === "pending" && <Button variant="outline" onClick={() => void update(request._id, "in_progress")}>Start work</Button>}
-                    <Button onClick={() => void update(request._id, "completed")}>Mark completed</Button>
-                    <Button variant="destructive" onClick={() => void update(request._id, "declined")}>Decline with reason</Button>
+                    {request.requestType === "account_deletion" ? (
+                      <Button variant="destructive" onClick={() => void deleteAccount(request._id)}>Execute deletion</Button>
+                    ) : (
+                      <Button onClick={() => void update(request._id, "completed")}>Mark completed</Button>
+                    )}
+                    <Button variant="outline" onClick={() => void update(request._id, "declined")}>Decline with reason</Button>
                   </div>
                 </CardContent>
               </Card>
