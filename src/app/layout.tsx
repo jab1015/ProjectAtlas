@@ -5,12 +5,12 @@ import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Atlas — The Operating System for Inventors",
+  title: "InventSmith — The Inventor OS",
   description:
-    "Atlas guides inventors from idea to market — through every stage of the invention journey. A structured path from first idea to launch and growth.",
+    "InventSmith is The Inventor OS from Modern Methods. You invent. InventSmith does the work — from idea validation and research through product development, commercialization, launch, and growth.",
   icons: process.env.NEXT_PUBLIC_BRAND_LOGO
     ? { icon: process.env.NEXT_PUBLIC_BRAND_LOGO }
-    : { icon: "/icon.svg", shortcut: "/icon.svg" },
+    : { icon: "/logo.PNG", shortcut: "/logo.PNG", apple: "/logo.PNG" },
 };
 
 export const viewport: Viewport = {
