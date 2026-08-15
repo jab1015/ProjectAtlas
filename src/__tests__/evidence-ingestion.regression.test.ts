@@ -57,4 +57,17 @@ describe("inventor evidence ingestion", () => {
     expect(internalSource).toContain("applyInventorEvidenceChange");
     expect(internalSource).toContain('extractionStatus: "completed"');
   });
+
+  it("lets the inventor safely retry failed binary extraction without re-uploading the evidence", () => {
+    const controlSource = readFileSync(join(process.cwd(), "convex/evidenceExtractionControl.ts"), "utf8");
+    const evidencePage = readFileSync(join(process.cwd(), "src/app/(app)/invention/[id]/evidence/page.tsx"), "utf8");
+
+    expect(controlSource).toContain("getAuthUserId");
+    expect(controlSource).toContain('provenance !== "inventor_upload"');
+    expect(controlSource).toContain('extractionStatus: "queued"');
+    expect(controlSource).toContain("ctx.scheduler.runAfter(0, extractInventorEvidenceFile");
+    expect(evidencePage).toContain("Retry extraction");
+    expect(evidencePage).toContain('item.extractionStatus === "failed"');
+    expect(evidencePage).toContain("item.extractionError");
+  });
 });
