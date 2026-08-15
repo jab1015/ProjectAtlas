@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { extractEvidenceFromFile } from "@/lib/evidenceIngestion";
 
 describe("inventor evidence ingestion", () => {
@@ -36,5 +38,23 @@ describe("inventor evidence ingestion", () => {
     expect(result.mode).toBe("text");
     expect(result.textPreview).toContain("target customer");
     expect(result.limitations.join(" ").toLowerCase()).toContain("inventor-provided");
+  });
+
+  it("queues server-side AI extraction for binary evidence and reapplies downstream evidence impact", () => {
+    const filesSource = readFileSync(join(process.cwd(), "convex/files.ts"), "utf8");
+    const extractionSource = readFileSync(join(process.cwd(), "convex/evidenceFileExtraction.ts"), "utf8");
+    const internalSource = readFileSync(join(process.cwd(), "convex/filesInternal.ts"), "utf8");
+
+    expect(filesSource).toContain('extractionMode === "metadata_only"');
+    expect(filesSource).toContain("extractInventorEvidenceFile");
+    expect(filesSource).toContain("ctx.scheduler.runAfter(0, extractInventorEvidenceFile");
+    expect(extractionSource).toContain('type: "input_file"');
+    expect(extractionSource).toContain('type: "input_image"');
+    expect(extractionSource).toContain("methodology");
+    expect(extractionSource).toContain("sampleSize");
+    expect(extractionSource).toContain("relevantWorkKinds");
+    expect(internalSource).toContain("recordEvidenceExtraction");
+    expect(internalSource).toContain("applyInventorEvidenceChange");
+    expect(internalSource).toContain('extractionStatus: "completed"');
   });
 });
