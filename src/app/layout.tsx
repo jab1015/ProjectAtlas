@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "InventSmith is The Inventor OS from Modern Methods. You invent. InventSmith does the work — from idea validation and research through product development, commercialization, launch, and growth.",
   icons: process.env.NEXT_PUBLIC_BRAND_LOGO
     ? { icon: process.env.NEXT_PUBLIC_BRAND_LOGO }
-    : { icon: "/logo.PNG", shortcut: "/logo.PNG", apple: "/logo.PNG" },
+    : { icon: "/Logo.png", shortcut: "/Logo.png", apple: "/Logo.png" },
 };
 
 export const viewport: Viewport = {
