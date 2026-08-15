@@ -15,6 +15,7 @@ export async function applyInventorEvidenceChange(
     sourceId?: Id<"evidenceSources">;
     label: string;
     evidenceKind?: string;
+    extraction?: unknown;
     now: number;
   }
 ) {
@@ -47,6 +48,7 @@ export async function applyInventorEvidenceChange(
             label: input.label,
             evidenceKind: input.evidenceKind ?? "other",
             provenance: "inventor_upload",
+            extraction: input.extraction ?? null,
             recordedAt: input.now,
           },
         ]
@@ -69,8 +71,7 @@ export async function applyInventorEvidenceChange(
 
   for (const item of workItems) {
     if (PRESERVE_WORK_KINDS.has(item.kind)) continue;
-    if (item.status === "running") continue;
-    if (item.status === "cancelled") continue;
+    if (item.status === "running" || item.status === "cancelled") continue;
 
     if (item.status === "completed" || item.status === "failed" || item.status === "stale") {
       await ctx.db.patch(item._id, {
@@ -134,6 +135,7 @@ export async function applyInventorEvidenceChange(
       action: input.action,
       sourceId: input.sourceId ? String(input.sourceId) : undefined,
       evidenceKind: input.evidenceKind ?? "other",
+      structuredExtractionAvailable: Boolean(input.extraction),
     },
     createdAt: input.now,
   });
