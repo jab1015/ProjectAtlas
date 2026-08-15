@@ -31,12 +31,17 @@ const PRO_WORK = new Set([
   "concept_image_generation",
   "engineering_handoff",
   "package_assembly",
+  "patent_design_handoff",
   "design_candidate_generation",
   "design_candidate_scoring",
   "product_design_specification",
   "cad_model_specification",
   "exploded_view_specification",
   "manufacturing_drawing_specification",
+  "native_cad_generation",
+  "product_render_generation",
+  "professional_service_plan",
+  "professional_provider_research",
   ...FULL_JOURNEY_PRO_WORK_KINDS,
 ]);
 
