@@ -106,7 +106,9 @@ const lifecycleWork: FullProductWorkPlanItem[] = lifecycleStages.flatMap((stage)
     inputSnapshot: {
       department: stage.name.toLowerCase().replaceAll(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""),
       stageId: stage.id,
-      instructions: item.instructions,
+      instructions: item.kind === "brand_asset_brief"
+        ? `${item.instructions} Also produce the exact detailed visual-generation direction in conceptImagePrompt for a coherent product brand concept board grounded in the selected naming direction, positioning, visual system, packaging principles, customer evidence, and claims constraints. The image prompt must preserve trademark/legal uncertainty and must not invent a different name, unsupported proof point, certification, patent claim, or final-clearance status.`
+        : item.instructions,
       research: item.research === true,
       professionalGate: item.professionalGate ?? null,
     },
