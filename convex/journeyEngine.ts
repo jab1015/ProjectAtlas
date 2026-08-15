@@ -14,6 +14,7 @@ import { internal } from "./_generated/api";
 import { materiallyChanged, shouldRequeueWorkKind, staleReasonForField } from "./stalenessLogic";
 import { CANONICAL_WORK_PLAN } from "./canonicalWorkPlan";
 import { FULL_JOURNEY_STAGES } from "./fullJourneyDefinition";
+import { POST_CANONICAL_WORK_PLAN } from "./fullProductWorkPlan";
 
 interface StageConfigEntry {
   id: number;
@@ -215,12 +216,36 @@ export const createInvention = mutation({
       });
     }
 
+    for (const item of POST_CANONICAL_WORK_PLAN) {
+      await ctx.db.insert("atlasWorkItems", {
+        inventionId,
+        kind: item.kind,
+        title: item.title,
+        status: "queued",
+        priority: item.priority,
+        inputSnapshot: item.inputSnapshot,
+        attemptCount: 0,
+        maxAttempts: 3,
+        estimatedCostUnits: item.estimatedCostUnits,
+        deliverableKind: item.deliverableKind,
+        dependsOnKinds: item.dependsOnKinds,
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+
     await ctx.db.insert("atlasExecutionEvents", {
       inventionId,
       eventType: "work_queued",
       actorType: "system",
-      summary: "InventSmith created the canonical autonomous idea-to-design work plan, including the Patent Readiness to Product Design handoff.",
-      metadata: { canonicalWorkCount: CANONICAL_WORK_PLAN.length, includesPatentDesignHandoff: true },
+      summary: "InventSmith created the complete autonomous idea-to-market work plan, including Product Design/CAD and every downstream department.",
+      metadata: {
+        canonicalWorkCount: CANONICAL_WORK_PLAN.length,
+        postCanonicalWorkCount: POST_CANONICAL_WORK_PLAN.length,
+        totalWorkCount: CANONICAL_WORK_PLAN.length + POST_CANONICAL_WORK_PLAN.length,
+        includesPatentDesignHandoff: true,
+        includesNativeCad: POST_CANONICAL_WORK_PLAN.some((item) => item.kind === "native_cad_generation"),
+      },
       createdAt: now,
     });
 
