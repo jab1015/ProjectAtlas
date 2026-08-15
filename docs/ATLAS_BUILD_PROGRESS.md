@@ -3,113 +3,83 @@
 **Last updated:** August 15, 2026  
 **Product destination:** Complete Idea-to-Market Inventor OS  
 **Authoritative product specification:** `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`  
-**Supporting long-range roadmap:** `docs/ATLAS_PRODUCT_ROADMAP.md` (legacy filename retained for continuity)  
-**Current implementation baseline:** controlled-pilot / feasibility foundation
+**Active build branch:** `inventsmith/full-product-build` / draft PR #24
 
-## Critical scope correction — August 15, 2026
+## Product destination
 
-InventSmith must be measured against the complete idea-to-market product vision, not only the previously narrowed controlled-pilot release.
-
-The controlled-pilot implementation remains useful foundation work, but it is **not the finished InventSmith product**.
-
-The required destination is:
+InventSmith is measured against the complete inventor journey:
 
 **Idea → Evidence → Validation → Market Research → Prior Art / Patent Readiness → Product Design → CAD / Engineering → Prototype → Manufacturing → Branding → Intellectual Property / Legal → Pricing → Marketing → Sales → Funding / Pitch → Launch → Growth**
 
-The inventor should not need to understand or manually manage this process. InventSmith must know what comes next, perform reversible internal work autonomously, request evidence or approval when required, and route work to qualified professionals when professional authority or judgment is necessary.
+The inventor should not have to understand or manually manage this process. InventSmith must know what comes next, perform reversible internal work autonomously, preserve evidence provenance, coordinate department dependencies, and request the smallest genuine human/professional/physical gate only when required.
 
-## Completion accounting rule
+The retired controlled-pilot 80% figure must never be used as overall InventSmith completion.
 
-Do not publish a single optimistic completion percentage that treats the controlled-pilot subset as the whole product.
+## Repository implementation checkpoint — August 15, 2026
 
-Progress must distinguish:
+The full-product branch now materially exceeds the old feasibility-only baseline. Implemented code includes:
 
-1. **Foundation / controlled-pilot implementation** — work already built around the canonical invention record, orchestration, evidence, feasibility, documents, security, subscriptions and deployment.
-2. **Complete InventSmith destination** — the full master specification in `INVENTSMITH_MASTER_PRODUCT_SPEC.md`.
+- inventor Evidence Locker using Convex storage and canonical evidence provenance;
+- downstream evidence-impact/staleness propagation;
+- engine-owned 15-stage Journey Center and department routes;
+- full journey work definitions and executable lifecycle departments;
+- evidence-backed Product Design candidate generation, scoring, selection and specification;
+- native preliminary CAD pipeline;
+- deterministic STEP, STL and DXF artifact generation for supported geometry;
+- editable InventSmith CAD source;
+- orthographic engineering views and exploded assembly views;
+- explicit CAD/design maturity and professional-review gating;
+- prototype strategy, sourcing, test planning, evidence assessment, design-gap analysis and readiness;
+- manufacturing process planning, factory requirements, manufacturer research, RFQ package, scorecard, quote comparison, unit economics, agreement checklist and readiness;
+- branding/positioning/name/trademark-screen/identity/asset-brief work;
+- IP strategy, invention disclosure, NDA draft package, contracting package, IP status tracking and legal-professional handoff;
+- pricing evidence, pricing strategy, break-even and validation planning;
+- marketing messaging, channels, plan, assets and prelaunch calendar;
+- sales channels, toolkit, funnel, projections and post-purchase experience;
+- funding strategy/source research, financial model, pitch-deck content, investor FAQ and funding readiness;
+- launch readiness/playbook/customer-feedback/performance/priorities;
+- growth audit/levers/roadmap/retention/performance reporting;
+- Ask InventSmith project-wide grounding across work, dependencies, evidence, deliverables, decisions, approvals, reviews, execution events, validation and journey state;
+- live-web routing for patent-status/current-research questions;
+- regression protection for cross-department verification, full-journey scope, evidence ingestion, CAD geometry, entitlement and professional-review policy.
 
-Until the complete capability matrix is code-audited, the repository must not claim a precise overall full-product percentage. The earlier **80%** figure applied only to the narrowed controlled-pilot scope and is retired as an overall InventSmith completion number.
-
-## Current verified foundation
-
-Repository and managed deployment work has established substantial foundation capability, including:
-
-- canonical invention record and structured ledgers;
-- assumptions/evidence/findings/decision tracking;
-- autonomous dependency orchestration;
-- bounded work execution, leases, retries and recovery;
-- finite cost budgets and entitlement enforcement;
-- evidence verification/trust controls;
-- feasibility-package generation;
-- preliminary prior-art/IP-readiness workflow foundation;
-- technical-feasibility workflow foundation;
-- market/competitor research foundation;
-- materials/manufacturing analysis foundation;
-- regulatory screening foundation;
-- preliminary BOM/cost work;
-- development-risk analysis;
-- engineering handoff foundation;
-- concept imagery;
-- PDF/DOCX generation;
-- Ask InventSmith grounding;
-- inventor status briefing;
-- work/document library foundation;
-- subscriptions, account deletion and structured data export;
-- restricted-category safety gating;
-- professional-review gates;
-- operational health checks and CI/deployment tooling.
-
-The August 15 MadeThis synchronization reported passing web + Convex TypeScript, 178 tests across 31 files, production dependency audit with zero known production vulnerabilities, production builds, Convex production deployment, Vercel READY, and live HTTP 200. These are deployment/build achievements, not proof of full product acceptance.
-
-## Live acceptance defects discovered August 15, 2026
-
-Initial founder testing of the live MadeThis deployment immediately identified gaps that prevent acceptance:
-
-- legacy Atlas logo remains visible in the live authenticated header;
-- official InventSmith logo is not visible on the tested surface;
-- Validation is visible and can be rebuilt, but the complete invention journey is not discoverable;
-- prior-art/patent research is not visibly accessible from the tested invention experience;
-- technical/product-design progression is not visibly accessible;
-- CAD/3D/exploded-view/manufacturing-design outputs are not available as required destination capabilities;
-- legal/IP/professional work is not visibly accessible;
-- the inventor is not being shown a clear complete path from the current stage to downstream work.
-
-These defects demonstrate why build/test/deployment success must be separated from functional product acceptance.
+CI run #101 for the Ask InventSmith project-wide grounding checkpoint passed successfully.
 
 ## Mandatory capability matrix
 
-| Capability | Destination requirement | Current status |
+| Capability | Repository state | Remaining acceptance work |
 |---|---|---|
-| Idea intake and persistent invention record | Required | Foundation exists; live UX requires acceptance |
-| Evidence/file upload | Upload surveys, interviews, PDFs, DOCX, spreadsheets/CSV, images, sketches, prototype results, quotes, decks, professional/legal material; classify and propagate evidence | **Must be completed/verified** |
-| Validation | Use inventor evidence + autonomous research; confidence and assumption tracking | Partial/live-visible |
-| Market/competitor research | Evidence-backed market sizing, segments, alternatives and competitors | Foundation exists; live UX/output requires acceptance |
-| Patent/prior-art intelligence | Search, compare, preserve coverage, identify differentiators/design constraints, attorney handoff | Foundation exists but complete live experience must be exposed/verified |
-| Product design | Generate candidates, compare trade-offs, score and refine strongest design | **Major implementation priority** |
-| CAD/3D design | Supported-category editable/preliminary CAD and appropriate STEP/STL/DXF outputs | **Not yet accepted; mandatory build target** |
-| Exploded/dimensioned views | Assemblies, parts, exploded views, orthographic/dimensioned drawings | **Not yet accepted; mandatory build target** |
-| Engineering package | Requirements, materials, tolerances where supported, BOM, assembly, DFM/DFA, revision control | Partial foundation; must be completed |
-| Prototype loop | Prototype plan, testing, uploaded evidence, failure analysis, design revision | **Must be built/completed** |
-| Manufacturing/factory guidance | Processes, factory types/candidates, RFQ, quote comparison, QC, tooling, logistics | Partial planning/foundation; **must be completed** |
-| Legal/contracts/NDAs | Identify need, prepare drafts/handoffs, professional review gates, track status | **Must be built/completed** |
-| Professional routing | Tell inventor which professional/provider is needed, why, what to send/ask; recommend candidates where possible | **Must be built/completed** |
-| Branding | Name/positioning/identity/messaging and assets | Roadmap capability; must be completed |
-| Pricing | Unit economics, pricing scenarios, break-even | Roadmap capability; must be completed |
-| Marketing | GTM, messaging, channels, assets, calendar | Roadmap capability; must be completed |
-| Sales | Channels, funnel, toolkit, projections | Roadmap capability; must be completed |
-| Pitch deck/funding | Evidence-backed deck with product renders, financial model, funding strategy, FAQ | **Mandatory; must be built/completed** |
-| Launch | Readiness, launch playbook, feedback/performance loop | Roadmap capability; must be completed |
-| Growth | 90-day audit, roadmap, real-data iteration and reporting | Roadmap capability; must be completed |
-| Documents/exports | Visible versioned library with format-appropriate exports | Foundation exists; expand to full journey |
-| Ask InventSmith | Grounded in complete invention record and all relevant evidence/work | Foundation exists; full-journey grounding required |
-| Correct InventSmith branding | Official logo/name across all customer-facing surfaces | **Live defect — fix required** |
+| Idea intake and persistent invention record | Implemented foundation | End-to-end live acceptance |
+| Evidence/file upload | Implemented on full-product branch | Live upload/extraction/refresh acceptance with representative files |
+| Validation | Implemented foundation | Verify uploaded evidence materially affects validation correctly |
+| Market/competitor research | Implemented foundation | Full-journey live acceptance |
+| Patent/prior-art intelligence | Implemented foundation + project-wide Ask grounding | Verify current patent research, status refresh, design constraints and professional handoff |
+| Product design | Implemented on full-product branch | Verify patent/research constraints flow into candidate scoring and selected design |
+| CAD/3D design | Native preliminary STEP/STL/DXF generation implemented for supported primitive geometry | Expand supported geometry where needed; engineering/prototype/live acceptance before manufacturing release |
+| Exploded/orthographic views | Implemented | Live visual/download acceptance; dimension/tolerance maturity must remain evidence-backed |
+| Engineering package | Foundation + CAD/design outputs implemented | Complete engineering-review acceptance and revision loop |
+| Prototype loop | Lifecycle department implemented | Physical prototype evidence remains a genuine human/real-world gate |
+| Manufacturing/factory guidance | Lifecycle department implemented | Verify real sourcing/RFQ/quote workflows and professional/financial gates |
+| Legal/contracts/NDAs | Lifecycle department implemented | Professional/legal review required where applicable |
+| Professional routing | Implemented through professional-review and lifecycle handoffs | Verify candidate/provider research and handoff UX |
+| Branding | Lifecycle department implemented | Asset-generation/live UX acceptance |
+| Pricing | Lifecycle department implemented | Real cost/market evidence acceptance |
+| Marketing | Lifecycle department implemented | Asset/export/live UX acceptance |
+| Sales | Lifecycle department implemented | Live UX and real-data acceptance |
+| Pitch deck/funding | Content/financial/funding lifecycle implemented | Format-appropriate presentation export and live investor-package acceptance remain required |
+| Launch | Lifecycle department implemented | Live/real-world launch acceptance |
+| Growth | Lifecycle department implemented | Requires real post-launch data for final functional acceptance |
+| Documents/exports | PDF/DOCX foundation plus CAD artifact downloads | Expand format-appropriate exports across full journey, including presentation package |
+| Ask InventSmith | Project-wide operational context implemented | Live authenticated conversational acceptance |
+| Correct InventSmith branding | Repository branding implementation exists | Final live replication/acceptance after GitHub build is complete |
 
-## CAD and product-design acceptance rule
+## CAD and manufacturing-release rule
 
-InventSmith is not complete if it only generates concept imagery or a design description.
+InventSmith must design the product, not stop at feasibility or concept imagery. For supported physical products it must progress through real geometry and engineering artifacts.
 
-For supported physical-product categories it must be able to progress toward a real design package containing appropriate 3D/CAD geometry, assemblies/parts, exploded views, dimensioned/orthographic views, materials, BOM, manufacturing recommendations, prototype artifacts and presentation-quality renders.
+Current native CAD supports deterministic assemblies built from boxes, cylinders and hollow tubes and emits STEP/STL/DXF, editable source, orthographic views and exploded views. This is a real CAD foundation but not permission to call every generated design factory-released.
 
-Design maturity must be explicit:
+Design maturity remains explicit:
 
 1. Concept Visualization
 2. Preliminary CAD
@@ -117,57 +87,30 @@ Design maturity must be explicit:
 4. Engineering Reviewed
 5. Manufacturing Released
 
-InventSmith may create preliminary CAD and manufacturing-preparation artifacts, but safety-critical or consequential engineering cannot be represented as Manufacturing Released until required qualified engineering review is recorded.
+Unknown dimensions/tolerances must remain provisional. Consequential engineering requires qualified review and/or prototype evidence before Manufacturing Released status.
 
-## Evidence upload acceptance rule
+## Evidence upload rule
 
-Evidence upload is a core workflow, not a generic attachment feature.
+Evidence upload is a project input, not a passive attachment feature. SurveyMonkey studies, interview notes/transcripts, PDFs, spreadsheets, images, sketches, prototype results, factory quotes, decks and professional/legal material must retain provenance, be associated with the correct invention, become available to relevant departments, and trigger staleness/refresh when conclusions materially change.
 
-When an inventor uploads material such as a 100-person SurveyMonkey study or interview notes, InventSmith must:
+## Ask InventSmith rule
 
-1. store the original artifact and provenance;
-2. associate it with the correct invention;
-3. classify the evidence type;
-4. extract structured findings where appropriate;
-5. record methodology/sample/context when available;
-6. make it available to relevant work such as Validation;
-7. update confidence/findings without fabricating provenance;
-8. mark affected downstream work stale or refresh it when material conclusions change.
+Ask InventSmith is the intelligence layer over the entire invention workspace. It must not claim it cannot see across the app when the requested state exists in InventSmith records.
 
-## Legal/professional acceptance rule
+Cross-department questions must be answered from actual work/dependency/execution state. Current or externally verifiable questions such as patent status may invoke web research, while uncertainty and professional/legal limits remain explicit.
 
-InventSmith must tell a first-time inventor when an NDA, contract, patent professional, engineer, regulatory specialist, testing lab, manufacturer, accountant, funding specialist or other professional/provider is needed. It must explain what to do, prepare the relevant brief/draft/checklist, and identify suitable candidate provider types or specific candidates where integrations/research permit.
+## Remaining repository priorities
 
-It must not impersonate a licensed professional or silently represent unreviewed specialist work as professionally approved.
+1. Expand CAD geometry/design capability beyond the initial primitive engine where representative products require it; strengthen dimensions, tolerances, interfaces and revision traceability without fabricating engineering certainty.
+2. Ensure patent/prior-art findings become explicit Product Design constraints and that design scoring records differentiation rationale without claiming patentability.
+3. Complete format-appropriate pitch-deck/investor-package export, not merely pitch-deck text.
+4. Strengthen file evidence extraction for DOCX/PDF/spreadsheet/interview/survey inputs and methodology/sample metadata.
+5. Verify each lifecycle department has inventor-facing outputs/actions rather than hidden backend-only work.
+6. Complete automated end-to-end acceptance coverage for the representative invention journey, including department handoffs, CAD artifacts, exports and human/professional gates.
+7. Synchronize all product/progress documentation with verified branch behavior.
+8. Merge only after repository CI and acceptance gates pass.
+9. After GitHub is complete, hand the finished pinned implementation to MadeThis for replication and perform live authenticated acceptance there.
 
-## Current build priorities
+## Completion rule
 
-1. Fix live InventSmith branding/logo and expose the complete journey/navigation.
-2. Complete and verify evidence/file upload with downstream evidence propagation.
-3. Expose and complete market, patent/prior-art, technical-feasibility and design-preparation work in the inventor experience.
-4. Build the evidence-backed Product Design Department: multiple candidates → scoring/trade-offs → selected/refined design.
-5. Build supported-category CAD/3D generation, STEP/STL/DXF as appropriate, assemblies, exploded/dimensioned views, renders and revision control.
-6. Build the prototype planning/testing/evidence/revision loop.
-7. Build manufacturing/factory discovery, RFQ, quote comparison and production-readiness workflow.
-8. Build legal/contracts/NDA/IP/professional-routing workflow.
-9. Complete branding, pricing, marketing and sales stages.
-10. Build evidence-backed pitch deck, financial model, funding strategy and investor package.
-11. Complete launch and growth stages.
-12. Run complete live idea-to-market acceptance and professional review.
-
-## Progress update rule
-
-Update this document whenever a material capability is implemented, deployed, live-verified, or found missing.
-
-Every update must distinguish:
-
-- planned;
-- code implemented;
-- repository tested;
-- deployed;
-- live functionally verified;
-- professional review required/completed.
-
-No capability is complete merely because code exists or a deployment returns HTTP 200.
-
-No future report may use the old controlled-pilot completion percentage as the overall InventSmith completion percentage.
+InventSmith is not complete because code builds, tests pass, or a deployment returns HTTP 200. Completion requires the complete idea-to-market repository implementation, repository acceptance, successful replication, live authenticated functional acceptance, and appropriate professional/physical gates for consequential real-world outputs.
