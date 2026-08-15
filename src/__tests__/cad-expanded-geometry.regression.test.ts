@@ -27,6 +27,44 @@ describe("InventSmith expanded native CAD geometry", () => {
     expect(artifacts.partCount).toBe(1);
   });
 
+  it("generates real helical threaded-cylinder geometry for screw-driven mechanisms", () => {
+    const spec: CadAssemblySpec = {
+      name: "RiseJar Threaded Lift Shaft",
+      units: "mm",
+      revision: "A",
+      assumptions: ["Pitch is provisional pending engineering review"],
+      unresolvedEngineering: ["Mating thread clearance and wear require prototype testing"],
+      parts: [{
+        id: "lift-shaft",
+        name: "Threaded lift shaft",
+        material: "Acetal",
+        primitive: { type: "threadedCylinder", radius: 8, height: 48, pitch: 6, threadDepth: 1.2, segments: 24 },
+      }],
+    };
+
+    const mesh = buildCadMesh(spec);
+    expect(mesh.length).toBeGreaterThan(1000);
+    const radialValues = mesh.flatMap((triangle) => [triangle.a, triangle.b, triangle.c]).map(([x, y]) => Math.hypot(x, y));
+    expect(Math.max(...radialValues)).toBeGreaterThan(8.5);
+    expect(Math.min(...radialValues.filter((value) => value > 0))).toBeLessThanOrEqual(8.01);
+    const artifacts = generateCadArtifacts(spec);
+    expect(artifacts.sourceJson).toContain("threadedCylinder");
+    expect(artifacts.step).toContain("FACETED_BREP");
+    expect(artifacts.stl).toContain("RiseJar_Threaded_Lift_Shaft");
+  });
+
+  it("rejects thread geometry that would be mechanically nonsensical", () => {
+    const spec: CadAssemblySpec = {
+      name: "Invalid Thread",
+      units: "mm",
+      revision: "A",
+      assumptions: [],
+      unresolvedEngineering: [],
+      parts: [{ id: "bad-thread", name: "Bad thread", primitive: { type: "threadedCylinder", radius: 5, height: 20, pitch: 1, threadDepth: 2.5, segments: 24 } }],
+    };
+    expect(() => buildCadMesh(spec)).toThrow(/thread depth|thread pitch/i);
+  });
+
   it("extrudes a custom convex product profile into STEP/STL/DXF geometry", () => {
     const spec: CadAssemblySpec = {
       name: "Custom Bracket",
