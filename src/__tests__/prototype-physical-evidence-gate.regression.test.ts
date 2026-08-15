@@ -32,7 +32,7 @@ describe("InventSmith physical prototype evidence gate", () => {
     const source = readFileSync(join(process.cwd(), "convex/evidenceImpact.ts"), "utf8");
     expect(source).toContain('input.evidenceKind === "prototype_test"');
     expect(source).toContain('item.kind === "prototype_physical_evidence"');
-    expect(source).toContain('item.status === "blocked"');
+    expect(source).toContain('item.status !== "blocked"');
     expect(source).toContain('status: "queued"');
     expect(source).toContain("released the physical prototype-evidence gate");
   });
