@@ -33,7 +33,7 @@ function installDownloadCapture() {
 
   URL.createObjectURL = vi.fn((blob: Blob | MediaSource) => {
     if (blob instanceof Blob) blobs.push(blob);
-    return "blob:atlas-test";
+    return "blob:inventsmith-test";
   });
   URL.revokeObjectURL = vi.fn();
   Object.defineProperty(globalThis, "document", {
@@ -63,9 +63,9 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("Atlas package export", () => {
+describe("InventSmith package export", () => {
   it("creates a filesystem-safe descriptive filename", () => {
-    expect(buildAtlasPackageFilename("Sink Rack: Version 2!", "pdf")).toBe("sink-rack-version-2-atlas-feasibility-package.pdf");
+    expect(buildAtlasPackageFilename("Sink Rack: Version 2!", "pdf")).toBe("sink-rack-version-2-inventsmith-feasibility-package.pdf");
   });
 
   it("exports only the newest version of each deliverable kind", () => {
@@ -89,7 +89,7 @@ describe("Atlas package export", () => {
     try {
       await exportAtlasPackageDocx(representativePackage);
       expect(capture.blobs).toHaveLength(1);
-      expect(capture.filenames[0]).toBe("adjustable-produce-rinsing-rack-atlas-feasibility-package.docx");
+      expect(capture.filenames[0]).toBe("adjustable-produce-rinsing-rack-inventsmith-feasibility-package.docx");
       const bytes = new Uint8Array(await capture.blobs[0].arrayBuffer());
       expect(bytes.length).toBeGreaterThan(2_000);
       expect(String.fromCharCode(bytes[0], bytes[1])).toBe("PK");
@@ -103,7 +103,7 @@ describe("Atlas package export", () => {
     try {
       await exportAtlasPackagePdf(representativePackage);
       expect(capture.blobs).toHaveLength(1);
-      expect(capture.filenames[0]).toBe("adjustable-produce-rinsing-rack-atlas-feasibility-package.pdf");
+      expect(capture.filenames[0]).toBe("adjustable-produce-rinsing-rack-inventsmith-feasibility-package.pdf");
       const bytes = new Uint8Array(await capture.blobs[0].arrayBuffer());
       expect(bytes.length).toBeGreaterThan(1_000);
       expect(new TextDecoder().decode(bytes.slice(0, 8))).toMatch(/^%PDF-/);
