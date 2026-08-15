@@ -95,9 +95,9 @@ function getCheckoutUrl(productId: string) {
 }
 
 function getDowngradeHref(planName: string) {
-  const subject = encodeURIComponent(`Atlas plan downgrade to ${planName}`);
+  const subject = encodeURIComponent(`InventSmith plan downgrade to ${planName}`);
   const body = encodeURIComponent(
-    `Hi Atlas team,\n\nPlease help me downgrade my Atlas subscription to ${planName}.\n\nThanks.`
+    `Hi InventSmith team,\n\nPlease help me downgrade my InventSmith subscription to ${planName}.\n\nThanks.`
   );
   return `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
 }
@@ -159,12 +159,12 @@ export default function AccountPage() {
   const privacyRequests = useQuery(listPrivacyRequests, isAuthenticated ? {} : "skip");
   const requestPrivacyAction = useMutation(createPrivacyRequest);
   const submitPrivacyRequest = async (requestType: "data_export" | "account_deletion") => {
-    if (requestType === "account_deletion" && !window.confirm("Request permanent deletion of your Atlas account and invention data? Billing and legally required transaction records may need separate handling.")) return;
+    if (requestType === "account_deletion" && !window.confirm("Request permanent deletion of your InventSmith account and invention data? Billing and legally required transaction records may need separate handling.")) return;
     try {
       const result = await requestPrivacyAction({ requestType });
       setPrivacyMessage(result.duplicate ? "That request is already pending." : requestType === "data_export" ? "Your data export request was recorded." : "Your account deletion request was recorded.");
     } catch {
-      setPrivacyMessage("Atlas could not record the privacy request. Please try again.");
+      setPrivacyMessage("InventSmith could not record the privacy request. Please try again.");
     }
   };
 
@@ -222,7 +222,7 @@ export default function AccountPage() {
               Profile and subscription
             </h1>
             <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-              Review your Atlas profile, current plan, and available subscription options.
+              Review your InventSmith profile, current plan, and available subscription options.
             </p>
           </div>
           <Button asChild variant="outline" className="w-full sm:w-auto">
@@ -310,7 +310,7 @@ export default function AccountPage() {
                   {(dailyUsage.usage.reservedAutonomousCostUnits ?? 0) > 0 && <p className="mt-1 text-xs text-muted-foreground">{dailyUsage.usage.reservedAutonomousCostUnits} unit(s) reserved for running work</p>}
                 </div>
                 <div className="rounded-[var(--radius-md)] border border-border bg-muted/30 p-3">
-                  <p className="text-muted-foreground">Ask Atlas</p>
+                  <p className="text-muted-foreground">Ask InventSmith</p>
                   <p className="mt-1 font-medium text-foreground">
                     {dailyUsage.usage.chatQuestions} / {currentPlan.chatQuestionsPerDay} today
                   </p>
@@ -374,7 +374,7 @@ export default function AccountPage() {
                       <li className="flex items-start gap-2">
                         <Check className="mt-0.5 h-4 w-4 text-primary" />
                         <span className="text-foreground">
-                          {plan.chatQuestionsPerDay} Ask Atlas questions/day
+                          {plan.chatQuestionsPerDay} Ask InventSmith questions/day
                         </span>
                       </li>
                     </ul>
@@ -413,7 +413,7 @@ export default function AccountPage() {
 
         <section className="mt-8 rounded-xl border border-border bg-card p-6" aria-labelledby="privacy-controls-title">
           <h2 id="privacy-controls-title" className="text-lg font-semibold">Privacy controls</h2>
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">Request a portable account-data export or coordinated deletion. Account deletion is not immediate because Atlas must also close authentication, subscription, and legally required transaction records.</p>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">Request a portable account-data export or coordinated deletion. Account deletion is not immediate because InventSmith must also close authentication, subscription, and legally required transaction records.</p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Button variant="outline" onClick={() => void submitPrivacyRequest("data_export")}>Request data export</Button>
             <Button variant="destructive" onClick={() => void submitPrivacyRequest("account_deletion")}>Request account deletion</Button>
