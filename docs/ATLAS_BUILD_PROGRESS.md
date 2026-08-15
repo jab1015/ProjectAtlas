@@ -151,9 +151,8 @@ Regression coverage now enforces that referenced work dependencies exist, that d
 4. Expand remaining format-appropriate exports, including richer structured financial/tabular output where CSV is insufficient.
 5. Add/validate inventor-facing visual brand asset generation and remaining commercial asset workflows where the product specification requires a produced asset rather than a brief.
 6. Complete automated and live end-to-end acceptance for representative inventions, including evidence refresh, department handoffs, CAD artifacts, exports and human/professional gates.
-7. Synchronize remaining product/progress documentation with verified branch behavior.
-8. Merge only after repository CI and acceptance gates pass.
-9. After GitHub is complete, hand the finished pinned implementation to MadeThis for replication and perform live authenticated acceptance there.
+7. Merge only after repository CI and acceptance gates pass.
+8. After GitHub is complete, hand the finished pinned implementation to MadeThis for replication and perform live authenticated acceptance there.
 
 ## Completion rule
 
