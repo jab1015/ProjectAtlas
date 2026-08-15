@@ -16,10 +16,12 @@ export function buildProductRenderPrompt(rawPrompt: string): string {
   const direction = rawPrompt.trim().slice(0, 7000);
   if (!direction) throw new Error("Product render prompt was empty");
   return [
-    "Create a polished industrial-design rendering board of the SELECTED invention design for inventor, manufacturer, and investor communication.",
-    "Keep the product architecture, visible mechanisms, material intent, interfaces, proportions, differentiation constraints, and part relationships consistent with the supplied selected-design/CAD description.",
-    "Include a clean hero three-quarter product render plus complementary views or detail callouts when the requested board supports them.",
+    "Create a polished MULTI-VIEW industrial-design presentation board of the SELECTED invention design for inventor, manufacturer, and investor communication.",
+    "Keep the product architecture, visible mechanisms, material intent, interfaces, proportions, differentiation constraints, and part relationships consistent across every view and with the supplied selected-design/CAD description.",
+    "The board should include: (1) a primary hero three-quarter render, (2) front view, (3) side view, (4) top view, and (5) one useful mechanism/detail close-up when the supplied design supports it.",
+    "Use the same product revision in every panel. Do not silently change geometry, component count, actuation method, seams, lid/base relationships, or interface locations between views.",
     "Use professional neutral presentation lighting and a clean background. Do not add invented logos, certifications, patent claims, dimensions, tolerances, features, controls, fasteners, or mechanisms that are not in the supplied design.",
+    "Do not fabricate an exploded view from appearance alone; InventSmith's deterministic CAD exploded-view artifact is the authoritative assembly-separation view.",
     "This is a presentation rendering of preliminary design state, not evidence of engineering approval, manufacturability, regulatory approval, or production release.",
     direction,
   ].join(" ");
