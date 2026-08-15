@@ -60,10 +60,12 @@ function statusClass(status: string) {
 }
 
 function artifactLabel(kind: string) {
-  if (kind === "native_cad_step") return "STEP";
-  if (kind === "native_cad_stl") return "STL";
-  if (kind === "native_cad_dxf") return "DXF";
-  if (kind === "native_cad_source") return "Editable source";
+  if (kind === "native_cad_step") return "STEP model";
+  if (kind === "native_cad_stl") return "STL mesh";
+  if (kind === "native_cad_dxf") return "DXF drawing";
+  if (kind === "native_cad_source") return "Editable CAD source";
+  if (kind === "cad_orthographic_views") return "Orthographic views";
+  if (kind === "cad_exploded_view") return "Exploded assembly view";
   return kind.replaceAll("_", " ");
 }
 
@@ -106,7 +108,7 @@ export default function ProductDesignStudioPage() {
     try {
       const result = await requestCad({ inventionId });
       setMessage(result.scheduled
-        ? "Native CAD generation started. InventSmith is creating the constrained assembly model and deterministic STEP/STL/DXF artifacts."
+        ? "Native CAD generation started. InventSmith is creating the constrained assembly model and deterministic STEP/STL/DXF, orthographic, exploded-view, and editable-source artifacts."
         : result.reason === "already_running"
         ? "Native CAD generation is already running."
         : "Native CAD generation is queued.");
@@ -125,6 +127,7 @@ export default function ProductDesignStudioPage() {
   const latestDeliverables = [...workspace.deliverables].sort((a, b) => b.updatedAt - a.updatedAt);
   const currentCadArtifacts = cadArtifacts.filter((artifact) => !artifact.staleReason);
   const cadRunning = workspace.workItems.some((item) => item.kind === "native_cad_generation" && item.status === "running");
+  const completeCadPackage = ["native_cad_step", "native_cad_stl", "native_cad_dxf", "native_cad_source", "cad_orthographic_views", "cad_exploded_view"].every((kind) => currentCadArtifacts.some((artifact) => artifact.kind === kind));
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -152,7 +155,7 @@ export default function ProductDesignStudioPage() {
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Design work</p><p className="mt-2 text-2xl font-semibold">{completed}/{workspace.workItems.length}</p><p className="mt-1 text-xs text-muted-foreground">completed</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Active queue</p><p className="mt-2 text-2xl font-semibold">{active}</p><p className="mt-1 text-xs text-muted-foreground">queued or running</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Inventor evidence</p><p className="mt-2 text-2xl font-semibold">{workspace.inventorEvidenceCount}</p><p className="mt-1 text-xs text-muted-foreground">of {workspace.evidenceCount} sources</p></div>
-            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Native CAD</p><p className="mt-2 text-2xl font-semibold">{currentCadArtifacts.length >= 4 ? "Generated" : cadRunning ? "Generating" : workspace.cadStatus.specificationReady ? "Spec ready" : "Pending"}</p><p className="mt-1 text-xs text-muted-foreground">STEP/STL/DXF/source</p></div>
+            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Native CAD package</p><p className="mt-2 text-2xl font-semibold">{completeCadPackage ? "Generated" : cadRunning ? "Generating" : workspace.cadStatus.specificationReady ? "Spec ready" : "Pending"}</p><p className="mt-1 text-xs text-muted-foreground">models + drawings + exploded view</p></div>
           </section>
 
           <section className="rounded-2xl border border-border bg-card p-6 sm:p-7">
@@ -173,10 +176,10 @@ export default function ProductDesignStudioPage() {
 
           <section className="rounded-2xl border border-primary/25 bg-primary/5 p-6 sm:p-7">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-              <div><h2 className="flex items-center gap-2 text-xl font-semibold"><Wrench className="h-5 w-5 text-primary" />Native CAD package</h2><p className="mt-1 max-w-2xl text-sm text-muted-foreground">After the Product Design Specification is current, InventSmith converts the selected design into a constrained parametric assembly and deterministically exports real STEP, STL and DXF files plus editable InventSmith geometry source.</p></div>
+              <div><h2 className="flex items-center gap-2 text-xl font-semibold"><Wrench className="h-5 w-5 text-primary" />Native CAD package</h2><p className="mt-1 max-w-2xl text-sm text-muted-foreground">After the Product Design Specification is current, InventSmith converts the selected design into a constrained parametric assembly and deterministically exports STEP, STL and DXF files, editable InventSmith geometry source, orthographic engineering views, and an exploded assembly view.</p></div>
               <Button onClick={() => void generateCad()} disabled={generatingCad || cadRunning} className="gap-2"><Box className="h-4 w-4" />{generatingCad || cadRunning ? "Generating CAD…" : currentCadArtifacts.length ? "Regenerate CAD" : "Generate native CAD"}</Button>
             </div>
-            {currentCadArtifacts.length > 0 && <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{currentCadArtifacts.slice(0, 4).map((artifact) => (
+            {currentCadArtifacts.length > 0 && <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{currentCadArtifacts.map((artifact) => (
               <div key={artifact._id} className="rounded-xl border border-border bg-background p-4"><p className="text-xs font-semibold uppercase tracking-wider text-primary">{artifactLabel(artifact.kind)}</p><p className="mt-1 text-sm font-medium">v{artifact.version} · Preliminary CAD</p>{artifact.downloadUrl && <Button asChild variant="outline" size="sm" className="mt-3 w-full gap-2"><a href={artifact.downloadUrl} download target="_blank" rel="noreferrer"><Download className="h-4 w-4" />Download</a></Button>}</div>
             ))}</div>}
             <p className="mt-4 text-xs text-muted-foreground">Native files are real CAD geometry, but remain <strong>Preliminary CAD</strong>. Relevant engineering review, tolerance/dimension confirmation, manufacturability review, and prototype testing are required before InventSmith may promote them to Manufacturing Released.</p>
