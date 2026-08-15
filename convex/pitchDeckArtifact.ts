@@ -90,8 +90,20 @@ export function pitchDeckSlidesFromMarkdown(markdown: string, inventionTitle: st
   return contentSlides.slice(0, 16);
 }
 
-export function buildPitchDeckArtifact(markdown: string, inventionTitle: string) {
+function attachProductVisual(slides: PptxSlide[], visual: Uint8Array) {
+  const preferred = slides.findIndex((slide, index) => index > 0 && /product|solution|design|engineering|how it works/i.test(slide.title));
+  const index = preferred >= 0 ? preferred : Math.min(1, slides.length - 1);
+  if (index >= 0) {
+    slides[index] = {
+      ...slides[index],
+      image: { data: visual, extension: "png", name: "Evidence-backed product render" },
+    };
+  }
+}
+
+export function buildPitchDeckArtifact(markdown: string, inventionTitle: string, visual?: Uint8Array) {
   const slides = pitchDeckSlidesFromMarkdown(markdown, inventionTitle);
+  if (visual?.length) attachProductVisual(slides, visual);
   const generated = buildInventSmithPptx(slides, {
     title: `${inventionTitle} — Investor Pitch Deck`,
     subject: "Evidence-backed inventor funding presentation",
@@ -99,5 +111,5 @@ export function buildPitchDeckArtifact(markdown: string, inventionTitle: string)
   });
   const concreteBytes = new Uint8Array(generated.length);
   concreteBytes.set(generated);
-  return { bytes: concreteBytes.buffer, slideCount: slides.length };
+  return { bytes: concreteBytes.buffer, slideCount: slides.length, embeddedProductVisual: Boolean(visual?.length) };
 }
