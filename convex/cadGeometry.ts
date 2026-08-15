@@ -8,6 +8,7 @@ export type CadPrimitive =
   | { type: "frustum"; bottomRadius: number; topRadius: number; height: number; segments?: number }
   | { type: "threadedCylinder"; radius: number; height: number; pitch: number; threadDepth: number; segments?: number }
   | { type: "threadedTube"; outerRadius: number; innerRadius: number; height: number; pitch: number; threadDepth: number; segments?: number }
+  | { type: "revolvedProfile"; points: Vec2[]; segments?: number }
   | { type: "extrudedConvexPolygon"; points: Vec2[]; height: number };
 
 export interface CadPartSpec {
@@ -311,6 +312,71 @@ function polygonArea(points: Vec2[]): number {
   return area / 2;
 }
 
+function orientation2d(a: Vec2, b: Vec2, c: Vec2) {
+  const value = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+  if (Math.abs(value) < EPSILON) return 0;
+  return Math.sign(value);
+}
+
+function onSegment2d(a: Vec2, b: Vec2, p: Vec2) {
+  return p[0] >= Math.min(a[0], b[0]) - EPSILON && p[0] <= Math.max(a[0], b[0]) + EPSILON &&
+    p[1] >= Math.min(a[1], b[1]) - EPSILON && p[1] <= Math.max(a[1], b[1]) + EPSILON;
+}
+
+function segmentsIntersect2d(a: Vec2, b: Vec2, c: Vec2, d: Vec2) {
+  const o1 = orientation2d(a, b, c);
+  const o2 = orientation2d(a, b, d);
+  const o3 = orientation2d(c, d, a);
+  const o4 = orientation2d(c, d, b);
+  if (o1 !== o2 && o3 !== o4) return true;
+  if (o1 === 0 && onSegment2d(a, b, c)) return true;
+  if (o2 === 0 && onSegment2d(a, b, d)) return true;
+  if (o3 === 0 && onSegment2d(c, d, a)) return true;
+  if (o4 === 0 && onSegment2d(c, d, b)) return true;
+  return false;
+}
+
+function isSimplePolygon(points: Vec2[]) {
+  for (let i = 0; i < points.length; i += 1) {
+    const a = points[i];
+    const b = points[(i + 1) % points.length];
+    if (Math.hypot(b[0] - a[0], b[1] - a[1]) < EPSILON) return false;
+    for (let j = i + 1; j < points.length; j += 1) {
+      const nextI = (i + 1) % points.length;
+      const nextJ = (j + 1) % points.length;
+      if (i === j || nextI === j || nextJ === i) continue;
+      if (segmentsIntersect2d(a, b, points[j], points[nextJ])) return false;
+    }
+  }
+  return true;
+}
+
+function revolvedProfileTriangles(part: CadPartSpec, rawPoints: Vec2[], segmentValue?: number): Triangle[] {
+  if (rawPoints.length < 3 || rawPoints.length > 32) throw new Error("revolved profile requires 3–32 radius/Z points");
+  let points = rawPoints.map(([radius, z], index) => [finitePositive(radius, `revolved profile point ${index + 1} radius`), finite(z, `revolved profile point ${index + 1} z`)] as Vec2);
+  if (!isSimplePolygon(points)) throw new Error("revolved profile must be a simple non-self-intersecting closed annular profile");
+  if (Math.abs(polygonArea(points)) < EPSILON) throw new Error("revolved profile must enclose non-zero cross-sectional area");
+  if (polygonArea(points) < 0) points = [...points].reverse();
+  const count = segments(segmentValue);
+  const out: Triangle[] = [];
+
+  const pointAt = ([radius, z]: Vec2, angle: number): Vec3 => [radius * Math.cos(angle), radius * Math.sin(angle), z];
+  for (let edge = 0; edge < points.length; edge += 1) {
+    const p0 = points[edge];
+    const p1 = points[(edge + 1) % points.length];
+    for (let i = 0; i < count; i += 1) {
+      const a0 = 2 * Math.PI * i / count;
+      const a1 = 2 * Math.PI * (i + 1) / count;
+      const p00 = pointAt(p0, a0);
+      const p01 = pointAt(p0, a1);
+      const p10 = pointAt(p1, a0);
+      const p11 = pointAt(p1, a1);
+      out.push(triangle(part, p00, p01, p11), triangle(part, p00, p11, p10));
+    }
+  }
+  return out;
+}
+
 function isConvexPolygon(points: Vec2[]): boolean {
   let sign = 0;
   for (let i = 0; i < points.length; i += 1) {
@@ -365,6 +431,7 @@ export function buildCadMesh(spec: CadAssemblySpec): Triangle[] {
       case "frustum": triangles.push(...frustumTriangles(part, part.primitive.bottomRadius, part.primitive.topRadius, part.primitive.height, part.primitive.segments)); break;
       case "threadedCylinder": triangles.push(...threadedCylinderTriangles(part, part.primitive.radius, part.primitive.height, part.primitive.pitch, part.primitive.threadDepth, part.primitive.segments)); break;
       case "threadedTube": triangles.push(...threadedTubeTriangles(part, part.primitive.outerRadius, part.primitive.innerRadius, part.primitive.height, part.primitive.pitch, part.primitive.threadDepth, part.primitive.segments)); break;
+      case "revolvedProfile": triangles.push(...revolvedProfileTriangles(part, part.primitive.points, part.primitive.segments)); break;
       case "extrudedConvexPolygon": triangles.push(...extrudedConvexPolygonTriangles(part, part.primitive.points, part.primitive.height)); break;
       default: throw new Error("Unsupported CAD primitive");
     }
