@@ -8,6 +8,7 @@ import type { Id } from "./_generated/dataModel";
 import { costUnitsFromTokens, shouldContinueAutonomousRun, shouldScheduleAutonomousRetry } from "./workOrchestratorLogic";
 import { buildConceptImagePrompt, CONCEPT_IMAGE_COST_UNITS } from "./conceptImageLogic";
 import { MAX_AUTONOMOUS_RUN_BUDGET } from "./usagePolicyLogic";
+import { restrictedPilotReason, triageInventionRisk } from "./riskTriageLogic";
 
 const claimNextWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; availableCostUnits: number; now: number }, { workItemId: Id<"atlasWorkItems"> | null; reason: string }>("atlasWorkState:claimNextWork");
 const getWorkContext = makeFunctionReference<"query", { workItemId: Id<"atlasWorkItems"> }, any>("atlasWorkState:getWorkContext");
@@ -88,6 +89,18 @@ export const runAvailableWork = internalAction({
       if (!claim.workItemId) return { completed, stopReason: claim.reason, remainingBudget };
       try {
         const { workItem, invention, record, sources, findings, deliverables } = await ctx.runQuery(getWorkContext, { workItemId: claim.workItemId });
+
+        const risk = triageInventionRisk(invention);
+        if (risk.restricted) {
+          await ctx.runMutation(blockWorkForHuman, {
+            workItemId: claim.workItemId,
+            reason: restrictedPilotReason(risk.categories),
+            gateType: "professional_review",
+            blockedAt: Date.now(),
+          });
+          return { completed, stopReason: "restricted_product_category", remainingBudget };
+        }
+
         const response = await client.responses.create({
           model: process.env.ATLAS_OPENAI_MODEL ?? "gpt-5.4-mini",
           max_output_tokens: 8000,
