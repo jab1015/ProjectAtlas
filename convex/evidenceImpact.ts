@@ -73,6 +73,41 @@ export async function applyInventorEvidenceChange(
     if (PRESERVE_WORK_KINDS.has(item.kind)) continue;
     if (item.status === "running" || item.status === "cancelled") continue;
 
+    const prototypeEvidenceArrived =
+      input.action === "uploaded" &&
+      input.evidenceKind === "prototype_test" &&
+      item.kind === "prototype_physical_evidence" &&
+      item.status === "blocked";
+
+    if (prototypeEvidenceArrived) {
+      await ctx.db.patch(item._id, {
+        status: "queued",
+        attemptCount: 0,
+        completedAt: undefined,
+        startedAt: undefined,
+        claimedAt: undefined,
+        leaseExpiresAt: undefined,
+        reservedCostUnits: undefined,
+        reservationDateKey: undefined,
+        actualCostUnits: undefined,
+        outputSummary: undefined,
+        blockedReason: undefined,
+        humanGateType: undefined,
+        lastError: "Prototype evidence was supplied; InventSmith can evaluate the physical-evidence gate again.",
+        updatedAt: input.now,
+      });
+      await ctx.db.insert("atlasExecutionEvents", {
+        inventionId,
+        workItemId: item._id,
+        eventType: "work_queued",
+        actorType: "system",
+        summary: "InventSmith released the physical prototype-evidence gate because prototype test evidence was supplied.",
+        metadata: { evidenceKind: input.evidenceKind, sourceId: input.sourceId ? String(input.sourceId) : undefined },
+        createdAt: input.now,
+      });
+      continue;
+    }
+
     if (item.status === "completed" || item.status === "failed" || item.status === "stale") {
       await ctx.db.patch(item._id, {
         status: "queued",
