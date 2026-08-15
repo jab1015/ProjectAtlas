@@ -19,11 +19,11 @@ export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
     <section aria-labelledby="atlas-briefing-title" className="space-y-6">
       <div className="flex items-center gap-2 text-sm font-medium text-primary">
         <Compass className="h-4 w-4" aria-hidden="true" />
-        <h2 id="atlas-briefing-title" className="text-sm text-primary">Your Atlas briefing</h2>
+        <h2 id="atlas-briefing-title" className="text-sm text-primary">Your InventSmith briefing</h2>
         <Button asChild variant="ghost" size="sm" className="ml-auto gap-2">
           <Link href={`/invention/${inventionId}/chat`}>
             <MessageCircle className="h-4 w-4" aria-hidden="true" />
-            Ask Atlas
+            Ask InventSmith
           </Link>
         </Button>
       </div>
@@ -54,9 +54,9 @@ export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
           <div className="flex items-start gap-3">
             <CheckCircle2 className="mt-0.5 h-5 w-5 text-success" aria-hidden="true" />
             <div>
-              <h3 className="text-base font-semibold">Atlas has what it needs for now</h3>
+              <h3 className="text-base font-semibold">InventSmith has what it needs for now</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Work will continue in the order shown below. Atlas will ask when your judgment or authorization is required.
+                Work will continue in the order shown below. InventSmith will ask only when your judgment, authorization, private input, professional review, payment, or physical-world action is genuinely required.
               </p>
             </div>
           </div>
@@ -67,7 +67,7 @@ export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
         <article className="rounded-xl border border-border bg-card p-5 shadow-sm">
           <div className="mb-4 flex items-center gap-2">
             <CircleDot className="h-4 w-4 text-primary" aria-hidden="true" />
-            <h3 className="text-base font-semibold">What Atlas is doing next</h3>
+            <h3 className="text-base font-semibold">What InventSmith is doing next</h3>
           </div>
           {briefing.next.length > 0 ? (
             <ul className="space-y-3">
@@ -104,7 +104,7 @@ export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
               ))}
             </ul>
           ) : (
-            <EmptyLine>Completed work will appear here as Atlas begins.</EmptyLine>
+            <EmptyLine>Completed work will appear here as InventSmith begins.</EmptyLine>
           )}
           <Link href={`/invention/${inventionId}/work`} className="mt-4 inline-flex text-sm font-medium">
             View all work
