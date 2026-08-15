@@ -22,11 +22,11 @@ const getStatusBriefing = makeFunctionReference<
   StatusBriefingData
 >("inventionWorkspace:getStatusBriefing");
 
-const ensureInventionRecord = makeFunctionReference<
+const backfillWorkspace = makeFunctionReference<
   "mutation",
   { inventionId: string },
-  string
->("inventionWorkspace:ensureInventionRecord");
+  { recordCreated: boolean; addedWorkCount: number; alreadyCurrent: boolean }
+>("inventionMigrations:backfillWorkspace");
 
 const kickAutonomousWork = makeFunctionReference<
   "mutation",
@@ -73,20 +73,20 @@ export default function DashboardPage() {
     activeInvention ? { inventionId: activeInvention._id } : "skip"
   );
 
-  const ensureRecord = useMutation(ensureInventionRecord);
+  const migrateWorkspace = useMutation(backfillWorkspace);
   const kickWork = useMutation(kickAutonomousWork);
   useEffect(() => {
     if (activeInvention) {
       void (async () => {
         try {
-          await ensureRecord({ inventionId: activeInvention._id });
+          await migrateWorkspace({ inventionId: activeInvention._id });
           await kickWork({ inventionId: activeInvention._id });
         } catch {
-          // The briefing remains usable if background work cannot start yet.
+          // The briefing remains usable if migration or background work cannot start yet.
         }
       })();
     }
-  }, [activeInvention, ensureRecord, kickWork]);
+  }, [activeInvention, migrateWorkspace, kickWork]);
 
   const briefing = useQuery(
     getStatusBriefing,
