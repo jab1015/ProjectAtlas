@@ -26,7 +26,8 @@ interface JourneyMapProps {
 }
 
 function stageHref(inventionId: string, stageId: number) {
-  if (stageId <= 4) return `/invention/${inventionId}`;
+  if (stageId <= 3) return `/invention/${inventionId}`;
+  if (stageId === 4) return `/invention/${inventionId}/patent`;
   if (stageId === 5) return `/invention/${inventionId}/design`;
   return `/invention/${inventionId}/department/${stageId}`;
 }
