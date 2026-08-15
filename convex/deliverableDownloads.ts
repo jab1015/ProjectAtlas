@@ -2,7 +2,12 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { query } from "./_generated/server";
 import { contentToReadableText } from "./deliverableLogic";
-import { csvDataUrl, financialModelMarkdownToCsv } from "./tabularExportLogic";
+import {
+  csvDataUrl,
+  financialModelMarkdownToCsv,
+  financialModelMarkdownToSpreadsheetXml,
+  spreadsheetXmlDataUrl,
+} from "./tabularExportLogic";
 
 export const getInventionArtifactDownloads = query({
   args: { inventionId: v.id("inventions") },
@@ -18,24 +23,36 @@ export const getInventionArtifactDownloads = query({
       .collect();
 
     const downloadable = deliverables.filter((item) => Boolean(item.storageId) || item.kind === "financial_model");
-    return await Promise.all(
+    const groups = await Promise.all(
       downloadable.map(async (item) => {
         if (item.kind === "financial_model" && !item.storageId) {
           const markdown = contentToReadableText(item.content);
           const csv = financialModelMarkdownToCsv(markdown, invention.title);
-          return {
+          const workbook = financialModelMarkdownToSpreadsheetXml(markdown, invention.title);
+          const common = {
             deliverableId: item._id,
             kind: item.kind,
-            title: `${item.title} — CSV`,
-            mediaType: "text/csv",
             artifactMaturity: item.artifactMaturity ?? null,
             version: item.version,
             staleReason: item.staleReason ?? null,
-            downloadUrl: csvDataUrl(csv),
           };
+          return [
+            {
+              ...common,
+              title: `${item.title} — CSV`,
+              mediaType: "text/csv",
+              downloadUrl: csvDataUrl(csv),
+            },
+            {
+              ...common,
+              title: `${item.title} — Excel workbook`,
+              mediaType: "application/vnd.ms-excel",
+              downloadUrl: spreadsheetXmlDataUrl(workbook),
+            },
+          ];
         }
 
-        return {
+        return [{
           deliverableId: item._id,
           kind: item.kind,
           title: item.title,
@@ -44,8 +61,9 @@ export const getInventionArtifactDownloads = query({
           version: item.version,
           staleReason: item.staleReason ?? null,
           downloadUrl: item.storageId ? await ctx.storage.getUrl(item.storageId) : null,
-        };
+        }];
       })
     );
+    return groups.flat();
   },
 });
