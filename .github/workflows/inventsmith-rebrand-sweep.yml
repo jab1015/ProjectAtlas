@@ -38,7 +38,7 @@ jobs:
       - name: Production dependency audit
         run: npm audit --omit=dev --audit-level=high
       - name: Next production build
-        run: npm run build
+        run: npx next build
       - name: Commit verified rebrand sweep
         run: |
           if git diff --quiet; then
