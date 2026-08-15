@@ -97,7 +97,9 @@ describe("InventSmith complete idea-to-market repository acceptance contract", (
 
     expect(dashboard).toContain("Complete InventSmith journey");
     expect(dashboard).toContain("Open Journey Center");
-    expect(journey).toContain("15-stage");
+    expect(journey).toContain("Complete inventor journey");
+    expect(journey).toContain("journey.stages.map");
+    expect(journey).toContain("journey.totalStages");
     expect(department).toContain("Department deliverables");
     expect(department).toContain("Evidence Locker");
     expect(legacyGuard).toContain("currentStageId >= 5");
