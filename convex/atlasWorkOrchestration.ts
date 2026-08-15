@@ -16,6 +16,7 @@ const completeWork = makeFunctionReference<"mutation", any, void>("atlasWorkStat
 const failWork = makeFunctionReference<"mutation", { workItemId: Id<"atlasWorkItems">; error: string; failedAt: number }, { willRetry: boolean }>("atlasWorkState:failWork");
 const blockWorkForHuman = makeFunctionReference<"mutation", any, void>("atlasWorkState:blockWorkForHuman");
 const continueAvailableWork = makeFunctionReference<"action", { inventionId: Id<"inventions">; costBudgetUnits?: number }, unknown>("atlasWorkOrchestration:runAvailableWork");
+const generateNativeCad = makeFunctionReference<"action", { inventionId: Id<"inventions">; workItemId: Id<"atlasWorkItems"> }, { discarded: boolean; failed: boolean; willRetry?: boolean; actualCostUnits: number }>("nativeCadGeneration:generateNativeCad");
 
 const resultSchema = {
   type: "object",
@@ -77,21 +78,29 @@ function assignmentInstructions(kind: string): string {
 }
 
 function workInput(workItem: any): Record<string, unknown> | null {
-  return workItem.inputSnapshot && typeof workItem.inputSnapshot === "object"
-    ? workItem.inputSnapshot as Record<string, unknown>
-    : null;
+  return workItem.inputSnapshot && typeof workItem.inputSnapshot === "object" ? workItem.inputSnapshot as Record<string, unknown> : null;
 }
 
 function resolvedInstructions(workItem: any): string {
   const input = workInput(workItem);
-  return typeof input?.instructions === "string" && input.instructions.trim()
-    ? input.instructions.trim()
-    : assignmentInstructions(workItem.kind);
+  return typeof input?.instructions === "string" && input.instructions.trim() ? input.instructions.trim() : assignmentInstructions(workItem.kind);
 }
 
 function needsWebResearch(workItem: any): boolean {
   const input = workInput(workItem);
   return RESEARCH_WORK.has(workItem.kind) || input?.research === true;
+}
+
+function contextDeliverableLimit(kind: string) {
+  return new Set([
+    "package_assembly",
+    "patent_design_handoff",
+    "design_candidate_generation",
+    "design_candidate_scoring",
+    "product_design_specification",
+    "manufacturer_rfq_package",
+    "pitch_deck_content",
+  ]).has(kind) ? 30 : 16;
 }
 
 export const runAvailableWork = internalAction({
@@ -119,6 +128,18 @@ export const runAvailableWork = internalAction({
           return { completed, stopReason: "restricted_product_category", remainingBudget };
         }
 
+        if (workItem.kind === "native_cad_generation") {
+          const cadResult = await ctx.runAction(generateNativeCad, { inventionId, workItemId: claim.workItemId });
+          remainingBudget = Math.max(0, remainingBudget - (cadResult.actualCostUnits ?? 0));
+          if (cadResult.failed) {
+            if (shouldScheduleAutonomousRetry(Boolean(cadResult.willRetry), remainingBudget)) {
+              await ctx.scheduler.runAfter(2_000, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget });
+            }
+            return { completed, stopReason: "native_cad_failed", remainingBudget };
+          }
+          continue;
+        }
+
         const response = await client.responses.create({
           model: process.env.ATLAS_OPENAI_MODEL ?? "gpt-5.4-mini",
           max_output_tokens: 8000,
@@ -131,9 +152,10 @@ export const runAvailableWork = internalAction({
               invention: { title: invention.title, problemStatement: invention.problemStatement, targetAudience: invention.targetAudience, solutionDescription: invention.solutionDescription },
               structuredRecord: record?.structuredBrief ?? null,
               priorWork: {
-                deliverables: deliverables.sort((a: any, b: any) => b.updatedAt - a.updatedAt).slice(0, workItem.kind === "package_assembly" ? 25 : 12).map((deliverable: any) => ({ title: deliverable.title, kind: deliverable.kind, version: deliverable.version, trustState: deliverable.trustState, content: deliverable.content, sourceCoverage: deliverable.sourceCoverage, confidence: deliverable.confidence, assumptions: deliverable.assumptions, limitations: deliverable.limitations, staleReason: deliverable.staleReason })),
-                findings: findings.sort((a: any, b: any) => b.updatedAt - a.updatedAt).slice(0, 50).map((finding: any) => ({ statement: finding.statement, kind: finding.kind, confidence: finding.confidence, status: finding.status, sourceIds: finding.sourceIds.map(String), limitations: finding.limitations })),
+                deliverables: deliverables.sort((a: any, b: any) => b.updatedAt - a.updatedAt).slice(0, contextDeliverableLimit(workItem.kind)).map((deliverable: any) => ({ title: deliverable.title, kind: deliverable.kind, version: deliverable.version, trustState: deliverable.trustState, content: deliverable.content, sourceCoverage: deliverable.sourceCoverage, confidence: deliverable.confidence, assumptions: deliverable.assumptions, limitations: deliverable.limitations, staleReason: deliverable.staleReason })),
+                findings: findings.sort((a: any, b: any) => b.updatedAt - a.updatedAt).slice(0, 60).map((finding: any) => ({ statement: finding.statement, kind: finding.kind, confidence: finding.confidence, status: finding.status, sourceIds: finding.sourceIds.map(String), limitations: finding.limitations })),
               },
+              inventorEvidence: sources.filter((source: any) => source.metadata?.provenance === "inventor_upload").slice(0, 40).map((source: any) => ({ title: source.title, evidenceKind: source.metadata?.evidenceKind, reliability: source.reliability, extraction: source.metadata?.extraction ?? null, excerpt: source.excerpt ?? null })),
               evidenceToVerify: workItem.kind === "evidence_verification" ? {
                 sources: sources.slice(0, 60).map((source: any) => ({ id: String(source._id), title: source.title, locator: source.locator, sourceType: source.sourceType, reliability: source.reliability })),
                 findings: findings.slice(0, 60).map((finding: any) => ({ statement: finding.statement, kind: finding.kind, confidence: finding.confidence, sourceIds: finding.sourceIds.map(String), status: finding.status })),
