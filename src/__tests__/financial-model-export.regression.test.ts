@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { csvDataUrl, extractMarkdownTables, financialModelMarkdownToCsv } from "../../convex/tabularExportLogic";
+import {
+  csvDataUrl,
+  extractMarkdownTables,
+  financialModelMarkdownToCsv,
+  financialModelMarkdownToSpreadsheetXml,
+  spreadsheetXmlDataUrl,
+} from "../../convex/tabularExportLogic";
 
 describe("InventSmith financial model structured export", () => {
   const markdown = [
@@ -37,10 +43,43 @@ describe("InventSmith financial model structured export", () => {
     expect(csvDataUrl(csv)).toMatch(/^data:text\/csv;charset=utf-8,/);
   });
 
-  it("exposes financial_model through the normal artifact-download service", () => {
+  it("produces an Excel-readable workbook with one worksheet per financial section", () => {
+    const workbook = financialModelMarkdownToSpreadsheetXml(markdown, "RiseJar & Co");
+    expect(workbook).toContain('<?mso-application progid="Excel.Sheet"?>');
+    expect(workbook).toContain('ss:Name="Summary"');
+    expect(workbook).toContain('ss:Name="Revenue and units"');
+    expect(workbook).toContain('ss:Name="Margin model"');
+    expect(workbook).toContain("RiseJar &amp; Co");
+    expect(workbook).toContain("Estimates and assumptions remain estimates");
+    expect(workbook).toContain('ss:StyleID="Header"');
+    expect(spreadsheetXmlDataUrl(workbook)).toMatch(/^data:application\/vnd\.ms-excel;charset=utf-8,/);
+  });
+
+  it("keeps worksheet names Excel-safe and unique", () => {
+    const repeated = [
+      "## Sales/Channel: Plan?",
+      "| Metric | Value |",
+      "| --- | --- |",
+      "| A | 1 |",
+      "## Sales/Channel: Plan?",
+      "| Metric | Value |",
+      "| --- | --- |",
+      "| B | 2 |",
+    ].join("\n");
+    const workbook = financialModelMarkdownToSpreadsheetXml(repeated, "Example");
+    expect(workbook).toContain('ss:Name="Sales Channel Plan"');
+    expect(workbook).toContain('ss:Name="Sales Channel Plan 2"');
+    expect(workbook).not.toContain('ss:Name="Sales/Channel: Plan?"');
+  });
+
+  it("exposes both CSV and Excel-readable financial_model downloads through the normal artifact service", () => {
     const source = readFileSync(join(process.cwd(), "convex/deliverableDownloads.ts"), "utf8");
     expect(source).toContain('item.kind === "financial_model"');
     expect(source).toContain('mediaType: "text/csv"');
+    expect(source).toContain('mediaType: "application/vnd.ms-excel"');
     expect(source).toContain("financialModelMarkdownToCsv");
+    expect(source).toContain("financialModelMarkdownToSpreadsheetXml");
+    expect(source).toContain("spreadsheetXmlDataUrl");
+    expect(source).toContain("groups.flat()");
   });
 });
