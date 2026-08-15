@@ -4,6 +4,7 @@ import { ChangeEvent, FormEvent, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
+import { makeFunctionReference } from "convex/server";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import { AppNav } from "@/components/atlas/app-nav";
@@ -11,8 +12,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, FileText, Upload, Trash2, ExternalLink, DatabaseZap } from "lucide-react";
+import { AlertTriangle, ArrowLeft, DatabaseZap, ExternalLink, FileText, RefreshCw, Trash2, Upload } from "lucide-react";
 import { extractEvidenceFromFile, type EvidenceExtraction } from "@/lib/evidenceIngestion";
+
+const retryEvidenceExtraction = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; evidenceSourceId: Id<"evidenceSources"> }, { scheduled: boolean; reason: "queued" | "already_queued" }>("evidenceExtractionControl:retryEvidenceExtraction");
 
 const MAX_FILE_BYTES = 25 * 1024 * 1024;
 const ACCEPTED_FILE_TYPES = [
@@ -42,6 +45,14 @@ function formatBytes(value: number | null | undefined) {
   return `${(value / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function extractionStatusLabel(status: string | null | undefined) {
+  if (status === "queued") return "Structured extraction queued";
+  if (status === "running") return "Structured extraction running";
+  if (status === "completed") return "Structured extraction complete";
+  if (status === "failed") return "Structured extraction failed";
+  return null;
+}
+
 export default function InventionEvidencePage() {
   const router = useRouter();
   const params = useParams();
@@ -50,6 +61,7 @@ export default function InventionEvidencePage() {
   const generateUploadUrl = useMutation(api.files.generateInventionEvidenceUploadUrl);
   const registerEvidence = useMutation(api.files.registerInventionEvidence);
   const removeEvidence = useMutation(api.files.removeInventionEvidence);
+  const retryExtraction = useMutation(retryEvidenceExtraction);
   const evidence = useQuery(
     api.files.listInventionEvidence,
     isAuthenticated && inventionId ? { inventionId } : "skip"
@@ -62,6 +74,7 @@ export default function InventionEvidencePage() {
   const [extraction, setExtraction] = useState<EvidenceExtraction | null>(null);
   const [extracting, setExtracting] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [retryingId, setRetryingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const kindLabels = useMemo(
@@ -145,6 +158,18 @@ export default function InventionEvidencePage() {
     }
   };
 
+  const retry = async (evidenceSourceId: Id<"evidenceSources">) => {
+    setRetryingId(String(evidenceSourceId));
+    setError(null);
+    try {
+      await retryExtraction({ inventionId, evidenceSourceId });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "InventSmith could not retry evidence extraction.");
+    } finally {
+      setRetryingId(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <AppNav />
@@ -160,8 +185,9 @@ export default function InventionEvidencePage() {
           <h1 className="text-3xl font-bold text-foreground">Give InventSmith the evidence you already have.</h1>
           <p className="max-w-3xl text-muted-foreground leading-relaxed">
             Upload survey results, interview notes, prototype tests, patents, quotes, drawings, professional reports,
-            pitch decks, contracts, or other invention material. CSV survey results and text evidence are structured at
-            intake so Validation and downstream departments can reason from the inventor evidence while preserving its provenance.
+            pitch decks, contracts, or other invention material. CSV survey results and text evidence are structured at intake;
+            supported binary files are preserved first and then structured server-side so Validation and downstream departments
+            can reason from the evidence while preserving its provenance.
           </p>
         </section>
 
@@ -171,7 +197,7 @@ export default function InventionEvidencePage() {
               <div className="space-y-2">
                 <Label htmlFor="evidence-file">Evidence file</Label>
                 <Input id="evidence-file" type="file" accept={ACCEPTED_FILE_TYPES} onChange={(event) => void onFileChange(event)} />
-                <p className="text-xs text-muted-foreground">Up to 25 MB per file. CSV and text are parsed immediately.</p>
+                <p className="text-xs text-muted-foreground">Up to 25 MB per file. CSV/text are parsed immediately; supported binary files are queued for structured extraction after upload.</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="evidence-kind">What kind of evidence is this?</Label>
@@ -203,6 +229,7 @@ export default function InventionEvidencePage() {
                 <p className="font-medium text-foreground">Structured evidence preview</p>
                 <p className="mt-1 text-muted-foreground">{extraction.summary}</p>
                 {extraction.survey && <p className="mt-2 text-xs text-muted-foreground">Survey rows: {extraction.survey.rowCount} · Questions/columns: {extraction.survey.columnCount}</p>}
+                {extraction.mode === "metadata_only" && <p className="mt-2 text-xs text-primary">InventSmith will attempt server-side structured extraction after the file is stored.</p>}
                 {extraction.limitations.length > 0 && <p className="mt-2 text-xs text-muted-foreground">Provenance/limitations are preserved with the evidence.</p>}
               </div>
             )}
@@ -217,31 +244,38 @@ export default function InventionEvidencePage() {
         <section className="space-y-4">
           <div>
             <h2 className="text-xl font-semibold text-foreground">Inventor-provided evidence</h2>
-            <p className="text-sm text-muted-foreground">Uploaded evidence can refresh affected research and design work, but remains unverified until InventSmith or a qualified reviewer evaluates it.</p>
+            <p className="text-sm text-muted-foreground">Uploaded evidence can refresh affected research and design work, but remains inventor-provided and unverified until InventSmith or a qualified reviewer evaluates its provenance and relevance.</p>
           </div>
 
           {evidence === undefined ? <p className="text-sm text-muted-foreground">Loading evidence…</p> : evidence.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border p-8 text-center text-muted-foreground">No evidence uploaded yet.</div>
           ) : (
             <div className="space-y-3">
-              {evidence.map((item) => (
-                <article key={item._id} className="rounded-xl border border-border bg-card p-5 flex gap-4 justify-between">
-                  <div className="flex gap-3 min-w-0">
-                    <FileText className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                    <div className="min-w-0 space-y-1">
-                      <p className="font-medium text-foreground truncate">{item.title}</p>
-                      <p className="text-xs text-muted-foreground">{kindLabels[item.evidenceKind] ?? item.evidenceKind} · {formatBytes(item.fileSize)} · Uploaded {new Date(item.createdAt).toLocaleDateString()}</p>
-                      {item.notes && <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.notes}</p>}
-                      {item.extractionSummary && <p className="text-xs text-primary">Structured intake: {item.extractionSummary}</p>}
-                      <p className="text-xs text-amber-700 dark:text-amber-400">Evidence state: unverified inventor upload</p>
+              {evidence.map((item) => {
+                const statusLabel = extractionStatusLabel(item.extractionStatus);
+                const retrying = retryingId === String(item._id);
+                return (
+                  <article key={item._id} className="rounded-xl border border-border bg-card p-5 flex gap-4 justify-between">
+                    <div className="flex gap-3 min-w-0">
+                      <FileText className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                      <div className="min-w-0 space-y-1">
+                        <p className="font-medium text-foreground truncate">{item.title}</p>
+                        <p className="text-xs text-muted-foreground">{kindLabels[item.evidenceKind] ?? item.evidenceKind} · {formatBytes(item.fileSize)} · Uploaded {new Date(item.createdAt).toLocaleDateString()}</p>
+                        {item.notes && <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.notes}</p>}
+                        {item.extractionSummary && <p className="text-xs text-primary">Structured intake: {item.extractionSummary}</p>}
+                        {statusLabel && <p className={`inline-flex items-center gap-1.5 text-xs ${item.extractionStatus === "failed" ? "text-destructive" : item.extractionStatus === "completed" ? "text-success" : "text-primary"}`}>{item.extractionStatus === "failed" ? <AlertTriangle className="h-3.5 w-3.5" /> : item.extractionStatus === "queued" || item.extractionStatus === "running" ? <DatabaseZap className="h-3.5 w-3.5" /> : null}{statusLabel}</p>}
+                        {item.extractionError && <p className="max-w-2xl text-xs text-destructive">{item.extractionError}</p>}
+                        <p className="text-xs text-amber-700 dark:text-amber-400">Evidence state: unverified inventor upload</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex gap-2 shrink-0">
-                    {item.downloadUrl && <Button asChild variant="outline" size="sm"><a href={item.downloadUrl} target="_blank" rel="noreferrer" aria-label={`Open ${item.fileName}`}><ExternalLink className="h-4 w-4" /></a></Button>}
-                    <Button type="button" variant="outline" size="sm" aria-label={`Delete ${item.fileName}`} onClick={async () => { if (!window.confirm(`Delete ${item.fileName}?`)) return; await removeEvidence({ inventionId, evidenceSourceId: item._id }); }}><Trash2 className="h-4 w-4" /></Button>
-                  </div>
-                </article>
-              ))}
+                    <div className="flex gap-2 shrink-0 self-start">
+                      {item.extractionStatus === "failed" && <Button type="button" variant="outline" size="sm" disabled={retrying} onClick={() => void retry(item._id)} aria-label={`Retry extraction for ${item.fileName}`}><RefreshCw className={`h-4 w-4 ${retrying ? "animate-spin" : ""}`} /></Button>}
+                      {item.downloadUrl && <Button asChild variant="outline" size="sm"><a href={item.downloadUrl} target="_blank" rel="noreferrer" aria-label={`Open ${item.fileName}`}><ExternalLink className="h-4 w-4" /></a></Button>}
+                      <Button type="button" variant="outline" size="sm" aria-label={`Delete ${item.fileName}`} onClick={async () => { if (!window.confirm(`Delete ${item.fileName}?`)) return; await removeEvidence({ inventionId, evidenceSourceId: item._id }); }}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>
