@@ -1,14 +1,12 @@
 import { REQUIRED_PILOT_DELIVERABLE_KINDS, type PilotEvaluationInput } from "@convex/pilotEvaluationLogic";
+import { REPRESENTATIVE_PILOT_INTAKE } from "@/lib/representativePilot";
 
 /**
  * Controlled-pilot fixture: a simple household product with no medical, food-contact,
  * child-safety, electrical, pressure, or other elevated-risk intended use.
  */
 export const representativeInvention = {
-  title: "Adjustable countertop produce-rinsing rack",
-  problemStatement: "Small kitchens lack a compact way to rinse and drain produce over differently sized sinks.",
-  targetAudience: "Adults in apartments and other small kitchens",
-  solutionDescription: "A manually adjustable rack that spans a household sink and supports a removable perforated basket.",
+  ...REPRESENTATIVE_PILOT_INTAKE,
   riskClass: "standard" as const,
 };
 
