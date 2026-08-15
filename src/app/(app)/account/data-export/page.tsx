@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const getStructuredExport = makeFunctionReference<"query", Record<string, never>, any>("privacyExport:getMyStructuredExport");
 
 function sanitizeFilePart(value: string) {
-  return value.replace(/[^a-z0-9._-]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "atlas-account";
+  return value.replace(/[^a-z0-9._-]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "inventsmith-account";
 }
 
 export default function DataExportPage() {
@@ -36,7 +36,7 @@ export default function DataExportPage() {
     const identity = typeof exportData.profile?.email === "string" ? exportData.profile.email.split("@")[0] : "account";
     const date = new Date(exportData.generatedAt).toISOString().slice(0, 10);
     anchor.href = url;
-    anchor.download = `atlas-data-export-${sanitizeFilePart(identity)}-${date}.json`;
+    anchor.download = `inventsmith-data-export-${sanitizeFilePart(identity)}-${date}.json`;
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
@@ -51,8 +51,8 @@ export default function DataExportPage() {
       <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-12">
         <div className="mb-6">
           <p className="text-xs font-medium uppercase tracking-widest text-primary">Privacy</p>
-          <h1 className="mt-2 text-2xl font-bold sm:text-3xl">Download your Atlas data</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Create a portable JSON copy of the structured data stored in your Atlas workspace.</p>
+          <h1 className="mt-2 text-2xl font-bold sm:text-3xl">Download your InventSmith data</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Create a portable JSON copy of the structured data stored in your InventSmith workspace.</p>
         </div>
 
         <Card>
