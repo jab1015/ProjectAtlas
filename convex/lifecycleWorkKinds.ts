@@ -12,6 +12,7 @@ export const FULL_JOURNEY_PRO_WORK_KINDS = [
   "manufacturer_rfq_package",
   "manufacturer_scorecard",
   "manufacturing_unit_economics",
+  "manufacturer_quote_evidence",
   "manufacturer_quote_comparison",
   "manufacturing_agreement_checklist",
   "manufacturing_readiness",
