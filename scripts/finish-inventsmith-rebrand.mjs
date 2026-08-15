@@ -4,6 +4,7 @@ import { join, relative } from "node:path";
 const root = process.cwd();
 const roots = ["src", "convex"];
 const changed = [];
+const auditTest = "src/__tests__/inventsmith-brand.regression.test.ts";
 
 function walk(path) {
   const absolute = join(root, path);
@@ -16,6 +17,9 @@ function walk(path) {
       continue;
     }
     if (!/\.(ts|tsx)$/.test(entry)) continue;
+    const relativePath = relative(root, child).replaceAll("\\", "/");
+    if (relativePath === auditTest) continue;
+
     const before = readFileSync(child, "utf8");
     let after = before.replace(/\bAtlas\b/g, "InventSmith");
 
@@ -28,7 +32,7 @@ function walk(path) {
 
     if (after !== before) {
       writeFileSync(child, after, "utf8");
-      changed.push(relative(root, child));
+      changed.push(relativePath);
     }
   }
 }
