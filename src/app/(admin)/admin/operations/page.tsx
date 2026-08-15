@@ -9,6 +9,7 @@ import { AdminHeader, StatsCard } from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { REPRESENTATIVE_PILOT_INTAKE } from "@/lib/representativePilot";
 
 interface Snapshot {
   generatedAt: number;
@@ -28,13 +29,6 @@ const createInvention = makeFunctionReference<"mutation", {
 }, string>("journeyEngine:createInvention");
 const kickAutonomousWork = makeFunctionReference<"mutation", { inventionId: string }, { scheduled: boolean; reason?: string }>("inventionWorkspace:kickAutonomousWork");
 
-const REPRESENTATIVE_PILOT = {
-  title: "Adjustable countertop produce-rinsing rack",
-  problemStatement: "Small kitchens lack a compact way to rinse and drain produce over differently sized sinks.",
-  targetAudience: "Adults in apartments and other small kitchens",
-  solutionDescription: "A manually adjustable rack that spans a household sink and supports a removable perforated basket.",
-};
-
 const labels = { failed: "Failed", expired: "Expired lease", blocked: "Human gate" } as const;
 
 export default function AtlasOperationsPage() {
@@ -47,7 +41,7 @@ export default function AtlasOperationsPage() {
     if (!window.confirm("Create the standard non-safety-critical Atlas representative invention and start its eligible autonomous work?")) return;
     setPilotState({ creating: true, message: "Creating representative pilot case…" });
     try {
-      const inventionId = await createPilotInvention(REPRESENTATIVE_PILOT);
+      const inventionId = await createPilotInvention(REPRESENTATIVE_PILOT_INTAKE);
       const result = await kickWork({ inventionId });
       setPilotState({
         creating: false,
