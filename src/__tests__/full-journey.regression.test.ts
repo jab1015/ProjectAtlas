@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { FULL_JOURNEY_STAGES } from "@convex/fullJourneyDefinition";
 import { lifecycleStages } from "@convex/lifecycleDepartments";
+import { POST_CANONICAL_WORK_PLAN } from "@convex/fullProductWorkPlan";
 
 const stageById = new Map(FULL_JOURNEY_STAGES.map((stage) => [stage.id, stage]));
 const lifecycleById = new Map(lifecycleStages.map((stage) => [stage.id, stage]));
@@ -97,6 +98,8 @@ describe("InventSmith full idea-to-market journey", () => {
       "contracting_package",
       "ip_status_tracker",
       "professional_legal_handoff",
+      "professional_service_plan",
+      "professional_provider_research",
     ]);
   });
 
@@ -117,12 +120,24 @@ describe("InventSmith full idea-to-market journey", () => {
   });
 
   it("requires implementation definitions for every post-design department", () => {
+    const fullPlanByStage = new Map<number, Set<string>>();
+    for (const item of POST_CANONICAL_WORK_PLAN) {
+      const rawStageId = item.inputSnapshot.stageId;
+      if (typeof rawStageId !== "number") continue;
+      const stageKinds = fullPlanByStage.get(rawStageId) ?? new Set<string>();
+      stageKinds.add(item.kind);
+      fullPlanByStage.set(rawStageId, stageKinds);
+    }
+
     for (let stageId = 6; stageId <= 15; stageId += 1) {
       const journey = stageById.get(stageId);
       const lifecycle = lifecycleById.get(stageId);
       expect(lifecycle, `stage ${stageId} has no executable lifecycle department`).toBeDefined();
       expect(lifecycle?.name).toBe(journey?.name);
-      const executableKinds = new Set(lifecycle?.work.map((item) => item.kind));
+      const executableKinds = new Set([
+        ...(lifecycle?.work.map((item) => item.kind) ?? []),
+        ...(fullPlanByStage.get(stageId) ?? []),
+      ]);
       for (const kind of journey?.requiredWorkKinds ?? []) {
         expect(executableKinds.has(kind), `${journey?.name} has no executable definition for ${kind}`).toBe(true);
       }
