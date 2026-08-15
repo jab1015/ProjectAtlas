@@ -92,10 +92,12 @@ export function pitchDeckSlidesFromMarkdown(markdown: string, inventionTitle: st
 
 export function buildPitchDeckArtifact(markdown: string, inventionTitle: string) {
   const slides = pitchDeckSlidesFromMarkdown(markdown, inventionTitle);
-  const bytes = buildInventSmithPptx(slides, {
+  const generated = buildInventSmithPptx(slides, {
     title: `${inventionTitle} — Investor Pitch Deck`,
     subject: "Evidence-backed inventor funding presentation",
     creator: "InventSmith — The Inventor OS • Modern Methods",
   });
-  return { bytes, slideCount: slides.length };
+  const concreteBytes = new Uint8Array(generated.length);
+  concreteBytes.set(generated);
+  return { bytes: concreteBytes.buffer, slideCount: slides.length };
 }
