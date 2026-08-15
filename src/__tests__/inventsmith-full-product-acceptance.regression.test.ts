@@ -102,8 +102,8 @@ describe("InventSmith complete idea-to-market repository acceptance contract", (
     expect(journey).toContain("journey.totalStages");
     expect(department).toContain("Department deliverables");
     expect(department).toContain("Evidence Locker");
-    expect(legacyGuard).toContain("currentStageId >= 5");
-    expect(legacyGuard).toContain("/journey");
+    expect(legacyGuard).toContain("state.currentStage.id >= 5");
+    expect(legacyGuard).toContain("router.replace(`${rootPath}/journey`)");
   });
 
   it("keeps the product promise tied to the complete destination rather than the retired pilot", () => {
