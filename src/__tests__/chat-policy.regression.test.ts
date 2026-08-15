@@ -3,6 +3,7 @@ import {
   canAskChatQuestion,
   CHAT_MESSAGE_MAX_CHARACTERS,
   isValidChatContent,
+  shouldUseExternalResearch,
   truncateModelContext,
   CHAT_MODEL_CONTEXT_MAX_CHARACTERS,
 } from "@convex/chatPolicyLogic";
@@ -26,5 +27,12 @@ describe("InventSmith chat policy", () => {
     const bounded = truncateModelContext("x".repeat(200), 80);
     expect(bounded.length).toBe(80);
     expect(bounded).toContain("[Context truncated by InventSmith]");
+  });
+
+  it("routes mutable patent status and inventor-provided URLs to live research", () => {
+    expect(shouldUseExternalResearch("Is US20130313258 expired fee related?")).toBe(true);
+    expect(shouldUseExternalResearch("Mark this abandoned based on https://patents.google.com/patent/US20050133511")).toBe(true);
+    expect(shouldUseExternalResearch("What is the current patent status?")).toBe(true);
+    expect(shouldUseExternalResearch("Has the patent team handed off to the design team?" )).toBe(false);
   });
 });
