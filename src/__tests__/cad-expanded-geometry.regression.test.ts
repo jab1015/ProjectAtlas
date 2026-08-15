@@ -53,8 +53,42 @@ describe("InventSmith expanded native CAD geometry", () => {
     expect(artifacts.stl).toContain("RiseJar_Threaded_Lift_Shaft");
   });
 
-  it("rejects thread geometry that would be mechanically nonsensical", () => {
+  it("generates a helical internally threaded mating tube with preserved wall thickness", () => {
     const spec: CadAssemblySpec = {
+      name: "RiseJar Mating Thread Pair",
+      units: "mm",
+      revision: "A",
+      assumptions: ["Nominal 6 mm pitch is provisional"],
+      unresolvedEngineering: ["Thread form, running clearance, backlash, wear and food-safe cleanability require engineering/prototype validation"],
+      parts: [
+        {
+          id: "shaft",
+          name: "External lift shaft",
+          material: "Acetal",
+          primitive: { type: "threadedCylinder", radius: 8, height: 36, pitch: 6, threadDepth: 1, segments: 24 },
+        },
+        {
+          id: "sleeve",
+          name: "Internally threaded lift sleeve",
+          material: "Acetal",
+          primitive: { type: "threadedTube", outerRadius: 13, innerRadius: 9.4, height: 24, pitch: 6, threadDepth: 1, segments: 24 },
+        },
+      ],
+    };
+
+    const mesh = buildCadMesh(spec);
+    const sleeveTriangles = mesh.filter((triangle) => triangle.partId === "sleeve");
+    expect(sleeveTriangles.length).toBeGreaterThan(1000);
+    const sleeveRadii = sleeveTriangles.flatMap((triangle) => [triangle.a, triangle.b, triangle.c]).map(([x, y]) => Math.hypot(x, y));
+    expect(Math.max(...sleeveRadii)).toBeCloseTo(13, 4);
+    expect(sleeveRadii.some((value) => value > 9.8 && value < 11)).toBe(true);
+    const artifacts = generateCadArtifacts(spec);
+    expect(artifacts.sourceJson).toContain("threadedTube");
+    expect(artifacts.step).toContain("FACETED_BREP");
+  });
+
+  it("rejects thread geometry that would be mechanically nonsensical", () => {
+    const invalidExternal: CadAssemblySpec = {
       name: "Invalid Thread",
       units: "mm",
       revision: "A",
@@ -62,7 +96,17 @@ describe("InventSmith expanded native CAD geometry", () => {
       unresolvedEngineering: [],
       parts: [{ id: "bad-thread", name: "Bad thread", primitive: { type: "threadedCylinder", radius: 5, height: 20, pitch: 1, threadDepth: 2.5, segments: 24 } }],
     };
-    expect(() => buildCadMesh(spec)).toThrow(/thread depth|thread pitch/i);
+    expect(() => buildCadMesh(invalidExternal)).toThrow(/thread depth|thread pitch/i);
+
+    const invalidInternal: CadAssemblySpec = {
+      name: "Invalid Internal Thread",
+      units: "mm",
+      revision: "A",
+      assumptions: [],
+      unresolvedEngineering: [],
+      parts: [{ id: "bad-sleeve", name: "Bad sleeve", primitive: { type: "threadedTube", outerRadius: 10, innerRadius: 9, height: 20, pitch: 3, threadDepth: 1.5, segments: 24 } }],
+    };
+    expect(() => buildCadMesh(invalidInternal)).toThrow(/wall thickness|inner radius/i);
   });
 
   it("extrudes a custom convex product profile into STEP/STL/DXF geometry", () => {
@@ -113,16 +157,18 @@ describe("InventSmith expanded native CAD geometry", () => {
     expect(() => buildCadMesh(spec)).toThrow(/convex/i);
   });
 
-  it("preserves manufacturing metadata in the editable CAD source plan", () => {
+  it("preserves manufacturing metadata and mating-thread support in the editable CAD source plan", () => {
     const generation = readFileSync(join(process.cwd(), "convex/nativeCadGeneration.ts"), "utf8");
     expect(generation).toContain('finish: { type: "string" }');
     expect(generation).toContain('manufacturingProcess: { type: "string" }');
     expect(generation).toContain('interfaceNotes: { type: "array"');
+    expect(generation).toContain('"threadedTube"');
     expect(generation).toContain("material: part.material.trim()");
     expect(generation).toContain("finish: part.finish.trim()");
     expect(generation).toContain("manufacturingProcess: part.manufacturingProcess.trim()");
     expect(generation).toContain("interfaceNotes: part.interfaceNotes.slice");
     expect(generation).toContain("If any of those fields are unknown, say TBD or provisional");
+    expect(generation).toContain("Mating external/internal thread pairs should use compatible nominal pitch");
   });
 
   it("keeps orthographic and exploded-view artifacts visible in the Design Studio", () => {
