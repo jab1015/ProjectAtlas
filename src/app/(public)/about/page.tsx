@@ -5,21 +5,19 @@ export default function AboutPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-20 sm:px-6 lg:px-8">
 
-      {/* Page title */}
       <h1
         className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground mb-16"
         style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
       >
-        About Atlas
+        About InventSmith
       </h1>
 
-      {/* Why Atlas Exists */}
       <section className="mb-14">
         <h2
           className="text-xl font-semibold text-foreground mb-4"
           style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
         >
-          Why Atlas Exists
+          Why InventSmith Exists
         </h2>
         <div className="space-y-4 text-muted-foreground leading-relaxed">
           <p>
@@ -28,17 +26,17 @@ export default function AboutPage() {
           </p>
           <p>
             Most inventors don&rsquo;t stall because their idea is bad.
-            They stall because no one has ever shown them what to do next.
+            They stall because turning an idea into something real requires research,
+            evidence, design, decisions, documentation, and coordination across many disciplines.
           </p>
           <p>
-            Atlas exists to change that.
+            InventSmith exists to take on as much of that work as possible.
           </p>
         </div>
       </section>
 
       <div className="border-t border-border" />
 
-      {/* Our Mission */}
       <section className="my-14">
         <h2
           className="text-xl font-semibold text-foreground mb-4"
@@ -48,43 +46,44 @@ export default function AboutPage() {
         </h2>
         <div className="space-y-4 text-muted-foreground leading-relaxed">
           <p>
-            To guide inventors from idea to market — through every stage of the journey.
+            To give every inventor an operating system that can help move an invention from idea to market.
           </p>
           <p>
-            Patent readiness is Stage 4 of 15. It&rsquo;s a real milestone, but it&rsquo;s not
-            the finish line. Atlas is designed to walk with you through product design,
-            manufacturing, branding, launch, funding, and growth — all the way to a product
-            in the hands of real customers.
+            InventSmith researches, organizes evidence, develops work products, tracks dependencies,
+            prepares options, and keeps the invention moving. When a real human decision, authorization,
+            professional review, payment, private input, or physical-world action is required, InventSmith
+            brings the inventor the prepared work instead of handing them a generic to-do list.
           </p>
-          <p>
-            Every feature in Atlas is designed to answer a single question:{" "}
-            <em className="text-foreground">&ldquo;What should I do next?&rdquo;</em>
+          <p className="font-medium text-foreground">
+            You invent. InventSmith does the work.
           </p>
         </div>
       </section>
 
       <div className="border-t border-border" />
 
-      {/* Our Promise */}
       <section className="my-14">
         <h2
           className="text-xl font-semibold text-foreground mb-4"
           style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
         >
-          Our Promise
+          The Inventor OS
         </h2>
         <div className="space-y-4 text-muted-foreground leading-relaxed">
           <p>
-            Atlas will always tell you the next best step for your invention.
-            Not a list of everything you could do. Just the one thing that will
-            move you forward today.
+            InventSmith is designed around a simple rule: if the system can safely do the work itself,
+            it should do the work instead of turning that work into an inventor task.
+          </p>
+          <p>
+            The inventor remains the inventor. InventSmith is the workshop around them — helping with
+            research, market validation, prior-art intelligence, feasibility, product development,
+            engineering preparation, commercialization, and the evidence needed for better decisions.
           </p>
         </div>
       </section>
 
       <div className="border-t border-border" />
 
-      {/* Privacy */}
       <section className="my-14">
         <h2
           className="text-xl font-semibold text-foreground mb-4"
@@ -93,27 +92,21 @@ export default function AboutPage() {
           Privacy
         </h2>
         <div className="space-y-4 text-muted-foreground leading-relaxed">
+          <p>Your ideas are yours. Always.</p>
           <p>
-            Your ideas are yours. Always.
+            InventSmith exists to help you develop your invention — not to claim ownership of it.
+            We never assert rights over anything you create, share, or store in InventSmith.
           </p>
-          <p>
-            Atlas exists to help you develop your invention — not to claim
-            ownership of it. We never assert rights over anything you create,
-            share, or store in Atlas.
-          </p>
-          <p>
-            Your invention remains your invention.
-          </p>
+          <p>Your invention remains your invention.</p>
         </div>
       </section>
 
-      {/* Footer CTA */}
       <div className="mt-16 rounded-2xl border border-border bg-muted/30 p-10 text-center">
         <h2
           className="text-xl font-semibold text-foreground mb-2"
           style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
         >
-          Ready to take your first step?
+          Put your idea into the Workshop.
         </h2>
         <p className="mt-2 text-sm text-muted-foreground mb-6">
           Start free. No credit card required.
