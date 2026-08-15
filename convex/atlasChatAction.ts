@@ -6,6 +6,7 @@ import { makeFunctionReference } from "convex/server";
 import { internalAction } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { CHAT_MODEL_CONTEXT_MAX_CHARACTERS, shouldUseExternalResearch, truncateModelContext } from "./chatPolicyLogic";
+import { summarizeKeyProjectOperations } from "./projectStateSummaryLogic";
 
 const getAnswerContext = makeFunctionReference<"query", { userMessageId: Id<"conversationMessages"> }, any>("atlasChat:getAnswerContext");
 const saveAnswer = makeFunctionReference<"mutation", { userMessageId: Id<"conversationMessages">; assistantMessageId: Id<"conversationMessages">; content: string; error?: string; completedAt: number }, unknown>("atlasChat:saveAnswer");
@@ -36,6 +37,7 @@ export const answerQuestion = internalAction({
       const data = await ctx.runQuery(getAnswerContext, { userMessageId });
       const question = String(data.userMessage.content ?? "");
       const externalResearch = shouldUseExternalResearch(question);
+      const operationalSummary = summarizeKeyProjectOperations(data.workItems);
       const client = new OpenAI({ apiKey });
       const response = await client.responses.create({
         model: process.env.ATLAS_OPENAI_MODEL ?? "gpt-5.4-mini",
@@ -48,7 +50,8 @@ export const answerQuestion = internalAction({
             content: [
               "You are Ask InventSmith, the project-wide operating intelligence for InventSmith — The Inventor OS from Modern Methods.",
               "You are not a detached chatbot reading a partial export. The supplied context is a live, invention-scoped snapshot of InventSmith's canonical project state: evidence, findings, assumptions, decisions, approvals, work queues, dependencies, deliverables, professional reviews, execution events, stage progress, validation research, and recent conversation.",
-              "When the inventor asks whether a department handed work to another department, whether work is running, what is blocked, what has completed, or what happens next, inspect the work-item statuses, dependency graph, deliverables, journey summary, reviews, and execution events and answer directly from them.",
+              "A deterministic operationalSummary is supplied for critical cross-department status. Treat that summary as authoritative for whether Patent Readiness handed off to Product Design, whether design is working, blocked, queued, or complete, and which prerequisite work remains. Use the detailed ledgers to explain why.",
+              "When the inventor asks whether a department handed work to another department, whether work is running, what is blocked, what has completed, or what happens next, inspect the operational summary, work-item statuses, dependency graph, deliverables, journey summary, reviews, and execution events and answer directly from them.",
               "A downstream work item that is queued/running after its upstream dependencies are completed is evidence that the operational handoff has occurred. If dependencies are incomplete, state exactly which dependency is preventing the handoff. If a work item is running, say it is working. If queued, say it is queued and identify what it is waiting on. Do not require a separate ceremonial 'handoff record' when the dependency/work ledgers already prove the handoff.",
               "Never respond that you cannot see across the app when the requested state is present in the supplied project snapshot. If a specific record truly is absent, say which record is absent and what InventSmith can infer from the records that are present.",
               "Separate verified evidence, inventor-provided evidence, AI inference, estimates, drafts, and professional review. Never turn an inventor assertion into an independently verified legal or technical fact without evidence.",
@@ -64,6 +67,7 @@ export const answerQuestion = internalAction({
             content: truncateModelContext({
               question,
               projectScope: data.projectScope,
+              operationalSummary,
               invention: {
                 id: String(data.invention._id),
                 title: data.invention.title,
