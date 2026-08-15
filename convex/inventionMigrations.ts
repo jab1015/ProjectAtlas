@@ -2,6 +2,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { missingCanonicalWorkKinds } from "./canonicalWorkPlan";
+import { POST_CANONICAL_WORK_PLAN } from "./fullProductWorkPlan";
 
 export const backfillWorkspace = mutation({
   args: { inventionId: v.id("inventions") },
@@ -14,10 +15,7 @@ export const backfillWorkspace = mutation({
 
     const now = Date.now();
     let recordCreated = false;
-    const existingRecord = await ctx.db
-      .query("inventionRecords")
-      .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
-      .unique();
+    const existingRecord = await ctx.db.query("inventionRecords").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).unique();
 
     if (!existingRecord) {
       await ctx.db.insert("inventionRecords", {
@@ -38,13 +36,12 @@ export const backfillWorkspace = mutation({
       recordCreated = true;
     }
 
-    const existingWork = await ctx.db
-      .query("atlasWorkItems")
-      .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
-      .collect();
-    const missing = missingCanonicalWorkKinds(existingWork.map((item) => item.kind));
+    const existingWork = await ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+    const existingKinds = new Set(existingWork.map((item) => item.kind));
+    const missingCanonical = missingCanonicalWorkKinds(existingKinds);
+    const missingPostCanonical = POST_CANONICAL_WORK_PLAN.filter((item) => !existingKinds.has(item.kind));
 
-    for (const item of missing) {
+    for (const item of missingCanonical) {
       const completed = item.initiallyCompleted === true;
       await ctx.db.insert("atlasWorkItems", {
         inventionId,
@@ -52,12 +49,10 @@ export const backfillWorkspace = mutation({
         title: item.title,
         status: completed ? "completed" : "queued",
         priority: item.priority,
-        inputSnapshot: item.instructions
-          ? {
-              department: item.kind === "patent_design_handoff" ? "patent_readiness" : "canonical",
-              instructions: item.instructions,
-            }
-          : undefined,
+        inputSnapshot: item.instructions ? {
+          department: item.kind === "patent_design_handoff" ? "patent_readiness" : "canonical",
+          instructions: item.instructions,
+        } : undefined,
         attemptCount: completed ? 1 : 0,
         maxAttempts: completed ? undefined : 3,
         estimatedCostUnits: item.estimatedCostUnits,
@@ -71,17 +66,39 @@ export const backfillWorkspace = mutation({
       });
     }
 
-    if (recordCreated || missing.length > 0) {
+    for (const item of missingPostCanonical) {
+      await ctx.db.insert("atlasWorkItems", {
+        inventionId,
+        kind: item.kind,
+        title: item.title,
+        status: "queued",
+        priority: item.priority,
+        inputSnapshot: item.inputSnapshot,
+        attemptCount: 0,
+        maxAttempts: 3,
+        estimatedCostUnits: item.estimatedCostUnits,
+        deliverableKind: item.deliverableKind,
+        dependsOnKinds: item.dependsOnKinds,
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+
+    const addedKinds = [...missingCanonical.map((item) => item.kind), ...missingPostCanonical.map((item) => item.kind)];
+    if (recordCreated || addedKinds.length > 0) {
       await ctx.db.insert("atlasExecutionEvents", {
         inventionId,
         eventType: "work_queued",
         actorType: "system",
-        summary: "InventSmith upgraded an existing invention to the canonical autonomous workspace.",
+        summary: "InventSmith upgraded the existing invention to the complete autonomous idea-to-market workspace.",
         metadata: {
           recordCreated,
-          addedWorkKinds: missing.map((item) => item.kind),
-          canonicalWorkCount: existingWork.length + missing.length,
-          instructionBackfillKinds: missing.filter((item) => Boolean(item.instructions)).map((item) => item.kind),
+          addedWorkKinds: addedKinds,
+          canonicalAdded: missingCanonical.length,
+          postCanonicalAdded: missingPostCanonical.length,
+          resultingWorkCount: existingWork.length + addedKinds.length,
+          includesPatentDesignHandoff: addedKinds.includes("patent_design_handoff") || existingKinds.has("patent_design_handoff"),
+          includesNativeCad: addedKinds.includes("native_cad_generation") || existingKinds.has("native_cad_generation"),
         },
         createdAt: now,
       });
@@ -89,9 +106,11 @@ export const backfillWorkspace = mutation({
 
     return {
       recordCreated,
-      addedWorkCount: missing.length,
-      addedWorkKinds: missing.map((item) => item.kind),
-      alreadyCurrent: !recordCreated && missing.length === 0,
+      addedWorkCount: addedKinds.length,
+      addedWorkKinds: addedKinds,
+      canonicalAdded: missingCanonical.length,
+      postCanonicalAdded: missingPostCanonical.length,
+      alreadyCurrent: !recordCreated && addedKinds.length === 0,
     };
   },
 });
