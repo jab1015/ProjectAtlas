@@ -38,7 +38,8 @@ describe("InventSmith customer-facing brand", () => {
         const lines = readFileSync(file, "utf8").split(/\r?\n/);
         lines.forEach((line, index) => {
           if (!/(["'`])[^"'`]*\bAtlas\b[^"'`]*\1/.test(line)) return;
-          if (/\/checkout\/atlas\//.test(line)) return; // Managed MadeThis binding.
+          if (/\/checkout\/atlas\//.test(line)) return; // Managed MadeThis checkout binding.
+          if (/X-Atlas-Subscription-Signature/.test(line)) return; // Deployed webhook protocol header.
           violations.push(`${relative(ROOT, file)}:${index + 1}: ${line.trim()}`);
         });
       }
