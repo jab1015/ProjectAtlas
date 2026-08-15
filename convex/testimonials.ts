@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./authHelpers";
 
 export const list = query({
   args: {
@@ -48,6 +49,7 @@ export const create = mutation({
     sortOrder: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const testimonialId = await ctx.db.insert("testimonials", {
       productId: args.productId,
       customerName: args.customerName,
@@ -75,6 +77,7 @@ export const update = mutation({
     sortOrder: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const { id, ...fields } = args;
 
     const testimonial = await ctx.db.get(id);
@@ -96,6 +99,7 @@ export const update = mutation({
 export const remove = mutation({
   args: { id: v.id("testimonials") },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const testimonial = await ctx.db.get(args.id);
     if (!testimonial) {
       throw new Error(`Testimonial ${args.id} not found`);

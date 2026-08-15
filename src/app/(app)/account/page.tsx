@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useQuery } from "convex/react";
-import { useConvexAuth } from "convex/react";
+import { useMutation, useQuery, useConvexAuth } from "convex/react";
+import { makeFunctionReference } from "convex/server";
 import { api } from "@convex/_generated/api";
 import {
   ArrowUpRight,
@@ -29,8 +29,8 @@ interface Plan {
   name: string;
   price: string;
   activeInventions: number | null;
-  aiTasksPerDay: number | null;
-  creditsPerMonth: number | null;
+  autonomousCostUnitsPerDay: number;
+  chatQuestionsPerDay: number;
   productId?: string;
   summary: string;
 }
@@ -47,8 +47,8 @@ const PLANS: Plan[] = [
     name: "Explorer",
     price: "Free",
     activeInventions: 1,
-    aiTasksPerDay: null,
-    creditsPerMonth: null,
+    autonomousCostUnitsPerDay: 25,
+    chatQuestionsPerDay: 30,
     summary: "Your base plan for shaping the first invention.",
   },
   {
@@ -56,8 +56,8 @@ const PLANS: Plan[] = [
     name: "Inventor",
     price: "$39/month",
     activeInventions: 3,
-    aiTasksPerDay: 10,
-    creditsPerMonth: 150,
+    autonomousCostUnitsPerDay: 125,
+    chatQuestionsPerDay: 100,
     productId: "md7ck7xa3kyqxqwhy9a0ecb6t98a5cmx",
     summary: "More room to develop early invention paths.",
   },
@@ -66,8 +66,8 @@ const PLANS: Plan[] = [
     name: "Pro",
     price: "$79/month",
     activeInventions: 10,
-    aiTasksPerDay: 25,
-    creditsPerMonth: 400,
+    autonomousCostUnitsPerDay: 350,
+    chatQuestionsPerDay: 200,
     productId: "md79k53vpy038wy2sgbd3e1k118a5m8f",
     summary: "For inventors actively moving several ideas forward.",
   },
@@ -75,11 +75,11 @@ const PLANS: Plan[] = [
     key: "enterprise",
     name: "Enterprise",
     price: "$149/month",
-    activeInventions: null,
-    aiTasksPerDay: null,
-    creditsPerMonth: null,
+    activeInventions: 25,
+    autonomousCostUnitsPerDay: 600,
+    chatQuestionsPerDay: 300,
     productId: "md75s0c4nz902ngq0kngcn48zn8a40ea",
-    summary: "Unlimited capacity for heavier invention pipelines.",
+    summary: "The largest bounded workspace for heavier invention pipelines.",
   },
 ];
 
@@ -127,9 +127,23 @@ function AccountSkeleton() {
   );
 }
 
+interface CurrentUsage {
+  dateKey: string;
+  tier: TierKey;
+  usage: { autonomousCostUnits: number; reservedAutonomousCostUnits?: number; completedWorkItems: number; chatQuestions: number };
+  limits: { autonomousCostUnits: number; chatQuestions: number };
+  remainingAutonomousCostUnits: number;
+}
+
+const getCurrentUsage = makeFunctionReference<"query", Record<string, never>, CurrentUsage>("atlasUsage:getCurrentUsage");
+interface PrivacyRequest { _id: string; requestType: "data_export" | "account_deletion"; status: string; requestedAt: number }
+const listPrivacyRequests = makeFunctionReference<"query", Record<string, never>, PrivacyRequest[]>("privacyRequests:listMine");
+const createPrivacyRequest = makeFunctionReference<"mutation", { requestType: "data_export" | "account_deletion" }, { requestId: string; duplicate: boolean }>("privacyRequests:request");
+
 export default function AccountPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useConvexAuth();
+  const [privacyMessage, setPrivacyMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -141,12 +155,24 @@ export default function AccountPage() {
     api.users.getUserProfile,
     isAuthenticated ? {} : "skip"
   );
+  const dailyUsage = useQuery(getCurrentUsage, isAuthenticated ? {} : "skip");
+  const privacyRequests = useQuery(listPrivacyRequests, isAuthenticated ? {} : "skip");
+  const requestPrivacyAction = useMutation(createPrivacyRequest);
+  const submitPrivacyRequest = async (requestType: "data_export" | "account_deletion") => {
+    if (requestType === "account_deletion" && !window.confirm("Request permanent deletion of your Atlas account and invention data? Billing and legally required transaction records may need separate handling.")) return;
+    try {
+      const result = await requestPrivacyAction({ requestType });
+      setPrivacyMessage(result.duplicate ? "That request is already pending." : requestType === "data_export" ? "Your data export request was recorded." : "Your account deletion request was recorded.");
+    } catch {
+      setPrivacyMessage("Atlas could not record the privacy request. Please try again.");
+    }
+  };
 
   if (isLoading || !isAuthenticated) {
     return null;
   }
 
-  if (profile === undefined) {
+  if (profile === undefined || dailyUsage === undefined || privacyRequests === undefined) {
     return (
       <div className="min-h-screen bg-background">
         <AppNav />
@@ -245,7 +271,10 @@ export default function AccountPage() {
               </div>
               <div className="flex items-start justify-between gap-4">
                 <CardTitle className="text-xl">{currentPlan.name}</CardTitle>
-                <Badge>{currentPlan.price}</Badge>
+                <div className="flex flex-wrap justify-end gap-2">
+                  <Badge variant="outline" className="capitalize">{profile.subscriptionStatus.replaceAll("_", " ")}</Badge>
+                  <Badge>{currentPlan.price}</Badge>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-5">
@@ -274,18 +303,23 @@ export default function AccountPage() {
                   </p>
                 </div>
                 <div className="rounded-[var(--radius-md)] border border-border bg-muted/30 p-3">
-                  <p className="text-muted-foreground">AI tasks</p>
+                  <p className="text-muted-foreground">Autonomous budget</p>
                   <p className="mt-1 font-medium text-foreground">
-                    {formatLimit(currentPlan.aiTasksPerDay, "per day")}
+                    {dailyUsage.usage.autonomousCostUnits} / {currentPlan.autonomousCostUnitsPerDay} units today
                   </p>
+                  {(dailyUsage.usage.reservedAutonomousCostUnits ?? 0) > 0 && <p className="mt-1 text-xs text-muted-foreground">{dailyUsage.usage.reservedAutonomousCostUnits} unit(s) reserved for running work</p>}
                 </div>
                 <div className="rounded-[var(--radius-md)] border border-border bg-muted/30 p-3">
-                  <p className="text-muted-foreground">Credits</p>
+                  <p className="text-muted-foreground">Ask Atlas</p>
                   <p className="mt-1 font-medium text-foreground">
-                    {formatLimit(currentPlan.creditsPerMonth, "per month")}
+                    {dailyUsage.usage.chatQuestions} / {currentPlan.chatQuestionsPerDay} today
                   </p>
                 </div>
               </div>
+              <p className="text-xs text-muted-foreground">Daily allowances reset at 00:00 UTC. Cost units meter research and generation effort; ordinary project viewing and review do not consume them.</p>
+              {profile.subscriptionCurrentPeriodEnd && (
+                <p className="text-xs text-muted-foreground">Current paid access period ends {new Date(profile.subscriptionCurrentPeriodEnd).toLocaleDateString()}.</p>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -334,13 +368,13 @@ export default function AccountPage() {
                       <li className="flex items-start gap-2">
                         <Check className="mt-0.5 h-4 w-4 text-primary" />
                         <span className="text-foreground">
-                          {formatLimit(plan.aiTasksPerDay, "AI tasks/day")}
+                          {plan.autonomousCostUnitsPerDay} autonomous cost units/day
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <Check className="mt-0.5 h-4 w-4 text-primary" />
                         <span className="text-foreground">
-                          {formatLimit(plan.creditsPerMonth, "credits/month")}
+                          {plan.chatQuestionsPerDay} Ask Atlas questions/day
                         </span>
                       </li>
                     </ul>
@@ -375,6 +409,21 @@ export default function AccountPage() {
               );
             })}
           </div>
+        </section>
+
+        <section className="mt-8 rounded-xl border border-border bg-card p-6" aria-labelledby="privacy-controls-title">
+          <h2 id="privacy-controls-title" className="text-lg font-semibold">Privacy controls</h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">Request a portable account-data export or coordinated deletion. Account deletion is not immediate because Atlas must also close authentication, subscription, and legally required transaction records.</p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Button variant="outline" onClick={() => void submitPrivacyRequest("data_export")}>Request data export</Button>
+            <Button variant="destructive" onClick={() => void submitPrivacyRequest("account_deletion")}>Request account deletion</Button>
+          </div>
+          {privacyMessage && <p role="status" className="mt-3 text-sm text-muted-foreground">{privacyMessage}</p>}
+          {privacyRequests.length > 0 && (
+            <ul className="mt-5 space-y-2 border-t border-border pt-4 text-sm">
+              {privacyRequests.slice(0, 5).map((request) => <li key={request._id} className="flex flex-wrap justify-between gap-2"><span className="capitalize">{request.requestType.replaceAll("_", " ")}</span><span className="capitalize text-muted-foreground">{request.status.replaceAll("_", " ")} · {new Date(request.requestedAt).toLocaleDateString()}</span></li>)}
+            </ul>
+          )}
         </section>
       </main>
 

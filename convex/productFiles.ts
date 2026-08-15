@@ -1,9 +1,11 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./authHelpers";
 
 export const generateUploadUrl = mutation({
   args: {},
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -13,6 +15,7 @@ export const list = query({
     productId: v.id("products"),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const files = await ctx.db
       .query("productFiles")
       .withIndex("by_productId", (q) => q.eq("productId", args.productId))
@@ -39,6 +42,7 @@ export const create = mutation({
     mimeType: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     // Get the current max sortOrder for this product
     const existingFiles = await ctx.db
       .query("productFiles")
@@ -70,6 +74,7 @@ export const remove = mutation({
     id: v.id("productFiles"),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const file = await ctx.db.get(args.id);
     if (!file) throw new Error("File not found");
 
@@ -87,6 +92,7 @@ export const updateSortOrder = mutation({
     sortOrder: v.number(),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const file = await ctx.db.get(args.id);
     if (!file) throw new Error("File not found");
 

@@ -18,7 +18,6 @@ import {
   Package,
   ShieldCheck,
 } from "lucide-react";
-import type { Id } from "@convex/_generated/dataModel";
 
 export default function DownloadPage({
   params,
@@ -36,8 +35,8 @@ export default function DownloadPage({
 
   const productFiles = useQuery(
     api.files.getByProduct,
-    purchase?.product
-      ? { productId: purchase.product._id }
+    purchase?.product && token
+      ? { downloadToken: token }
       : "skip"
   );
 
@@ -148,12 +147,12 @@ export default function DownloadPage({
               </p>
             ) : (
               <div className="space-y-2">
-                {productFiles.map((file: { _id: string; displayName: string; fileSize: number; storageId: Id<"_storage"> }) => (
-                  <DownloadFileItem
+                {productFiles.map((file) => (
+                  <DownloadButton
                     key={file._id}
                     fileName={file.displayName}
                     fileSize={file.fileSize}
-                    storageId={file.storageId}
+                    downloadUrl={file.downloadUrl ?? undefined}
                   />
                 ))}
               </div>
@@ -175,25 +174,5 @@ export default function DownloadPage({
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-function DownloadFileItem({
-  fileName,
-  fileSize,
-  storageId,
-}: {
-  fileName: string;
-  fileSize: number;
-  storageId: Id<"_storage">;
-}) {
-  const downloadUrl = useQuery(api.files.getDownloadUrl, { storageId });
-
-  return (
-    <DownloadButton
-      fileName={fileName}
-      fileSize={fileSize}
-      downloadUrl={downloadUrl ?? undefined}
-    />
   );
 }

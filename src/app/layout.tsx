@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, IBM_Plex_Sans } from "next/font/google";
 import { Providers } from "@/lib/convex";
 import { PostHogProvider } from "@/lib/posthog";
@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   icons: process.env.NEXT_PUBLIC_BRAND_LOGO
     ? { icon: process.env.NEXT_PUBLIC_BRAND_LOGO }
     : { icon: "/icon.svg", shortcut: "/icon.svg" },
+};
+
+export const viewport: Viewport = {
   themeColor: "#2d6a4f",
 };
 

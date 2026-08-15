@@ -1,0 +1,48 @@
+import { normalizeAtlasTier, type AtlasTier } from "./usagePolicyLogic";
+
+const FREE_WORK = new Set([
+  "idea_capture",
+  "brief_analysis",
+  "competitor_discovery",
+  "assumptions_unknowns",
+  "market_feasibility",
+  "preliminary_prior_art",
+]);
+
+const INVENTOR_WORK = new Set([
+  ...FREE_WORK,
+  "technical_feasibility",
+  "materials_manufacturing",
+  "regulatory_screening",
+  "ip_readiness",
+  "feature_prior_art_comparison",
+  "distinguishing_features",
+  "product_requirements",
+  "preliminary_bom_cost",
+  "development_risks",
+  "evidence_verification",
+  "feasibility_recommendation",
+]);
+
+const PRO_WORK = new Set([
+  ...INVENTOR_WORK,
+  "design_directions",
+  "concept_image_generation",
+  "engineering_handoff",
+  "package_assembly",
+]);
+
+export function canTierRunWorkKind(tier: unknown, kind: string | undefined): boolean {
+  if (!kind) return false;
+  const normalized = normalizeAtlasTier(tier);
+  if (normalized === "enterprise" || normalized === "pro") return PRO_WORK.has(kind);
+  if (normalized === "inventor") return INVENTOR_WORK.has(kind);
+  return FREE_WORK.has(kind);
+}
+
+export function minimumTierForWorkKind(kind: string): AtlasTier | null {
+  if (FREE_WORK.has(kind)) return "free";
+  if (INVENTOR_WORK.has(kind)) return "inventor";
+  if (PRO_WORK.has(kind)) return "pro";
+  return null;
+}

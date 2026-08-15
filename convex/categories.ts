@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./authHelpers";
 
 function generateSlug(name: string): string {
   return name
@@ -42,6 +43,7 @@ export const create = mutation({
     name: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const name = args.name.trim();
     if (!name) throw new Error("Category name is required");
 
@@ -74,6 +76,7 @@ export const update = mutation({
     name: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const category = await ctx.db.get(args.id);
     if (!category) throw new Error("Category not found");
 
@@ -100,6 +103,7 @@ export const remove = mutation({
     id: v.id("categories"),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const category = await ctx.db.get(args.id);
     if (!category) throw new Error("Category not found");
 

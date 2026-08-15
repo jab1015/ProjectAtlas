@@ -13,7 +13,7 @@ const FAQ_ITEMS = [
   {
     question: "What is Atlas?",
     answer:
-      "Atlas is the operating system for inventors. It guides you through all 15 stages of the invention journey — from idea capture and validation through patent readiness, product design, manufacturing, branding, launch, and growth — one step at a time, all the way to market.",
+      "Atlas is an autonomous invention-development assistant. The controlled-pilot release focuses on idea capture, feasibility, preliminary prior-art research, and IP-readiness preparation. Later product-development and market stages remain on the roadmap.",
   },
   {
     question: "Who is Atlas for?",
@@ -23,12 +23,12 @@ const FAQ_ITEMS = [
   {
     question: "How does Atlas work?",
     answer:
-      "When you create an account, you start by capturing your invention idea. Atlas then guides you through a series of structured stages, each one building on the last. At every point, Atlas tells you exactly what to do next — so you're never staring at a blank screen wondering where to start.",
+      "You capture the invention once. Atlas creates a structured record, runs useful work in dependency order, shows its evidence and limitations, and pauses only for a decision, authorization, private information, professional review, payment, or physical-world action that genuinely requires you.",
   },
   {
     question: "Is my invention private?",
     answer:
-      "Yes. Your invention information is stored securely and is only accessible to you. Atlas does not share, sell, or distribute your invention details to any third party.",
+      "Atlas uses authenticated, owner-scoped workspaces and does not authorize external sharing without your approval. Like any hosted service, approved infrastructure and AI processors may handle data to provide the service; final privacy terms and the pilot data-processing review must be completed before public launch.",
   },
   {
     question: "Who owns my invention?",
@@ -38,22 +38,22 @@ const FAQ_ITEMS = [
   {
     question: "Do I need a patent before using Atlas?",
     answer:
-      "No. Atlas guides you through the entire pre-patent process. By the time you complete Stage 4, you'll have the research and documentation you need to move forward with IP protection — that comes in a later stage.",
+      "No. Atlas can prepare a preliminary prior-art landscape and an organized patent-professional handoff. It does not determine patentability, freedom to operate, validity, or infringement, and it does not replace a patent professional.",
   },
   {
     question: "What does the Explorer plan include?",
     answer:
-      "The Explorer plan is free and includes idea capture, competitive research, patent research, and 1 active invention. It gives you the foundation you need before upgrading into validation, market research, design, legal, and launch support.",
+      "Explorer is free for one active invention and includes a limited feasibility preview, 25 autonomous cost units per day, and 30 Ask Atlas questions per day. Research remains draft until it passes the applicable evidence checks.",
   },
   {
     question: "What is the Inventor plan?",
     answer:
-      "Inventor is $39/month and includes 3 active inventions, 10 AI tasks/day, 150 credits/month, validation and market research, document upload/download, and agent chat. It does not include design or legal features.",
+      "The current Inventor pricing hypothesis is $39/month for 3 active inventions, 125 autonomous cost units per day, 100 Ask Atlas questions per day, and the feasibility/IP-readiness workspace. Pricing remains subject to controlled-pilot validation.",
   },
   {
     question: "What do Pro and Enterprise add?",
     answer:
-      "Pro is $79/month and adds legal paperwork, patent drafts, contracts, pitch decks, logo and branding, product design, manufacturing outreach, and investor outreach for up to 10 active inventions. Enterprise is $149/month and adds unlimited usage, CAD, explosion blueprints, team workspaces, and API access.",
+      "The current Pro and Enterprise hypotheses provide larger but bounded research budgets, more active inventions, deeper preparation, and professional collaboration as those capabilities are released. Professional services are separately authorized and priced. No plan includes unlimited expensive AI work, automatic legal approval, or production-ready CAD by default.",
   },
   {
     question: "Can I cancel anytime?",
@@ -63,7 +63,7 @@ const FAQ_ITEMS = [
   {
     question: "What happens after Patent Readiness?",
     answer:
-      "Patent readiness is Stage 4 of 15 — a major milestone, but not the finish line. After Stage 4, you move into product development, IP protection, manufacturing, branding, funding, and launch. Stages 5 through 15 are available with Pro and guide you all the way to market.",
+      "The feasibility and IP-readiness package ends with a transparent proceed, revise, pause, or do-not-invest-yet recommendation. Product design, prototyping, professional IP work, manufacturing, funding, and launch remain later roadmap capabilities and require additional human or professional involvement.",
   },
 ];
 

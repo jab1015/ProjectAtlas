@@ -25,11 +25,49 @@ export default defineSchema({
         v.literal("inventor_pro")
       )
     ),
+    subscriptionStatus: v.optional(v.union(
+      v.literal("trialing"), v.literal("active"), v.literal("past_due"), v.literal("canceled"),
+      v.literal("unpaid"), v.literal("incomplete"), v.literal("paused")
+    )),
+    subscriptionId: v.optional(v.string()),
+    billingCustomerId: v.optional(v.string()),
+    subscriptionCurrentPeriodEnd: v.optional(v.number()),
+    subscriptionUpdatedAt: v.optional(v.number()),
     // Extension point: Inventor Twin
     inventorTwin: v.optional(v.null()),
   })
     .index("email", ["email"])
     .index("by_role", ["role"]),
+
+  subscriptionEvents: defineTable({
+    providerEventId: v.string(),
+    customerEmail: v.string(),
+    tier: v.union(v.literal("inventor"), v.literal("pro"), v.literal("enterprise")),
+    status: v.union(
+      v.literal("trialing"), v.literal("active"), v.literal("past_due"), v.literal("canceled"),
+      v.literal("unpaid"), v.literal("incomplete"), v.literal("paused")
+    ),
+    subscriptionId: v.optional(v.string()),
+    billingCustomerId: v.optional(v.string()),
+    currentPeriodEnd: v.optional(v.number()),
+    occurredAt: v.number(),
+    appliedUserId: v.optional(v.id("users")),
+    receivedAt: v.number(),
+  })
+    .index("by_providerEventId", ["providerEventId"])
+    .index("by_customerEmail", ["customerEmail"]),
+
+  privacyRequests: defineTable({
+    userId: v.id("users"),
+    requestType: v.union(v.literal("data_export"), v.literal("account_deletion")),
+    status: v.union(v.literal("pending"), v.literal("in_progress"), v.literal("completed"), v.literal("declined")),
+    requestedAt: v.number(),
+    completedAt: v.optional(v.number()),
+    resolutionNotes: v.optional(v.string()),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_userId_status", ["userId", "status"])
+    .index("by_status", ["status"]),
 
   // ── Atlas: Inventions ────────────────────────────────────────────────────────
   inventions: defineTable({
@@ -46,7 +84,352 @@ export default defineSchema({
     organizationId: v.optional(v.string()),
   })
     .index("by_userId", ["userId"])
-    .index("by_userId_status", ["userId", "status"]),
+    .index("by_userId_status", ["userId", "status"])
+    .index("by_status", ["status"]),
+
+  // Canonical structured memory for an invention. Chat and generated
+  // deliverables read from this record instead of treating conversation
+  // history as the source of truth.
+  inventionRecords: defineTable({
+    inventionId: v.id("inventions"),
+    userId: v.id("users"),
+    schemaVersion: v.number(),
+    lifecycleStatus: v.union(
+      v.literal("intake"),
+      v.literal("researching"),
+      v.literal("awaiting_decision"),
+      v.literal("awaiting_review"),
+      v.literal("ready"),
+      v.literal("paused"),
+      v.literal("closed")
+    ),
+    riskClass: v.union(
+      v.literal("standard"),
+      v.literal("restricted"),
+      v.literal("professional_review_required")
+    ),
+    structuredBrief: v.optional(v.any()),
+    currentRecommendation: v.optional(
+      v.union(
+        v.literal("proceed"),
+        v.literal("proceed_with_changes"),
+        v.literal("pause"),
+        v.literal("do_not_invest_yet")
+      )
+    ),
+    recommendationRationale: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_inventionId", ["inventionId"])
+    .index("by_userId", ["userId"])
+    .index("by_userId_lifecycleStatus", ["userId", "lifecycleStatus"]),
+
+  evidenceSources: defineTable({
+    inventionId: v.id("inventions"),
+    sourceType: v.union(
+      v.literal("inventor_statement"),
+      v.literal("patent"),
+      v.literal("patent_application"),
+      v.literal("product"),
+      v.literal("publication"),
+      v.literal("regulation"),
+      v.literal("standard"),
+      v.literal("market_data"),
+      v.literal("professional_input"),
+      v.literal("other")
+    ),
+    title: v.string(),
+    locator: v.optional(v.string()),
+    publisher: v.optional(v.string()),
+    jurisdiction: v.optional(v.string()),
+    publishedAt: v.optional(v.number()),
+    accessedAt: v.number(),
+    excerpt: v.optional(v.string()),
+    reliability: v.union(
+      v.literal("primary"),
+      v.literal("authoritative_secondary"),
+      v.literal("secondary"),
+      v.literal("unverified")
+    ),
+    metadata: v.optional(v.any()),
+    createdAt: v.number(),
+  })
+    .index("by_inventionId", ["inventionId"])
+    .index("by_inventionId_sourceType", ["inventionId", "sourceType"]),
+
+  evidenceFindings: defineTable({
+    inventionId: v.id("inventions"),
+    statement: v.string(),
+    kind: v.union(
+      v.literal("sourced_fact"),
+      v.literal("inventor_statement"),
+      v.literal("estimate"),
+      v.literal("ai_inference")
+    ),
+    confidence: v.number(),
+    sourceIds: v.array(v.id("evidenceSources")),
+    assumptions: v.array(v.string()),
+    limitations: v.array(v.string()),
+    status: v.union(
+      v.literal("draft"),
+      v.literal("evidence_checked"),
+      v.literal("disputed"),
+      v.literal("stale")
+    ),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_inventionId", ["inventionId"])
+    .index("by_inventionId_status", ["inventionId", "status"]),
+
+  inventionAssumptions: defineTable({
+    inventionId: v.id("inventions"),
+    statement: v.string(),
+    impact: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    status: v.union(
+      v.literal("untested"),
+      v.literal("testing"),
+      v.literal("supported"),
+      v.literal("refuted"),
+      v.literal("accepted_risk")
+    ),
+    evidenceFindingIds: v.array(v.id("evidenceFindings")),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_inventionId", ["inventionId"])
+    .index("by_inventionId_status", ["inventionId", "status"]),
+
+  inventionDecisions: defineTable({
+    inventionId: v.id("inventions"),
+    title: v.string(),
+    question: v.string(),
+    options: v.array(v.any()),
+    recommendedOptionKey: v.optional(v.string()),
+    selectedOptionKey: v.optional(v.string()),
+    rationale: v.optional(v.string()),
+    status: v.union(
+      v.literal("open"),
+      v.literal("approved"),
+      v.literal("rejected"),
+      v.literal("superseded")
+    ),
+    decidedByUserId: v.optional(v.id("users")),
+    decidedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_inventionId", ["inventionId"])
+    .index("by_inventionId_status", ["inventionId", "status"]),
+
+  approvalRequests: defineTable({
+    inventionId: v.id("inventions"),
+    decisionId: v.optional(v.id("inventionDecisions")),
+    actionType: v.union(
+      v.literal("share_confidential_information"),
+      v.literal("contact_third_party"),
+      v.literal("publish_or_disclose"),
+      v.literal("purchase_or_fee"),
+      v.literal("submit_or_file"),
+      v.literal("external_use"),
+      v.literal("other")
+    ),
+    summary: v.string(),
+    consequences: v.array(v.string()),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("approved"),
+      v.literal("denied"),
+      v.literal("expired"),
+      v.literal("cancelled")
+    ),
+    requestedAt: v.number(),
+    resolvedAt: v.optional(v.number()),
+    resolvedByUserId: v.optional(v.id("users")),
+  })
+    .index("by_inventionId", ["inventionId"])
+    .index("by_inventionId_status", ["inventionId", "status"]),
+
+  atlasWorkItems: defineTable({
+    inventionId: v.id("inventions"),
+    kind: v.string(),
+    title: v.string(),
+    status: v.union(
+      v.literal("queued"),
+      v.literal("running"),
+      v.literal("blocked"),
+      v.literal("awaiting_approval"),
+      v.literal("completed"),
+      v.literal("failed"),
+      v.literal("cancelled"),
+      v.literal("stale")
+    ),
+    priority: v.number(),
+    inputSnapshot: v.optional(v.any()),
+    outputSummary: v.optional(v.string()),
+    blockedReason: v.optional(v.string()),
+    attemptCount: v.number(),
+    estimatedCostUnits: v.optional(v.number()),
+    reservedCostUnits: v.optional(v.number()),
+    reservationDateKey: v.optional(v.string()),
+    actualCostUnits: v.optional(v.number()),
+    maxAttempts: v.optional(v.number()),
+    claimedAt: v.optional(v.number()),
+    leaseExpiresAt: v.optional(v.number()),
+    lastError: v.optional(v.string()),
+    deliverableKind: v.optional(v.string()),
+    dependsOnKinds: v.optional(v.array(v.string())),
+    humanGateType: v.optional(
+      v.union(
+        v.literal("decision"),
+        v.literal("authorization"),
+        v.literal("private_information"),
+        v.literal("professional_review"),
+        v.literal("payment"),
+        v.literal("physical_work")
+      )
+    ),
+    createdAt: v.number(),
+    startedAt: v.optional(v.number()),
+    completedAt: v.optional(v.number()),
+    updatedAt: v.number(),
+  })
+    .index("by_inventionId", ["inventionId"])
+    .index("by_inventionId_status", ["inventionId", "status"])
+    .index("by_status_priority", ["status", "priority"]),
+
+  atlasExecutionEvents: defineTable({
+    inventionId: v.id("inventions"),
+    workItemId: v.optional(v.id("atlasWorkItems")),
+    eventType: v.union(
+      v.literal("work_queued"),
+      v.literal("work_claimed"),
+      v.literal("work_completed"),
+      v.literal("work_failed"),
+      v.literal("work_blocked"),
+      v.literal("inventor_input_received"),
+      v.literal("approval_resolved"),
+      v.literal("decision_resolved"),
+      v.literal("chat_requested"),
+      v.literal("chat_answered"),
+      v.literal("chat_failed"),
+      v.literal("invention_changed"),
+      v.literal("professional_review_recorded")
+    ),
+    actorType: v.union(v.literal("atlas"), v.literal("inventor"), v.literal("system")),
+    summary: v.string(),
+    attemptNumber: v.optional(v.number()),
+    costUnits: v.optional(v.number()),
+    metadata: v.optional(v.any()),
+    createdAt: v.number(),
+  })
+    .index("by_inventionId", ["inventionId"])
+    .index("by_workItemId", ["workItemId"])
+    .index("by_inventionId_createdAt", ["inventionId", "createdAt"]),
+
+  atlasDailyUsage: defineTable({
+    userId: v.id("users"),
+    dateKey: v.string(),
+    autonomousCostUnits: v.number(),
+    reservedAutonomousCostUnits: v.optional(v.number()),
+    completedWorkItems: v.number(),
+    chatQuestions: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_userId_dateKey", ["userId", "dateKey"]),
+
+  atlasDeliverables: defineTable({
+    inventionId: v.id("inventions"),
+    workItemId: v.optional(v.id("atlasWorkItems")),
+    kind: v.string(),
+    title: v.string(),
+    version: v.number(),
+    trustState: v.union(
+      v.literal("atlas_draft"),
+      v.literal("evidence_checked"),
+      v.literal("inventor_approved"),
+      v.literal("professional_review_required"),
+      v.literal("professionally_reviewed"),
+      v.literal("ready_for_authorized_use")
+    ),
+    content: v.optional(v.any()),
+    storageId: v.optional(v.id("_storage")),
+    mediaType: v.optional(v.string()),
+    artifactMaturity: v.optional(
+      v.union(
+        v.literal("concept_visualization"),
+        v.literal("preliminary_cad"),
+        v.literal("prototype_candidate"),
+        v.literal("engineering_reviewed"),
+        v.literal("manufacturing_released")
+      )
+    ),
+    generationPrompt: v.optional(v.string()),
+    sourceIds: v.array(v.id("evidenceSources")),
+    assumptions: v.array(v.string()),
+    limitations: v.array(v.string()),
+    sourceCoverage: v.optional(v.number()),
+    confidence: v.optional(v.number()),
+    searchDate: v.optional(v.number()),
+    missingInformation: v.optional(v.array(v.string())),
+    staleReason: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_inventionId", ["inventionId"])
+    .index("by_inventionId_kind", ["inventionId", "kind"])
+    .index("by_inventionId_trustState", ["inventionId", "trustState"]),
+
+  deliverableDependencies: defineTable({
+    inventionId: v.id("inventions"),
+    deliverableId: v.id("atlasDeliverables"),
+    dependencyType: v.union(
+      v.literal("decision"),
+      v.literal("finding"),
+      v.literal("assumption"),
+      v.literal("deliverable")
+    ),
+    dependencyId: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_inventionId", ["inventionId"])
+    .index("by_deliverableId", ["deliverableId"])
+    .index("by_dependency", ["dependencyType", "dependencyId"]),
+
+  professionalReviews: defineTable({
+    inventionId: v.id("inventions"),
+    deliverableId: v.id("atlasDeliverables"),
+    specialty: v.union(
+      v.literal("patent"),
+      v.literal("contracts"),
+      v.literal("engineering"),
+      v.literal("regulatory"),
+      v.literal("finance"),
+      v.literal("other")
+    ),
+    requiredCredentials: v.string(),
+    scope: v.string(),
+    status: v.union(
+      v.literal("required"),
+      v.literal("requested"),
+      v.literal("in_review"),
+      v.literal("changes_requested"),
+      v.literal("accepted"),
+      v.literal("declined")
+    ),
+    reviewerName: v.optional(v.string()),
+    reviewerReference: v.optional(v.string()),
+    notes: v.optional(v.string()),
+    requestedAt: v.optional(v.number()),
+    reviewedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_inventionId", ["inventionId"])
+    .index("by_deliverableId", ["deliverableId"])
+    .index("by_inventionId_status", ["inventionId", "status"]),
 
   // ── Atlas: Stage Progress ────────────────────────────────────────────────────
   stageProgress: defineTable({
@@ -68,6 +451,19 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_inventionId", ["inventionId"]),
+
+  conversationMessages: defineTable({
+    conversationId: v.id("conversations"),
+    inventionId: v.id("inventions"),
+    role: v.union(v.literal("user"), v.literal("assistant")),
+    content: v.string(),
+    status: v.union(v.literal("pending"), v.literal("complete"), v.literal("failed")),
+    error: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_conversationId", ["conversationId"])
+    .index("by_inventionId", ["inventionId"]),
 
   // ── Extension point: Document upload / file storage ────────────────────────
   documents: defineTable({

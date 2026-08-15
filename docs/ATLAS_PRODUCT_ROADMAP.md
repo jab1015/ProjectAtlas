@@ -1,4 +1,6 @@
 # Atlas Product Roadmap
+
+> **Delivery note (August 14, 2026):** This is the complete long-range journey roadmap. The controlled-pilot release is intentionally limited to Idea through Feasibility and IP Readiness as defined in `ATLAS_PRODUCT_RESET_V1.md`. Current build evidence and completion percentage are maintained in `ATLAS_BUILD_PROGRESS.md`.
 ## From Idea to Market — The Complete Inventor Journey
 
 ---

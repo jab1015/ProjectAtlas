@@ -16,7 +16,7 @@ export const ACTIVE_INVENTION_LIMITS: Record<SubscriptionTier, number> = {
   free: 1,
   inventor: 3,
   pro: 10,
-  enterprise: Number.POSITIVE_INFINITY,
+  enterprise: 25,
 };
 
 export function normalizeSubscriptionTier(tier: unknown): SubscriptionTier {

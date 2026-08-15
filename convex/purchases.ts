@@ -1,5 +1,8 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { ConvexError } from "convex/values";
+import { isAdmin, requireAdmin } from "./authHelpers";
 
 export const getByToken = query({
   args: { downloadToken: v.string() },
@@ -15,13 +18,22 @@ export const getByToken = query({
 
     const product = await ctx.db.get(purchase.productId);
 
-    return { ...purchase, product };
+    return {
+      _id: purchase._id,
+      customerEmail: purchase.customerEmail,
+      amountCents: purchase.amountCents,
+      currency: purchase.currency,
+      fulfillmentStatus: purchase.fulfillmentStatus,
+      createdAt: purchase.createdAt,
+      product,
+    };
   },
 });
 
 export const getByEmail = query({
   args: { email: v.string() },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const purchases = await ctx.db
       .query("purchases")
       .withIndex("by_customerEmail", (q) =>
@@ -46,6 +58,10 @@ export const getByEmail = query({
 export const getByUserId = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId || (currentUserId !== args.userId && !(await isAdmin(ctx)))) {
+      throw new ConvexError("Not authorized");
+    }
     const purchases = await ctx.db
       .query("purchases")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
@@ -67,6 +83,7 @@ export const getByUserId = query({
 export const getRecent = query({
   args: {},
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     const purchases = await ctx.db
       .query("purchases")
       .order("desc")
@@ -86,6 +103,7 @@ export const getRecent = query({
 export const listAll = query({
   args: {},
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     const purchases = await ctx.db.query("purchases").collect();
 
     const purchasesWithProduct = await Promise.all(
@@ -108,6 +126,7 @@ export const listAll = query({
 export const getStats = query({
   args: {},
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     const allPurchases = await ctx.db.query("purchases").collect();
 
     const totalRevenue = allPurchases.reduce(

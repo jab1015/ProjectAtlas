@@ -1,5 +1,7 @@
 # ATLAS AUTOMATION IMPLEMENTATION PLAN
 
+> **Current-state notice (August 14, 2026):** This document remains the long-range automation reference, but its July 2026 current-state assessment is historical. Active implementation scope is governed by `ATLAS_PRODUCT_RESET_V1.md`, and verified progress is tracked in `ATLAS_BUILD_PROGRESS.md`.
+
 > **Version 1.0 | July 2026**
 > **Classification: Internal Engineering Reference**
 > **Source of Truth: `.agent/architecture-decisions.md` · `docs/ATLAS_AUTOMATION_CONSTITUTION.md` · `docs/FOUNDER_REFERENCE_PROJECT_RISE_JARS_PART_D.md`**

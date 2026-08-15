@@ -10,6 +10,7 @@ import { v, ConvexError } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
+import { materiallyChanged, shouldRequeueWorkKind, staleReasonForField } from "./stalenessLogic";
 
 // ── Stage Configuration (single source of truth) ────────────────────────────
 
@@ -217,6 +218,232 @@ export const createInvention = mutation({
       status: "active",
     });
 
+    await ctx.db.insert("inventionRecords", {
+      inventionId,
+      userId,
+      schemaVersion: 1,
+      lifecycleStatus: "intake",
+      riskClass: "standard",
+      structuredBrief: {
+        title: args.title,
+        problemStatement: args.problemStatement,
+        targetAudience: args.targetAudience,
+        solutionDescription: args.solutionDescription,
+      },
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    await ctx.db.insert("atlasWorkItems", {
+      inventionId,
+      kind: "idea_capture",
+      title: "Capture the invention brief",
+      status: "completed",
+      priority: 100,
+      outputSummary: "Atlas created the first structured record of the invention.",
+      attemptCount: 1,
+      createdAt: now,
+      startedAt: now,
+      completedAt: now,
+      updatedAt: now,
+    });
+
+    const followOnWork = [
+      {
+        kind: "assumptions_unknowns",
+        title: "Build the assumptions and unknowns register",
+        priority: 75,
+        estimatedCostUnits: 8,
+        deliverableKind: "assumptions_unknowns_register",
+        dependsOnKinds: ["brief_analysis"],
+      },
+      {
+        kind: "market_feasibility",
+        title: "Assess market feasibility and demand signals",
+        priority: 70,
+        estimatedCostUnits: 15,
+        deliverableKind: "market_feasibility_report",
+        dependsOnKinds: ["brief_analysis", "competitor_discovery"],
+      },
+      {
+        kind: "preliminary_prior_art",
+        title: "Build a preliminary prior-art landscape",
+        priority: 65,
+        estimatedCostUnits: 18,
+        deliverableKind: "preliminary_prior_art_landscape",
+        dependsOnKinds: ["brief_analysis"],
+      },
+      {
+        kind: "technical_feasibility",
+        title: "Assess technical feasibility and product risks",
+        priority: 60,
+        estimatedCostUnits: 12,
+        deliverableKind: "technical_feasibility_assessment",
+        dependsOnKinds: ["brief_analysis"],
+      },
+      {
+        kind: "materials_manufacturing",
+        title: "Research materials and manufacturing approaches",
+        priority: 50,
+        estimatedCostUnits: 15,
+        deliverableKind: "materials_manufacturing_assessment",
+        dependsOnKinds: ["technical_feasibility", "preliminary_prior_art"],
+      },
+      {
+        kind: "regulatory_screening",
+        title: "Screen potentially applicable regulatory requirements",
+        priority: 45,
+        estimatedCostUnits: 15,
+        deliverableKind: "regulatory_readiness_screening",
+        dependsOnKinds: ["technical_feasibility"],
+      },
+      {
+        kind: "ip_readiness",
+        title: "Prepare the patent-professional readiness brief",
+        priority: 40,
+        estimatedCostUnits: 12,
+        deliverableKind: "ip_readiness_brief",
+        dependsOnKinds: ["preliminary_prior_art", "technical_feasibility"],
+      },
+      {
+        kind: "feature_prior_art_comparison",
+        title: "Compare proposed features with the prior-art landscape",
+        priority: 58,
+        estimatedCostUnits: 12,
+        deliverableKind: "feature_prior_art_comparison",
+        dependsOnKinds: ["preliminary_prior_art", "technical_feasibility"],
+      },
+      {
+        kind: "distinguishing_features",
+        title: "Develop distinguishing feature hypotheses and alternative embodiments",
+        priority: 56,
+        estimatedCostUnits: 10,
+        deliverableKind: "distinguishing_features_alternative_embodiments",
+        dependsOnKinds: ["feature_prior_art_comparison"],
+      },
+      {
+        kind: "product_requirements",
+        title: "Draft the initial product requirements",
+        priority: 48,
+        estimatedCostUnits: 12,
+        deliverableKind: "initial_product_requirements",
+        dependsOnKinds: ["market_feasibility", "technical_feasibility", "distinguishing_features"],
+      },
+      {
+        kind: "design_directions",
+        title: "Prepare preliminary product design directions",
+        priority: 43,
+        estimatedCostUnits: 14,
+        deliverableKind: "product_design_directions",
+        dependsOnKinds: ["product_requirements", "materials_manufacturing"],
+      },
+      {
+        kind: "preliminary_bom_cost",
+        title: "Prepare a preliminary bill of materials and cost range",
+        priority: 42,
+        estimatedCostUnits: 14,
+        deliverableKind: "preliminary_bom_cost_range",
+        dependsOnKinds: ["product_requirements", "materials_manufacturing"],
+      },
+      {
+        kind: "concept_image_generation",
+        title: "Generate a concept visualization board",
+        priority: 41,
+        estimatedCostUnits: 30,
+        deliverableKind: "concept_visualization_board",
+        dependsOnKinds: ["design_directions"],
+      },
+      {
+        kind: "development_risks",
+        title: "Map development risks, costs, and dependencies",
+        priority: 38,
+        estimatedCostUnits: 10,
+        deliverableKind: "development_risks_costs_dependencies",
+        dependsOnKinds: ["market_feasibility", "preliminary_bom_cost", "regulatory_screening"],
+      },
+      {
+        kind: "engineering_handoff",
+        title: "Prepare the engineering professional handoff brief",
+        priority: 36,
+        estimatedCostUnits: 10,
+        deliverableKind: "engineering_handoff_brief",
+        dependsOnKinds: ["product_requirements", "preliminary_bom_cost", "development_risks"],
+      },
+      {
+        kind: "evidence_verification",
+        title: "Verify material sources and claim support",
+        priority: 35,
+        estimatedCostUnits: 18,
+        deliverableKind: "evidence_verification_report",
+        dependsOnKinds: ["assumptions_unknowns", "ip_readiness", "development_risks"],
+      },
+      {
+        kind: "feasibility_recommendation",
+        title: "Prepare the proceed, revise, pause, or stop recommendation",
+        priority: 30,
+        estimatedCostUnits: 10,
+        deliverableKind: "feasibility_recommendation",
+        dependsOnKinds: ["ip_readiness", "evidence_verification"],
+      },
+      {
+        kind: "package_assembly",
+        title: "Assemble the invention feasibility and development package",
+        priority: 20,
+        estimatedCostUnits: 16,
+        deliverableKind: "invention_feasibility_development_package",
+        dependsOnKinds: ["feasibility_recommendation"],
+      },
+    ];
+
+    for (const item of followOnWork) {
+      await ctx.db.insert("atlasWorkItems", {
+        inventionId,
+        ...item,
+        status: "queued",
+        attemptCount: 0,
+        maxAttempts: 3,
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+
+    await ctx.db.insert("atlasWorkItems", {
+      inventionId,
+      kind: "brief_analysis",
+      title: "Analyze the invention brief",
+      status: "queued",
+      priority: 90,
+      attemptCount: 0,
+      maxAttempts: 3,
+      estimatedCostUnits: 8,
+      deliverableKind: "invention_brief_analysis",
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    await ctx.db.insert("atlasWorkItems", {
+      inventionId,
+      kind: "competitor_discovery",
+      title: "Research competing products and alternatives",
+      status: "queued",
+      priority: 80,
+      attemptCount: 0,
+      maxAttempts: 3,
+      estimatedCostUnits: 15,
+      deliverableKind: "competitor_landscape",
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    await ctx.db.insert("atlasExecutionEvents", {
+      inventionId,
+      eventType: "work_queued",
+      actorType: "system",
+      summary: "Atlas created the initial autonomous feasibility and IP-readiness work plan.",
+      metadata: { queuedWorkCount: followOnWork.length + 2 },
+      createdAt: now,
+    });
+
     // Stage 1 is complete: all 4 criteria fulfilled from onboarding
     const stage1Criteria = stageConfig[0].completionCriteria;
     await ctx.db.insert("stageProgress", {
@@ -325,9 +552,53 @@ export const updateInventionField = mutation({
     const invention = await ctx.db.get(inventionId);
     if (!invention || invention.userId !== userId) throw new Error("Not found");
 
+    const previous = invention[field];
+    const now = Date.now();
     await ctx.db.patch(inventionId, {
       [field]: value,
-      updatedAt: Date.now(),
+      updatedAt: now,
+    });
+    if (!materiallyChanged(previous, value)) return;
+
+    const record = await ctx.db.query("inventionRecords").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).unique();
+    if (record) {
+      const structuredBrief = record.structuredBrief && typeof record.structuredBrief === "object"
+        ? record.structuredBrief as Record<string, unknown>
+        : {};
+      await ctx.db.patch(record._id, { structuredBrief: { ...structuredBrief, [field]: value }, updatedAt: now });
+    }
+
+    const reason = staleReasonForField(field);
+    const [deliverables, findings, workItems] = await Promise.all([
+      ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      ctx.db.query("evidenceFindings").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    ]);
+    for (const deliverable of deliverables) {
+      await ctx.db.patch(deliverable._id, { staleReason: reason, updatedAt: now });
+    }
+    for (const finding of findings) {
+      if (finding.status !== "stale") await ctx.db.patch(finding._id, { status: "stale", updatedAt: now });
+    }
+    for (const item of workItems) {
+      if (!shouldRequeueWorkKind(item.kind) || item.status === "running") continue;
+      await ctx.db.patch(item._id, {
+        status: "queued",
+        attemptCount: 0,
+        completedAt: undefined,
+        blockedReason: undefined,
+        humanGateType: undefined,
+        lastError: undefined,
+        updatedAt: now,
+      });
+    }
+    await ctx.db.insert("atlasExecutionEvents", {
+      inventionId,
+      eventType: "invention_changed",
+      actorType: "inventor",
+      summary: `${field} changed; downstream work was marked stale and queued for refresh.`,
+      metadata: { field, staleDeliverables: deliverables.length, staleFindings: findings.length },
+      createdAt: now,
     });
   },
 });
@@ -398,7 +669,7 @@ export const advanceStage = mutation({
 /**
  * Deletes an invention and all owned child records.
  * Only the owning user may call this mutation.
- * Cleans up: stageProgress, conversations, documents, validationResearch, notifications.
+ * Cleans up all legacy and canonical invention-owned records.
  */
 export const deleteInvention = mutation({
   args: { inventionId: v.id("inventions") },
@@ -422,6 +693,14 @@ export const deleteInvention = mutation({
     }
 
     // 2. conversations rows
+    const conversationMessageRows = await ctx.db
+      .query("conversationMessages")
+      .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
+      .collect();
+    for (const row of conversationMessageRows) {
+      await ctx.db.delete(row._id);
+    }
+
     const conversationRows = await ctx.db
       .query("conversations")
       .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
@@ -455,6 +734,52 @@ export const deleteInvention = mutation({
       .collect();
     for (const row of notificationRows) {
       if (row.inventionId === inventionId) {
+        await ctx.db.delete(row._id);
+      }
+    }
+
+    // 6. Canonical Atlas records. Delete dependency rows before deliverables.
+    const generatedMediaRows = await ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+    for (const row of generatedMediaRows) {
+      if (row.storageId) await ctx.storage.delete(row.storageId);
+    }
+
+    const canonicalRowGroups = await Promise.all([
+      ctx.db.query("deliverableDependencies").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      ctx.db.query("atlasExecutionEvents").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      ctx.db.query("professionalReviews").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      ctx.db.query("approvalRequests").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      ctx.db.query("inventionDecisions").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      ctx.db.query("inventionAssumptions").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      ctx.db.query("evidenceFindings").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      ctx.db.query("inventionRecords").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    ]);
+
+    // Return cost reservations held by this invention before its work rows are removed.
+    const reservedByDate = new Map<string, number>();
+    for (const row of canonicalRowGroups[4]) {
+      if (row.reservedCostUnits && row.reservationDateKey) {
+        reservedByDate.set(row.reservationDateKey, (reservedByDate.get(row.reservationDateKey) ?? 0) + row.reservedCostUnits);
+      }
+    }
+    for (const [dateKey, reservedUnits] of reservedByDate) {
+      const usage = await ctx.db
+        .query("atlasDailyUsage")
+        .withIndex("by_userId_dateKey", (q) => q.eq("userId", userId).eq("dateKey", dateKey))
+        .unique();
+      if (usage) {
+        await ctx.db.patch(usage._id, {
+          reservedAutonomousCostUnits: Math.max(0, (usage.reservedAutonomousCostUnits ?? 0) - reservedUnits),
+          updatedAt: Date.now(),
+        });
+      }
+    }
+
+    for (const rows of canonicalRowGroups) {
+      for (const row of rows) {
         await ctx.db.delete(row._id);
       }
     }

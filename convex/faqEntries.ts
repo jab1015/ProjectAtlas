@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./authHelpers";
 
 export const list = query({
   args: {
@@ -37,6 +38,7 @@ export const create = mutation({
     sortOrder: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const entryId = await ctx.db.insert("faqEntries", {
       productId: args.productId,
       question: args.question,
@@ -58,6 +60,7 @@ export const update = mutation({
     sortOrder: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const { id, ...fields } = args;
 
     const entry = await ctx.db.get(id);
@@ -79,6 +82,7 @@ export const update = mutation({
 export const remove = mutation({
   args: { id: v.id("faqEntries") },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const entry = await ctx.db.get(args.id);
     if (!entry) {
       throw new Error(`FAQ entry ${args.id} not found`);

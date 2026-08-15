@@ -1,19 +1,26 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./authHelpers";
 
 export const generateUploadUrl = mutation({
   args: {},
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     return await ctx.storage.generateUploadUrl();
   },
 });
 
 export const getByProduct = query({
-  args: { productId: v.id("products") },
+  args: { downloadToken: v.string() },
   handler: async (ctx, args) => {
+    const purchase = await ctx.db
+      .query("purchases")
+      .withIndex("by_downloadToken", (q) => q.eq("downloadToken", args.downloadToken))
+      .unique();
+    if (!purchase || purchase.fulfillmentStatus !== "fulfilled") return [];
     const files = await ctx.db
       .query("productFiles")
-      .withIndex("by_productId", (q) => q.eq("productId", args.productId))
+      .withIndex("by_productId", (q) => q.eq("productId", purchase.productId))
       .collect();
 
     // Sort by sortOrder, then createdAt
@@ -24,7 +31,14 @@ export const getByProduct = query({
       return a.createdAt - b.createdAt;
     });
 
-    return files;
+    return Promise.all(files.map(async (file) => ({
+      _id: file._id,
+      displayName: file.displayName,
+      fileName: file.fileName,
+      fileSize: file.fileSize,
+      mimeType: file.mimeType,
+      downloadUrl: await ctx.storage.getUrl(file.storageId),
+    })));
   },
 });
 
@@ -39,6 +53,7 @@ export const create = mutation({
     sortOrder: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const fileId = await ctx.db.insert("productFiles", {
       productId: args.productId,
       displayName: args.displayName,
@@ -57,6 +72,7 @@ export const create = mutation({
 export const remove = mutation({
   args: { id: v.id("productFiles") },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const file = await ctx.db.get(args.id);
     if (!file) {
       throw new Error(`ProductFile ${args.id} not found`);
@@ -71,8 +87,15 @@ export const remove = mutation({
 });
 
 export const getDownloadUrl = query({
-  args: { storageId: v.id("_storage") },
+  args: { storageId: v.id("_storage"), downloadToken: v.string() },
   handler: async (ctx, args) => {
+    const purchase = await ctx.db
+      .query("purchases")
+      .withIndex("by_downloadToken", (q) => q.eq("downloadToken", args.downloadToken))
+      .unique();
+    if (!purchase || purchase.fulfillmentStatus !== "fulfilled") return null;
+    const files = await ctx.db.query("productFiles").withIndex("by_productId", (q) => q.eq("productId", purchase.productId)).collect();
+    if (!files.some((file) => file.storageId === args.storageId)) return null;
     return await ctx.storage.getUrl(args.storageId);
   },
 });

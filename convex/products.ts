@@ -1,5 +1,6 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./authHelpers";
 
 export const list = query({
   args: {
@@ -146,6 +147,7 @@ export const getRelated = query({
 export const listAll = query({
   args: {},
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     const products = await ctx.db.query("products").collect();
 
     const productsWithCategory = await Promise.all(
@@ -169,6 +171,7 @@ export const listAll = query({
 export const getById = query({
   args: { id: v.id("products") },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const product = await ctx.db.get(args.id);
     if (!product) return null;
 

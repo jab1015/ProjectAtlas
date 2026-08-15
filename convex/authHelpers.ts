@@ -7,6 +7,7 @@
 import { QueryCtx, MutationCtx } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { query } from "./_generated/server";
+import { ConvexError } from "convex/values";
 
 type AuthCtx = QueryCtx | MutationCtx;
 type SubscriptionTier = "free" | "inventor" | "pro" | "enterprise";
@@ -15,7 +16,7 @@ const ACTIVE_INVENTION_LIMITS: Record<SubscriptionTier, number> = {
   free: 1,
   inventor: 3,
   pro: 10,
-  enterprise: Number.POSITIVE_INFINITY,
+  enterprise: 25,
 };
 
 function normalizeSubscriptionTier(tier: unknown): SubscriptionTier {
@@ -50,6 +51,10 @@ export async function isAdmin(ctx: AuthCtx): Promise<boolean> {
   if (!userId) return false;
   const user = await ctx.db.get(userId);
   return user?.role === "admin";
+}
+
+export async function requireAdmin(ctx: AuthCtx): Promise<void> {
+  if (!(await isAdmin(ctx))) throw new ConvexError("Administrator authorization required");
 }
 
 export async function canAccessStage(ctx: AuthCtx, stageId: number): Promise<boolean> {

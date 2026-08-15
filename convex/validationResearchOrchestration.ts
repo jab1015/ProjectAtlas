@@ -62,7 +62,7 @@ function selectProvider(): ValidationResearchProvider {
   if (!apiKey) {
     throw new Error(
       "[ValidationResearch] OPENAI_API_KEY is not set on this Convex deployment. " +
-      "Set it with: npx convex env set OPENAI_API_KEY <key> --deployment first-lion-585"
+      "Configure it securely in the intended Convex deployment environment."
     );
   }
   const provider = new OpenAIValidationResearchProvider(apiKey);

@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { effectiveTierForSubscription } from "./subscriptionPolicyLogic";
 
 const ADMIN_EMAIL = "jerry.brown1015@gmail.com";
 const ADMIN_SUBSCRIPTION_TIER = "enterprise";
@@ -56,9 +57,21 @@ export const ensureUserProfile = mutation({
       }
     } else {
       if (!user.role) updates.role = "user";
-      const normalizedTier = normalizeSubscriptionTier(user.subscriptionTier);
-      if (!user.subscriptionTier || user.subscriptionTier !== normalizedTier) {
-        updates.subscriptionTier = normalizedTier;
+      const pendingEvents = user.email
+        ? await ctx.db.query("subscriptionEvents").withIndex("by_customerEmail", (q) => q.eq("customerEmail", user.email!)).collect()
+        : [];
+      const latestEvent = pendingEvents.sort((a, b) => b.occurredAt - a.occurredAt)[0];
+      if (latestEvent && latestEvent.occurredAt > (user.subscriptionUpdatedAt ?? 0)) {
+        updates.subscriptionTier = effectiveTierForSubscription(latestEvent.tier, latestEvent.status, latestEvent.currentPeriodEnd, Date.now());
+        updates.subscriptionStatus = latestEvent.status;
+        updates.subscriptionId = latestEvent.subscriptionId;
+        updates.billingCustomerId = latestEvent.billingCustomerId;
+        updates.subscriptionCurrentPeriodEnd = latestEvent.currentPeriodEnd;
+        updates.subscriptionUpdatedAt = latestEvent.occurredAt;
+        await ctx.db.patch(latestEvent._id, { appliedUserId: userId });
+      } else {
+        const normalizedTier = normalizeSubscriptionTier(user.subscriptionTier);
+        if (!user.subscriptionTier || user.subscriptionTier !== normalizedTier) updates.subscriptionTier = normalizedTier;
       }
     }
 
@@ -90,6 +103,8 @@ export const getUserProfile = query({
       name: user.name,
       email: user.email,
       subscriptionTier: normalizeSubscriptionTier(user.subscriptionTier),
+      subscriptionStatus: user.subscriptionStatus ?? (normalizeSubscriptionTier(user.subscriptionTier) === "free" ? "inactive" : "active"),
+      subscriptionCurrentPeriodEnd: user.subscriptionCurrentPeriodEnd,
       activeInventionCount: activeInventions.length,
     };
   },

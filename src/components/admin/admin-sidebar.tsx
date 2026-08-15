@@ -13,6 +13,8 @@ import {
   ArrowLeft,
   Menu,
   X,
+  ShieldCheck,
+  Activity,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -29,6 +31,8 @@ const navItems = [
   { href: "/admin/categories", label: "Categories", icon: FolderOpen },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/customers", label: "Customers", icon: Users },
+  { href: "/admin/privacy", label: "Privacy requests", icon: ShieldCheck },
+  { href: "/admin/operations", label: "Atlas operations", icon: Activity },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 

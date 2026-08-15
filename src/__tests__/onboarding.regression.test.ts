@@ -123,7 +123,7 @@ describe("subscription tier configuration", () => {
     expect(getActiveInventionLimit("free")).toBe(1);
     expect(getActiveInventionLimit("inventor")).toBe(3);
     expect(getActiveInventionLimit("pro")).toBe(10);
-    expect(getActiveInventionLimit("enterprise")).toBe(Number.POSITIVE_INFINITY);
+    expect(getActiveInventionLimit("enterprise")).toBe(25);
   });
 
   it("limits paid stage access to Pro and Enterprise", () => {

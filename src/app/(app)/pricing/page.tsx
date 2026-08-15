@@ -13,8 +13,9 @@ const TIERS = [
     features: [
       "1 active invention",
       "Idea capture",
-      "Competitive research",
-      "Patent research",
+      "25 autonomous cost units/day",
+      "30 Ask Atlas questions/day",
+      "Limited feasibility preview",
     ],
     cta: "Get started free",
     href: "/sign-up",
@@ -24,15 +25,14 @@ const TIERS = [
     name: "Inventor",
     price: "$39",
     cadence: "/month",
-    description: "Research and validate more ideas with Atlas.",
+    description: "Develop a small invention portfolio through feasibility.",
     features: [
       "3 active inventions",
-      "10 AI tasks/day",
-      "150 credits/month",
-      "Validation and market research",
-      "Document upload/download",
-      "Agent chat",
-      "No design or legal features",
+      "125 autonomous cost units/day",
+      "100 Ask Atlas questions/day",
+      "Feasibility and preliminary IP-readiness work",
+      "Evidence and decision ledgers",
+      "Versioned Atlas draft deliverables",
     ],
     cta: "Choose Inventor",
     href: "/sign-up",
@@ -42,16 +42,15 @@ const TIERS = [
     name: "Pro",
     price: "$79",
     cadence: "/month",
-    description: "Move from validated idea to market-ready assets.",
+    description: "Deeper research and professional-ready preparation.",
     features: [
       "10 active inventions",
-      "25 AI tasks/day",
-      "400 credits/month",
-      "Legal team: NDAs, patent drafts, contracts",
-      "Pitch decks",
-      "Logo, branding, and product design",
-      "Manufacturing and investor outreach",
-      "No CAD or blueprints",
+      "350 autonomous cost units/day",
+      "200 Ask Atlas questions/day",
+      "Deeper feasibility and prior-art research",
+      "Professional handoff preparation",
+      "Expanded exports and collaboration as released",
+      "Professional services separately authorized",
     ],
     cta: "Choose Pro",
     href: "/sign-up",
@@ -61,14 +60,14 @@ const TIERS = [
     name: "Enterprise",
     price: "$149",
     cadence: "/month",
-    description: "Unlimited execution for serious invention teams.",
+    description: "The largest bounded workspace for invention programs.",
     features: [
-      "Unlimited active inventions",
-      "Unlimited AI tasks and credits",
-      "CAD: 2D and 3D",
-      "Explosion blueprints",
-      "Team workspaces",
-      "API access",
+      "25 active inventions",
+      "600 autonomous cost units/day",
+      "300 Ask Atlas questions/day",
+      "Priority onboarding and support",
+      "No unlimited expensive operations",
+      "Custom services separately scoped",
     ],
     cta: "Choose Enterprise",
     href: "/sign-up",
@@ -109,10 +108,10 @@ export default function PricingPage() {
               className="text-3xl sm:text-4xl font-bold text-foreground mb-4"
               style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
             >
-              Simple, transparent pricing
+              Bounded plans for measurable progress
             </h1>
             <p className="text-muted-foreground text-lg">
-              Start free. Upgrade when your invention gets serious.
+              Start free. Research and generation are metered so Atlas can work persistently without hidden runaway costs.
             </p>
           </div>
 

@@ -17,7 +17,7 @@
  *   refreshValidationSection    — mark a section for re-generation (no content generation)
  */
 
-import { mutation } from "./_generated/server";
+import { mutation, type MutationCtx } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import type { Id } from "./_generated/dataModel";
@@ -25,6 +25,21 @@ import type { Id } from "./_generated/dataModel";
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+
+async function requireOwnedInvention(ctx: MutationCtx, inventionId: Id<"inventions">) {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) throw new ConvexError("NOT_AUTHENTICATED");
+  const invention = await ctx.db.get(inventionId);
+  if (!invention || invention.userId !== userId) throw new ConvexError("INVENTION_NOT_FOUND");
+  return userId;
+}
+
+async function requireOwnedResearch(ctx: MutationCtx, researchId: Id<"validationResearch">) {
+  const record = await ctx.db.get(researchId);
+  if (!record) throw new ConvexError("RESEARCH_NOT_FOUND");
+  const userId = await requireOwnedInvention(ctx, record.inventionId);
+  return { record, userId };
+}
 
 // ── Section entry type (in-memory only — not imported from types to keep runtime clean) ──
 
@@ -69,6 +84,7 @@ export const triggerValidationResearch = mutation({
     ctx,
     { inventionId, stageId }
   ): Promise<{ status: "existing" | "created"; researchId: Id<"validationResearch"> }> => {
+    await requireOwnedInvention(ctx, inventionId);
     const now = Date.now();
 
     // Check for a completed record within the last 24 hours
@@ -115,10 +131,7 @@ export const approveValidationSection = mutation({
     sectionKey: v.string(),
   },
   handler: async (ctx, { researchId, sectionKey }): Promise<SectionEntry> => {
-    const record = await ctx.db.get(researchId);
-    if (!record) {
-      throw new ConvexError("RESEARCH_NOT_FOUND");
-    }
+    const { record, userId } = await requireOwnedResearch(ctx, researchId);
 
     const sections: SectionsMap = (record.sections as SectionsMap) ?? {};
     const section = sections[sectionKey];
@@ -126,8 +139,7 @@ export const approveValidationSection = mutation({
       throw new ConvexError("SECTION_NOT_FOUND");
     }
 
-    const userId = await getAuthUserId(ctx);
-    const approvedBy: string = userId ?? "system";
+    const approvedBy: string = userId;
     const now = Date.now();
 
     const updatedSection: SectionEntry = {
@@ -167,10 +179,7 @@ export const editValidationSection = mutation({
     ctx,
     { researchId, sectionKey, editedContent }
   ): Promise<SectionEntry> => {
-    const record = await ctx.db.get(researchId);
-    if (!record) {
-      throw new ConvexError("RESEARCH_NOT_FOUND");
-    }
+    const { record, userId } = await requireOwnedResearch(ctx, researchId);
 
     const sections: SectionsMap = (record.sections as SectionsMap) ?? {};
     const section = sections[sectionKey];
@@ -178,8 +187,7 @@ export const editValidationSection = mutation({
       throw new ConvexError("SECTION_NOT_FOUND");
     }
 
-    const userId = await getAuthUserId(ctx);
-    const lastEditedBy: string = userId ?? "system";
+    const lastEditedBy: string = userId;
     const now = Date.now();
 
     // Preserve Atlas-generated content on first edit
@@ -224,10 +232,7 @@ export const refreshValidationSection = mutation({
     sectionKey: v.string(),
   },
   handler: async (ctx, { researchId, sectionKey }): Promise<SectionEntry> => {
-    const record = await ctx.db.get(researchId);
-    if (!record) {
-      throw new ConvexError("RESEARCH_NOT_FOUND");
-    }
+    const { record } = await requireOwnedResearch(ctx, researchId);
 
     const sections: SectionsMap = (record.sections as SectionsMap) ?? {};
     const section = sections[sectionKey];

@@ -1,5 +1,6 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./authHelpers";
 
 function generateSlug(title: string): string {
   return title
@@ -30,6 +31,7 @@ export const create = mutation({
     metaDescription: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const now = Date.now();
     let slug = args.slug || generateSlug(args.title);
 
@@ -92,6 +94,7 @@ export const update = mutation({
     metaDescription: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const { id, ...fields } = args;
 
     const product = await ctx.db.get(id);
@@ -129,6 +132,7 @@ export const remove = mutation({
     id: v.id("products"),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const product = await ctx.db.get(args.id);
     if (!product) {
       throw new Error(`Product ${args.id} not found`);

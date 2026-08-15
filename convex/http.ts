@@ -1,9 +1,17 @@
-import { httpRouter } from "convex/server";
+import { httpRouter, makeFunctionReference } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { auth } from "./auth";
+import { constantTimeEqualAscii, validateFulfillmentPayload } from "./webhookSecurityLogic";
+import { validateSubscriptionWebhookPayload, type SubscriptionStatus } from "./subscriptionPolicyLogic";
 
 const http = httpRouter();
+const MAX_WEBHOOK_BYTES = 64 * 1024;
+const applySubscriptionEvent = makeFunctionReference<"mutation", {
+  providerEventId: string; customerEmail: string; tier: "inventor" | "pro" | "enterprise";
+  status: SubscriptionStatus; subscriptionId?: string; billingCustomerId?: string;
+  currentPeriodEnd?: number; occurredAt: number;
+}, unknown>("subscriptionMutations:applySubscriptionEvent");
 
 // ─── @convex-dev/auth routes ────────────────────────────────────────────────
 auth.addHttpRoutes(http);
@@ -31,7 +39,10 @@ http.route({
       );
     }
 
+    const declaredLength = Number(request.headers.get("content-length") ?? 0);
+    if (declaredLength > MAX_WEBHOOK_BYTES) return new Response(JSON.stringify({ error: "Payload too large" }), { status: 413, headers: { "Content-Type": "application/json" } });
     const bodyText = await request.text();
+    if (bodyText.length > MAX_WEBHOOK_BYTES) return new Response(JSON.stringify({ error: "Payload too large" }), { status: 413, headers: { "Content-Type": "application/json" } });
 
     // Use Web Crypto API for HMAC verification (works in Convex runtime)
     const encoder = new TextEncoder();
@@ -51,22 +62,23 @@ http.route({
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
 
-    if (signature !== expectedSignature) {
+    if (!constantTimeEqualAscii(signature.toLowerCase(), expectedSignature)) {
       return new Response(
         JSON.stringify({ error: "Invalid signature" }),
         { status: 401, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    const body = JSON.parse(bodyText) as {
-      orderId: string;
-      productId: string;
-      customerEmail: string;
-      customerName?: string;
-      amountCents: number;
-      currency: string;
-      stripeCheckoutSessionId?: string;
-    };
+    let parsedBody: unknown;
+    try {
+      parsedBody = JSON.parse(bodyText);
+    } catch {
+      return new Response(JSON.stringify({ error: "Malformed JSON" }), { status: 400, headers: { "Content-Type": "application/json" } });
+    }
+    const body = validateFulfillmentPayload(parsedBody);
+    if (!body) {
+      return new Response(JSON.stringify({ error: "Invalid fulfillment payload" }), { status: 400, headers: { "Content-Type": "application/json" } });
+    }
 
     // Look up the product by platformProductId
     const product = await ctx.runQuery(
@@ -119,6 +131,37 @@ http.route({
   }),
 });
 
+// Signed subscription lifecycle events make Atlas's backend tier authoritative.
+http.route({
+  path: "/api/subscription",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const secret = process.env.ATLAS_SUBSCRIPTION_WEBHOOK_SECRET;
+    if (!secret) return new Response(JSON.stringify({ error: "Subscription webhook secret not configured" }), { status: 500, headers: { "Content-Type": "application/json" } });
+    const signature = request.headers.get("X-Atlas-Subscription-Signature");
+    if (!signature) return new Response(JSON.stringify({ error: "Missing signature" }), { status: 401, headers: { "Content-Type": "application/json" } });
+    const declaredLength = Number(request.headers.get("content-length") ?? 0);
+    if (declaredLength > MAX_WEBHOOK_BYTES) return new Response(JSON.stringify({ error: "Payload too large" }), { status: 413, headers: { "Content-Type": "application/json" } });
+    const bodyText = await request.text();
+    if (bodyText.length > MAX_WEBHOOK_BYTES) return new Response(JSON.stringify({ error: "Payload too large" }), { status: 413, headers: { "Content-Type": "application/json" } });
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey("raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+    const signed = await crypto.subtle.sign("HMAC", key, encoder.encode(bodyText));
+    const expected = Array.from(new Uint8Array(signed)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+    if (!constantTimeEqualAscii(signature.toLowerCase(), expected)) return new Response(JSON.stringify({ error: "Invalid signature" }), { status: 401, headers: { "Content-Type": "application/json" } });
+    let parsed: unknown;
+    try { parsed = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: "Malformed JSON" }), { status: 400, headers: { "Content-Type": "application/json" } }); }
+    const body = validateSubscriptionWebhookPayload(parsed);
+    if (!body) return new Response(JSON.stringify({ error: "Invalid subscription event" }), { status: 400, headers: { "Content-Type": "application/json" } });
+    const result = await ctx.runMutation(applySubscriptionEvent, {
+      providerEventId: body.eventId, customerEmail: body.customerEmail, tier: body.tier, status: body.status,
+      subscriptionId: body.subscriptionId, billingCustomerId: body.customerId,
+      currentPeriodEnd: body.currentPeriodEnd, occurredAt: body.occurredAt,
+    });
+    return new Response(JSON.stringify({ received: true, result }), { status: 200, headers: { "Content-Type": "application/json" } });
+  }),
+});
+
 // ─── Download Endpoint ──────────────────────────────────────────────────────
 
 http.route({
@@ -142,7 +185,7 @@ http.route({
       purchaseId: purchaseId as any,
     });
 
-    if (!purchase || purchase.downloadToken !== token) {
+    if (!purchase || purchase.downloadToken !== token || purchase.fulfillmentStatus !== "fulfilled") {
       return new Response(
         JSON.stringify({ error: "Invalid download link" }),
         { status: 403, headers: { "Content-Type": "application/json" } }
@@ -165,7 +208,10 @@ http.route({
     let targetFile = files[0];
     if (fileId) {
       const found = files.find((f) => f._id === fileId);
-      if (found) targetFile = found;
+      if (!found) {
+        return new Response(JSON.stringify({ error: "Requested file is not part of this purchase" }), { status: 404, headers: { "Content-Type": "application/json" } });
+      }
+      targetFile = found;
     }
 
     // Get the download URL from storage
