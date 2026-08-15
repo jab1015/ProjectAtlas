@@ -14,7 +14,7 @@ const context: InventionContext = {
   inventionId: "inv_test_validation_stall",
   title: "Validation Stall Test",
   problemStatement: "Validation results disappear after research starts.",
-  inventionDescription: "A regression fixture for Atlas validation orchestration.",
+  inventionDescription: "A regression fixture for InventSmith validation orchestration.",
 };
 
 const sectionOrder = ["validationPlan", "customerSegments"] as ValidationSectionKey[];

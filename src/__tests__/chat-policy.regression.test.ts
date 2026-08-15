@@ -7,7 +7,7 @@ import {
   CHAT_MODEL_CONTEXT_MAX_CHARACTERS,
 } from "@convex/chatPolicyLogic";
 
-describe("Atlas chat policy", () => {
+describe("InventSmith chat policy", () => {
   it("rejects blank and oversized messages", () => {
     expect(isValidChatContent("   ")).toBe(false);
     expect(isValidChatContent("a".repeat(CHAT_MESSAGE_MAX_CHARACTERS))).toBe(true);
@@ -25,6 +25,6 @@ describe("Atlas chat policy", () => {
     expect(truncateModelContext({ answer: 42 }, CHAT_MODEL_CONTEXT_MAX_CHARACTERS)).toBe('{"answer":42}');
     const bounded = truncateModelContext("x".repeat(200), 80);
     expect(bounded.length).toBe(80);
-    expect(bounded).toContain("[Context truncated by Atlas]");
+    expect(bounded).toContain("[Context truncated by InventSmith]");
   });
 });

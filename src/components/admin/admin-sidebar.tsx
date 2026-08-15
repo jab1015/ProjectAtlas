@@ -32,7 +32,7 @@ const navItems = [
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/privacy", label: "Privacy requests", icon: ShieldCheck },
-  { href: "/admin/operations", label: "Atlas operations", icon: Activity },
+  { href: "/admin/operations", label: "InventSmith operations", icon: Activity },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
@@ -49,7 +49,7 @@ export function AdminSidebar({ storeName }: AdminSidebarProps) {
 
   const sidebarContent = (
     <div className="flex h-full flex-col">
-      {/* Atlas name */}
+      {/* InventSmith name */}
       <div className="px-4 py-5">
         <AtlasLogo size="sm" className="text-primary" />
         <p className="mt-1 text-xs text-muted-foreground">Admin Dashboard</p>
@@ -92,7 +92,7 @@ export function AdminSidebar({ storeName }: AdminSidebarProps) {
           className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Atlas
+          Back to InventSmith
         </Link>
       </div>
     </div>

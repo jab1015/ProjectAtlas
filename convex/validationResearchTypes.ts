@@ -1,5 +1,5 @@
 /**
- * Atlas Validation Research — Shared TypeScript Types
+ * InventSmith Validation Research — Shared TypeScript Types
  *
  * These types are the canonical data model for Stage 2 Validation Automation.
  * They correspond to the `validationResearch` Convex table schema and are

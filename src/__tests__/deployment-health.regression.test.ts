@@ -6,7 +6,7 @@ describe("deployment health contract", () => {
   const httpSource = readFileSync(join(process.cwd(), "convex", "http.ts"), "utf8");
   const envExample = readFileSync(join(process.cwd(), ".env.example"), "utf8");
 
-  it("checks the same Convex Auth key material documented by Atlas", () => {
+  it("checks the same Convex Auth key material documented by InventSmith", () => {
     expect(envExample).toContain("JWT_PRIVATE_KEY=");
     expect(envExample).toContain("JWKS=");
     expect(httpSource).toContain("process.env.JWT_PRIVATE_KEY && process.env.JWKS");

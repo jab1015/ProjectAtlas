@@ -1,5 +1,5 @@
 /**
- * Atlas Validation Logic — pure business logic (no Convex runtime dependency).
+ * InventSmith Validation Logic — pure business logic (no Convex runtime dependency).
  *
  * Extracted here so it can be imported by:
  *   - src/__tests__/validation.regression.test.ts (unit regression tests)

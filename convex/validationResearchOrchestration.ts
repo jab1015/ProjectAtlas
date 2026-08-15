@@ -1,5 +1,5 @@
 /**
- * Atlas Validation Research — Stage 2 Orchestration Action
+ * InventSmith Validation Research — Stage 2 Orchestration Action
  *
  * Phase 1C-3: Journey Hook + Research Orchestration
  *

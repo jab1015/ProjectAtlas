@@ -46,7 +46,7 @@ async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
       ctx.db.query("validationResearch").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
     ]);
 
-    if (records.length > 1) throw new ConvexError("Invention has multiple canonical records; Atlas must reconcile the data before export.");
+    if (records.length > 1) throw new ConvexError("Invention has multiple canonical records; InventSmith must reconcile the data before export.");
     const bounded = {
       sources: requireWithinLimit(sources, ROW_LIMIT, "evidence source count"),
       findings: requireWithinLimit(findings, ROW_LIMIT, "evidence finding count"),
@@ -99,7 +99,7 @@ async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
   return {
     exportVersion: 1,
     generatedAt: Date.now(),
-    scope: "Atlas structured account data. Uploaded/generated binary file bytes are not embedded in this JSON; use the invention work library or a formal coordinated export for binary files.",
+    scope: "InventSmith structured account data. Uploaded/generated binary file bytes are not embedded in this JSON; use the invention work library or a formal coordinated export for binary files.",
     profile: {
       _id: user._id,
       _creationTime: user._creationTime,

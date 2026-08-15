@@ -1,5 +1,5 @@
 /**
- * Atlas Validation Research — OpenAI Provider
+ * InventSmith Validation Research — OpenAI Provider
  *
  * Implements ValidationResearchProvider using GPT-4o to generate genuine
  * AI-backed research for each validation section.
@@ -36,7 +36,7 @@ function buildSectionPrompt(
   ctx: InventionContext,
   sectionKey: ValidationSectionKey
 ): string {
-  const base = `You are Atlas, an AI-powered operating system for inventors that guides users from idea to market.
+  const base = `You are InventSmith, an AI-powered operating system for inventors that guides users from idea to market.
 You are generating a ${sectionKey} section for the inventor's Stage 2 Validation Report.
 
 INVENTION CONTEXT:
@@ -136,7 +136,7 @@ evidence needed to de-risk. Include an overall risk profile assessment.`;
     case VALIDATION_SECTION_KEYS.RECOMMENDATIONS:
       return `${base}
 
-Generate Atlas Recommendations (## Atlas Recommendations — ${ctx.title}).
+Generate InventSmith Recommendations (## InventSmith Recommendations — ${ctx.title}).
 Provide 5 prioritized, actionable recommendations specific to this invention.
 Include priority level (Critical/High/Medium), rationale, and concrete next steps.
 End with a preliminary go/no-go status and what evidence is needed to change it.`;

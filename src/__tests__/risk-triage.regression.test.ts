@@ -27,7 +27,7 @@ describe("controlled-pilot risk triage", () => {
 
   it("produces a professional-review gate explanation without claiming a legal conclusion", () => {
     const reason = restrictedPilotReason(["life-safety or protective equipment"]);
-    expect(reason).toMatch(/controlled Atlas pilot/i);
+    expect(reason).toMatch(/controlled InventSmith pilot/i);
     expect(reason).toMatch(/qualified professional/i);
     expect(reason).not.toMatch(/illegal|prohibited by law/i);
   });

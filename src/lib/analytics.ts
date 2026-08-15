@@ -1,5 +1,5 @@
 /**
- * Atlas Analytics — provider-agnostic event layer.
+ * InventSmith Analytics — provider-agnostic event layer.
  *
  * Purpose: Product learning. Track where inventors succeed, get stuck, or
  * abandon the journey. No analytics UI is exposed in the MVP.

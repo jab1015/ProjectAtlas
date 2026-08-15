@@ -33,7 +33,7 @@ export function normalizeFinding(finding: RawFinding): RawFinding {
       sourceUrls,
       limitations: [
         ...finding.limitations,
-        "Atlas received no valid source URL for this claim, so it is recorded as an inference rather than a sourced fact.",
+        "InventSmith received no valid source URL for this claim, so it is recorded as an inference rather than a sourced fact.",
       ],
     };
   }
@@ -54,7 +54,7 @@ export function reliabilityFromVerificationStatus(status: VerificationStatus) {
 }
 
 export const SOURCE_VERIFICATION_MAX_AGE_MS = 90 * 24 * 60 * 60 * 1000;
-export const EVIDENCE_FRESHNESS_STALE_REASON = "One or more supporting sources require fresh verification before Atlas can rely on this output.";
+export const EVIDENCE_FRESHNESS_STALE_REASON = "One or more supporting sources require fresh verification before InventSmith can rely on this output.";
 
 export function isSourceEligibleForPromotion(
   source: { reliability: string; locator?: string; metadata?: unknown },

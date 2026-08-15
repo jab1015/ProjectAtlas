@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { classifyWorkHealth, operationalSeverity } from "@convex/operationalHealthLogic";
 
-describe("Atlas operational health", () => {
+describe("InventSmith operational health", () => {
   it("distinguishes active work from an expired lease", () => {
     expect(classifyWorkHealth({ status: "running", leaseExpiresAt: 1_001 }, 1_000)).toBe("healthy");
     expect(classifyWorkHealth({ status: "running", leaseExpiresAt: 1_000 }, 1_000)).toBe("expired");

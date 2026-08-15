@@ -1,5 +1,5 @@
 /**
- * Atlas Validation Research — Phase 1B Mutations
+ * InventSmith Validation Research — Phase 1B Mutations
  *
  * Mutation layer for Stage 2 Validation Automation.
  *
@@ -13,7 +13,7 @@
  * Mutations:
  *   triggerValidationResearch   — create or retrieve a research session (idempotent 24h)
  *   approveValidationSection    — mark a section APPROVED
- *   editValidationSection       — save founder edits without overwriting Atlas content
+ *   editValidationSection       — save founder edits without overwriting InventSmith content
  *   refreshValidationSection    — mark a section for re-generation (no content generation)
  */
 
@@ -165,7 +165,7 @@ export const approveValidationSection = mutation({
 /**
  * Save founder edits to a validation section.
  *
- * NEVER overwrites Atlas-generated content (generatedContent is immutable).
+ * NEVER overwrites InventSmith-generated content (generatedContent is immutable).
  * On first edit: copies generatedContent → originalGeneratedContent.
  * Sets currentFounderVersion to the edited content.
  */
@@ -190,7 +190,7 @@ export const editValidationSection = mutation({
     const lastEditedBy: string = userId;
     const now = Date.now();
 
-    // Preserve Atlas-generated content on first edit
+    // Preserve InventSmith-generated content on first edit
     const originalGeneratedContent =
       section.originalGeneratedContent !== undefined
         ? section.originalGeneratedContent

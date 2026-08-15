@@ -189,7 +189,7 @@ export const ensureInventionRecord = mutation({
   },
 });
 
-/** Safely nudges the idempotent worker whenever an inventor opens Atlas. */
+/** Safely nudges the idempotent worker whenever an inventor opens InventSmith. */
 export const kickAutonomousWork = mutation({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
@@ -324,7 +324,7 @@ export const respondToBlockedWork = mutation({
   },
 });
 
-/** Records a real professional's review. Inventors cannot self-certify Atlas drafts. */
+/** Records a real professional's review. Inventors cannot self-certify InventSmith drafts. */
 export const recordProfessionalReview = mutation({
   args: {
     reviewId: v.id("professionalReviews"),

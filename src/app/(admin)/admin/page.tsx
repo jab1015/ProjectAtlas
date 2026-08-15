@@ -75,7 +75,7 @@ export default function AdminDashboardPage() {
             <Button asChild variant="outline" size="sm">
               <Link href="/" target="_blank">
                 <ExternalLink className="h-4 w-4" />
-                View Atlas
+                View InventSmith
               </Link>
             </Button>
           </div>

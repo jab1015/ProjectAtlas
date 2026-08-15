@@ -1,5 +1,5 @@
 /**
- * Atlas Validation Research — Session Mutations
+ * InventSmith Validation Research — Session Mutations
  *
  * Internal mutations that manage the validation research session lifecycle.
  * These run in Convex's default V8 runtime (no "use node").

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildStatusBriefing } from "@convex/statusBriefingLogic";
 
-describe("Atlas status briefing", () => {
+describe("InventSmith status briefing", () => {
   it("returns the four inventor-facing briefing sections", () => {
     const briefing = buildStatusBriefing({
       workItems: [
@@ -25,7 +25,7 @@ describe("Atlas status briefing", () => {
       decisions: [
         {
           title: "Select target customer",
-          question: "Should Atlas focus first on older adults?",
+          question: "Should InventSmith focus first on older adults?",
           status: "open",
           createdAt: 10,
         },

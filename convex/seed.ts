@@ -1,5 +1,5 @@
 /**
- * Atlas seed: ensures jerry.brown1015@gmail.com has admin + enterprise tier.
+ * InventSmith seed: ensures jerry.brown1015@gmail.com has admin + enterprise tier.
  * Runs idempotently — safe to call multiple times.
  *
  * This is an internalMutation so it can only be triggered from trusted contexts

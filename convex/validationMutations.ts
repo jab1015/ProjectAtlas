@@ -1,5 +1,5 @@
 /**
- * Atlas Validation Research — Convex Mutations & Queries
+ * InventSmith Validation Research — Convex Mutations & Queries
  *
  * Mutations:
  *   triggerValidationResearch  — create a research run (idempotent within 24h)

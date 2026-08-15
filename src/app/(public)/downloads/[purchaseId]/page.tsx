@@ -48,7 +48,7 @@ export default function DownloadPage({
           icon={AlertTriangle}
           title="Invalid Download Link"
           description="This download link is missing a valid token. Please use the link from your purchase confirmation email."
-          ctaText="Back to Atlas"
+          ctaText="Back to InventSmith"
           ctaLink="/"
         />
       </div>
@@ -81,7 +81,7 @@ export default function DownloadPage({
           icon={AlertTriangle}
           title="Download Not Found"
           description="This download link is invalid or has expired. Please check your purchase confirmation email for the correct link."
-          ctaText="Back to Atlas"
+          ctaText="Back to InventSmith"
           ctaLink="/"
         />
       </div>

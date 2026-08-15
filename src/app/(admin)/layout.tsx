@@ -10,7 +10,7 @@ export default function AdminLayout({
 }) {
   return (
     <div className="flex min-h-screen bg-background">
-      <AdminSidebar storeName="Atlas" />
+      <AdminSidebar storeName="InventSmith" />
       <main className="flex-1 overflow-y-auto p-6 pt-16 md:p-8 md:pt-8">
         {children}
       </main>
