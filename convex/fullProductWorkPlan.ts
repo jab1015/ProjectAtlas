@@ -56,10 +56,44 @@ const lifecycleWork: FullProductWorkPlanItem[] = lifecycleStages.flatMap((stage)
   }))
 );
 
+const professionalRoutingWork: FullProductWorkPlanItem[] = [
+  {
+    kind: "professional_service_plan",
+    title: "Determine which outside professionals and services the inventor needs",
+    priority: 37,
+    estimatedCostUnits: 10,
+    deliverableKind: "professional_service_plan",
+    dependsOnKinds: ["engineering_handoff", "ip_readiness", "regulatory_screening", "factory_requirements"],
+    inputSnapshot: {
+      department: "intellectual_property_legal",
+      stageId: 9,
+      instructions: "Build a timed professional-service plan from the actual invention record. Identify only specialties justified by the evidence and current journey state, such as patent attorney/agent, trademark counsel, product or industrial designer, mechanical/electrical/firmware engineer, materials specialist, regulatory consultant, testing/certification laboratory, prototype service, factory/tooling provider, packaging specialist, logistics provider, accountant/tax professional, insurance professional, branding/marketing specialist, retail/distribution specialist, grant specialist, lender or investor category. For each needed specialty explain why it is needed, when to engage, what decision depends on it, what InventSmith has already prepared, exactly what to send, questions to ask, credentials/capabilities to verify, expected engagement scope, and red flags. Do not create unnecessary human work when InventSmith can complete the task itself. Do not contact, hire, share confidential information, spend money, file, or commit on the inventor's behalf.",
+      research: false,
+      professionalGate: null,
+    },
+  },
+  {
+    kind: "professional_provider_research",
+    title: "Research evidence-backed candidate professionals and service providers",
+    priority: 36,
+    estimatedCostUnits: 18,
+    deliverableKind: "professional_provider_candidate_report",
+    dependsOnKinds: ["professional_service_plan", "manufacturer_sourcing", "professional_legal_handoff"],
+    inputSnapshot: {
+      department: "intellectual_property_legal",
+      stageId: 9,
+      instructions: "Using the professional-service plan and invention requirements, research specific candidate providers where credible public evidence permits. Prioritize authoritative professional directories, official firm/provider pages, accreditation or certification sources, relevant technical capabilities, geography/jurisdiction fit when known, and demonstrated service scope. For each candidate state the evidence for fit, source URLs, what still must be verified, and why the candidate may or may not match this invention. Include appropriate alternatives rather than implying endorsement. Never fabricate availability, price, credentials, licensing, success rate, or experience. If a user's jurisdiction or location is genuinely necessary and absent from the invention record, identify that as the smallest missing input rather than guessing. Do not contact anyone, disclose confidential invention material, hire, purchase, or commit without inventor approval.",
+      research: true,
+      professionalGate: null,
+    },
+  },
+];
+
 export const POST_CANONICAL_WORK_PLAN: readonly FullProductWorkPlanItem[] = [
   ...designWork,
   nativeCadWork,
   ...lifecycleWork,
+  ...professionalRoutingWork,
 ];
 
 export const FULL_PRODUCT_AUTONOMOUS_WORK_KINDS = new Set(POST_CANONICAL_WORK_PLAN.map((item) => item.kind));
