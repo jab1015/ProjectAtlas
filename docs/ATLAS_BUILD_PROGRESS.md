@@ -30,6 +30,7 @@ The full-product branch now materially exceeds the old feasibility-only baseline
 - Ask write-back records inventor statements as unverified evidence, preserves URLs and chat origin, prevents duplicate capture, and never silently promotes inventor assertions to independently verified legal/technical facts;
 - engine-owned 15-stage Journey Center and department routes;
 - a legacy-root route guard that prevents Stage 5+ inventions from falling back into the retired Stage-4/“coming soon” workspace and sends them to the complete Journey Center instead;
+- inventor-facing readiness language that converts legacy backend readiness values into actionable labels such as **Needs more evidence**, **Evidence building**, and **Ready for next stage** without breaking compatibility;
 - dedicated inventor-facing Market Research workspace exposing research outputs, sources, confidence, coverage, stale state, and inventor evidence;
 - dedicated inventor-facing Patent Readiness workspace exposing prior art, feature comparison, distinguishing hypotheses, sources, trust state, and the Patent → Design handoff;
 - full journey work definitions and executable lifecycle departments;
@@ -51,7 +52,9 @@ The full-product branch now materially exceeds the old feasibility-only baseline
 - explicit `prototype_physical_evidence` gate: InventSmith cannot assess an unbuilt/untested prototype as if it were tested; the gate blocks at a physical-work request and automatically releases when real prototype-test evidence arrives;
 - manufacturing process planning, factory requirements, manufacturer research, RFQ package, scorecard, quote comparison, unit economics, agreement checklist and readiness;
 - explicit `manufacturer_quote_evidence` gate: quote comparison cannot proceed from modeled pricing alone and automatically releases when a real manufacturer quote/RFQ response is supplied;
-- branding/positioning/name/trademark-screen/identity/asset-brief work;
+- branding/positioning/name/trademark-screen/identity work plus inventor-facing visual brand concept-board generation;
+- Stage 8 `brand_asset_brief` now produces both the written production brief and a stored/downloadable PNG brand concept board grounded in the selected naming direction, positioning, customer evidence, visual system, packaging principles and claims constraints;
+- brand visual generation explicitly preserves trademark/legal uncertainty and cannot invent a replacement product name, unsupported proof point, certification, patent claim, award or final-clearance status;
 - removal of legacy Atlas `logo.svg` and `logo-mark.svg` public assets so a deployment/replication cannot accidentally reuse the former customer-facing mark;
 - regression protection requiring the approved InventSmith `Logo.png` asset and preventing legacy Atlas logo assets from returning;
 - IP strategy, invention disclosure, NDA draft package, contracting package, IP status tracking and legal-professional handoff;
@@ -64,13 +67,15 @@ The full-product branch now materially exceeds the old feasibility-only baseline
 - editable native PowerPoint pitch-deck generation from invention-specific evidence;
 - automatic embedding of the current generated product render into the pitch deck when available;
 - spreadsheet-friendly CSV export generated from structured financial-model Markdown tables while preserving the complete narrative/evidence deliverable;
-- inventor-facing artifact download support for PowerPoint, CAD, drawings, CSV financial output, images and other stored/generated artifacts;
+- Excel-readable SpreadsheetML financial workbook export with a summary sheet, one worksheet per structured financial section, Excel-safe unique worksheet names, and preserved estimate/professional-review caveats;
+- financial model artifact service exposes both CSV and Excel-readable workbook representations without adding another package/supply-chain dependency;
+- inventor-facing artifact download support for PowerPoint, CAD, drawings, spreadsheet financial output, images and other stored/generated artifacts;
 - launch readiness/playbook/customer-feedback/performance/priorities;
 - explicit `launch_actual_evidence` gate: Launch Performance cannot treat forecasts or modeled funnels as actual results and waits for real sales/orders/conversion/analytics/returns/reviews/customer evidence; sales/launch evidence automatically releases the gate;
 - growth audit/levers/roadmap/retention/performance reporting;
 - Ask InventSmith project-wide grounding across work, dependencies, evidence, deliverables, decisions, approvals, reviews, execution events, validation and journey state;
 - live-web routing for patent-status/current-research questions;
-- regression protection for cross-department verification, governed chat evidence capture, Market/Patent workspace routing, connected full-journey wiring, real-world evidence gates, browser and binary evidence ingestion/retry, expanded/mating threaded CAD geometry, CAD manufacturing metadata, dimensioned drawings, complete CAD artifact visibility, multi-view product rendering, financial CSV export, pitch-deck generation, entitlement, professional routing and professional-review policy.
+- regression protection for cross-department verification, governed chat evidence capture, Market/Patent workspace routing, connected full-journey wiring, real-world evidence gates, browser and binary evidence ingestion/retry, expanded/mating threaded CAD geometry, CAD manufacturing metadata, dimensioned drawings, complete CAD artifact visibility, multi-view product rendering, visual brand-board generation, financial CSV/workbook export, pitch-deck generation, entitlement, professional routing, readiness language and professional-review policy.
 
 ## Mandatory capability matrix
 
@@ -83,21 +88,21 @@ The full-product branch now materially exceeds the old feasibility-only baseline
 | Patent/prior-art intelligence | Implemented foundation + dedicated Patent Readiness workspace + project-wide Ask grounding/write-back | Verify current patent-status refresh, design constraints and professional handoff on representative inventions |
 | Product design | Implemented on full-product branch | Verify patent/research constraints flow into candidate scoring and selected design on representative inventions |
 | CAD/3D design | Native preliminary STEP/STL/DXF generation implemented with box/cylinder/tube/frustum/custom convex extrusion/external helical thread/internal helical threaded-tube geometry; editable source carries manufacturing metadata | Continue sealing/custom rotational-interface geometry and representative engineering acceptance before manufacturing release |
-| Product renders | Multi-view selected-product presentation board implemented in the render brief | Live visual-consistency/quality acceptance and additional technical-image workflows as needed |
+| Product renders | Multi-view selected-product presentation board implemented in the render brief | Live visual-consistency/quality acceptance and additional technical-image workflows only where representative inventions require them |
 | Exploded/orthographic views | Implemented, visible/downloadable, with geometry-derived overall dimensions | Live visual/download acceptance; critical dimensions, fits and tolerances must remain evidence-backed |
 | Engineering package | Product/CAD specs, revisioned native source, dimensional views, manufacturing metadata, engineering handoff and professional gates implemented | Complete representative engineering-review acceptance and revision loop |
 | Prototype loop | Lifecycle department + explicit physical-test evidence gate implemented | Physical prototype construction/testing remains a genuine human/real-world gate |
 | Manufacturing/factory guidance | Lifecycle department + real quote/RFQ evidence gate implemented | Verify real sourcing/RFQ/quote workflows and professional/financial gates |
 | Legal/contracts/NDAs | Lifecycle department implemented | Professional/legal review required where applicable |
 | Professional routing | Service plan + provider research implemented | Live provider-research/handoff UX acceptance |
-| Branding | Lifecycle department implemented; old Atlas SVG assets removed | Visual asset-generation/live UX acceptance |
+| Branding | Lifecycle department + visual brand concept-board generation implemented; old Atlas SVG assets removed | Live visual-quality/download/UX acceptance and professional design/trademark review where applicable |
 | Pricing | Lifecycle department implemented | Real cost/market evidence acceptance |
 | Marketing | Lifecycle department implemented | Asset/export/live UX acceptance |
 | Sales | Lifecycle department implemented | Live UX and real-data acceptance |
-| Pitch deck/funding | Editable native PPTX generation implemented, including available product-render embedding; financial model has CSV export | Live investor-package acceptance; richer financial presentation polish and XLSX-class structured export if needed |
+| Pitch deck/funding | Editable native PPTX generation implemented, including available product-render embedding; financial model has CSV + Excel-readable multi-sheet workbook export | Live investor-package acceptance and richer presentation polish where representative cases expose a gap |
 | Launch | Lifecycle department + actual-sales/launch evidence gate implemented | Real launch remains a genuine external-world gate; live evidence acceptance after launch |
 | Growth | Lifecycle department implemented | Requires real post-launch data for final functional acceptance |
-| Documents/exports | PDF/DOCX foundation + PPTX + CAD/image/drawing downloads + financial CSV export | Expand remaining artifact-specific structured exports where they materially improve downstream use |
+| Documents/exports | PDF/DOCX foundation + PPTX + CAD/image/drawing downloads + CSV and Excel-readable multi-sheet financial export | Expand only remaining artifact-specific structured exports that materially improve real downstream use |
 | Ask InventSmith | Project-wide operational context + live-web routing + governed material-input write-back implemented | Live authenticated conversational/write-back acceptance |
 | Correct InventSmith branding | Approved `Logo.png` is canonical; legacy Atlas public SVG assets removed and regression-protected | Final live replication/acceptance after GitHub build is complete |
 
@@ -153,7 +158,7 @@ When the inventor supplies material project evidence through Ask InventSmith, th
 
 A capability is not considered implemented merely because a backend work item or deliverable exists. Material departments and artifacts must be discoverable in the inventor-facing product.
 
-Market Research and Patent Readiness therefore have dedicated workspaces, Product Design exposes the complete CAD package—including orthographic and exploded views—and lifecycle departments expose stored/generated artifacts with download actions. Stage 5+ inventions are prevented from falling back to the retired four-stage root workspace.
+Market Research and Patent Readiness therefore have dedicated workspaces, Product Design exposes the complete CAD package—including orthographic and exploded views—and lifecycle departments expose stored/generated artifacts with download actions. Stage 5+ inventions are prevented from falling back to the retired four-stage root workspace. Readiness labels must explain the current state in inventor language rather than displaying a context-free “Not Ready” status.
 
 ## Connected-journey rule
 
@@ -163,18 +168,17 @@ Regression coverage enforces that referenced work dependencies exist, that depen
 
 ## Verification checkpoint
 
-CI #220 passed the complete repository pipeline after the mating internal-thread CAD expansion: web TypeScript, Convex TypeScript, regression suite, production dependency audit, and Next production build.
+CI #228 passed the complete repository pipeline after the Stage 8 visual-brand prompt contract and dedicated brand-generation regression. CI #231 then passed web TypeScript, Convex TypeScript, the full regression suite, production dependency audit, and Next production build after the Excel-readable multi-sheet financial workbook export.
 
 ## Remaining repository priorities
 
 1. Live-test representative binary evidence uploads and Ask InventSmith write-back across PDF/DOCX/XLSX/image/deck/patent/survey/prototype/quote/sales inputs.
 2. Continue expanding native CAD geometry for sealing features, custom rotational interfaces and representative product mechanisms without fabricating engineering certainty.
-3. Validate multi-view product rendering for geometry consistency and expand technical-image workflows where representative inventions require them.
-4. Expand remaining format-appropriate exports, including richer structured financial/tabular output where CSV is insufficient.
-5. Add/validate inventor-facing visual brand asset generation and remaining commercial asset workflows where the product specification requires a produced asset rather than a brief.
-6. Complete automated and live end-to-end acceptance for representative inventions, including evidence refresh, department handoffs, CAD artifacts, exports and human/professional gates.
-7. Merge only after repository CI and acceptance gates pass.
-8. After GitHub is complete, hand the finished pinned implementation to MadeThis for replication and perform live authenticated acceptance there.
+3. Validate multi-view product rendering and generated brand boards for visual consistency/quality in representative live inventions; add further technical-image workflows only where acceptance exposes a real gap.
+4. Expand remaining artifact-specific structured exports only where representative downstream use demonstrates that the current PDF/DOCX/PPTX/CAD/image/CSV/workbook set is insufficient.
+5. Complete automated and live end-to-end acceptance for representative inventions, including evidence refresh, department handoffs, CAD artifacts, exports, brand assets and human/professional gates.
+6. Merge only after repository CI and acceptance gates pass.
+7. After GitHub is complete, hand the finished pinned implementation to MadeThis for replication and perform live authenticated acceptance there.
 
 ## Completion rule
 
