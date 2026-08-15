@@ -52,6 +52,12 @@ export const backfillWorkspace = mutation({
         title: item.title,
         status: completed ? "completed" : "queued",
         priority: item.priority,
+        inputSnapshot: item.instructions
+          ? {
+              department: item.kind === "patent_design_handoff" ? "patent_readiness" : "canonical",
+              instructions: item.instructions,
+            }
+          : undefined,
         attemptCount: completed ? 1 : 0,
         maxAttempts: completed ? undefined : 3,
         estimatedCostUnits: item.estimatedCostUnits,
@@ -75,6 +81,7 @@ export const backfillWorkspace = mutation({
           recordCreated,
           addedWorkKinds: missing.map((item) => item.kind),
           canonicalWorkCount: existingWork.length + missing.length,
+          instructionBackfillKinds: missing.filter((item) => Boolean(item.instructions)).map((item) => item.kind),
         },
         createdAt: now,
       });
