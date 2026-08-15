@@ -6,6 +6,7 @@ export interface CanonicalWorkPlanItem {
   deliverableKind?: string;
   dependsOnKinds?: string[];
   initiallyCompleted?: boolean;
+  instructions?: string;
 }
 
 export const CANONICAL_WORK_PLAN: readonly CanonicalWorkPlanItem[] = [
@@ -18,7 +19,15 @@ export const CANONICAL_WORK_PLAN: readonly CanonicalWorkPlanItem[] = [
   { kind: "technical_feasibility", title: "Assess technical feasibility and product risks", priority: 60, estimatedCostUnits: 12, deliverableKind: "technical_feasibility_assessment", dependsOnKinds: ["brief_analysis"] },
   { kind: "feature_prior_art_comparison", title: "Compare proposed features with the prior-art landscape", priority: 58, estimatedCostUnits: 12, deliverableKind: "feature_prior_art_comparison", dependsOnKinds: ["preliminary_prior_art", "technical_feasibility"] },
   { kind: "distinguishing_features", title: "Develop distinguishing feature hypotheses and alternative embodiments", priority: 56, estimatedCostUnits: 10, deliverableKind: "distinguishing_features_alternative_embodiments", dependsOnKinds: ["feature_prior_art_comparison"] },
-  { kind: "patent_design_handoff", title: "Hand patent constraints and differentiation targets to Product Design", priority: 55, estimatedCostUnits: 10, deliverableKind: "patent_design_handoff", dependsOnKinds: ["preliminary_prior_art", "feature_prior_art_comparison", "distinguishing_features", "ip_readiness"] },
+  {
+    kind: "patent_design_handoff",
+    title: "Hand patent constraints and differentiation targets to Product Design",
+    priority: 55,
+    estimatedCostUnits: 10,
+    deliverableKind: "patent_design_handoff",
+    dependsOnKinds: ["preliminary_prior_art", "feature_prior_art_comparison", "distinguishing_features", "ip_readiness"],
+    instructions: "Create the formal Patent Readiness to Product Design handoff. Summarize the closest prior-art references and their verified/unverified status, crowded functional or structural features, potentially distinguishing feature hypotheses, alternative embodiments, design constraints, source uncertainty, and unresolved questions for patent counsel. Translate that work into a clear design brief with red-flag zones, differentiation targets, and concept directions Product Design should explore. Do not claim patentability, freedom to operate, validity, enforceability, or legal clearance. The purpose is to make Product Design strategically informed by the current prior-art record while preserving professional patent-review gates.",
+  },
   { kind: "materials_manufacturing", title: "Research materials and manufacturing approaches", priority: 50, estimatedCostUnits: 15, deliverableKind: "materials_manufacturing_assessment", dependsOnKinds: ["technical_feasibility", "preliminary_prior_art"] },
   { kind: "product_requirements", title: "Draft the initial product requirements", priority: 48, estimatedCostUnits: 12, deliverableKind: "initial_product_requirements", dependsOnKinds: ["market_feasibility", "technical_feasibility", "distinguishing_features"] },
   { kind: "regulatory_screening", title: "Screen potentially applicable regulatory requirements", priority: 45, estimatedCostUnits: 15, deliverableKind: "regulatory_readiness_screening", dependsOnKinds: ["technical_feasibility"] },
