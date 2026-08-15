@@ -22,7 +22,7 @@ const navLinks = [
 ];
 
 export function StoreHeader({
-  storeName = "Atlas",
+  storeName = "InventSmith",
   logoUrl,
   className,
 }: StoreHeaderProps) {
@@ -37,7 +37,7 @@ export function StoreHeader({
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo / Atlas Name */}
+        {/* Product logo */}
         <Link href="/" className="no-underline hover:opacity-80 transition-opacity">
           {logoUrl ? (
             <img
@@ -50,7 +50,6 @@ export function StoreHeader({
           )}
         </Link>
 
-        {/* Desktop Navigation */}
         <nav className="hidden items-center gap-6 md:flex">
           {navLinks.map((link) => (
             <Link
@@ -72,7 +71,6 @@ export function StoreHeader({
           )}
         </nav>
 
-        {/* Mobile Menu Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground md:hidden"
@@ -86,7 +84,6 @@ export function StoreHeader({
         </button>
       </div>
 
-      {/* Mobile Navigation */}
       {mobileMenuOpen && (
         <div className="border-t border-border md:hidden">
           <nav className="mx-auto max-w-7xl space-y-1 px-4 py-3 sm:px-6 lg:px-8">
