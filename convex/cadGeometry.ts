@@ -7,6 +7,7 @@ export type CadPrimitive =
   | { type: "tube"; outerRadius: number; innerRadius: number; height: number; segments?: number }
   | { type: "frustum"; bottomRadius: number; topRadius: number; height: number; segments?: number }
   | { type: "threadedCylinder"; radius: number; height: number; pitch: number; threadDepth: number; segments?: number }
+  | { type: "threadedTube"; outerRadius: number; innerRadius: number; height: number; pitch: number; threadDepth: number; segments?: number }
   | { type: "extrudedConvexPolygon"; points: Vec2[]; height: number };
 
 export interface CadPartSpec {
@@ -16,6 +17,9 @@ export interface CadPartSpec {
   position?: Vec3;
   rotationDeg?: Vec3;
   material?: string;
+  finish?: string;
+  manufacturingProcess?: string;
+  interfaceNotes?: string[];
 }
 
 export interface CadAssemblySpec {
@@ -236,6 +240,67 @@ function threadedCylinderTriangles(part: CadPartSpec, radiusValue: number, heigh
   return out;
 }
 
+function threadedTubeTriangles(part: CadPartSpec, outerValue: number, innerValue: number, heightValue: number, pitchValue: number, depthValue: number, segmentValue?: number): Triangle[] {
+  const outer = finitePositive(outerValue, "threaded tube outer radius");
+  const inner = finitePositive(innerValue, "threaded tube minimum inner radius");
+  const height = finitePositive(heightValue, "threaded tube height");
+  const pitch = finitePositive(pitchValue, "internal thread pitch");
+  const depth = finitePositive(depthValue, "internal thread depth");
+  if (inner >= outer) throw new Error("threaded tube inner radius must be smaller than outer radius");
+  if (inner + depth >= outer) throw new Error("internal thread depth leaves no valid tube wall thickness");
+  if (pitch <= depth) throw new Error("internal thread pitch must be larger than thread depth");
+  const around = segments(segmentValue);
+  const turns = height / pitch;
+  const axialSteps = Math.max(8, Math.min(512, Math.ceil(turns * around)));
+  const z0 = -height / 2;
+  const z1 = height / 2;
+  const out: Triangle[] = [];
+
+  const outerPoint = (angle: number, z: number): Vec3 => [outer * Math.cos(angle), outer * Math.sin(angle), z];
+  const innerPoint = (angle: number, z: number): Vec3 => {
+    const phase = wrappedPhase(angle - 2 * Math.PI * (z - z0) / pitch);
+    const normalized = Math.abs(phase) / Math.PI;
+    const groove = Math.max(0, 1 - normalized * 4);
+    const localRadius = inner + depth * groove;
+    return [localRadius * Math.cos(angle), localRadius * Math.sin(angle), z];
+  };
+
+  for (let zi = 0; zi < axialSteps; zi += 1) {
+    const za = z0 + height * zi / axialSteps;
+    const zb = z0 + height * (zi + 1) / axialSteps;
+    for (let ai = 0; ai < around; ai += 1) {
+      const a0 = 2 * Math.PI * ai / around;
+      const a1 = 2 * Math.PI * (ai + 1) / around;
+      const o00 = outerPoint(a0, za);
+      const o01 = outerPoint(a1, za);
+      const o10 = outerPoint(a0, zb);
+      const o11 = outerPoint(a1, zb);
+      const i00 = innerPoint(a0, za);
+      const i01 = innerPoint(a1, za);
+      const i10 = innerPoint(a0, zb);
+      const i11 = innerPoint(a1, zb);
+      out.push(triangle(part, o00, o01, o11), triangle(part, o00, o11, o10));
+      out.push(triangle(part, i00, i11, i01), triangle(part, i00, i10, i11));
+    }
+  }
+
+  for (let ai = 0; ai < around; ai += 1) {
+    const a0 = 2 * Math.PI * ai / around;
+    const a1 = 2 * Math.PI * (ai + 1) / around;
+    const ob0 = outerPoint(a0, z0);
+    const ob1 = outerPoint(a1, z0);
+    const ot0 = outerPoint(a0, z1);
+    const ot1 = outerPoint(a1, z1);
+    const ib0 = innerPoint(a0, z0);
+    const ib1 = innerPoint(a1, z0);
+    const it0 = innerPoint(a0, z1);
+    const it1 = innerPoint(a1, z1);
+    out.push(triangle(part, ob0, ib1, ob1), triangle(part, ob0, ib0, ib1));
+    out.push(triangle(part, ot0, ot1, it1), triangle(part, ot0, it1, it0));
+  }
+  return out;
+}
+
 function polygonArea(points: Vec2[]): number {
   let area = 0;
   for (let i = 0; i < points.length; i += 1) {
@@ -299,6 +364,7 @@ export function buildCadMesh(spec: CadAssemblySpec): Triangle[] {
       case "tube": triangles.push(...tubeTriangles(part, part.primitive.outerRadius, part.primitive.innerRadius, part.primitive.height, part.primitive.segments)); break;
       case "frustum": triangles.push(...frustumTriangles(part, part.primitive.bottomRadius, part.primitive.topRadius, part.primitive.height, part.primitive.segments)); break;
       case "threadedCylinder": triangles.push(...threadedCylinderTriangles(part, part.primitive.radius, part.primitive.height, part.primitive.pitch, part.primitive.threadDepth, part.primitive.segments)); break;
+      case "threadedTube": triangles.push(...threadedTubeTriangles(part, part.primitive.outerRadius, part.primitive.innerRadius, part.primitive.height, part.primitive.pitch, part.primitive.threadDepth, part.primitive.segments)); break;
       case "extrudedConvexPolygon": triangles.push(...extrudedConvexPolygonTriangles(part, part.primitive.points, part.primitive.height)); break;
       default: throw new Error("Unsupported CAD primitive");
     }
@@ -354,7 +420,7 @@ export function exportFacetedStep(spec: CadAssemblySpec, triangles = buildCadMes
   add(`APPLICATION_PROTOCOL_DEFINITION('international standard','automotive_design',2000,#${appContext})`);
   const productContext = add(`PRODUCT_CONTEXT('',#${appContext},'mechanical')`);
   const product = add(`PRODUCT(${stepString(spec.name)},${stepString(spec.name)},'',(#${productContext}))`);
-  const formation = add(`PRODUCT_DEFINITION_FORMATION_WITH_SPECIFIED_SOURCE('','',#${product},.NOT_KNOWN.)`);
+  const formation = add(`PRODUCT_DEFINITION_FORMATION_WITH_SPECIFIED_SOURCE('','',#${product},.NOT_KN.)`);
   const definitionContext = add(`PRODUCT_DEFINITION_CONTEXT('part definition',#${appContext},'design')`);
   const definition = add(`PRODUCT_DEFINITION('design','',#${formation},#${definitionContext})`);
   const definitionShape = add(`PRODUCT_DEFINITION_SHAPE('','',#${definition})`);
