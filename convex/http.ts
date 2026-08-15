@@ -34,7 +34,7 @@ http.route({
       const probe = await ctx.runQuery(healthProbe, {});
       const configuration = {
         ai: Boolean(process.env.OPENAI_API_KEY),
-        auth: Boolean(process.env.AUTH_SECRET),
+        auth: Boolean(process.env.JWT_PRIVATE_KEY && process.env.JWKS),
         fulfillmentWebhook: Boolean(process.env.PLATFORM_FULFILLMENT_SECRET),
         subscriptionWebhook: Boolean(process.env.ATLAS_SUBSCRIPTION_WEBHOOK_SECRET),
       };
