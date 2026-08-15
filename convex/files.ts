@@ -43,6 +43,7 @@ export const registerInventionEvidence = mutation({
     title: v.optional(v.string()),
     evidenceKind: v.optional(v.string()),
     notes: v.optional(v.string()),
+    extraction: v.optional(v.any()),
   },
   handler: async (ctx, args) => {
     const { userId } = await requireOwnedInvention(ctx, args.inventionId);
@@ -66,6 +67,7 @@ export const registerInventionEvidence = mutation({
         fileSize: args.fileSize,
         mimeType: args.mimeType,
         evidenceKind,
+        extraction: args.extraction ?? null,
         uploadedAt: now,
       },
       createdAt: now,
@@ -80,6 +82,7 @@ export const registerInventionEvidence = mutation({
         evidenceSourceId: sourceId,
         evidenceKind,
         fileName: args.fileName,
+        structuredExtractionAvailable: Boolean(args.extraction),
       },
       createdAt: now,
     });
@@ -89,6 +92,7 @@ export const registerInventionEvidence = mutation({
       sourceId,
       label: title,
       evidenceKind,
+      extraction: args.extraction,
       now,
     });
 
@@ -115,6 +119,7 @@ export const listInventionEvidence = query({
         .map(async (source) => {
           const storageId = source.metadata?.storageId as Id<"_storage"> | undefined;
           const downloadUrl = storageId ? await ctx.storage.getUrl(storageId) : null;
+          const extraction = source.metadata?.extraction as { mode?: string; summary?: string } | null | undefined;
           return {
             _id: source._id,
             title: source.title,
@@ -125,6 +130,8 @@ export const listInventionEvidence = query({
             fileSize: typeof source.metadata?.fileSize === "number" ? source.metadata.fileSize : null,
             mimeType: typeof source.metadata?.mimeType === "string" ? source.metadata.mimeType : null,
             evidenceKind: typeof source.metadata?.evidenceKind === "string" ? source.metadata.evidenceKind : "other",
+            extractionMode: extraction?.mode ?? null,
+            extractionSummary: extraction?.summary ?? null,
             downloadUrl,
           };
         })
