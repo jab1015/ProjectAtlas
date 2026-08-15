@@ -10,6 +10,7 @@ import { financialModelMarkdownToSpreadsheetXml } from "../../convex/tabularExpo
 const allWork = [...CANONICAL_WORK_PLAN, ...POST_CANONICAL_WORK_PLAN];
 const allKinds = new Set(allWork.map((item) => item.kind));
 const byKind = new Map(allWork.map((item) => [item.kind, item]));
+const postByKind = new Map(POST_CANONICAL_WORK_PLAN.map((item) => [item.kind, item]));
 
 const EXPECTED_STAGES = [
   "Idea",
@@ -47,9 +48,9 @@ describe("InventSmith complete idea-to-market repository acceptance contract", (
     expect(byKind.get("manufacturer_quote_comparison")?.dependsOnKinds).toContain("manufacturer_quote_evidence");
     expect(byKind.get("launch_performance")?.dependsOnKinds).toContain("launch_actual_evidence");
 
-    const prototype = byKind.get("prototype_physical_evidence");
-    const quote = byKind.get("manufacturer_quote_evidence");
-    const launch = byKind.get("launch_actual_evidence");
+    const prototype = postByKind.get("prototype_physical_evidence");
+    const quote = postByKind.get("manufacturer_quote_evidence");
+    const launch = postByKind.get("launch_actual_evidence");
     expect(String(prototype?.inputSnapshot.instructions)).toContain("do not synthesize");
     expect(String(quote?.inputSnapshot.instructions)).toContain("Do not invent prices");
     expect(String(launch?.inputSnapshot.instructions)).toContain("Forecasts, sales projections, modeled funnels");
@@ -73,7 +74,7 @@ describe("InventSmith complete idea-to-market repository acceptance contract", (
   });
 
   it("keeps commercial artifact generation as produced outputs rather than briefs only", () => {
-    const brandWork = byKind.get("brand_asset_brief");
+    const brandWork = postByKind.get("brand_asset_brief");
     expect(String(brandWork?.inputSnapshot.instructions)).toContain("conceptImagePrompt");
     const brandPrompt = buildBrandIdentityPrompt("Use the selected evidence-backed name and brand direction.");
     expect(brandPrompt).toContain("PRODUCT BRAND CONCEPT BOARD");
