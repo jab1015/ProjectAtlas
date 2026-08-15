@@ -72,6 +72,23 @@ const manufacturerQuoteEvidenceGate: FullProductWorkPlanItem = {
   },
 };
 
+const launchActualEvidenceGate: FullProductWorkPlanItem = {
+  kind: "launch_actual_evidence",
+  title: "Collect actual launch, sales and customer evidence",
+  priority: 13.5,
+  estimatedCostUnits: 1,
+  deliverableKind: "launch_actual_evidence_gate",
+  dependsOnKinds: ["customer_feedback_loop", "launch_playbook"],
+  inputSnapshot: {
+    department: "launch",
+    stageId: 14,
+    externalEvidenceGate: true,
+    instructions: "This is an actual-market evidence gate. Inspect inventor-provided evidence for real post-launch sales, orders, conversion, traffic/analytics, returns, support issues, reviews, customer feedback, inventory/fulfillment observations, or other launch results. Forecasts, sales projections, modeled funnels, and pre-launch plans do not satisfy this gate. If no actual launch evidence exists, return needsHuman=true, humanGateType=private_information, and ask for the smallest useful action: upload the available sales/launch analytics or customer evidence from the real launch. Do not invent revenue, orders, conversion, CAC, returns, reviews, or customer behavior. If actual evidence exists, summarize only observed results and limitations so Launch Performance can compare reality against the plan.",
+    research: false,
+    professionalGate: null,
+  },
+};
+
 const lifecycleWork: FullProductWorkPlanItem[] = lifecycleStages.flatMap((stage) =>
   stage.work.map((item) => ({
     kind: item.kind,
@@ -83,7 +100,9 @@ const lifecycleWork: FullProductWorkPlanItem[] = lifecycleStages.flatMap((stage)
       ? [...item.dependsOnKinds, "prototype_physical_evidence"]
       : item.kind === "manufacturer_quote_comparison"
         ? [...item.dependsOnKinds, "manufacturer_quote_evidence"]
-        : [...item.dependsOnKinds],
+        : item.kind === "launch_performance"
+          ? [...item.dependsOnKinds, "launch_actual_evidence"]
+          : [...item.dependsOnKinds],
     inputSnapshot: {
       department: stage.name.toLowerCase().replaceAll(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""),
       stageId: stage.id,
@@ -132,6 +151,7 @@ export const POST_CANONICAL_WORK_PLAN: readonly FullProductWorkPlanItem[] = [
   nativeCadWork,
   prototypeEvidenceGate,
   manufacturerQuoteEvidenceGate,
+  launchActualEvidenceGate,
   ...lifecycleWork,
   ...professionalRoutingWork,
 ];
