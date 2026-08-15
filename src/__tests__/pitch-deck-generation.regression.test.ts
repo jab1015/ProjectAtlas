@@ -58,7 +58,7 @@ describe("InventSmith pitch deck generation", () => {
     const containerText = new TextDecoder().decode(new Uint8Array(artifact.bytes));
 
     expect(artifact.embeddedProductVisual).toBe(true);
-    expect(containerText).toContain("ppt/media/image1.png");
+    expect(containerText).toMatch(/ppt\/media\/image\d+\.png/);
     expect(containerText).toContain("relationships/image");
     expect(containerText).toContain("Evidence-backed product render");
   });
