@@ -55,6 +55,23 @@ const prototypeEvidenceGate: FullProductWorkPlanItem = {
   },
 };
 
+const manufacturerQuoteEvidenceGate: FullProductWorkPlanItem = {
+  kind: "manufacturer_quote_evidence",
+  title: "Collect real manufacturer quote / RFQ evidence",
+  priority: 50.5,
+  estimatedCostUnits: 1,
+  deliverableKind: "manufacturer_quote_evidence_gate",
+  dependsOnKinds: ["manufacturer_rfq_package", "manufacturer_sourcing"],
+  inputSnapshot: {
+    department: "manufacturing",
+    stageId: 7,
+    externalEvidenceGate: true,
+    instructions: "This is an external commercial evidence gate, not a request to fabricate a quote. Inspect inventor-provided evidence for one or more actual manufacturer/factory RFQ responses or quotations tied to the current design/revision. If no real quote evidence exists, return needsHuman=true, humanGateType=authorization, and ask for the smallest useful action: obtain at least one real quote/RFQ response and upload it to the Evidence Locker. Do not invent prices, MOQs, lead times, tooling, payment terms, certifications, or supplier commitments. If real quote evidence exists, summarize only the quoted scope and limitations so the downstream comparison can proceed.",
+    research: false,
+    professionalGate: null,
+  },
+};
+
 const lifecycleWork: FullProductWorkPlanItem[] = lifecycleStages.flatMap((stage) =>
   stage.work.map((item) => ({
     kind: item.kind,
@@ -64,7 +81,9 @@ const lifecycleWork: FullProductWorkPlanItem[] = lifecycleStages.flatMap((stage)
     deliverableKind: item.deliverableKind,
     dependsOnKinds: item.kind === "prototype_evidence_assessment"
       ? [...item.dependsOnKinds, "prototype_physical_evidence"]
-      : [...item.dependsOnKinds],
+      : item.kind === "manufacturer_quote_comparison"
+        ? [...item.dependsOnKinds, "manufacturer_quote_evidence"]
+        : [...item.dependsOnKinds],
     inputSnapshot: {
       department: stage.name.toLowerCase().replaceAll(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""),
       stageId: stage.id,
@@ -112,6 +131,7 @@ export const POST_CANONICAL_WORK_PLAN: readonly FullProductWorkPlanItem[] = [
   ...designWork,
   nativeCadWork,
   prototypeEvidenceGate,
+  manufacturerQuoteEvidenceGate,
   ...lifecycleWork,
   ...professionalRoutingWork,
 ];
