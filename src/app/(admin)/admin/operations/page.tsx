@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
-import { Activity, AlertTriangle, Clock3, Coins, OctagonX } from "lucide-react";
+import { Activity, AlertTriangle, Clock3, Coins, FlaskConical, OctagonX } from "lucide-react";
 import { AdminHeader, StatsCard } from "@/components/admin";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -21,11 +23,44 @@ interface Snapshot {
 }
 
 const getSnapshot = makeFunctionReference<"query", Record<string, never>, Snapshot>("operationalHealth:getSnapshot");
+const createInvention = makeFunctionReference<"mutation", {
+  title: string; problemStatement: string; targetAudience: string; solutionDescription: string;
+}, string>("journeyEngine:createInvention");
+const kickAutonomousWork = makeFunctionReference<"mutation", { inventionId: string }, { scheduled: boolean; reason?: string }>("inventionWorkspace:kickAutonomousWork");
+
+const REPRESENTATIVE_PILOT = {
+  title: "Adjustable countertop produce-rinsing rack",
+  problemStatement: "Small kitchens lack a compact way to rinse and drain produce over differently sized sinks.",
+  targetAudience: "Adults in apartments and other small kitchens",
+  solutionDescription: "A manually adjustable rack that spans a household sink and supports a removable perforated basket.",
+};
 
 const labels = { failed: "Failed", expired: "Expired lease", blocked: "Human gate" } as const;
 
 export default function AtlasOperationsPage() {
   const snapshot = useQuery(getSnapshot);
+  const createPilotInvention = useMutation(createInvention);
+  const kickWork = useMutation(kickAutonomousWork);
+  const [pilotState, setPilotState] = useState<{ inventionId?: string; message?: string; creating: boolean }>({ creating: false });
+
+  const launchRepresentativePilot = async () => {
+    if (!window.confirm("Create the standard non-safety-critical Atlas representative invention and start its eligible autonomous work?")) return;
+    setPilotState({ creating: true, message: "Creating representative pilot case…" });
+    try {
+      const inventionId = await createPilotInvention(REPRESENTATIVE_PILOT);
+      const result = await kickWork({ inventionId });
+      setPilotState({
+        creating: false,
+        inventionId,
+        message: result.scheduled
+          ? "Representative pilot created and autonomous work scheduled."
+          : `Representative pilot created. Work was not scheduled yet (${result.reason ?? "unknown reason"}).`,
+      });
+    } catch (error) {
+      setPilotState({ creating: false, message: error instanceof Error ? error.message : "Could not create the representative pilot case." });
+    }
+  };
+
   if (snapshot === undefined) return <div className="space-y-6"><AdminHeader title="Atlas operations" /><Skeleton className="h-28" /><Skeleton className="h-72" /></div>;
 
   return (
@@ -37,6 +72,19 @@ export default function AtlasOperationsPage() {
         <StatsCard title="Human gates" value={String(snapshot.counts.blocked)} icon={AlertTriangle} />
         <StatsCard title="Cost today" value={`${snapshot.counts.usedCostUnits} used · ${snapshot.counts.reservedCostUnits} reserved`} icon={Coins} />
       </div>
+
+      <Card>
+        <CardHeader><CardTitle className="flex items-center gap-2 text-lg"><FlaskConical className="h-5 w-5" />Controlled-pilot launcher</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">Creates the standard adjustable produce-rinsing rack case used by Atlas regression evaluation, then starts whatever autonomous work the signed-in administrator's plan and daily budget permit.</p>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button onClick={() => void launchRepresentativePilot()} disabled={pilotState.creating}>{pilotState.creating ? "Creating…" : "Create representative pilot"}</Button>
+            {pilotState.inventionId && <Button asChild variant="outline"><Link href={`/invention/${pilotState.inventionId}/work`}>Open pilot work</Link></Button>}
+          </div>
+          {pilotState.message && <p role="status" className="text-xs text-muted-foreground">{pilotState.message}</p>}
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader><CardTitle className="flex items-center gap-2 text-lg"><Activity className="h-5 w-5" />Work requiring attention</CardTitle></CardHeader>
         <CardContent>
