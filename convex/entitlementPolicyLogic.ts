@@ -30,6 +30,12 @@ const PRO_WORK = new Set([
   "concept_image_generation",
   "engineering_handoff",
   "package_assembly",
+  "design_candidate_generation",
+  "design_candidate_scoring",
+  "product_design_specification",
+  "cad_model_specification",
+  "exploded_view_specification",
+  "manufacturing_drawing_specification",
 ]);
 
 export function canTierRunWorkKind(tier: unknown, kind: string | undefined): boolean {
