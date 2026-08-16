@@ -80,6 +80,15 @@ async function invitationRowsForEmail(ctx: MutationCtx, email: string) {
   return rows;
 }
 
+async function invitationRowsForAccount(ctx: MutationCtx, userId: Id<"users">) {
+  // There is intentionally no acceptedByUserId index: invitations are normally
+  // addressed/looked up by email. Account deletion is rare and must also catch a
+  // pending invitation that was securely bound to this account before its email
+  // later changed, so a bounded lifecycle operation scans and filters by user ID.
+  const rows = await ctx.db.query("organizationInvitations").collect();
+  return rows.filter((row) => row.acceptedByUserId === userId);
+}
+
 export async function deleteAccountData(ctx: MutationCtx, userId: Id<"users">): Promise<AccountDeletionSummary> {
   const user = await ctx.db.get(userId);
   if (!user) throw new Error("Account already deleted or user record missing");
@@ -160,11 +169,19 @@ export async function deleteAccountData(ctx: MutationCtx, userId: Id<"users">): 
   }
 
   const normalizedEmail = user.email?.trim().toLowerCase();
-  const invitationRows = normalizedEmail ? await invitationRowsForEmail(ctx, normalizedEmail) : [];
+  const [emailInvitationRows, accountInvitationRows] = await Promise.all([
+    normalizedEmail ? invitationRowsForEmail(ctx, normalizedEmail) : Promise.resolve([]),
+    invitationRowsForAccount(ctx, userId),
+  ]);
+  const invitationRowsById = new Map<string, (typeof accountInvitationRows)[number]>();
+  for (const row of emailInvitationRows) invitationRowsById.set(String(row._id), row);
+  for (const row of accountInvitationRows) invitationRowsById.set(String(row._id), row);
+  const invitationRows = [...invitationRowsById.values()];
   for (const row of invitationRows) {
     // Company/studio invitation history may remain with the organization, but
     // the departing person's email/account reference is removed. Pending seats
-    // are released immediately instead of surviving account deletion.
+    // are released immediately even if the account changed email after the
+    // invitation was securely bound.
     await ctx.db.patch(row._id, {
       email: `deleted-invite-${row._id}@invalid.local`,
       status: row.status === "pending" ? "revoked" : row.status,
