@@ -5,7 +5,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { useQuery, useMutation, useConvexAuth } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import { api } from "@convex/_generated/api";
-import { Building2, Download, LogOut, Map, ScrollText, UserRound, Wrench } from "lucide-react";
+import { BarChart3, Building2, Download, LogOut, Map, ScrollText, UserRound, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AtlasLogo } from "@/components/atlas/atlas-logo";
 import { useEffect } from "react";
@@ -35,6 +35,7 @@ export function AppNav({ className }: AppNavProps) {
           <Button asChild variant="ghost" size="sm" className="gap-1.5"><Link href="/inventions"><ScrollText className="h-4 w-4" /><span className="hidden sm:inline">My Inventions</span></Link></Button>
           {activeInvention && activeInvention.access !== "view" && activeInvention.access !== "review" && <Button asChild variant="ghost" size="sm" className="gap-1.5"><Link href={`/invention/${activeInvention._id}/design`} title="Product Design + CAD"><Wrench className="h-4 w-4" /><span className="hidden lg:inline">Design + CAD</span></Link></Button>}
           <Button asChild variant="ghost" size="sm" className="gap-1.5"><Link href="/organizations" title="Organizations and team access"><Building2 className="h-4 w-4" /><span className="hidden xl:inline">Teams</span></Link></Button>
+          <Button asChild variant="ghost" size="sm" className="gap-1.5"><Link href="/organizations/usage" title="Organization usage and cost-to-serve"><BarChart3 className="h-4 w-4" /><span className="hidden 2xl:inline">Usage</span></Link></Button>
           <Button asChild variant="ghost" size="sm" className="gap-1.5"><Link href="/account/data-export" title="Download your InventSmith data"><Download className="h-4 w-4" /><span className="hidden 2xl:inline">My Data</span></Link></Button>
           <Button asChild variant="ghost" size="sm" className="gap-1.5"><Link href="/account"><UserRound className="h-4 w-4" /><span className="hidden sm:inline">Account</span></Link></Button>
           {user && <span className="hidden max-w-[140px] truncate text-sm text-muted-foreground 2xl:block">{user.name ?? user.email ?? ""}</span>}
