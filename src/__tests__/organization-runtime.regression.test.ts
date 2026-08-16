@@ -3,6 +3,10 @@ import { describe, expect, it } from "vitest";
 
 const schemaSource = readFileSync("convex/schema.ts", "utf8");
 const organizationSource = readFileSync("convex/organizations.ts", "utf8");
+const usageScopeSource = readFileSync("convex/organizationUsageScope.ts", "utf8");
+const chatSource = readFileSync("convex/atlasChat.ts", "utf8");
+const workspaceSource = readFileSync("convex/inventionWorkspace.ts", "utf8");
+const workStateSource = readFileSync("convex/atlasWorkState.ts", "utf8");
 
 describe("InventSmith organization runtime", () => {
   it("keeps organization-native tenancy represented in the Convex schema", () => {
@@ -27,5 +31,30 @@ describe("InventSmith organization runtime", () => {
     expect(organizationSource).toContain("requireInventionEditAccess");
     expect(organizationSource).toContain("requireInventionManageAccess");
     expect(organizationSource).toContain("Target user must be an active organization member");
+  });
+
+  it("shares one usage allowance across organization members and inventions", () => {
+    expect(usageScopeSource).toContain("organization.createdByUserId");
+    expect(usageScopeSource).toContain("plan: organization.planKey");
+    expect(usageScopeSource).toContain('scope: "organization" as const');
+    expect(usageScopeSource).toContain("usageUserId: invention.userId");
+
+    expect(chatSource).toContain("resolveInventionUsageScope(ctx, inventionId)");
+    expect(chatSource).toContain('q.eq("userId", usageScope.usageUserId)');
+    expect(chatSource).toContain("userId: usageScope.usageUserId");
+
+    expect(workspaceSource).toContain("resolveInventionUsageScope(ctx, inventionId)");
+    expect(workspaceSource).toContain('q.eq("userId", usageScope.usageUserId)');
+    expect(workspaceSource).toContain("usageScope.plan");
+
+    expect(workStateSource).toContain("resolveInventionUsageScope(ctx, args.inventionId)");
+    expect(workStateSource).toContain("resolveInventionUsageScope(ctx, inventionId)");
+    expect(workStateSource).toContain('q.eq("userId", usageScope.usageUserId)');
+    expect(workStateSource).toContain("userId: usageScope.usageUserId");
+    expect(workStateSource).toContain("canTierRunWorkKind(usageScope.plan, kind)");
+  });
+
+  it("keeps canonical invention ownership attribution stable when collaborators initialize missing records", () => {
+    expect(workspaceSource).toContain("userId: invention.userId");
   });
 });
