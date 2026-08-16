@@ -4,6 +4,7 @@ import { makeFunctionReference } from "convex/server";
 import type { Id } from "./_generated/dataModel";
 import { canTierRunWorkKind } from "./entitlementPolicyLogic";
 import { requireInventionEditAccess, requireInventionReadAccess } from "./organizations";
+import { ensureOrganizationDailyUsage } from "./organizationDailyUsage";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 
 const runAvailableWork = makeFunctionReference<"action", { inventionId: Id<"inventions">; costBudgetUnits?: number }, unknown>("atlasWorkOrchestration:runAvailableWork");
@@ -16,6 +17,18 @@ async function settleCadUsage(ctx: any, workItem: any, inventionId: Id<"inventio
   const usageScope = await resolveInventionUsageScope(ctx, inventionId);
   if (!usageScope) throw new ConvexError("Invention not found while settling CAD usage");
   const key = workItem.reservationDateKey ?? dateKey(now);
+
+  if (usageScope.scope === "organization" && usageScope.organizationId) {
+    const usage = await ensureOrganizationDailyUsage(ctx, usageScope.organizationId, key, now);
+    await ctx.db.patch(usage._id, {
+      autonomousCostUnits: usage.autonomousCostUnits + actualCostUnits,
+      reservedAutonomousCostUnits: Math.max(0, (usage.reservedAutonomousCostUnits ?? 0) - (workItem.reservedCostUnits ?? 0)),
+      completedWorkItems: usage.completedWorkItems + completedWorkItems,
+      updatedAt: now,
+    });
+    return;
+  }
+
   const usage = await ctx.db.query("atlasDailyUsage").withIndex("by_userId_dateKey", (q: any) => q.eq("userId", usageScope.usageUserId).eq("dateKey", key)).unique();
   if (usage) {
     await ctx.db.patch(usage._id, {
