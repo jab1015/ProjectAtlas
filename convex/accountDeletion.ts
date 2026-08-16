@@ -107,6 +107,7 @@ export async function deleteAccountData(
       personalOrganizationIds.push(organization._id);
     }
   }
+  const personalOrganizationIdSet = new Set(personalOrganizationIds.map(String));
 
   const legacyInventions = (await ctx.db
     .query("inventions")
@@ -187,16 +188,20 @@ export async function deleteAccountData(
     });
   }
 
-  const subscriptionEvents = user.email
+  const matchingSubscriptionEvents = user.email
     ? await ctx.db
         .query("subscriptionEvents")
         .withIndex("by_customerEmail", (q) => q.eq("customerEmail", user.email!))
         .collect()
     : [];
-  for (const row of subscriptionEvents) {
+  const personalSubscriptionEvents = matchingSubscriptionEvents.filter((row) =>
+    !row.appliedOrganizationId || personalOrganizationIdSet.has(String(row.appliedOrganizationId))
+  );
+  for (const row of personalSubscriptionEvents) {
     await ctx.db.patch(row._id, {
       customerEmail: `deleted-${row._id}@invalid.local`,
       appliedUserId: undefined,
+      appliedOrganizationId: undefined,
       subscriptionId: undefined,
       billingCustomerId: undefined,
     });
@@ -250,7 +255,7 @@ export async function deleteAccountData(
     usageRowsDeleted: usage.length + organizationUsageRowsDeleted,
     notificationsDeleted: notifications.length,
     purchasesAnonymized: purchases.length,
-    subscriptionEventsAnonymized: subscriptionEvents.length,
+    subscriptionEventsAnonymized: personalSubscriptionEvents.length,
     authSessionsDeleted: sessions.length,
     authAccountsDeleted: accounts.length,
   };
