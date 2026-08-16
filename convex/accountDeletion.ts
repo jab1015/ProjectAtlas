@@ -142,7 +142,18 @@ export async function deleteAccountData(
   for (const grant of accessGrants) await ctx.db.delete(grant._id);
   for (const membership of memberships) await ctx.db.delete(membership._id);
 
+  let organizationUsageRowsDeleted = 0;
   for (const organizationId of personalOrganizationIds) {
+    // Personal organizations are part of this account's data boundary, so their
+    // organization-native usage ledger must be removed with the organization.
+    // Company/studio ledgers are intentionally untouched when a member leaves.
+    const organizationUsage = await ctx.db
+      .query("organizationDailyUsage")
+      .withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId))
+      .collect();
+    for (const row of organizationUsage) await ctx.db.delete(row._id);
+    organizationUsageRowsDeleted += organizationUsage.length;
+
     const remainingMemberships = await ctx.db
       .query("organizationMemberships")
       .withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId))
@@ -236,7 +247,7 @@ export async function deleteAccountData(
     inventionsDeleted: inventions.length,
     generatedFilesDeleted,
     uploadedFilesDeleted,
-    usageRowsDeleted: usage.length,
+    usageRowsDeleted: usage.length + organizationUsageRowsDeleted,
     notificationsDeleted: notifications.length,
     purchasesAnonymized: purchases.length,
     subscriptionEventsAnonymized: subscriptionEvents.length,
