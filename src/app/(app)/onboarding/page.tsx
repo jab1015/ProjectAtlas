@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useConvexAuth } from "convex/react";
 import { makeFunctionReference } from "convex/server";
@@ -48,7 +48,7 @@ const STEPS: OnboardingStep[] = [
   { id: "title", question: "Give your invention a working title.", hint: "Don't overthink it — you can change this later.", type: "text" },
 ];
 
-export default function OnboardingPage() {
+function OnboardingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const requestedOrganizationId = searchParams.get("organizationId");
@@ -185,5 +185,13 @@ export default function OnboardingPage() {
 
       <MadeThisBadge />
     </div>
+  );
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">Preparing InventSmith…</div>}>
+      <OnboardingContent />
+    </Suspense>
   );
 }
