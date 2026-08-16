@@ -5,7 +5,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { useQuery, useMutation } from "convex/react";
 import { useConvexAuth } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { Download, LogOut, Map, ScrollText, UserRound, Wrench } from "lucide-react";
+import { Building2, Download, LogOut, Map, ScrollText, UserRound, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AtlasLogo } from "@/components/atlas/atlas-logo";
 import { useEffect } from "react";
@@ -36,7 +36,8 @@ export function AppNav({ className }: AppNavProps) {
 
           {activeInvention && <Button asChild variant="ghost" size="sm" className="gap-1.5"><Link href={`/invention/${activeInvention._id}/design`} title="Product Design + CAD"><Wrench className="h-4 w-4" /><span className="hidden lg:inline">Design + CAD</span></Link></Button>}
 
-          <Button asChild variant="ghost" size="sm" className="gap-1.5"><Link href="/account/data-export" title="Download your InventSmith data"><Download className="h-4 w-4" /><span className="hidden xl:inline">My Data</span></Link></Button>
+          <Button asChild variant="ghost" size="sm" className="gap-1.5"><Link href="/organizations" title="Organizations and team access"><Building2 className="h-4 w-4" /><span className="hidden xl:inline">Teams</span></Link></Button>
+          <Button asChild variant="ghost" size="sm" className="gap-1.5"><Link href="/account/data-export" title="Download your InventSmith data"><Download className="h-4 w-4" /><span className="hidden 2xl:inline">My Data</span></Link></Button>
           <Button asChild variant="ghost" size="sm" className="gap-1.5"><Link href="/account"><UserRound className="h-4 w-4" /><span className="hidden sm:inline">Account</span></Link></Button>
           {user && <span className="hidden max-w-[140px] truncate text-sm text-muted-foreground 2xl:block">{user.name ?? user.email ?? ""}</span>}
           <Button variant="ghost" size="sm" onClick={() => void signOut()} className="gap-1.5 text-muted-foreground hover:text-foreground" title="Sign out"><LogOut className="h-4 w-4" /><span className="hidden sm:inline">Sign Out</span></Button>
