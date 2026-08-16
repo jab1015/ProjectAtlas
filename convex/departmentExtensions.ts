@@ -1,6 +1,6 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
-import { ConvexError, v } from "convex/values";
+import { v } from "convex/values";
 import { query } from "./_generated/server";
+import { requireInventionReadAccess } from "./organizations";
 
 /**
  * Returns full-product work assigned to a lifecycle stage but defined outside
@@ -10,10 +10,7 @@ import { query } from "./_generated/server";
 export const getDepartmentExtensions = query({
   args: { inventionId: v.id("inventions"), stageId: v.number() },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new ConvexError("Authentication required");
-    const invention = await ctx.db.get(args.inventionId);
-    if (!invention || invention.userId !== userId) throw new ConvexError("Invention not found or access denied");
+    await requireInventionReadAccess(ctx, args.inventionId);
 
     const [workItems, deliverables] = await Promise.all([
       ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect(),
