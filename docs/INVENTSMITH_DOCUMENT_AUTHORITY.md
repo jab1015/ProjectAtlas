@@ -12,7 +12,7 @@ Read these first, in this order:
 2. `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md` — authoritative implementation checkpoint and continuation order.
 3. `docs/ATLAS_BUILD_PROGRESS.md` — concise repository progress/acceptance status; legacy filename retained for compatibility.
 4. `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md` — document precedence and supersession rules.
-5. `docs/ATLAS_DEPLOYMENT_RUNBOOK.md` — deployment/live verification procedures where still applicable.
+5. `docs/ATLAS_DEPLOYMENT_RUNBOOK.md` — authoritative MadeThis handoff, deployment and live-acceptance procedure; legacy filename retained for compatibility.
 
 ## Historical/specialized planning documents
 
@@ -34,16 +34,18 @@ In particular, any older statement that says or implies that only Stages 1–4 a
 - Until email ownership is cryptographically/operationally verified, a later account may not claim a pre-signup invitation merely by registering the invited address.
 - Pricing direction: **Explorer $0 → Inventor $39 → Pro $99 → Enterprise $199 → Studio $299+**.
 - Studio direction begins with **Studio 3 $299 / 3 active inventions** and **Studio 6 $399 / 6 active inventions**; larger capacity remains economics-driven/custom.
-- Exact seats/compute/storage/premium-generation allowances remain unlocked until measured cost-to-serve is sufficiently calibrated.
+- Exact compute/storage/premium-generation allowances remain unlocked until measured cost-to-serve is sufficiently calibrated. Current daily usage ceilings are safety caps, not final commercial promises.
 - Internal cost economics are not customer-wide data; detailed provider/cost intelligence is restricted to authorized organization administration.
 - Repository CI success is necessary but not sufficient for live/physical/professional/billing acceptance.
 
 ## Current implementation truth
 
-The organization schema, shared organization usage ledger, organization-scoped entitlement foundation, invention-level authorization/sharing foundations, organization-safe privacy/export/deletion behavior, measured cost-unit attribution/scenario reporting and safe consent-based team invitation foundation are implemented on `inventsmith/full-product-build`.
+The organization schema, shared organization usage ledger, organization-scoped entitlement foundation, invention-level authorization/sharing foundations, organization-safe privacy/export/deletion behavior, measured cost-unit attribution/scenario reporting, consent-based team invitation foundation, complete journey wiring and genuine prototype/quote/launch/professional evidence gates are implemented on `inventsmith/full-product-build`.
 
-The latest fully verified CI checkpoint is older than the newest invitation/privacy/economics/documentation commits. Therefore the immediate continuation action is a fresh full CI pass on the current head, followed by repair of any failures and continuation of the remaining production-readiness audit.
+Atlas CI #443 on `6ec6429ac3ff7bf75d4e018a972b1e1338b5a59a` is the latest fully verified checkpoint before the deployment-runbook/authority documentation refresh. The current documentation head must receive its own full green CI pass before being pinned for MadeThis replication.
 
 ## Continuation rule
 
 A new chat or coding worker must not spend time reconciling every historical Atlas document before continuing implementation. Use the authority order above, preserve compatible historical detail, and treat conflicting older release-scope language as superseded. Draft PR #24 remains intentionally unmerged until GitHub implementation is complete and founder approval is given.
+
+When repository inspection finds no remaining code-only blocker and the current head is fully green, the next step is to pin the exact GitHub SHA and hand it to MadeThis for deterministic replication. Live authentication, external billing, real provider/runtime economics, artifact-quality review and genuine physical/professional/market evidence are acceptance work after replication; they must not be fabricated inside the repository merely to claim completion.
