@@ -45,7 +45,10 @@ export const applySubscriptionEvent = internalMutation({
       .query("subscriptionEvents")
       .withIndex("by_providerEventId", (q) => q.eq("providerEventId", args.providerEventId))
       .unique();
-    if (existing) return { duplicate: true, applied: Boolean(existing.appliedUserId) };
+    if (existing) return {
+      duplicate: true,
+      applied: Boolean(existing.appliedUserId || existing.appliedOrganizationId),
+    };
 
     const receivedAt = Date.now();
     const user = await ctx.db.query("users").withIndex("email", (q) => q.eq("email", args.customerEmail)).first();
@@ -70,27 +73,25 @@ export const applySubscriptionEvent = internalMutation({
         ownerEmail &&
         ownerEmail === args.customerEmail.trim().toLowerCase()
       );
-      const stale = Boolean(organization && organization.updatedAt > args.occurredAt);
+      // Billing recency is independent from organization profile/team edits.
+      const stale = Boolean(organization && (organization.subscriptionUpdatedAt ?? 0) > args.occurredAt);
+      const plan = requestedOrganizationPlan(args.tier, args.organizationPlanKey);
       const eventId = await ctx.db.insert("subscriptionEvents", {
         providerEventId: args.providerEventId,
         customerEmail: args.customerEmail,
-        // subscriptionEvents retains the legacy/base tier for migration-safe
-        // history. The exact Studio plan is authoritative on the organization.
         tier: args.tier,
+        organizationPlanKey: plan,
         status: args.status,
         subscriptionId: args.subscriptionId,
         billingCustomerId: args.billingCustomerId,
         currentPeriodEnd: args.currentPeriodEnd,
         occurredAt: args.occurredAt,
-        // Compatibility attribution only. Entitlement is written solely to the
-        // organization below; this user does not receive a duplicate allowance.
-        appliedUserId: validTarget && !stale ? ownerMembership?.userId : undefined,
+        appliedOrganizationId: validTarget && !stale ? args.organizationId : undefined,
         receivedAt,
       });
       if (!validTarget) return { duplicate: false, applied: false, eventId, invalidOrganizationTarget: true };
       if (stale) return { duplicate: false, applied: false, eventId, stale: true };
 
-      const plan = requestedOrganizationPlan(args.tier, args.organizationPlanKey);
       const effectivePlan = effectiveOrganizationPlanForSubscription(
         plan,
         args.status,
@@ -103,7 +104,8 @@ export const applySubscriptionEvent = internalMutation({
         subscriptionId: args.subscriptionId,
         billingCustomerId: args.billingCustomerId,
         subscriptionCurrentPeriodEnd: args.currentPeriodEnd,
-        updatedAt: args.occurredAt,
+        subscriptionUpdatedAt: args.occurredAt,
+        updatedAt: Math.max(organization?.updatedAt ?? 0, args.occurredAt),
       });
       return {
         duplicate: false,
@@ -121,6 +123,7 @@ export const applySubscriptionEvent = internalMutation({
         providerEventId: args.providerEventId,
         customerEmail: args.customerEmail,
         tier: args.tier,
+        organizationPlanKey: args.organizationPlanKey,
         status: args.status,
         subscriptionId: args.subscriptionId,
         billingCustomerId: args.billingCustomerId,
@@ -170,7 +173,7 @@ export const applySubscriptionEvent = internalMutation({
         personalOrganization &&
         personalOrganization.kind === "personal" &&
         personalOrganization.status === "active" &&
-        personalOrganization.updatedAt <= args.occurredAt
+        (personalOrganization.subscriptionUpdatedAt ?? 0) <= args.occurredAt
       ) {
         await ctx.db.patch(personalOrganization._id, {
           planKey: organizationPlanForEffectiveTier(effectiveTier),
@@ -178,7 +181,8 @@ export const applySubscriptionEvent = internalMutation({
           subscriptionId: args.subscriptionId,
           billingCustomerId: args.billingCustomerId,
           subscriptionCurrentPeriodEnd: args.currentPeriodEnd,
-          updatedAt: args.occurredAt,
+          subscriptionUpdatedAt: args.occurredAt,
+          updatedAt: Math.max(personalOrganization.updatedAt, args.occurredAt),
         });
       }
     }
