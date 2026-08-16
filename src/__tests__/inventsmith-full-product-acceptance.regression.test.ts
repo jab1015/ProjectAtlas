@@ -106,6 +106,26 @@ describe("InventSmith complete idea-to-market repository acceptance contract", (
     expect(legacyGuard).toContain("router.replace(`${rootPath}/journey`)");
   });
 
+  it("keeps subscription entitlement and privacy/export/deletion behavior inside the full-product contract", () => {
+    const entitlement = readFileSync(join(process.cwd(), "convex/entitlementPolicyLogic.ts"), "utf8");
+    const subscription = readFileSync(join(process.cwd(), "convex/subscriptionPolicyLogic.ts"), "utf8");
+    const privacyExport = readFileSync(join(process.cwd(), "convex/privacyExport.ts"), "utf8");
+    const accountDeletion = readFileSync(join(process.cwd(), "convex/accountDeletion.ts"), "utf8");
+    const exportPage = readFileSync(join(process.cwd(), "src/app/(app)/account/data-export/page.tsx"), "utf8");
+
+    expect(entitlement).toContain("canTierRunWorkKind");
+    expect(subscription).toContain("effectiveTierForSubscription");
+    expect(subscription).toContain('status === "canceled"');
+    expect(privacyExport).toContain("getAuthUserId(ctx)");
+    expect(privacyExport).toContain("binaryContentIncluded: false");
+    expect(privacyExport).not.toContain('ctx.db.query("authSessions")');
+    expect(exportPage).toContain("Download JSON export");
+    expect(accountDeletion).toContain("ctx.storage.delete");
+    expect(accountDeletion).toContain('query("authRefreshTokens")');
+    expect(accountDeletion).toContain("purchasesAnonymized");
+    expect(accountDeletion).toContain("subscriptionEventsAnonymized");
+  });
+
   it("keeps the product promise tied to the complete destination rather than the retired pilot", () => {
     const spec = readFileSync(join(process.cwd(), "docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md"), "utf8");
     const progress = readFileSync(join(process.cwd(), "docs/ATLAS_BUILD_PROGRESS.md"), "utf8");
