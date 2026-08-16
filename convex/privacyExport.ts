@@ -91,6 +91,14 @@ async function invitationRowsForEmail(ctx: QueryCtx, email: string) {
   return requireWithinLimit(rows, ROW_LIMIT, "organization-invitation count");
 }
 
+async function invitationRowsForAccount(ctx: QueryCtx, userId: Id<"users">) {
+  // Stable pending-invitation account binding reuses acceptedByUserId. Status is
+  // the consent truth. Include account-bound rows even after an email change so
+  // the user's personal export remains complete.
+  const rows = await ctx.db.query("organizationInvitations").take(ROW_LIMIT + 1);
+  return requireWithinLimit(rows.filter((row) => row.acceptedByUserId === userId), ROW_LIMIT, "account-bound organization-invitation count");
+}
+
 async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
   const { user, inventions: scopedInventions, organizationAffiliations, personalOrganizationIdValues } = await personalExportScope(ctx, userId);
   const inventions = requireWithinLimit(scopedInventions, INVENTION_LIMIT, "personal invention count");
@@ -117,12 +125,19 @@ async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
   const personalOrganizationIdSet = new Set(personalOrganizationIdValues.map(String));
   const subscriptionEvents = matchingSubscriptionEvents.filter((event) => !event.appliedOrganizationId || personalOrganizationIdSet.has(String(event.appliedOrganizationId)));
   const normalizedEmail = user.email?.trim().toLowerCase();
-  const organizationInvitations = normalizedEmail ? await invitationRowsForEmail(ctx, normalizedEmail) : [];
+  const [emailInvitationRows, accountInvitationRows] = await Promise.all([
+    normalizedEmail ? invitationRowsForEmail(ctx, normalizedEmail) : Promise.resolve([]),
+    invitationRowsForAccount(ctx, userId),
+  ]);
+  const organizationInvitationsById = new Map<string, (typeof accountInvitationRows)[number]>();
+  for (const row of emailInvitationRows) organizationInvitationsById.set(String(row._id), row);
+  for (const row of accountInvitationRows) organizationInvitationsById.set(String(row._id), row);
+  const organizationInvitations = requireWithinLimit([...organizationInvitationsById.values()], ROW_LIMIT, "organization-invitation count");
 
   return {
     exportVersion: 5,
     generatedAt: Date.now(),
-    scope: "InventSmith personal account data. Company/studio invention, usage, and organization billing data is excluded from this personal export even if this user originally created the invention or paid for the organization. Invitations addressed to this account are included because they are personal access records. Organization-authorized exports are handled separately. Uploaded/generated binary file bytes are not embedded in this JSON.",
+    scope: "InventSmith personal account data. Company/studio invention, usage, and organization billing data is excluded from this personal export even if this user originally created the invention or paid for the organization. Invitations addressed or securely account-bound to this account are included because they are personal access records. Invitation status, not the presence of an account-binding field, is the source of truth for consent. Organization-authorized exports are handled separately. Uploaded/generated binary file bytes are not embedded in this JSON.",
     profile: {
       _id: user._id,
       _creationTime: user._creationTime,
