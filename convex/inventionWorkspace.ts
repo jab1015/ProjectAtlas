@@ -1,6 +1,5 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
-import { internalMutation, mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { makeFunctionReference } from "convex/server";
 import { buildStatusBriefing } from "./statusBriefingLogic";
@@ -9,6 +8,11 @@ import { MAX_AUTONOMOUS_RUN_BUDGET, remainingAutonomousCostUnitsAfterReservation
 import { evaluatePilotPackage } from "./pilotEvaluationLogic";
 import { isAdmin } from "./authHelpers";
 import { deriveTrustStateFromProfessionalReviews } from "./professionalReviewLogic";
+import {
+  requireInventionEditAccess,
+  requireInventionManageAccess,
+  requireInventionReadAccess,
+} from "./organizations";
 
 const runAvailableWork = makeFunctionReference<
   "action",
@@ -16,25 +20,20 @@ const runAvailableWork = makeFunctionReference<
   unknown
 >("atlasWorkOrchestration:runAvailableWork");
 
-async function requireOwnedInvention(
-  ctx: QueryCtx | MutationCtx,
+async function getAccessibleInvention(
+  ctx: Parameters<typeof requireInventionReadAccess>[0],
   inventionId: Id<"inventions">
 ) {
-  const userId = await getAuthUserId(ctx);
-  if (!userId) throw new ConvexError("Not authenticated");
-
+  const authorization = await requireInventionReadAccess(ctx, inventionId);
   const invention = await ctx.db.get(inventionId);
-  if (!invention || invention.userId !== userId) {
-    throw new ConvexError("Invention not found");
-  }
-
-  return { invention, userId };
+  if (!invention) throw new ConvexError("Invention not found");
+  return { invention, ...authorization };
 }
 
 export const getWorkspaceState = query({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
-    const { invention, userId } = await requireOwnedInvention(ctx, inventionId);
+    const { invention, userId, access } = await getAccessibleInvention(ctx, inventionId);
 
     const [user, record, assumptions, findings, decisions, approvals, workItems, deliverables, reviews] =
       await Promise.all([
@@ -51,6 +50,7 @@ export const getWorkspaceState = query({
 
     return {
       invention,
+      access,
       record,
       assumptions,
       findings,
@@ -67,7 +67,7 @@ export const getWorkspaceState = query({
 export const getStatusBriefing = query({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
-    const { userId } = await requireOwnedInvention(ctx, inventionId);
+    const { userId } = await requireInventionReadAccess(ctx, inventionId);
 
     const [user, workItems, decisions, approvals, findings] = await Promise.all([
       ctx.db.get(userId),
@@ -84,7 +84,7 @@ export const getStatusBriefing = query({
 export const getReviewQueue = query({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
-    const { invention } = await requireOwnedInvention(ctx, inventionId);
+    const { invention } = await getAccessibleInvention(ctx, inventionId);
     const [decisions, approvals, blockedWork] = await Promise.all([
       ctx.db
         .query("inventionDecisions")
@@ -118,7 +118,7 @@ export const getReviewQueue = query({
 export const getDeliverableLibrary = query({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
-    const { invention } = await requireOwnedInvention(ctx, inventionId);
+    const { invention } = await getAccessibleInvention(ctx, inventionId);
     const [deliverables, sources, reviews, executionEvents] = await Promise.all([
       ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
       ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
@@ -148,7 +148,7 @@ export const getDeliverableLibrary = query({
 export const getPilotEvaluation = query({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
-    await requireOwnedInvention(ctx, inventionId);
+    await requireInventionReadAccess(ctx, inventionId);
     const [deliverables, findings, sources, workItems] = await Promise.all([
       ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
       ctx.db.query("evidenceFindings").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
@@ -163,7 +163,9 @@ export const getPilotEvaluation = query({
 export const ensureInventionRecord = mutation({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
-    const { invention, userId } = await requireOwnedInvention(ctx, inventionId);
+    const { userId } = await requireInventionEditAccess(ctx, inventionId);
+    const invention = await ctx.db.get(inventionId);
+    if (!invention) throw new ConvexError("Invention not found");
     const existing = await ctx.db
       .query("inventionRecords")
       .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
@@ -193,7 +195,7 @@ export const ensureInventionRecord = mutation({
 export const kickAutonomousWork = mutation({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
-    const { userId } = await requireOwnedInvention(ctx, inventionId);
+    const { userId } = await requireInventionEditAccess(ctx, inventionId);
     const user = await ctx.db.get(userId);
     const dateKey = utcDateKey(Date.now());
     const usage = await ctx.db.query("atlasDailyUsage").withIndex("by_userId_dateKey", (q) => q.eq("userId", userId).eq("dateKey", dateKey)).unique();
@@ -216,7 +218,7 @@ export const resolveDecision = mutation({
   handler: async (ctx, { decisionId, selectedOptionKey, rationale }) => {
     const decision = await ctx.db.get(decisionId);
     if (!decision) throw new ConvexError("Decision not found");
-    const { userId } = await requireOwnedInvention(ctx, decision.inventionId);
+    const { userId } = await requireInventionManageAccess(ctx, decision.inventionId);
     if (!canResolveDecision(decision.status, selectedOptionKey, decision.options)) {
       throw new ConvexError(
         decision.status === "open"
@@ -238,8 +240,8 @@ export const resolveDecision = mutation({
       inventionId: decision.inventionId,
       eventType: "decision_resolved",
       actorType: "inventor",
-      summary: `Inventor selected decision option ${selectedOptionKey}.`,
-      metadata: { decisionId: String(decisionId), selectedOptionKey },
+      summary: `Authorized invention manager selected decision option ${selectedOptionKey}.`,
+      metadata: { decisionId: String(decisionId), selectedOptionKey, resolvedByUserId: String(userId) },
       createdAt: now,
     });
     return { success: true };
@@ -254,7 +256,7 @@ export const resolveApprovalRequest = mutation({
   handler: async (ctx, { approvalRequestId, approved }) => {
     const request = await ctx.db.get(approvalRequestId);
     if (!request) throw new ConvexError("Approval request not found");
-    const { userId } = await requireOwnedInvention(ctx, request.inventionId);
+    const { userId } = await requireInventionManageAccess(ctx, request.inventionId);
     if (!canResolveApproval(request.status)) {
       throw new ConvexError("Approval request is not pending");
     }
@@ -269,8 +271,8 @@ export const resolveApprovalRequest = mutation({
       inventionId: request.inventionId,
       eventType: "approval_resolved",
       actorType: "inventor",
-      summary: approved ? "Inventor approved the requested action." : "Inventor denied the requested action.",
-      metadata: { approvalRequestId: String(approvalRequestId), approved },
+      summary: approved ? "Authorized invention manager approved the requested action." : "Authorized invention manager denied the requested action.",
+      metadata: { approvalRequestId: String(approvalRequestId), approved, resolvedByUserId: String(userId) },
       createdAt: now,
     });
     return { success: true };
@@ -285,7 +287,7 @@ export const respondToBlockedWork = mutation({
   handler: async (ctx, { workItemId, response }) => {
     const workItem = await ctx.db.get(workItemId);
     if (!workItem) throw new ConvexError("Work item not found");
-    const { userId } = await requireOwnedInvention(ctx, workItem.inventionId);
+    const { userId } = await requireInventionEditAccess(ctx, workItem.inventionId);
     if (workItem.status !== "blocked") throw new ConvexError("Work item is not waiting for input");
     const cleaned = response.trim();
     if (!canRespondToBlockedWork(workItem.status, cleaned)) throw new ConvexError("Response must be between 1 and 4,000 characters");
@@ -310,8 +312,8 @@ export const respondToBlockedWork = mutation({
       workItemId,
       eventType: "inventor_input_received",
       actorType: "inventor",
-      summary: "Inventor supplied the requested minimum input; work was requeued.",
-      metadata: { gateType: workItem.humanGateType, characterCount: cleaned.length },
+      summary: "Authorized collaborator supplied the requested minimum input; work was requeued.",
+      metadata: { gateType: workItem.humanGateType, characterCount: cleaned.length, suppliedByUserId: String(userId) },
       createdAt: now,
     });
     if (remaining > 0) {
