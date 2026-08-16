@@ -1,11 +1,11 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { makeFunctionReference } from "convex/server";
-import { internalMutation, internalQuery, mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
+import { internalMutation, internalQuery, mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { canAskChatQuestion, isValidChatContent } from "./chatPolicyLogic";
 import { canAskWithinDailyAllowance, utcDateKey } from "./usagePolicyLogic";
 import { FULL_JOURNEY_STAGES } from "./fullJourneyDefinition";
+import { requireInventionEditAccess, requireInventionReadAccess } from "./organizations";
 
 const answerQuestion = makeFunctionReference<
   "action",
@@ -13,18 +13,12 @@ const answerQuestion = makeFunctionReference<
   unknown
 >("atlasChatAction:answerQuestion");
 
-async function requireOwnedInvention(ctx: QueryCtx | MutationCtx, inventionId: Id<"inventions">) {
-  const userId = await getAuthUserId(ctx);
-  if (!userId) throw new ConvexError("Not authenticated");
-  const invention = await ctx.db.get(inventionId);
-  if (!invention || invention.userId !== userId) throw new ConvexError("Invention not found");
-  return { invention, userId };
-}
-
 export const getConversation = query({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
-    const { invention } = await requireOwnedInvention(ctx, inventionId);
+    await requireInventionReadAccess(ctx, inventionId);
+    const invention = await ctx.db.get(inventionId);
+    if (!invention) throw new ConvexError("Invention not found");
     const conversation = await ctx.db
       .query("conversations")
       .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
@@ -48,12 +42,15 @@ export const ask = mutation({
   handler: async (ctx, { inventionId, content }) => {
     const cleaned = content.trim();
     if (!isValidChatContent(cleaned)) throw new ConvexError("Message must be between 1 and 4,000 characters");
-    const { userId } = await requireOwnedInvention(ctx, inventionId);
+    const { userId } = await requireInventionEditAccess(ctx, inventionId);
     const now = Date.now();
-    const user = await ctx.db.get(userId);
+    const [user, invention] = await Promise.all([ctx.db.get(userId), ctx.db.get(inventionId)]);
+    if (!invention) throw new ConvexError("Invention not found");
+    const organization = invention.organizationId ? await ctx.db.get(invention.organizationId) : null;
+    const allowancePlan = organization?.planKey ?? user?.subscriptionTier;
     const dateKey = utcDateKey(now);
     const dailyUsage = await ctx.db.query("atlasDailyUsage").withIndex("by_userId_dateKey", (q) => q.eq("userId", userId).eq("dateKey", dateKey)).unique();
-    if (!canAskWithinDailyAllowance(user?.subscriptionTier, dailyUsage?.chatQuestions ?? 0)) {
+    if (!canAskWithinDailyAllowance(allowancePlan, dailyUsage?.chatQuestions ?? 0)) {
       throw new ConvexError("InventSmith chat's daily allowance has been reached. It resets at 00:00 UTC.");
     }
     let conversation = await ctx.db
@@ -98,8 +95,8 @@ export const ask = mutation({
       inventionId,
       eventType: "chat_requested",
       actorType: "inventor",
-      summary: "The inventor asked InventSmith a project question.",
-      metadata: { characterCount: cleaned.length },
+      summary: "An authorized collaborator asked InventSmith a project question.",
+      metadata: { characterCount: cleaned.length, userId: String(userId) },
       createdAt: now,
     });
     if (dailyUsage) {
