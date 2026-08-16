@@ -11,11 +11,10 @@ function cloneItem(item: FullProductWorkPlanItem): FullProductWorkPlanItem {
   };
 }
 
-function pruneDependencies(items: FullProductWorkPlanItem[]): FullProductWorkPlanItem[] {
-  const kinds = new Set(items.map((item) => item.kind));
+function pruneDependencies(items: FullProductWorkPlanItem[], availableKinds: Set<string>): FullProductWorkPlanItem[] {
   return items.map((item) => ({
     ...item,
-    dependsOnKinds: item.dependsOnKinds.filter((kind) => kinds.has(kind)),
+    dependsOnKinds: item.dependsOnKinds.filter((kind) => availableKinds.has(kind)),
   }));
 }
 
@@ -29,7 +28,11 @@ export function buildInventionWorkPlan(classification: InventionClassification) 
     selectedPost.push(...SOFTWARE_PRODUCT_WORK_PLAN.map(cloneItem));
   }
 
-  const postCanonical = pruneDependencies(selectedPost);
+  const availableKinds = new Set([
+    ...canonical.map((item) => item.kind),
+    ...selectedPost.map((item) => item.kind),
+  ]);
+  const postCanonical = pruneDependencies(selectedPost, availableKinds);
   return {
     canonical,
     postCanonical,
