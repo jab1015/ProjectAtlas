@@ -9,40 +9,41 @@ This file prevents historical Atlas planning documents from overriding the curre
 Read these first, in this order:
 
 1. `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md` — authoritative product destination and non-negotiable requirements.
-2. `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md` — current implementation checkpoint, organization/pricing architecture and continuation order.
-3. `docs/ATLAS_BUILD_PROGRESS.md` — current repository progress/acceptance status. The legacy filename is retained for compatibility.
-4. `docs/ATLAS_DEPLOYMENT_RUNBOOK.md` — deployment/live verification procedures where still applicable.
+2. `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md` — authoritative implementation checkpoint and continuation order.
+3. `docs/ATLAS_BUILD_PROGRESS.md` — concise repository progress/acceptance status; legacy filename retained for compatibility.
+4. `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md` — document precedence and supersession rules.
+5. `docs/ATLAS_DEPLOYMENT_RUNBOOK.md` — deployment/live verification procedures where still applicable.
 
 ## Historical/specialized planning documents
 
-Documents such as `ATLAS_PRODUCT_ROADMAP.md`, `ATLAS_PRODUCT_RESET_V1.md`, `ATLAS_AUTOMATION_IMPLEMENTATION_PLAN.md`, older release plans, older controlled-pilot plans, and specialized Atlas architecture/research documents remain useful historical or subsystem references. They must not override the current InventSmith master specification or current plan/progress checkpoint.
+Older `ATLAS_*` roadmaps, reset plans, automation plans, release plans, controlled-pilot plans, stage blueprints, research architecture documents, Bibles and other historical material remain useful for compatible detail and subsystem history. They do not override the current InventSmith master specification or current plan/progress checkpoint.
 
-In particular, any older statement that:
+In particular, any older statement that says or implies that only Stages 1–4 are the destination; Stages 5–15 are merely future scope; a controlled pilot equals overall completion; Product Design/CAD/manufacturing/funding/launch are outside the intended product; the customer-facing product is Atlas; subscriptions are purely user-scoped; the architecture is inherently single-user/single-invention; the old $39/$79/$149 pricing ladder remains authoritative; organization seats multiply paid AI allowance; or repository-green alone means production acceptance is superseded.
 
-- only Stages 1–4 are the current product destination;
-- Stages 5–15 are merely future roadmap capabilities;
-- the controlled pilot represents overall product completion;
-- Product Design/CAD/manufacturing/funding/launch are outside the intended current product;
-- the product is customer-facing `Atlas` rather than `InventSmith`;
-- subscriptions are purely user-scoped;
-- the system is single-inventor/single-user by architecture;
-- pricing remains the old $39/$79/$149 ladder;
-
-is superseded by the current InventSmith documents.
-
-## Current locked architecture decisions
+## Current locked product/architecture decisions
 
 - Customer-facing product: **InventSmith — The Inventor OS** by **Modern Methods**.
 - Complete idea-to-market destination remains mandatory.
+- Product principle: **The inventor should never have to think about InventSmith. InventSmith should think about the inventor.**
 - Organization-native hierarchy: **User → Organization / Company → Memberships → Invention Workspaces**.
 - Single inventors use one-member personal organizations.
-- Billing/entitlements and expensive-work allowances move to organization scope.
+- Billing/entitlements and expensive-work allowances belong to organization scope for organization-owned inventions.
 - Multiple active/archived inventions and multi-user organizations are first-class requirements.
 - Invention-level sharing and bounded professional/guest access are required.
+- Pending team invitations reserve seats and require recipient consent before membership is created.
+- Until email ownership is cryptographically/operationally verified, a later account may not claim a pre-signup invitation merely by registering the invited address.
 - Pricing direction: **Explorer $0 → Inventor $39 → Pro $99 → Enterprise $199 → Studio $299+**.
-- Studio direction begins with **Studio 3 $299 / 3 active inventions** and **Studio 6 $399 / 6 active inventions**; larger capacity remains economics-driven/custom until cost modeling is complete.
-- Exact seats/compute/storage/premium-generation allowances are not final until measured cost-to-serve is modeled.
+- Studio direction begins with **Studio 3 $299 / 3 active inventions** and **Studio 6 $399 / 6 active inventions**; larger capacity remains economics-driven/custom.
+- Exact seats/compute/storage/premium-generation allowances remain unlocked until measured cost-to-serve is sufficiently calibrated.
+- Internal cost economics are not customer-wide data; detailed provider/cost intelligence is restricted to authorized organization administration.
+- Repository CI success is necessary but not sufficient for live/physical/professional/billing acceptance.
+
+## Current implementation truth
+
+The organization schema, shared organization usage ledger, organization-scoped entitlement foundation, invention-level authorization/sharing foundations, organization-safe privacy/export/deletion behavior, measured cost-unit attribution/scenario reporting and safe consent-based team invitation foundation are implemented on `inventsmith/full-product-build`.
+
+The latest fully verified CI checkpoint is older than the newest invitation/privacy/economics/documentation commits. Therefore the immediate continuation action is a fresh full CI pass on the current head, followed by repair of any failures and continuation of the remaining production-readiness audit.
 
 ## Continuation rule
 
-A new chat or coding worker must not spend time reconciling every historical Atlas document before continuing implementation. Use the current authority order above, preserve compatible historical detail, and treat conflicting older release-scope language as superseded.
+A new chat or coding worker must not spend time reconciling every historical Atlas document before continuing implementation. Use the authority order above, preserve compatible historical detail, and treat conflicting older release-scope language as superseded. Draft PR #24 remains intentionally unmerged until GitHub implementation is complete and founder approval is given.
