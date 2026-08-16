@@ -69,3 +69,53 @@ export function addCostClassUsage(
   if (completed) summary[operationClass].completions += 1;
   return operationClass;
 }
+
+function nearestRank(sorted: number[], percentile: number): number {
+  if (sorted.length === 0) return 0;
+  const bounded = Math.max(0, Math.min(1, percentile));
+  const rank = Math.max(1, Math.ceil(bounded * sorted.length));
+  return sorted[Math.min(sorted.length - 1, rank - 1)] ?? 0;
+}
+
+export interface ObservedCostProfile {
+  sampleSize: number;
+  totalCostUnits: number;
+  averageCostUnitsPerInvention: number;
+  medianCostUnitsPerInvention: number;
+  heavyUseP90CostUnitsPerInvention: number;
+  maxObservedCostUnitsPerInvention: number;
+  studioOverlap: {
+    top3CostUnits: number;
+    top6CostUnits: number;
+  };
+  calibrationConfidence: "insufficient" | "directional" | "representative";
+}
+
+/**
+ * Derives cost-to-serve scenarios only from measured invention cost units.
+ * This intentionally does not convert units to dollars or extrapolate beyond
+ * observed evidence. The result becomes progressively more useful as real
+ * production invention samples accumulate.
+ */
+export function buildObservedCostProfile(inventionCostUnits: number[]): ObservedCostProfile {
+  const sorted = inventionCostUnits
+    .map((value) => Math.max(0, Number.isFinite(value) ? value : 0))
+    .sort((a, b) => a - b);
+  const totalCostUnits = sorted.reduce((sum, value) => sum + value, 0);
+  const descending = [...sorted].sort((a, b) => b - a);
+  const sampleSize = sorted.length;
+
+  return {
+    sampleSize,
+    totalCostUnits,
+    averageCostUnitsPerInvention: sampleSize === 0 ? 0 : totalCostUnits / sampleSize,
+    medianCostUnitsPerInvention: nearestRank(sorted, 0.5),
+    heavyUseP90CostUnitsPerInvention: nearestRank(sorted, 0.9),
+    maxObservedCostUnitsPerInvention: sorted[sorted.length - 1] ?? 0,
+    studioOverlap: {
+      top3CostUnits: descending.slice(0, 3).reduce((sum, value) => sum + value, 0),
+      top6CostUnits: descending.slice(0, 6).reduce((sum, value) => sum + value, 0),
+    },
+    calibrationConfidence: sampleSize >= 30 ? "representative" : sampleSize >= 10 ? "directional" : "insufficient",
+  };
+}
