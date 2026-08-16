@@ -1,8 +1,8 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import type { Id } from "./_generated/dataModel";
-import { normalizeAtlasTier } from "./usagePolicyLogic";
+import { requireInventionEditAccess, requireInventionReadAccess } from "./organizations";
+import { resolveInventionUsageScope } from "./organizationUsageScope";
+import { getOrganizationPlanPolicy } from "./organizationPolicyLogic";
 
 interface LifecycleWorkDefinition {
   kind: string;
@@ -164,16 +164,6 @@ export const lifecycleStages: LifecycleStageDefinition[] = [
   },
 ];
 
-async function requireOwnedInvention(ctx: Parameters<typeof getAuthUserId>[0] & { db: any }, inventionId: Id<"inventions">) {
-  const userId = await getAuthUserId(ctx);
-  if (!userId) throw new ConvexError("Authentication required");
-  const invention = await ctx.db.get(inventionId);
-  if (!invention || invention.userId !== userId) throw new ConvexError("Invention not found or access denied");
-  const user = await ctx.db.get(userId);
-  if (!user) throw new ConvexError("Inventor profile not found");
-  return { userId, invention, user };
-}
-
 function stageById(stageId: number): LifecycleStageDefinition {
   const stage = lifecycleStages.find((item) => item.id === stageId);
   if (!stage) throw new ConvexError("This InventSmith lifecycle department is not defined");
@@ -184,9 +174,10 @@ export const ensureLifecycleDepartment = mutation({
   args: { inventionId: v.id("inventions"), stageId: v.number() },
   handler: async (ctx, args) => {
     const stage = stageById(args.stageId);
-    const { user } = await requireOwnedInvention(ctx, args.inventionId);
-    const tier = normalizeAtlasTier(user.subscriptionTier);
-    if (tier !== "pro" && tier !== "enterprise") throw new ConvexError(`${stage.name} requires a Pro or Enterprise entitlement`);
+    await requireInventionEditAccess(ctx, args.inventionId);
+    const usageScope = await resolveInventionUsageScope(ctx, args.inventionId);
+    if (!usageScope) throw new ConvexError("Invention not found");
+    if (!getOrganizationPlanPolicy(usageScope.plan).completeJourney) throw new ConvexError(`${stage.name} requires a Pro or higher entitlement`);
 
     const existing = await ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q: any) => q.eq("inventionId", args.inventionId)).collect();
     const kinds = new Set(existing.map((item: any) => item.kind));
@@ -217,7 +208,7 @@ export const ensureLifecycleDepartment = mutation({
         eventType: "work_queued",
         actorType: "system",
         summary: `InventSmith opened Stage ${stage.id}: ${stage.name} and queued ${created} work items.`,
-        metadata: { stageId: stage.id, stageName: stage.name, created },
+        metadata: { stageId: stage.id, stageName: stage.name, created, usageScope: usageScope.scope },
         createdAt: now,
       });
     }
@@ -229,7 +220,9 @@ export const getLifecycleDepartment = query({
   args: { inventionId: v.id("inventions"), stageId: v.number() },
   handler: async (ctx, args) => {
     const stage = stageById(args.stageId);
-    const { invention } = await requireOwnedInvention(ctx, args.inventionId);
+    await requireInventionReadAccess(ctx, args.inventionId);
+    const invention = await ctx.db.get(args.inventionId);
+    if (!invention) throw new ConvexError("Invention not found");
     const [workItems, deliverables, evidence] = await Promise.all([
       ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q: any) => q.eq("inventionId", args.inventionId)).collect(),
       ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q: any) => q.eq("inventionId", args.inventionId)).collect(),
