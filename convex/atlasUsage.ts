@@ -3,6 +3,7 @@ import { ConvexError, v } from "convex/values";
 import { query } from "./_generated/server";
 import { getDailyUsageLimits, normalizeAtlasTier, remainingAutonomousCostUnitsAfterReservations, utcDateKey } from "./usagePolicyLogic";
 import { getOrganizationMembership } from "./organizations";
+import { getOrganizationUsageSnapshot } from "./organizationDailyUsage";
 
 export const getCurrentUsage = query({
   args: { organizationId: v.optional(v.id("organizations")) },
@@ -11,7 +12,6 @@ export const getCurrentUsage = query({
     if (!userId) throw new ConvexError("Not authenticated");
     const user = await ctx.db.get(userId);
 
-    let usageUserId = userId;
     let plan: unknown = user?.subscriptionTier;
     let organizationId = args.organizationId ?? user?.personalOrganizationId;
     let scope: "organization" | "legacy_user" = "legacy_user";
@@ -25,7 +25,6 @@ export const getCurrentUsage = query({
         if (args.organizationId) throw new ConvexError("Organization access required");
         organizationId = undefined;
       } else {
-        usageUserId = organization.createdByUserId;
         plan = organization.planKey;
         scope = "organization";
       }
@@ -33,10 +32,12 @@ export const getCurrentUsage = query({
 
     const now = Date.now();
     const dateKey = utcDateKey(now);
-    const usage = await ctx.db
-      .query("atlasDailyUsage")
-      .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageUserId).eq("dateKey", dateKey))
-      .unique();
+    const usage = scope === "organization" && organizationId
+      ? await getOrganizationUsageSnapshot(ctx, organizationId, dateKey)
+      : await ctx.db
+          .query("atlasDailyUsage")
+          .withIndex("by_userId_dateKey", (q) => q.eq("userId", userId).eq("dateKey", dateKey))
+          .unique();
     const tier = normalizeAtlasTier(plan);
     const limits = getDailyUsageLimits(tier);
     return {
