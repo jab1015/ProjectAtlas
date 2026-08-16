@@ -8,6 +8,7 @@ const chatSource = readFileSync("convex/atlasChat.ts", "utf8");
 const workspaceSource = readFileSync("convex/inventionWorkspace.ts", "utf8");
 const workStateSource = readFileSync("convex/atlasWorkState.ts", "utf8");
 const nativeCadSource = readFileSync("convex/nativeCad.ts", "utf8");
+const productDesignSource = readFileSync("convex/productDesign.ts", "utf8");
 
 describe("InventSmith organization runtime", () => {
   it("keeps organization-native tenancy represented in the Convex schema", () => {
@@ -84,6 +85,15 @@ describe("InventSmith organization runtime", () => {
     expect(nativeCadSource).toContain('q.eq("userId", usageScope.usageUserId)');
     expect(nativeCadSource).toContain("canTierRunWorkKind(usageScope.plan");
     expect(nativeCadSource).toContain("authorized collaborator requested an additional preliminary CAD generation pass");
+  });
+
+  it("keeps Product Design collaborative while enforcing the organization plan", () => {
+    expect(productDesignSource).not.toContain("invention.userId !== userId");
+    expect(productDesignSource).not.toContain("requireOwner");
+    expect(productDesignSource).toContain("requireInventionEditAccess(ctx, args.inventionId)");
+    expect(productDesignSource).toContain("requireInventionReadAccess(ctx, args.inventionId)");
+    expect(productDesignSource).toContain("resolveInventionUsageScope(ctx, args.inventionId)");
+    expect(productDesignSource).toContain("canTierRunWorkKind(usageScope.plan");
   });
 
   it("keeps canonical invention ownership attribution stable when collaborators initialize missing records", () => {
