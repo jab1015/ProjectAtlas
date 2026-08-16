@@ -5,9 +5,11 @@ import { describe, expect, it } from "vitest";
 const source = readFileSync(join(process.cwd(), "convex/accountDeletion.ts"), "utf8");
 
 describe("organization-aware account deletion", () => {
-  it("blocks company/studio owners until ownership is resolved", () => {
+  it("blocks company/studio owners until ownership is resolved even when membership is suspended", () => {
+    expect(source).toContain('if (membership.status === "removed") continue');
     expect(source).toContain('membership.role === "owner" && organization.kind !== "personal"');
     expect(source).toContain("Transfer or close company/studio ownership before deleting this account");
+    expect(source).not.toContain('if (membership.status !== "active") continue');
   });
 
   it("deletes only legacy or personal-organization inventions", () => {
@@ -35,16 +37,20 @@ describe("organization-aware account deletion", () => {
     expect(source).toContain("usageRowsDeleted: usage.length + organizationUsageRowsDeleted");
   });
 
-  it("anonymizes only legacy/personal billing events and preserves company/studio billing history", () => {
+  it("anonymizes billing events only when stable user or personal-organization identity matches", () => {
     expect(source).toContain("matchingSubscriptionEvents");
     expect(source).toContain("personalSubscriptionEvents");
-    expect(source).toContain("!row.appliedOrganizationId || personalOrganizationIdSet.has(String(row.appliedOrganizationId))");
+    expect(source).toContain("row.appliedUserId === userId");
+    expect(source).toContain("belongsToPersonalOrganization");
+    expect(source).toContain("if (!belongsToUser && !belongsToPersonalOrganization) return false");
     expect(source).toContain("subscriptionEventsAnonymized: personalSubscriptionEvents.length");
   });
 
-  it("anonymizes invitations addressed or securely bound to the deleted account and releases pending seats", () => {
+  it("anonymizes bound invitations and uses email-only legacy rows only when the address uniquely identifies the deleted account", () => {
     expect(source).toContain("invitationRowsForEmail");
     expect(source).toContain("invitationRowsForAccount");
+    expect(source).toContain("emailUniquelyBelongsToUser");
+    expect(source).toContain("!row.acceptedByUserId || row.acceptedByUserId === userId");
     expect(source).toContain('row.acceptedByUserId === userId');
     expect(source).toContain("invitationRowsById");
     expect(source).toContain("changed email after the");
