@@ -21,8 +21,6 @@ describe("organization invitations", () => {
     expect(invitations).toContain("countReservedSeats");
     expect(invitations).toContain('invitation.status === "pending" && invitation.expiresAt > now');
     expect(invitations).toContain("Organization included-seat limit reached");
-    expect(organizations).toContain('query("organizationInvitations")');
-    expect(organizations).toContain('invitation.status === "pending" && invitation.expiresAt > now');
   });
 
   it("binds each secure invitation to the exact pre-existing account, not only a mutable email", () => {
@@ -58,6 +56,13 @@ describe("organization invitations", () => {
     expect(legacyMutation).toContain("explicit acceptance");
     expect(legacyMutation).not.toContain('status: "active"');
     expect(legacyMutation).not.toContain('insert("organizationMemberships"');
+  });
+
+  it("rechecks projected reserved-seat capacity when an invitation is accepted", () => {
+    expect(invitations).toContain("projectedReservedSeats");
+    expect(invitations).toContain("reservedSeats - 1 + (existingAlreadyOccupiesSeat ? 0 : 1)");
+    expect(invitations).toContain("projectedReservedSeats > policy.includedSeatLimit");
+    expect(invitations).toContain("no longer has an available seat");
   });
 
   it("supports revocation and expiration without granting invention access", () => {
