@@ -21,13 +21,20 @@ describe("InventSmith public product copy", () => {
     expect(faq).toContain("Product Design + CAD");
   });
 
-  it("keeps public plan copy consistent on the primary pricing and FAQ surfaces", () => {
-    for (const value of ["$39/month", "$79/month", "$149/month", "25 autonomous work units per day", "350 autonomous work units per day", "600 autonomous work units per day"]) {
+  it("keeps organization-native plan copy consistent on pricing and FAQ surfaces", () => {
+    for (const value of ["$39/month", "$99/month", "$199/month", "$299/month", "$399/month"]) {
       expect(faq).toContain(value);
-    }
-    for (const value of ["$39/month", "$79/month", "$149/month", "25 autonomous work units/day", "350 autonomous work units/day", "600 autonomous work units/day"]) {
       expect(pricing).toContain(value);
     }
+    for (const value of ["1 active invention", "2 active inventions", "3 active inventions", "6 active inventions"]) {
+      expect(faq).toContain(value);
+      expect(pricing).toContain(value);
+    }
+    expect(faq).toContain("Team members share the organization’s subscription and resource allowance");
+    expect(pricing).toContain("shared organization usage governance");
+    expect(faq).not.toContain("$79/month");
+    expect(faq).not.toContain("$149/month");
+    expect(pricing).not.toContain("autonomous work units/day");
   });
 
   it("does not expose the retired Atlas support address on primary public surfaces", () => {
