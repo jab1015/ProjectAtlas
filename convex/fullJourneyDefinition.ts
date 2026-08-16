@@ -1,3 +1,5 @@
+import { stageLabelForProductType, type InventionProductType } from "./inventionClassificationLogic";
+
 export interface FullJourneyStageDefinition {
   id: number;
   name: string;
@@ -23,6 +25,29 @@ export const FULL_JOURNEY_STAGES: FullJourneyStageDefinition[] = [
   { id: 14, name: "Launch", routeType: "department", requiredWorkKinds: ["launch_readiness", "launch_playbook", "customer_feedback_loop", "launch_actual_evidence", "launch_performance", "post_launch_priorities"], dependsOnStageIds: [7, 8, 9, 10, 11, 12] },
   { id: 15, name: "Growth", routeType: "department", requiredWorkKinds: ["growth_audit", "growth_levers", "growth_roadmap", "retention_system", "growth_performance_reporting"], dependsOnStageIds: [14] },
 ];
+
+const SOFTWARE_STAGE_WORK: Record<number, string[]> = {
+  5: ["software_product_specification", "software_ux_flow_design", "software_architecture", "software_data_model", "software_security_privacy_review"],
+  6: ["software_prototype_plan", "software_implementation_plan"],
+  7: ["software_qa_test_plan", "software_beta_release_readiness", "software_distribution_release_plan"],
+};
+
+export function journeyStagesForProductType(productType: InventionProductType): FullJourneyStageDefinition[] {
+  return FULL_JOURNEY_STAGES.map((stage) => {
+    const softwareKinds = SOFTWARE_STAGE_WORK[stage.id] ?? [];
+    const requiredWorkKinds = productType === "software"
+      ? (softwareKinds.length > 0 ? softwareKinds : [...stage.requiredWorkKinds])
+      : productType === "hybrid"
+        ? [...stage.requiredWorkKinds, ...softwareKinds]
+        : [...stage.requiredWorkKinds];
+    return {
+      ...stage,
+      name: stageLabelForProductType(stage.id, productType, stage.name),
+      requiredWorkKinds,
+      dependsOnStageIds: [...stage.dependsOnStageIds],
+    };
+  });
+}
 
 export function routeForJourneyStage(inventionId: string, stage: FullJourneyStageDefinition): string {
   if (stage.routeType === "market") return `/invention/${inventionId}/market`;
