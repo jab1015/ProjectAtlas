@@ -38,6 +38,14 @@ describe("organization-aware personal data export", () => {
     expect(organizationExport).toContain("subscriptionUpdatedAt: organization.subscriptionUpdatedAt");
   });
 
+  it("includes invitations by current email or stable account binding without treating binding as consent", () => {
+    expect(source).toContain("invitationRowsForEmail");
+    expect(source).toContain("invitationRowsForAccount");
+    expect(source).toContain("row.acceptedByUserId === userId");
+    expect(source).toContain("organizationInvitationsById");
+    expect(source).toContain("Invitation status, not the presence of an account-binding field, is the source of truth for consent");
+  });
+
   it("keeps binary bytes and authentication secrets out of the JSON export", () => {
     expect(source).toContain("binaryContentIncluded: false");
     expect(source).toContain('"password hashes"');
