@@ -9,6 +9,7 @@ export interface SubscriptionWebhookPayload {
   status: SubscriptionStatus;
   subscriptionId?: string;
   customerId?: string;
+  organizationId?: string;
   currentPeriodEnd?: number;
   occurredAt: number;
 }
@@ -33,11 +34,16 @@ export function validateSubscriptionWebhookPayload(value: unknown): Subscription
   if (body.currentPeriodEnd !== undefined && (typeof body.currentPeriodEnd !== "number" || !Number.isSafeInteger(body.currentPeriodEnd) || body.currentPeriodEnd < 0)) return null;
   if (body.subscriptionId !== undefined && (typeof body.subscriptionId !== "string" || body.subscriptionId.length > 200)) return null;
   if (body.customerId !== undefined && (typeof body.customerId !== "string" || body.customerId.length > 200)) return null;
+  if (body.organizationId !== undefined && (typeof body.organizationId !== "string" || !body.organizationId.trim() || body.organizationId.length > 200)) return null;
   return {
-    eventId: body.eventId.trim(), customerEmail: body.customerEmail.trim().toLowerCase(),
-    tier: body.tier as Exclude<AtlasTier, "free">, status: body.status as SubscriptionStatus,
+    eventId: body.eventId.trim(),
+    customerEmail: body.customerEmail.trim().toLowerCase(),
+    tier: body.tier as Exclude<AtlasTier, "free">,
+    status: body.status as SubscriptionStatus,
     subscriptionId: typeof body.subscriptionId === "string" ? body.subscriptionId.trim() || undefined : undefined,
     customerId: typeof body.customerId === "string" ? body.customerId.trim() || undefined : undefined,
-    currentPeriodEnd: body.currentPeriodEnd as number | undefined, occurredAt: body.occurredAt,
+    organizationId: typeof body.organizationId === "string" ? body.organizationId.trim() || undefined : undefined,
+    currentPeriodEnd: body.currentPeriodEnd as number | undefined,
+    occurredAt: body.occurredAt,
   };
 }
