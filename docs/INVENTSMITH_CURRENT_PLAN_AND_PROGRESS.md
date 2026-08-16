@@ -14,9 +14,9 @@ This is the handoff document for a new chat, coding session, or future worker. R
 
 ## Founder operating instruction
 
-Continue autonomously in chat mode until a genuine founder-only action is required. Do not stop for routine implementation choices, code edits, tests, documentation, or repository work. Ask the founder only for a physical action, credential/secret, billing-provider action, external professional/legal authorization, deployment-account action, or other action that cannot safely be performed from the repository/tooling available.
+Continue autonomously in chat mode until a genuine founder-only action is required. Do not stop for routine implementation choices, code edits, tests, documentation, or repository work. Ask the founder only for a physical action, credential/secret, billing-provider action, external professional/legal authorization, deployment-account action, or another action that cannot safely be performed from the repository/tooling available.
 
-Do not merge PR #24 until the implementation is complete and the founder approves the merge/handoff.
+Do not merge PR #24 until implementation is complete and the founder approves the merge/handoff.
 
 ## Product destination
 
@@ -53,34 +53,66 @@ Required behavior:
 Implemented:
 
 - additive organization schema/runtime foundation;
-- personal-organization compatibility/migration direction;
+- personal-organization compatibility and legacy invention migration;
 - organization policy logic and regression coverage;
 - organization-native invention creation;
-- active-invention capacity enforcement;
-- creator/manager access assignment;
-- organization invention listing;
-- archive/restore with restore-time capacity revalidation;
+- active-invention capacity enforcement and archive/restore revalidation;
 - Read/Edit/Manage invention authorization helpers;
-- main invention workspace moved from direct owner-only checks to organization authorization;
+- main invention workspace, Ask InventSmith, Evidence Locker, Product Design, Native CAD, Journey Center, lifecycle departments and artifact downloads moved to organization-aware authorization;
 - consequential decisions and approvals require Manage access;
-- Ask InventSmith supports authorized collaborators, with Edit required to submit questions/incur AI work;
-- Evidence Locker supports organization readers, editors for upload/register and managers for deletion;
-- department artifacts and deliverable downloads available to authorized readers;
-- creator/ownership attribution retained for backward compatibility;
-- Studio plan keys recognized by usage policy rather than falling into free-tier behavior;
-- organization authorization/capacity regression protection.
+- evidence-extraction retry uses organization Edit access rather than legacy creator ownership;
+- invention-level access grants and Professional/Guest Reviewer isolation foundations;
+- organization-owned inventions survive member departure;
+- ownership transfer and organization-safe account-deletion behavior;
+- personal versus company/studio privacy/export boundaries;
+- Studio plan keys recognized by organization policy and usage policy.
 
-The latest completed authorization checkpoint was fully green in CI before the next cost-accounting work began.
+## Organization-scoped expensive-resource accounting — completed
 
-## Current work in progress
+The user-scoped accounting migration is now implemented for organization-owned inventions.
 
-The immediate workstream is **organization-scoped usage/cost control**.
+- additive `organizationDailyUsage` ledger keyed by organization + UTC day;
+- legacy `atlasDailyUsage` remains for inventions without `organizationId`;
+- same-day legacy usage is captured as a migration baseline when an organization ledger is first created;
+- Ask InventSmith allowance checks and question accounting use the organization ledger;
+- autonomous work reservations and settlement use the organization ledger;
+- reservations are checked and written inside Convex mutations so collaborators cannot race independent counters;
+- Native CAD's specialized success/failure/stale-output settlement path now settles against the same organization ledger as its reservation;
+- collaborator seats do not multiply AI/CAD/render/research allowance;
+- stale-output protections and reservation release behavior remain intact;
+- visual-generation work (concept boards, product renders and brand boards) returns through central work settlement and therefore uses the same organization reservation boundary.
 
-Important rule: adding organization members must never multiply the organization's AI/CAD/render/research allowance.
+## Cost attribution — completed foundation
 
-Ask InventSmith already resolves the organization plan for an organization-owned invention, but its daily usage row is still stored under the individual user in the legacy `atlasDailyUsage` structure. This is the next migration point: expensive-work accounting must become organization-scoped while remaining backward compatible with legacy single-user records.
+InventSmith now records/reports measured cost units by:
 
-Do not fake this by simply sharing UI counters. Enforcement must happen server-side at the operation boundary.
+- organization;
+- invention;
+- operation kind;
+- operation class (`light`, `standard`, `expensive`, `premium`);
+- provider/model metadata where available.
+
+Ask InventSmith records model token units, live-research usage and provider/model attribution in the execution ledger. Autonomous work continues to carry work-item/event cost units. Organization reporting reconciles shared daily usage with attributed invention/work activity and explicitly exposes provider-attribution gaps instead of inventing dollar costs.
+
+Actual dollar economics and final commercial allowances remain intentionally unlocked until representative cost-to-serve measurement is available.
+
+## Organization billing / entitlement authority — completed repository foundation
+
+Implemented additively:
+
+- organization-targeted subscription events;
+- organization `planKey` as entitlement authority for organization-owned inventions;
+- legacy user subscriptions preserved for migration compatibility;
+- legacy personal subscriptions mirror into personal organizations;
+- organization-specific `subscriptionUpdatedAt` prevents generic organization edits from corrupting billing event ordering;
+- subscription events carry organization attribution (`appliedOrganizationId`) and exact organization plan attribution where needed;
+- Studio 3, Studio 6 and Studio Custom lifecycle entitlement is organization-only;
+- organization billing history is included in organization export and excluded from unrelated personal exports;
+- existing provider customer/subscription identity continues to authorize lifecycle events after organization ownership transfer;
+- first organization activation still requires the current owner boundary rather than accepting an arbitrary customer identity;
+- missing customer/subscription identifiers in later provider events do not erase an established billing identity.
+
+The repository does **not** invent an internal payment processor. Provider checkout/product activation still requires the actual external billing-provider integration/configuration before live acceptance.
 
 ## Pricing direction — locked for planning; allowances not final
 
@@ -94,8 +126,6 @@ Commercial ladder:
 - **Studio 6 — $399/month — 6 active inventions**
 - **Studio Custom — larger/custom capacity based on measured economics**
 
-Potential larger Studio packaging can add active inventions, seats, client workspaces and professional workflow features, but exact larger tiers are not locked until cost-to-serve is measured.
-
 ### Pricing principles
 
 - Explorer: evaluation/acquisition with tightly bounded expensive work.
@@ -107,7 +137,7 @@ Potential larger Studio packaging can add active inventions, seats, client works
 - Customers should not need to understand model tokens.
 - Internally meter real/estimated cost by organization, invention and operation class.
 
-### Economics required before billing lock
+### Economics required before billing/allowance lock
 
 Model actual cost for:
 
@@ -121,7 +151,7 @@ Include AI reasoning, current/deep research, evidence extraction, image generati
 
 ## Full-product implementation already present
 
-The branch already contains substantial implementation across the complete journey:
+The branch contains substantial implementation across the complete journey:
 
 - persistent invention record and evidence provenance;
 - Evidence Locker with structured/binary ingestion and retry;
@@ -146,26 +176,36 @@ The branch already contains substantial implementation across the complete journ
 - full-product repository acceptance contract;
 - corrected InventSmith branding, favicon, public journey, FAQ and pricing surfaces;
 - obsolete public storefront routes retired while legacy fulfilled-download compatibility remains;
-- checkout success no longer treats a URL plan parameter as confirmed entitlement;
+- checkout success does not treat a URL plan parameter as confirmed entitlement;
 - two-surface live verifier for backend + frontend; browser session persistence remains a genuine live gate;
 - CI syntax validation for deployment/verification scripts.
+
+## Latest verified checkpoint
+
+GitHub Actions **Atlas CI run #396** on branch head `08bb04d1b22489da8694dd524be9f971b05a3775` completed fully green:
+
+- Install dependencies — PASS
+- Verify operational scripts — PASS
+- Typecheck web — PASS
+- Typecheck Convex — PASS
+- Regression tests — PASS
+- Production dependency audit — PASS
+- Next production build — PASS
+
+This checkpoint includes the organization usage ledger, Native CAD organization settlement, billing/privacy architecture, and organization-aware evidence-extraction retry regression correction.
 
 ## Current implementation order
 
 Continue autonomously in this order unless a real dependency requires reordering:
 
-1. **Finish organization-scoped usage accounting** across Ask InventSmith and autonomous/expensive work.
-2. Add cost attribution by organization + invention + operation class (`light`, `standard`, `expensive`, `premium`) and estimated provider cost where available.
-3. Move subscription/billing entitlement authority to organization scope while preserving legacy user billing during migration.
-4. Audit/replace remaining direct `invention.userId === userId` and owner-only backend checks with correct Read/Edit/Manage authorization.
-5. Implement organization/team management and invitations.
-6. Implement invention-level sharing and Professional/Guest Reviewer assignment.
-7. Make privacy export, member removal, account deletion, organization deletion and ownership transfer organization-safe.
-8. Build representative cost-to-serve model and normal/heavy/worst-reasonable invention economics.
-9. Lock plan allowances, included seats, storage and premium-generation limits.
-10. Reconcile public/account pricing and checkout/billing products only after economics and entitlement policy are locked.
-11. Run complete repository acceptance.
-12. After GitHub is complete, hand the pinned GitHub implementation to MadeThis for replication and run live authenticated multi-user/multi-invention acceptance.
+1. Finish targeted audit of remaining specialized generation/accounting and legacy creator-only authorization paths.
+2. Complete minor migration-ordering/hygiene gaps, including carrying billing recency into newly created personal organizations.
+3. Update repository progress/acceptance documentation as each production checkpoint closes.
+4. Build representative cost-to-serve reporting from measured usage and define normal/heavy/worst-reasonable invention economics.
+5. Lock plan allowances, included seats, storage and premium-generation limits from measured economics.
+6. Reconcile public/account pricing and external billing-provider checkout products only after economics and entitlement policy are locked.
+7. Run complete repository acceptance.
+8. After GitHub is complete, hand the pinned GitHub implementation to MadeThis for replication and run live authenticated multi-user/multi-invention acceptance.
 
 ## Hard safety/quality rules
 
@@ -190,8 +230,8 @@ Repository implementation is not production acceptance. Final acceptance still i
 - multi-user role enforcement;
 - invention-level isolation between collaborators/guests;
 - active/archive slot enforcement under real subscriptions;
-- organization billing/webhook behavior;
-- organization-scoped AI/CAD/render/research usage accounting;
+- organization billing/webhook behavior against the actual provider;
+- organization-scoped AI/CAD/render/research usage accounting under concurrent live requests;
 - privacy/export/deletion/member-removal behavior;
 - representative uploaded evidence across supported file types;
 - full idea-to-market representative invention;
@@ -208,4 +248,4 @@ Read, in order:
 2. `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`
 3. `docs/ATLAS_BUILD_PROGRESS.md`
 
-Then inspect draft PR #24 and branch `inventsmith/full-product-build`. Continue from **organization-scoped usage/cost accounting**. Do not restart planning, do not return to the old pilot, do not merge the PR, and do not hand work to MadeThis yet. Finish the GitHub implementation first.
+Then inspect draft PR #24 and branch `inventsmith/full-product-build`. Continue from the **remaining production-readiness audit and cost-to-serve work**. Do not restart planning, do not return to the old pilot, do not merge the PR, and do not hand work to MadeThis yet. Finish the GitHub implementation first.
