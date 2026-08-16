@@ -54,11 +54,13 @@ describe("subscription lifecycle policy", () => {
     expect(mutation).toContain("organizationPlanKey");
   });
 
-  it("keeps an established provider customer authoritative after organization ownership transfer", () => {
+  it("keeps an established provider billing identity authoritative after organization ownership transfer", () => {
     const mutation = readFileSync(join(process.cwd(), "convex/subscriptionMutations.ts"), "utf8");
     expect(mutation).toContain("existingCustomerMatch");
     expect(mutation).toContain("organization.billingCustomerId === args.billingCustomerId");
-    expect(mutation).toContain("existingCustomerMatch || ownerActivationMatch");
+    expect(mutation).toContain("existingSubscriptionMatch");
+    expect(mutation).toContain("organization.subscriptionId === args.subscriptionId");
+    expect(mutation).toContain("existingCustomerMatch || existingSubscriptionMatch || ownerActivationMatch");
     expect(mutation).toContain("billingCustomerId: args.billingCustomerId ?? organization?.billingCustomerId");
     expect(mutation).toContain("subscriptionId: args.subscriptionId ?? organization?.subscriptionId");
   });
