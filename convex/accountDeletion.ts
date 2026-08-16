@@ -97,7 +97,7 @@ export async function deleteAccountData(ctx: MutationCtx, userId: Id<"users">): 
   const memberships = await ctx.db.query("organizationMemberships").withIndex("by_userId", (q) => q.eq("userId", userId)).collect();
   const personalOrganizationIds: Id<"organizations">[] = [];
   for (const membership of memberships) {
-    if (membership.status !== "active") continue;
+    if (membership.status === "removed") continue;
     const organization = await ctx.db.get(membership.organizationId);
     if (!organization || organization.status === "closed") continue;
     if (membership.role === "owner" && organization.kind !== "personal") {
@@ -157,7 +157,13 @@ export async function deleteAccountData(ctx: MutationCtx, userId: Id<"users">): 
   const matchingSubscriptionEvents = user.email
     ? await ctx.db.query("subscriptionEvents").withIndex("by_customerEmail", (q) => q.eq("customerEmail", user.email!)).collect()
     : [];
-  const personalSubscriptionEvents = matchingSubscriptionEvents.filter((row) => !row.appliedOrganizationId || personalOrganizationIdSet.has(String(row.appliedOrganizationId)));
+  const personalSubscriptionEvents = matchingSubscriptionEvents.filter((row) => {
+    const belongsToUser = row.appliedUserId === userId;
+    const belongsToPersonalOrganization = Boolean(row.appliedOrganizationId && personalOrganizationIdSet.has(String(row.appliedOrganizationId)));
+    if (!belongsToUser && !belongsToPersonalOrganization) return false;
+    if (row.appliedOrganizationId && !belongsToPersonalOrganization) return false;
+    return true;
+  });
   for (const row of personalSubscriptionEvents) {
     await ctx.db.patch(row._id, {
       customerEmail: `deleted-${row._id}@invalid.local`,
@@ -169,8 +175,14 @@ export async function deleteAccountData(ctx: MutationCtx, userId: Id<"users">): 
   }
 
   const normalizedEmail = user.email?.trim().toLowerCase();
+  const usersForEmail = normalizedEmail
+    ? await ctx.db.query("users").withIndex("email", (q) => q.eq("email", normalizedEmail)).collect()
+    : [];
+  const emailUniquelyBelongsToUser = usersForEmail.length === 1 && usersForEmail[0]._id === userId;
   const [emailInvitationRows, accountInvitationRows] = await Promise.all([
-    normalizedEmail ? invitationRowsForEmail(ctx, normalizedEmail) : Promise.resolve([]),
+    emailUniquelyBelongsToUser && normalizedEmail
+      ? invitationRowsForEmail(ctx, normalizedEmail).then((rows) => rows.filter((row) => !row.acceptedByUserId || row.acceptedByUserId === userId))
+      : Promise.resolve([]),
     invitationRowsForAccount(ctx, userId),
   ]);
   const invitationRowsById = new Map<string, (typeof accountInvitationRows)[number]>();
