@@ -38,10 +38,12 @@ The full-product branch now materially exceeds the old feasibility-only baseline
 - evidence-backed Product Design candidate generation, scoring, selection and specification;
 - native preliminary CAD pipeline;
 - deterministic STEP, STL and DXF artifact generation for supported geometry;
-- expanded native CAD geometry including boxes, cylinders, hollow tubes, tapered/frustum forms, custom-profile extrusion, real helical externally threaded cylinders, and real helical internally threaded tubes/sleeves for mating screw-driven interfaces;
+- expanded native CAD geometry including boxes, cylinders, hollow tubes, tapered/frustum forms, custom-profile extrusion, real helical externally threaded cylinders, real helical internally threaded tubes/sleeves for mating screw-driven interfaces, and closed annular `revolvedProfile` geometry for stepped collars, shoulders, sealing lips, gasket/O-ring grooves and other rotational interfaces;
+- revolved-profile geometry permits concavity where sealing/interface grooves require it while rejecting degenerate or self-crossing profiles;
 - editable InventSmith CAD source;
 - editable CAD source preserves part material, finish intent, target manufacturing process, interface/mating notes, position/rotation, assembly revision, assumptions, and unresolved engineering state;
 - native CAD planning explicitly treats external/internal thread pitch compatibility, clearance, thread form, backlash, wear and fit as provisional unless engineering evidence supports them;
+- native CAD planning likewise preserves seal compression, gland fill, squeeze, contact pressure, sealing clearances, critical fits and tolerances as provisional unless engineering/prototype evidence supports them;
 - orthographic engineering views and exploded assembly views;
 - orthographic views include geometry-derived overall X/Y/Z dimensions in millimeters while explicitly distinguishing preliminary dimensions from engineering-approved tolerances/fits;
 - complete six-artifact CAD package visibility/downloads in the Design Studio rather than hiding orthographic/exploded outputs;
@@ -75,7 +77,8 @@ The full-product branch now materially exceeds the old feasibility-only baseline
 - growth audit/levers/roadmap/retention/performance reporting;
 - Ask InventSmith project-wide grounding across work, dependencies, evidence, deliverables, decisions, approvals, reviews, execution events, validation and journey state;
 - live-web routing for patent-status/current-research questions;
-- regression protection for cross-department verification, governed chat evidence capture, Market/Patent workspace routing, connected full-journey wiring, real-world evidence gates, browser and binary evidence ingestion/retry, expanded/mating threaded CAD geometry, CAD manufacturing metadata, dimensioned drawings, complete CAD artifact visibility, multi-view product rendering, visual brand-board generation, financial CSV/workbook export, pitch-deck generation, entitlement, professional routing, readiness language and professional-review policy.
+- a dedicated full-product repository acceptance contract protecting all 15 stages, real-world evidence gates, native CAD outputs, generated commercial artifacts, downstream inventor-visible departments, and the rule that InventSmith must not regress to the retired controlled-pilot scope;
+- regression protection for cross-department verification, governed chat evidence capture, Market/Patent workspace routing, connected full-journey wiring, real-world evidence gates, browser and binary evidence ingestion/retry, expanded/mating threaded and revolved CAD geometry, CAD manufacturing metadata, dimensioned drawings, complete CAD artifact visibility, multi-view product rendering, visual brand-board generation, financial CSV/workbook export, pitch-deck generation, entitlement, professional routing, readiness language and professional-review policy.
 
 ## Mandatory capability matrix
 
@@ -87,7 +90,7 @@ The full-product branch now materially exceeds the old feasibility-only baseline
 | Market/competitor research | Implemented foundation + dedicated Market Research workspace | Full-journey live acceptance |
 | Patent/prior-art intelligence | Implemented foundation + dedicated Patent Readiness workspace + project-wide Ask grounding/write-back | Verify current patent-status refresh, design constraints and professional handoff on representative inventions |
 | Product design | Implemented on full-product branch | Verify patent/research constraints flow into candidate scoring and selected design on representative inventions |
-| CAD/3D design | Native preliminary STEP/STL/DXF generation implemented with box/cylinder/tube/frustum/custom convex extrusion/external helical thread/internal helical threaded-tube geometry; editable source carries manufacturing metadata | Continue sealing/custom rotational-interface geometry and representative engineering acceptance before manufacturing release |
+| CAD/3D design | Native preliminary STEP/STL/DXF generation implemented with box/cylinder/tube/frustum/custom convex extrusion/external helical thread/internal helical threaded-tube/revolved annular-profile geometry; editable source carries manufacturing metadata | Representative engineering acceptance before manufacturing release; add further mechanism geometry only where a representative invention exposes a real unsupported need |
 | Product renders | Multi-view selected-product presentation board implemented in the render brief | Live visual-consistency/quality acceptance and additional technical-image workflows only where representative inventions require them |
 | Exploded/orthographic views | Implemented, visible/downloadable, with geometry-derived overall dimensions | Live visual/download acceptance; critical dimensions, fits and tolerances must remain evidence-backed |
 | Engineering package | Product/CAD specs, revisioned native source, dimensional views, manufacturing metadata, engineering handoff and professional gates implemented | Complete representative engineering-review acceptance and revision loop |
@@ -110,11 +113,11 @@ The full-product branch now materially exceeds the old feasibility-only baseline
 
 InventSmith must design the product, not stop at feasibility or concept imagery. For supported physical products it must progress through real geometry and engineering artifacts.
 
-Current native CAD supports deterministic assemblies built from boxes, cylinders, hollow tubes, tapered/frustum forms, custom-profile convex extrusions, externally threaded helical cylinders and internally threaded helical tubes/sleeves. It emits STEP/STL/DXF, editable source, orthographic views and exploded views. The editable source also preserves supported material/finish/process/interface intent and revision/unresolved-engineering metadata. This is a real CAD foundation but not permission to call every generated design factory-released.
+Current native CAD supports deterministic assemblies built from boxes, cylinders, hollow tubes, tapered/frustum forms, custom-profile convex extrusions, externally threaded helical cylinders, internally threaded helical tubes/sleeves, and closed annular revolved profiles for rotational interface/sealing features. It emits STEP/STL/DXF, editable source, orthographic views and exploded views. The editable source also preserves supported material/finish/process/interface intent and revision/unresolved-engineering metadata. This is a real CAD foundation but not permission to call every generated design factory-released.
 
 Orthographic views include overall dimensions derived directly from the generated geometry. These values describe the preliminary CAD geometry; they do not create evidence-backed critical tolerances, fits, sealing requirements or engineering approval by themselves.
 
-Thread pitch, thread depth, mating clearance, thread form, backlash, wear, sealing surfaces, tolerance stack-up and other critical interface dimensions must remain provisional unless supported by engineering evidence. Threaded interfaces require mating-part/clearance review and prototype testing before production release.
+Thread pitch, thread depth, mating clearance, thread form, backlash, wear, sealing surfaces, seal compression, gland fill, squeeze, contact pressure, tolerance stack-up and other critical interface dimensions must remain provisional unless supported by engineering evidence. Threaded and sealing interfaces require mating-part/clearance review and prototype testing before production release.
 
 Design maturity remains explicit:
 
@@ -168,16 +171,18 @@ Regression coverage enforces that referenced work dependencies exist, that depen
 
 ## Verification checkpoint
 
-CI #228 passed the complete repository pipeline after the Stage 8 visual-brand prompt contract and dedicated brand-generation regression. CI #231 then passed web TypeScript, Convex TypeScript, the full regression suite, production dependency audit, and Next production build after the Excel-readable multi-sheet financial workbook export.
+CI #239 passed the complete repository pipeline after the revolved-profile sealing/interface CAD expansion and the dedicated full-product repository acceptance contract: web TypeScript, Convex TypeScript, the full regression suite, production dependency audit, and Next production build. Earlier CI #228 verified the Stage 8 visual-brand prompt contract and dedicated brand-generation regression; CI #231 verified the Excel-readable multi-sheet financial workbook export.
+
+The CI install step currently reports high-severity findings in the broader dependency tree, while the enforced production audit `npm audit --omit=dev --audit-level=high` passes. Those broader/dev-tree findings should be upgraded deliberately rather than through blind dependency churn that could destabilize the accepted product path.
 
 ## Remaining repository priorities
 
 1. Live-test representative binary evidence uploads and Ask InventSmith write-back across PDF/DOCX/XLSX/image/deck/patent/survey/prototype/quote/sales inputs.
-2. Continue expanding native CAD geometry for sealing features, custom rotational interfaces and representative product mechanisms without fabricating engineering certainty.
-3. Validate multi-view product rendering and generated brand boards for visual consistency/quality in representative live inventions; add further technical-image workflows only where acceptance exposes a real gap.
-4. Expand remaining artifact-specific structured exports only where representative downstream use demonstrates that the current PDF/DOCX/PPTX/CAD/image/CSV/workbook set is insufficient.
-5. Complete automated and live end-to-end acceptance for representative inventions, including evidence refresh, department handoffs, CAD artifacts, exports, brand assets and human/professional gates.
-6. Merge only after repository CI and acceptance gates pass.
+2. Validate multi-view product rendering and generated brand boards for visual consistency/quality in representative live inventions; add further CAD/technical-image geometry only where acceptance exposes a real unsupported mechanism.
+3. Complete representative engineering/prototype/manufacturing/RFQ acceptance, preserving physical, professional, legal, financial and external-action gates rather than fabricating completion.
+4. Expand artifact-specific structured exports only where representative downstream use demonstrates that the current PDF/DOCX/PPTX/CAD/image/CSV/workbook set is insufficient.
+5. Complete live authenticated end-to-end acceptance for representative inventions, including evidence refresh, department handoffs, CAD artifacts, exports, brand assets, subscription/entitlement behavior, privacy/export/deletion behavior, and human/professional gates.
+6. Keep PR #24 unmerged until the latest documentation head is green and repository acceptance is complete.
 7. After GitHub is complete, hand the finished pinned implementation to MadeThis for replication and perform live authenticated acceptance there.
 
 ## Completion rule
