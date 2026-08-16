@@ -10,6 +10,7 @@ describe("InventSmith public product copy", () => {
   const faq = read("src/app/(public)/faq/page.tsx");
   const pricing = read("src/app/(public)/pricing/page.tsx");
   const landing = read("src/app/page.tsx");
+  const footer = read("src/components/store-footer.tsx");
 
   it("does not describe implemented full-product stages as later roadmap capabilities", () => {
     expect(faq).not.toContain("remain later roadmap capabilities");
@@ -30,7 +31,7 @@ describe("InventSmith public product copy", () => {
   });
 
   it("does not expose the retired Atlas support address on primary public surfaces", () => {
-    for (const source of [landing, faq]) {
+    for (const source of [landing, faq, footer]) {
       expect(source).not.toContain("team@atlas.madethis.app");
       expect(source).toContain("support@madethis.com");
     }
