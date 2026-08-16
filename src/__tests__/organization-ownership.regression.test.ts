@@ -17,17 +17,17 @@ describe("organization ownership transfer", () => {
     expect(source).toContain("Personal InventSmith ownership cannot be transferred");
   });
 
-  it("prevents a same-day shared-usage reset through ownership hopping", () => {
-    expect(source).toContain('query("atlasDailyUsage")');
-    expect(source).toContain("currentUsage.autonomousCostUnits > 0");
-    expect(source).toContain("currentUsage.chatQuestions > 0");
-    expect(source).toContain("resets at 00:00 UTC");
+  it("does not gate ownership transfer on daily usage now that usage is organization-keyed", () => {
+    expect(source).toContain("Usage reservations are now keyed directly by organization + UTC day");
+    expect(source).not.toContain('query("atlasDailyUsage")');
+    expect(source).not.toContain("resets at 00:00 UTC");
   });
 
-  it("moves the transitional billing/usage owner and demotes the previous owner to admin", () => {
+  it("moves the compatibility billing contact and demotes the previous owner to admin", () => {
     expect(source).toContain('{ role: "admin", updatedAt: now }');
     expect(source).toContain('{ role: "owner", updatedAt: now }');
     expect(source).toContain("createdByUserId: args.newOwnerUserId");
+    expect(source).toContain("Usage no longer depends on this field");
   });
 
   it("exposes ownership transfer only from the owner-facing company/studio team UI and requires confirmation", () => {
