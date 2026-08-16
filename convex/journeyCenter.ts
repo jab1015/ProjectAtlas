@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { query } from "./_generated/server";
-import { FULL_JOURNEY_STAGES, routeForJourneyStage } from "./fullJourneyDefinition";
+import { journeyStagesForProductType, routeForJourneyStage } from "./fullJourneyDefinition";
+import { classifyInvention } from "./inventionClassificationLogic";
 import { requireInventionReadAccess } from "./organizations";
 
 export const getJourneyCenter = query({
@@ -9,6 +10,8 @@ export const getJourneyCenter = query({
     await requireInventionReadAccess(ctx, args.inventionId);
     const invention = await ctx.db.get(args.inventionId);
     if (!invention) throw new ConvexError("Invention not found");
+    const classification = classifyInvention(invention);
+    const journeyStages = journeyStagesForProductType(classification.productType);
 
     const [workItems, deliverables, reviews, approvals, decisions, evidence] = await Promise.all([
       ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect(),
@@ -20,7 +23,7 @@ export const getJourneyCenter = query({
     ]);
 
     const deliverableById = new Map(deliverables.map((item) => [String(item._id), item]));
-    const stageRows = FULL_JOURNEY_STAGES.map((stage) => {
+    const stageRows = journeyStages.map((stage) => {
       const relevant = stage.requiredWorkKinds.map((kind) => workItems.find((item) => item.kind === kind)).filter(Boolean);
       const completedCount = relevant.filter((item) => item?.status === "completed").length;
       const blockedItems = relevant.filter((item) => item?.status === "blocked" || item?.status === "awaiting_approval");
@@ -78,7 +81,14 @@ export const getJourneyCenter = query({
     else if (firstIncomplete.status === "failed") nextAction = `Retry or resolve failed ${firstIncomplete.name} work.`;
 
     return {
-      invention: { _id: invention._id, title: invention.title, updatedAt: invention.updatedAt },
+      invention: {
+        _id: invention._id,
+        title: invention.title,
+        updatedAt: invention.updatedAt,
+        productType: classification.productType,
+        supportClass: classification.supportClass,
+        regulatedCategories: classification.categories,
+      },
       stages: stageRows,
       currentStage: firstIncomplete,
       completedStages,
