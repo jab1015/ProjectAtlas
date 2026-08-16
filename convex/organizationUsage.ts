@@ -3,7 +3,7 @@ import { query } from "./_generated/server";
 import { getOrganizationMembership } from "./organizations";
 import { getOrganizationPlanPolicy } from "./organizationPolicyLogic";
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { addCostClassUsage, emptyCostClassSummary } from "./costEconomicsLogic";
+import { addCostClassUsage, buildObservedCostProfile, emptyCostClassSummary } from "./costEconomicsLogic";
 
 function utcDateKey(timestamp: number) {
   return new Date(timestamp).toISOString().slice(0, 10);
@@ -145,6 +145,7 @@ export const getOrganizationUsageOverview = query({
 
     const policy = getOrganizationPlanPolicy(organization.planKey);
     const autonomousLedgerVsEventDelta = sharedUsage.autonomousCostUnits - autonomousEventCostUnits;
+    const observedCostProfile = buildObservedCostProfile(inventionUsage.map((item) => item.costUnits));
     return {
       organization: {
         organizationId: organization._id,
@@ -206,9 +207,10 @@ export const getOrganizationUsageOverview = query({
       economics: {
         estimatedVariableCostUsd: null,
         grossMarginEstimate: null,
-        calibrationReady: totalCostUnits > 0,
+        calibrationReady: observedCostProfile.sampleSize > 0,
         providerPricingCaptured: false,
-        note: "Measured usage is attributable by organization, invention, operation kind and light/standard/expensive/premium class. Ask InventSmith now records OpenAI model/token metadata. Dollar conversion remains unset until model, web-search, image, CAD, extraction, storage and artifact unit prices are calibrated from real production usage.",
+        observedCostProfile,
+        note: "Observed normal/heavy/max and Studio-overlap scenarios are measured in InventSmith cost units only. Dollar conversion remains unset until model, web-search, image, CAD, extraction, storage and artifact unit prices are calibrated from real production usage.",
       },
     };
   },
