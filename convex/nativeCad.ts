@@ -1,29 +1,22 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { internalMutation, internalQuery, mutation, query } from "./_generated/server";
 import { makeFunctionReference } from "convex/server";
 import type { Id } from "./_generated/dataModel";
 import { canTierRunWorkKind } from "./entitlementPolicyLogic";
+import { requireInventionEditAccess, requireInventionReadAccess } from "./organizations";
+import { resolveInventionUsageScope } from "./organizationUsageScope";
 
 const runAvailableWork = makeFunctionReference<"action", { inventionId: Id<"inventions">; costBudgetUnits?: number }, unknown>("atlasWorkOrchestration:runAvailableWork");
-
-async function requireOwnedInvention(ctx: Parameters<typeof getAuthUserId>[0] & { db: any }, inventionId: Id<"inventions">) {
-  const userId = await getAuthUserId(ctx);
-  if (!userId) throw new ConvexError("Authentication required");
-  const invention = await ctx.db.get(inventionId);
-  if (!invention || invention.userId !== userId) throw new ConvexError("Invention not found or access denied");
-  const user = await ctx.db.get(userId);
-  if (!user) throw new ConvexError("Inventor profile not found");
-  return { userId, invention, user };
-}
 
 function dateKey(timestamp: number) {
   return new Date(timestamp).toISOString().slice(0, 10);
 }
 
-async function settleCadUsage(ctx: any, workItem: any, userId: Id<"users">, actualCostUnits: number, completedWorkItems: number, now: number) {
+async function settleCadUsage(ctx: any, workItem: any, inventionId: Id<"inventions">, actualCostUnits: number, completedWorkItems: number, now: number) {
+  const usageScope = await resolveInventionUsageScope(ctx, inventionId);
+  if (!usageScope) throw new ConvexError("Invention not found while settling CAD usage");
   const key = workItem.reservationDateKey ?? dateKey(now);
-  const usage = await ctx.db.query("atlasDailyUsage").withIndex("by_userId_dateKey", (q: any) => q.eq("userId", userId).eq("dateKey", key)).unique();
+  const usage = await ctx.db.query("atlasDailyUsage").withIndex("by_userId_dateKey", (q: any) => q.eq("userId", usageScope.usageUserId).eq("dateKey", key)).unique();
   if (usage) {
     await ctx.db.patch(usage._id, {
       autonomousCostUnits: usage.autonomousCostUnits + actualCostUnits,
@@ -32,15 +25,17 @@ async function settleCadUsage(ctx: any, workItem: any, userId: Id<"users">, actu
       updatedAt: now,
     });
   } else {
-    await ctx.db.insert("atlasDailyUsage", { userId, dateKey: key, autonomousCostUnits: actualCostUnits, reservedAutonomousCostUnits: 0, completedWorkItems, chatQuestions: 0, updatedAt: now });
+    await ctx.db.insert("atlasDailyUsage", { userId: usageScope.usageUserId, dateKey: key, autonomousCostUnits: actualCostUnits, reservedAutonomousCostUnits: 0, completedWorkItems, chatQuestions: 0, updatedAt: now });
   }
 }
 
 export const requestNativeCadGeneration = mutation({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, args) => {
-    const { user } = await requireOwnedInvention(ctx, args.inventionId);
-    if (!canTierRunWorkKind(user.subscriptionTier, "cad_model_specification")) throw new ConvexError("Native CAD generation requires a Pro or Enterprise entitlement");
+    await requireInventionEditAccess(ctx, args.inventionId);
+    const usageScope = await resolveInventionUsageScope(ctx, args.inventionId);
+    if (!usageScope) throw new ConvexError("Invention not found");
+    if (!canTierRunWorkKind(usageScope.plan, "cad_model_specification")) throw new ConvexError("Native CAD generation requires a Pro or higher entitlement");
 
     const designSpecs = await ctx.db.query("atlasDeliverables").withIndex("by_inventionId_kind", (q: any) => q.eq("inventionId", args.inventionId).eq("kind", "product_design_specification")).collect();
     const currentDesign = designSpecs.filter((item: any) => !item.staleReason).sort((a: any, b: any) => b.version - a.version)[0];
@@ -81,8 +76,8 @@ export const requestNativeCadGeneration = mutation({
       workItemId: current?._id,
       eventType: "work_queued",
       actorType: "inventor",
-      summary: "Inventor requested an additional preliminary CAD generation pass; InventSmith routed it through the guarded autonomous work budget.",
-      metadata: { maturity: "preliminary_cad", productDesignVersion: currentDesign.version },
+      summary: "An authorized collaborator requested an additional preliminary CAD generation pass; InventSmith routed it through the guarded organization work budget.",
+      metadata: { maturity: "preliminary_cad", productDesignVersion: currentDesign.version, usageScope: usageScope.scope, usageUserId: String(usageScope.usageUserId) },
       createdAt: now,
     });
     await ctx.scheduler.runAfter(0, runAvailableWork, { inventionId: args.inventionId });
@@ -126,7 +121,7 @@ export const recordNativeCadSuccess = internalMutation({
 
     if (workItem.claimedAt && currentInvention.updatedAt > workItem.claimedAt) {
       for (const artifact of args.artifacts) await ctx.storage.delete(artifact.storageId);
-      await settleCadUsage(ctx, workItem, currentInvention.userId, args.actualCostUnits, 0, args.completedAt);
+      await settleCadUsage(ctx, workItem, args.inventionId, args.actualCostUnits, 0, args.completedAt);
       await ctx.db.patch(workItem._id, { status: "queued", reservedCostUnits: undefined, reservationDateKey: undefined, claimedAt: undefined, startedAt: undefined, lastError: "Invention inputs changed while CAD was generating; generated artifacts were discarded.", updatedAt: args.completedAt });
       return { discarded: true, actualCostUnits: args.actualCostUnits };
     }
@@ -146,9 +141,10 @@ export const recordNativeCadSuccess = internalMutation({
       });
     }
 
-    await settleCadUsage(ctx, workItem, currentInvention.userId, args.actualCostUnits, 1, args.completedAt);
+    await settleCadUsage(ctx, workItem, args.inventionId, args.actualCostUnits, 1, args.completedAt);
     await ctx.db.patch(args.workItemId, { status: "completed", outputSummary: `Generated a ${args.partCount}-part preliminary native CAD package with STEP, STL, DXF, editable source, orthographic views, and exploded view.`, actualCostUnits: args.actualCostUnits, completedAt: args.completedAt, claimedAt: undefined, startedAt: undefined, leaseExpiresAt: undefined, reservedCostUnits: undefined, reservationDateKey: undefined, updatedAt: args.completedAt });
-    await ctx.db.insert("atlasExecutionEvents", { inventionId: args.inventionId, workItemId: args.workItemId, eventType: "work_completed", actorType: "atlas", summary: `InventSmith generated native preliminary CAD: ${args.partCount} parts, ${args.triangleCount} mesh facets, STEP/STL/DXF/source plus orthographic and exploded-view artifacts.`, costUnits: args.actualCostUnits, metadata: { artifactKinds: args.artifacts.map((item) => item.kind), maturity: "preliminary_cad" }, createdAt: args.completedAt });
+    const usageScope = await resolveInventionUsageScope(ctx, args.inventionId);
+    await ctx.db.insert("atlasExecutionEvents", { inventionId: args.inventionId, workItemId: args.workItemId, eventType: "work_completed", actorType: "atlas", summary: `InventSmith generated native preliminary CAD: ${args.partCount} parts, ${args.triangleCount} mesh facets, STEP/STL/DXF/source plus orthographic and exploded-view artifacts.`, costUnits: args.actualCostUnits, metadata: { artifactKinds: args.artifacts.map((item) => item.kind), maturity: "preliminary_cad", usageScope: usageScope?.scope, usageUserId: usageScope ? String(usageScope.usageUserId) : undefined }, createdAt: args.completedAt });
     return { discarded: false, actualCostUnits: args.actualCostUnits };
   },
 });
@@ -160,7 +156,7 @@ export const recordNativeCadFailure = internalMutation({
     if (!workItem || workItem.inventionId !== args.inventionId) return { willRetry: false };
     const invention = await ctx.db.get(args.inventionId);
     const willRetry = workItem.attemptCount < (workItem.maxAttempts ?? 3);
-    if (!willRetry && invention) await settleCadUsage(ctx, workItem, invention.userId, 0, 0, args.failedAt);
+    if (!willRetry && invention) await settleCadUsage(ctx, workItem, args.inventionId, 0, 0, args.failedAt);
     await ctx.db.patch(workItem._id, { status: willRetry ? "queued" : "failed", reservedCostUnits: willRetry ? workItem.reservedCostUnits : undefined, reservationDateKey: willRetry ? workItem.reservationDateKey : undefined, lastError: args.error.slice(0, 2000), startedAt: undefined, claimedAt: undefined, leaseExpiresAt: undefined, updatedAt: args.failedAt });
     await ctx.db.insert("atlasExecutionEvents", { inventionId: args.inventionId, workItemId: args.workItemId, eventType: "work_failed", actorType: "system", summary: willRetry ? "Native CAD generation failed and is eligible for autonomous retry." : "Native CAD generation exhausted its retry limit.", metadata: { error: args.error.slice(0, 1000), willRetry }, createdAt: args.failedAt });
     return { willRetry };
@@ -170,7 +166,7 @@ export const recordNativeCadFailure = internalMutation({
 export const getNativeCadArtifacts = query({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, args) => {
-    await requireOwnedInvention(ctx, args.inventionId);
+    await requireInventionReadAccess(ctx, args.inventionId);
     const deliverables = await ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q: any) => q.eq("inventionId", args.inventionId)).collect();
     const cadKinds = new Set(["native_cad_step", "native_cad_stl", "native_cad_dxf", "native_cad_source", "cad_orthographic_views", "cad_exploded_view"]);
     return await Promise.all(deliverables.filter((item: any) => cadKinds.has(item.kind)).sort((a: any, b: any) => b.updatedAt - a.updatedAt).map(async (item: any) => ({ _id: item._id, kind: item.kind, title: item.title, version: item.version, trustState: item.trustState, artifactMaturity: item.artifactMaturity, staleReason: item.staleReason, mediaType: item.mediaType, downloadUrl: item.storageId ? await ctx.storage.getUrl(item.storageId) : null, updatedAt: item.updatedAt })));
