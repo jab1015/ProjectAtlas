@@ -8,44 +8,41 @@ function read(path: string) {
 
 describe("InventSmith public pricing alignment", () => {
   const publicPricing = read("src/app/(public)/pricing/page.tsx");
-  const account = read("src/app/(app)/account/page.tsx");
-  const usage = read("convex/usagePolicyLogic.ts");
+  const policy = read("convex/organizationPolicyLogic.ts");
   const entitlement = read("convex/entitlementPolicyLogic.ts");
   const landing = read("src/app/page.tsx");
 
   it("keeps the public route present for the landing-page pricing link", () => {
     expect(landing).toContain('href="/pricing"');
-    expect(publicPricing).toContain("Choose how much of the Workshop you need.");
+    expect(publicPricing).toContain("A plan for one invention—or an entire invention practice.");
   });
 
-  it("matches the authenticated plan prices and active-invention capacities", () => {
+  it("matches the approved organization prices, active-invention capacities, and included seats", () => {
     for (const value of [
-      'name: "Explorer"', 'price: "Free"', 'activeInventions: 1',
-      'name: "Inventor"', 'price: "$39/month"', 'activeInventions: 3',
-      'name: "Pro"', 'price: "$79/month"', 'activeInventions: 10',
-      'name: "Enterprise"', 'price: "$149/month"', 'activeInventions: 25',
-    ]) {
-      expect(account).toContain(value);
-    }
-    for (const value of ["Explorer", "Free", "1 active invention", "Inventor", "$39/month", "3 active inventions", "Pro", "$79/month", "10 active inventions", "Enterprise", "$149/month", "25 active inventions"]) {
-      expect(publicPricing).toContain(value);
-    }
-  });
+      'displayName: "Explorer"', "monthlyPriceUsd: 0", "activeInventionLimit: 1", "includedSeatLimit: 1",
+      'displayName: "Inventor"', "monthlyPriceUsd: 39",
+      'displayName: "Pro"', "monthlyPriceUsd: 99",
+      'displayName: "Enterprise"', "monthlyPriceUsd: 199", "activeInventionLimit: 2", "includedSeatLimit: 3",
+      'displayName: "Studio 3"', "monthlyPriceUsd: 299", "activeInventionLimit: 3", "includedSeatLimit: 5",
+      'displayName: "Studio 6"', "monthlyPriceUsd: 399", "activeInventionLimit: 6", "includedSeatLimit: 8",
+    ]) expect(policy).toContain(value);
 
-  it("matches enforced daily usage allowances and does not overstate lower-tier entitlement", () => {
-    expect(usage).toContain("free: { autonomousCostUnits: 25, chatQuestions: 30 }");
-    expect(usage).toContain("inventor: { autonomousCostUnits: 125, chatQuestions: 100 }");
-    expect(usage).toContain("pro: { autonomousCostUnits: 350, chatQuestions: 200 }");
-    expect(usage).toContain("enterprise: { autonomousCostUnits: 600, chatQuestions: 300 }");
     for (const value of [
-      "25 autonomous work units/day", "30 Ask InventSmith questions/day",
-      "125 autonomous work units/day", "100 Ask InventSmith questions/day",
-      "350 autonomous work units/day", "200 Ask InventSmith questions/day",
-      "600 autonomous work units/day", "300 Ask InventSmith questions/day",
+      "Explorer", "Free", "1 active invention · 1 user",
+      "Inventor", "$39/month",
+      "Pro", "$99/month",
+      "Enterprise", "$199/month", "2 active inventions · 3 users",
+      "Studio 3", "$299/month", "3 active inventions · 5 users",
+      "Studio 6", "$399/month", "6 active inventions · 8 users",
     ]) expect(publicPricing).toContain(value);
+  });
 
+  it("does not sell raw model units as the primary public value proposition", () => {
+    expect(publicPricing).not.toContain("autonomous work units/day");
+    expect(publicPricing).not.toContain("Ask InventSmith questions/day");
+    expect(publicPricing).toContain("Bounded AI, research, CAD, render, and document usage");
+    expect(publicPricing).toContain("Pro");
+    expect(publicPricing).toContain("complete idea-to-market");
     expect(entitlement).toContain('if (normalized === "enterprise" || normalized === "pro") return PRO_WORK.has(kind)');
-    expect(publicPricing).toContain("Unlock the complete InventSmith idea-to-market work system");
-    expect(publicPricing).not.toContain("Inventor unlocks the complete");
   });
 });
