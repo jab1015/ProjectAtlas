@@ -7,6 +7,7 @@ import { remainingAutonomousCostUnitsAfterReservations, utcDateKey } from "./usa
 import { requiredProfessionalReviews } from "./professionalReviewPolicy";
 import { canTierRunWorkKind } from "./entitlementPolicyLogic";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
+import { ensureOrganizationDailyUsage, findOrganizationDailyUsage } from "./organizationDailyUsage";
 
 async function settleUsageReservation(
   ctx: MutationCtx,
@@ -19,6 +20,41 @@ async function settleUsageReservation(
   const usageScope = await resolveInventionUsageScope(ctx, inventionId);
   if (!usageScope) throw new ConvexError("Invention not found while settling usage");
   const dateKey = item.reservationDateKey ?? utcDateKey(now);
+  const reservedCostUnits = item.reservedCostUnits ?? 0;
+
+  if (usageScope.scope === "organization") {
+    let organizationUsage = await findOrganizationDailyUsage(ctx, usageScope.organizationId, dateKey);
+
+    // A work item claimed immediately before this additive ledger deployed may
+    // still have its reservation in the former creator row. If no organization
+    // ledger exists yet, settle that pre-ledger reservation in place; the first
+    // later org operation will bootstrap from the already-settled legacy total.
+    if (!organizationUsage && reservedCostUnits > 0) {
+      const transitionalUsage = await ctx.db
+        .query("atlasDailyUsage")
+        .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey))
+        .unique();
+      if (transitionalUsage && (transitionalUsage.reservedAutonomousCostUnits ?? 0) >= reservedCostUnits) {
+        await ctx.db.patch(transitionalUsage._id, {
+          autonomousCostUnits: transitionalUsage.autonomousCostUnits + actualCostUnits,
+          reservedAutonomousCostUnits: Math.max(0, (transitionalUsage.reservedAutonomousCostUnits ?? 0) - reservedCostUnits),
+          completedWorkItems: transitionalUsage.completedWorkItems + completedWorkItems,
+          updatedAt: now,
+        });
+        return;
+      }
+    }
+
+    organizationUsage = organizationUsage ?? await ensureOrganizationDailyUsage(ctx, usageScope.organizationId, dateKey, now);
+    await ctx.db.patch(organizationUsage._id, {
+      autonomousCostUnits: organizationUsage.autonomousCostUnits + actualCostUnits,
+      reservedAutonomousCostUnits: Math.max(0, (organizationUsage.reservedAutonomousCostUnits ?? 0) - reservedCostUnits),
+      completedWorkItems: organizationUsage.completedWorkItems + completedWorkItems,
+      updatedAt: now,
+    });
+    return;
+  }
+
   const usage = await ctx.db
     .query("atlasDailyUsage")
     .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey))
@@ -26,7 +62,7 @@ async function settleUsageReservation(
   if (usage) {
     await ctx.db.patch(usage._id, {
       autonomousCostUnits: usage.autonomousCostUnits + actualCostUnits,
-      reservedAutonomousCostUnits: Math.max(0, (usage.reservedAutonomousCostUnits ?? 0) - (item.reservedCostUnits ?? 0)),
+      reservedAutonomousCostUnits: Math.max(0, (usage.reservedAutonomousCostUnits ?? 0) - reservedCostUnits),
       completedWorkItems: usage.completedWorkItems + completedWorkItems,
       updatedAt: now,
     });
@@ -50,14 +86,23 @@ export const claimNextWork = internalMutation({
     const usageScope = await resolveInventionUsageScope(ctx, args.inventionId);
     if (!usageScope) throw new ConvexError("Invention not found");
     const dateKey = utcDateKey(args.now);
-    const usage = await ctx.db
-      .query("atlasDailyUsage")
-      .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey))
-      .unique();
+
+    const organizationUsage = usageScope.scope === "organization"
+      ? await ensureOrganizationDailyUsage(ctx, usageScope.organizationId, dateKey, args.now)
+      : null;
+    const legacyUsage = usageScope.scope === "legacy_user"
+      ? await ctx.db
+          .query("atlasDailyUsage")
+          .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey))
+          .unique()
+      : null;
+    const autonomousCostUnits = organizationUsage?.autonomousCostUnits ?? legacyUsage?.autonomousCostUnits ?? 0;
+    const reservedAutonomousCostUnits = organizationUsage?.reservedAutonomousCostUnits ?? legacyUsage?.reservedAutonomousCostUnits ?? 0;
+
     const serverAvailableUnits = remainingAutonomousCostUnitsAfterReservations(
       usageScope.plan,
-      usage?.autonomousCostUnits ?? 0,
-      usage?.reservedAutonomousCostUnits ?? 0
+      autonomousCostUnits,
+      reservedAutonomousCostUnits
     );
     const selection = selectNextWorkItem(
       items.map((item) => ({ ...item, _id: String(item._id) })),
@@ -69,12 +114,17 @@ export const claimNextWork = internalMutation({
     const workItemId = selection.selected._id as typeof items[number]["_id"];
     const reservation = selection.selected.reservedCostUnits ?? selection.selected.estimatedCostUnits ?? 0;
     if (!selection.selected.reservedCostUnits && reservation > 0) {
-      if (usage) {
-        await ctx.db.patch(usage._id, {
-          reservedAutonomousCostUnits: (usage.reservedAutonomousCostUnits ?? 0) + reservation,
+      if (organizationUsage) {
+        await ctx.db.patch(organizationUsage._id, {
+          reservedAutonomousCostUnits: (organizationUsage.reservedAutonomousCostUnits ?? 0) + reservation,
           updatedAt: args.now,
         });
-      } else {
+      } else if (legacyUsage) {
+        await ctx.db.patch(legacyUsage._id, {
+          reservedAutonomousCostUnits: (legacyUsage.reservedAutonomousCostUnits ?? 0) + reservation,
+          updatedAt: args.now,
+        });
+      } else if (usageScope.scope === "legacy_user") {
         await ctx.db.insert("atlasDailyUsage", {
           userId: usageScope.usageUserId,
           dateKey,
@@ -104,7 +154,11 @@ export const claimNextWork = internalMutation({
       actorType: "atlas",
       summary: `InventSmith claimed ${selection.selected.kind}.`,
       attemptNumber: selection.selected.attemptCount + 1,
-      metadata: { usageScope: usageScope.scope, usageUserId: String(usageScope.usageUserId) },
+      metadata: {
+        usageScope: usageScope.scope,
+        usageOrganizationId: usageScope.organizationId ? String(usageScope.organizationId) : undefined,
+        usageUserId: usageScope.scope === "legacy_user" ? String(usageScope.usageUserId) : undefined,
+      },
       createdAt: args.now,
     });
     return { workItemId, reason: "selected" as const };
