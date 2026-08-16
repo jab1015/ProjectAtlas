@@ -25,6 +25,19 @@ const INVENTOR_WORK = new Set([
   "feasibility_recommendation",
 ]);
 
+const SOFTWARE_PRO_WORK = [
+  "software_product_specification",
+  "software_ux_flow_design",
+  "software_architecture",
+  "software_data_model",
+  "software_security_privacy_review",
+  "software_prototype_plan",
+  "software_implementation_plan",
+  "software_qa_test_plan",
+  "software_beta_release_readiness",
+  "software_distribution_release_plan",
+] as const;
+
 const PRO_WORK = new Set([
   ...INVENTOR_WORK,
   "design_directions",
@@ -42,6 +55,7 @@ const PRO_WORK = new Set([
   "product_render_generation",
   "professional_service_plan",
   "professional_provider_research",
+  ...SOFTWARE_PRO_WORK,
   ...FULL_JOURNEY_PRO_WORK_KINDS,
 ]);
 
