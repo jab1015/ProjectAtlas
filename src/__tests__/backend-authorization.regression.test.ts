@@ -35,8 +35,9 @@ describe("backend authorization boundaries", () => {
     expect(block).toContain("purchase.productId");
   });
 
-  it("requires ownership for every legacy validation-research write", () => {
+  it("requires organization-aware edit access for every validation-research write", () => {
     const file = source("validationResearchMutations.ts");
+    expect(file).toContain("requireInventionEditAccess");
     expect(exportedFunctionBlock(file, "triggerValidationResearch")).toContain("requireOwnedInvention");
     for (const name of ["approveValidationSection", "editValidationSection", "refreshValidationSection"]) {
       expect(exportedFunctionBlock(file, name)).toContain("requireOwnedResearch");
@@ -70,5 +71,12 @@ describe("backend authorization boundaries", () => {
     expect(exportedFunctionBlock(file, "registerInventionEvidence")).toContain("requireInventionEditAccess");
     expect(exportedFunctionBlock(file, "listInventionEvidence")).toContain("requireInventionReadAccess");
     expect(exportedFunctionBlock(file, "removeInventionEvidence")).toContain("requireInventionManageAccess");
+  });
+
+  it("uses organization-aware edit access for evidence extraction retries", () => {
+    const file = source("evidenceExtractionControl.ts");
+    const block = exportedFunctionBlock(file, "retryEvidenceExtraction");
+    expect(file).not.toContain("invention.userId !== userId");
+    expect(block).toContain("requireInventionEditAccess");
   });
 });
