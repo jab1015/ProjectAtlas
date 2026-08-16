@@ -4,13 +4,12 @@ import type { Id } from "./_generated/dataModel";
 export type UsageScopeCtx = QueryCtx | MutationCtx;
 
 /**
- * Resolve the transitional usage/billing scope for an invention.
+ * Resolve the entitlement and accounting scope for an invention.
  *
- * The existing atlasDailyUsage table is user-keyed. Until the persisted usage
- * ledger is migrated to organization IDs, organization-owned inventions charge
- * the organization's creator/billing owner row so adding collaborators cannot
- * multiply AI/CAD/render allowances. Legacy inventions continue charging their
- * legacy owner exactly as before.
+ * Organization-owned inventions use their organization plan and the dedicated
+ * organizationDailyUsage ledger. `usageUserId` remains present on organization
+ * scopes only as a migration reference to the former creator-row accounting.
+ * Legacy inventions keep their original user-scoped behavior unchanged.
  */
 export async function resolveInventionUsageScope(
   ctx: UsageScopeCtx,
@@ -25,6 +24,7 @@ export async function resolveInventionUsageScope(
       return {
         invention,
         organization,
+        organizationId: organization._id,
         usageUserId: organization.createdByUserId,
         plan: organization.planKey,
         scope: "organization" as const,
@@ -36,6 +36,7 @@ export async function resolveInventionUsageScope(
   return {
     invention,
     organization: null,
+    organizationId: null,
     usageUserId: invention.userId,
     plan: legacyOwner?.subscriptionTier,
     scope: "legacy_user" as const,
