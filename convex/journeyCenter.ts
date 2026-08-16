@@ -1,15 +1,14 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { query } from "./_generated/server";
 import { FULL_JOURNEY_STAGES, routeForJourneyStage } from "./fullJourneyDefinition";
+import { requireInventionReadAccess } from "./organizations";
 
 export const getJourneyCenter = query({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new ConvexError("Authentication required");
+    await requireInventionReadAccess(ctx, args.inventionId);
     const invention = await ctx.db.get(args.inventionId);
-    if (!invention || invention.userId !== userId) throw new ConvexError("Invention not found or access denied");
+    if (!invention) throw new ConvexError("Invention not found");
 
     const [workItems, deliverables, reviews, approvals, decisions, evidence] = await Promise.all([
       ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect(),
