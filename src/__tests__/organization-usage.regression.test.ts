@@ -8,26 +8,57 @@ function convexSource(file: string) {
 }
 
 describe("organization-scoped usage accounting", () => {
-  it("routes organization-owned invention usage through one shared billing owner", () => {
+  it("uses one organization/day ledger instead of multiplying allowance by collaborator", () => {
+    const scope = convexSource("organizationUsageScope.ts");
+    const ledger = convexSource("organizationDailyUsage.ts");
+    const workState = convexSource("atlasWorkState.ts");
+    const chat = convexSource("atlasChat.ts");
+    const schema = convexSource("schema.ts");
+
+    expect(scope).toContain("organizationId: organization._id");
+    expect(scope).toContain('scope: "organization"');
+    expect(schema).toContain("organizationDailyUsage: defineTable");
+    expect(schema).toContain('index("by_organizationId_dateKey", ["organizationId", "dateKey"])');
+    expect(ledger).toContain("ensureOrganizationDailyUsage");
+    expect(ledger).toContain("aggregateLegacyOrganizationUsage");
+    expect(ledger).toContain('membership.status === "active"');
+    expect(workState).toContain("ensureOrganizationDailyUsage");
+    expect(workState).toContain("usageScope.organizationId");
+    expect(chat).toContain("ensureOrganizationDailyUsage");
+    expect(chat).toContain("usageScope.organizationId");
+    expect(chat).toContain("canAskWithinDailyAllowance(usageScope.plan");
+  });
+
+  it("preserves user-scoped accounting for legacy inventions", () => {
     const scope = convexSource("organizationUsageScope.ts");
     const workState = convexSource("atlasWorkState.ts");
     const chat = convexSource("atlasChat.ts");
 
-    expect(scope).toContain("usageUserId: organization.createdByUserId");
-    expect(scope).toContain('scope: "organization"');
-    expect(workState).toContain("resolveInventionUsageScope");
-    expect(workState).toContain("usageScope.usageUserId");
-    expect(workState).toContain("usageScope.plan");
-    expect(chat).toContain("resolveInventionUsageScope");
-    expect(chat).toContain("usageScope.usageUserId");
-    expect(chat).toContain("canAskWithinDailyAllowance(usageScope.plan");
+    expect(scope).toContain('scope: "legacy_user"');
+    expect(scope).toContain("usageUserId: invention.userId");
+    expect(workState).toContain('usageScope.scope === "legacy_user"');
+    expect(workState).toContain('query("atlasDailyUsage")');
+    expect(chat).toContain('usageScope.scope === "legacy_user"');
+    expect(chat).toContain('insert("atlasDailyUsage"');
+  });
+
+  it("makes organization reservation checks and writes part of one mutation transaction", () => {
+    const ledger = convexSource("organizationDailyUsage.ts");
+    const workState = convexSource("atlasWorkState.ts");
+
+    expect(ledger).toContain("indexed read plus insert/update occurs");
+    expect(workState).toContain("remainingAutonomousCostUnitsAfterReservations");
+    expect(workState).toContain("reservedAutonomousCostUnits");
+    expect(workState).toContain("await ctx.db.patch(organizationUsage._id");
+    expect(workState).toContain("settleUsageReservation");
+    expect(workState).toContain("stale output was discarded");
   });
 
   it("lets the current-usage API report an authorized organization's shared allowance", () => {
     const source = convexSource("atlasUsage.ts");
     expect(source).toContain('organizationId: v.optional(v.id("organizations"))');
     expect(source).toContain("getOrganizationMembership");
-    expect(source).toContain("usageUserId = organization.createdByUserId");
+    expect(source).toContain("getOrganizationUsageSnapshot");
     expect(source).toContain("plan = organization.planKey");
     expect(source).toContain('scope = "organization"');
   });
