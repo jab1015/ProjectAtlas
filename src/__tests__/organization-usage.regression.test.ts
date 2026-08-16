@@ -22,6 +22,15 @@ describe("organization-scoped usage accounting", () => {
     expect(chat).toContain("canAskWithinDailyAllowance(usageScope.plan");
   });
 
+  it("lets the current-usage API report an authorized organization's shared allowance", () => {
+    const source = convexSource("atlasUsage.ts");
+    expect(source).toContain('organizationId: v.optional(v.id("organizations"))');
+    expect(source).toContain("getOrganizationMembership");
+    expect(source).toContain("usageUserId = organization.createdByUserId");
+    expect(source).toContain("plan = organization.planKey");
+    expect(source).toContain('scope = "organization"');
+  });
+
   it("reports cost units by organization, invention and work kind without inventing a dollar conversion", () => {
     const source = convexSource("organizationUsage.ts");
     expect(source).toContain("getOrganizationUsageOverview");
