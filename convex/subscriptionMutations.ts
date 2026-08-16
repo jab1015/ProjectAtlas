@@ -65,13 +65,22 @@ export const applySubscriptionEvent = internalMutation({
       const ownerMembership = ownerMemberships.length === 1 ? ownerMemberships[0] : null;
       const billingOwner = ownerMembership ? await ctx.db.get(ownerMembership.userId) : null;
       const ownerEmail = billingOwner?.email?.trim().toLowerCase();
+      const existingCustomerMatch = Boolean(
+        organization?.billingCustomerId &&
+        args.billingCustomerId &&
+        organization.billingCustomerId === args.billingCustomerId
+      );
+      const ownerActivationMatch = Boolean(
+        !organization?.billingCustomerId &&
+        ownerEmail &&
+        ownerEmail === args.customerEmail.trim().toLowerCase()
+      );
       const validTarget = Boolean(
         organization &&
         organization.status === "active" &&
         ownerMembership &&
         ownerMembership.userId === organization.createdByUserId &&
-        ownerEmail &&
-        ownerEmail === args.customerEmail.trim().toLowerCase()
+        (existingCustomerMatch || ownerActivationMatch)
       );
       // Billing recency is independent from organization profile/team edits.
       const stale = Boolean(organization && (organization.subscriptionUpdatedAt ?? 0) > args.occurredAt);
@@ -101,8 +110,8 @@ export const applySubscriptionEvent = internalMutation({
       await ctx.db.patch(args.organizationId, {
         planKey: effectivePlan,
         subscriptionStatus: args.status,
-        subscriptionId: args.subscriptionId,
-        billingCustomerId: args.billingCustomerId,
+        subscriptionId: args.subscriptionId ?? organization?.subscriptionId,
+        billingCustomerId: args.billingCustomerId ?? organization?.billingCustomerId,
         subscriptionCurrentPeriodEnd: args.currentPeriodEnd,
         subscriptionUpdatedAt: args.occurredAt,
         updatedAt: Math.max(organization?.updatedAt ?? 0, args.occurredAt),
@@ -156,8 +165,8 @@ export const applySubscriptionEvent = internalMutation({
     await ctx.db.patch(user._id, {
       subscriptionTier: effectiveTier,
       subscriptionStatus: args.status,
-      subscriptionId: args.subscriptionId,
-      billingCustomerId: args.billingCustomerId,
+      subscriptionId: args.subscriptionId ?? user.subscriptionId,
+      billingCustomerId: args.billingCustomerId ?? user.billingCustomerId,
       subscriptionCurrentPeriodEnd: args.currentPeriodEnd,
       subscriptionUpdatedAt: args.occurredAt,
     });
@@ -178,8 +187,8 @@ export const applySubscriptionEvent = internalMutation({
         await ctx.db.patch(personalOrganization._id, {
           planKey: organizationPlanForEffectiveTier(effectiveTier),
           subscriptionStatus: args.status,
-          subscriptionId: args.subscriptionId,
-          billingCustomerId: args.billingCustomerId,
+          subscriptionId: args.subscriptionId ?? personalOrganization.subscriptionId,
+          billingCustomerId: args.billingCustomerId ?? personalOrganization.billingCustomerId,
           subscriptionCurrentPeriodEnd: args.currentPeriodEnd,
           subscriptionUpdatedAt: args.occurredAt,
           updatedAt: Math.max(personalOrganization.updatedAt, args.occurredAt),
