@@ -1,22 +1,16 @@
-import { query, mutation, type MutationCtx, type QueryCtx } from "./_generated/server";
+import { query, mutation } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { makeFunctionReference } from "convex/server";
 import type { Id } from "./_generated/dataModel";
 import { requireAdmin } from "./authHelpers";
 import { applyInventorEvidenceChange } from "./evidenceImpact";
+import {
+  requireInventionEditAccess,
+  requireInventionManageAccess,
+  requireInventionReadAccess,
+} from "./organizations";
 
 const extractInventorEvidenceFile = makeFunctionReference<"action", { evidenceSourceId: Id<"evidenceSources"> }, unknown>("evidenceFileExtraction:extractInventorEvidenceFile");
-
-type EvidenceCtx = MutationCtx | QueryCtx;
-
-async function requireOwnedInvention(ctx: EvidenceCtx, inventionId: Id<"inventions">) {
-  const userId = await getAuthUserId(ctx);
-  if (!userId) throw new ConvexError("Authentication required");
-  const invention = await ctx.db.get(inventionId);
-  if (!invention || invention.userId !== userId) throw new ConvexError("Invention not found or access denied");
-  return { userId, invention };
-}
 
 export const generateUploadUrl = mutation({
   args: {},
@@ -29,7 +23,7 @@ export const generateUploadUrl = mutation({
 export const generateInventionEvidenceUploadUrl = mutation({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, args) => {
-    await requireOwnedInvention(ctx, args.inventionId);
+    await requireInventionEditAccess(ctx, args.inventionId);
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -47,7 +41,7 @@ export const registerInventionEvidence = mutation({
     extraction: v.optional(v.any()),
   },
   handler: async (ctx, args) => {
-    const { userId } = await requireOwnedInvention(ctx, args.inventionId);
+    const { userId } = await requireInventionEditAccess(ctx, args.inventionId);
     const now = Date.now();
     const evidenceKind = args.evidenceKind?.trim() || "other";
     const title = args.title?.trim() || args.fileName;
@@ -86,6 +80,7 @@ export const registerInventionEvidence = mutation({
         evidenceSourceId: sourceId,
         evidenceKind,
         fileName: args.fileName,
+        uploadedByUserId: String(userId),
         structuredExtractionAvailable: Boolean(args.extraction) && extractionMode !== "metadata_only",
         serverExtractionQueued: needsServerExtraction,
       },
@@ -111,7 +106,7 @@ export const registerInventionEvidence = mutation({
 export const listInventionEvidence = query({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, args) => {
-    await requireOwnedInvention(ctx, args.inventionId);
+    await requireInventionReadAccess(ctx, args.inventionId);
     const sources = await ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect();
     const inventorUploads = sources.filter((source) => source.metadata?.provenance === "inventor_upload");
 
@@ -146,7 +141,7 @@ export const listInventionEvidence = query({
 export const removeInventionEvidence = mutation({
   args: { inventionId: v.id("inventions"), evidenceSourceId: v.id("evidenceSources") },
   handler: async (ctx, args) => {
-    await requireOwnedInvention(ctx, args.inventionId);
+    const { userId } = await requireInventionManageAccess(ctx, args.inventionId);
     const source = await ctx.db.get(args.evidenceSourceId);
     if (!source || source.inventionId !== args.inventionId) throw new ConvexError("Evidence not found or access denied");
     if (source.metadata?.provenance !== "inventor_upload") throw new ConvexError("Only inventor-uploaded evidence can be removed here");
@@ -157,6 +152,14 @@ export const removeInventionEvidence = mutation({
     await applyInventorEvidenceChange(ctx, args.inventionId, { action: "removed", sourceId: source._id, label: source.title, evidenceKind, now });
     if (storageId) await ctx.storage.delete(storageId);
     await ctx.db.delete(args.evidenceSourceId);
+    await ctx.db.insert("atlasExecutionEvents", {
+      inventionId: args.inventionId,
+      eventType: "inventor_input_received",
+      actorType: "inventor",
+      summary: `Removed uploaded evidence: ${source.title}`,
+      metadata: { evidenceSourceId: String(source._id), removedByUserId: String(userId) },
+      createdAt: now,
+    });
   },
 });
 
