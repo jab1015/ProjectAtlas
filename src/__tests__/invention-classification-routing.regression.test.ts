@@ -97,6 +97,16 @@ describe("InventSmith invention classification and journey routing", () => {
     }
   });
 
+  it("routes ordinary service-business ideas outside the invention workflow", () => {
+    const classification = classifyInvention({
+      title: "Start a landscaping company",
+      solutionDescription: "I want to open a landscaping service business for local homeowners.",
+    });
+    expect(classification.supportClass).toBe("unsupported");
+    expect(classification.categories).toContain("business-only concept");
+    expect(classification.unsupportedReason).toMatch(/inventions and product concepts/i);
+  });
+
   it("does not confuse ordinary security products with covert surveillance abuse", () => {
     const classification = classifyInvention({
       title: "Home security camera app",
@@ -134,7 +144,7 @@ describe("InventSmith invention classification and journey routing", () => {
   });
 
   it("allows Pro and Enterprise organizations to execute every software work kind", () => {
-    const software = buildInventionWorkPlan(classifyInvention({ title: "Mobile app", solutionDescription: "An Android and iOS application." }));
+    const software = buildInventionWorkPlan(classifyInvention({ title: "Mobile app", solutionDescription: "An Android and iOS app." }));
     const softwareKinds = software.postCanonical.map((item) => item.kind).filter((kind) => kind.startsWith("software_"));
     expect(softwareKinds.length).toBeGreaterThan(5);
     for (const kind of softwareKinds) {
@@ -152,6 +162,12 @@ describe("InventSmith invention classification and journey routing", () => {
     expect(source).toContain('classification.supportClass === "unsupported"');
     expect(source).toContain("unsupportedInventionMessage(classification)");
     expect(source).toContain("initializeClassifiedInvention");
+  });
+
+  it("keeps the live onboarding UI on the organization-native classified creation path", () => {
+    const onboarding = readFileSync(join(process.cwd(), "src/app/(app)/onboarding/page.tsx"), "utf8");
+    expect(onboarding).toContain('"organizationInventions:create"');
+    expect(onboarding).not.toContain('"journeyEngine:createInvention"');
   });
 
   it("stores classification in the canonical record without requiring a destructive schema migration", () => {
