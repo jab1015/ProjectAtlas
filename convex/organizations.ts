@@ -29,32 +29,6 @@ function personalOrganizationName(name?: string, email?: string): string {
   return "My InventSmith";
 }
 
-async function countOccupiedSeats(ctx: AuthCtx, organizationId: Id<"organizations">): Promise<number> {
-  const [memberships, invitations] = await Promise.all([
-    ctx.db
-      .query("organizationMemberships")
-      .withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId))
-      .collect(),
-    ctx.db
-      .query("organizationInvitations")
-      .withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId))
-      .collect(),
-  ]);
-  const now = Date.now();
-  const membershipSeats = memberships.filter((membership) => membership.status === "active" || membership.status === "invited").length;
-  const invitationSeats = invitations.filter((invitation) => invitation.status === "pending" && invitation.expiresAt > now).length;
-  return membershipSeats + invitationSeats;
-}
-
-async function assertSeatAvailable(ctx: AuthCtx, organizationId: Id<"organizations">) {
-  const organization = await ctx.db.get(organizationId);
-  if (!organization || organization.status !== "active") throw new ConvexError("Organization not found");
-  const seatLimit = getOrganizationPlanPolicy(organization.planKey).includedSeatLimit;
-  if (seatLimit === null) return;
-  const occupiedSeats = await countOccupiedSeats(ctx, organizationId);
-  if (occupiedSeats >= seatLimit) throw new ConvexError("Organization included-seat limit reached");
-}
-
 export async function getOrganizationMembership(
   ctx: AuthCtx,
   organizationId: Id<"organizations">,
@@ -298,6 +272,8 @@ export const listOrganizationMembers = query({
   },
 });
 
+// Legacy API shape is retained temporarily so older clients fail safely instead
+// of creating membership without the invited person's explicit acceptance.
 export const addMemberByEmail = mutation({
   args: {
     organizationId: v.id("organizations"),
@@ -306,35 +282,7 @@ export const addMemberByEmail = mutation({
   },
   handler: async (ctx, args) => {
     await requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"]);
-    const normalizedEmail = args.email.trim().toLowerCase();
-    if (!normalizedEmail) throw new ConvexError("Member email is required");
-    const user = await ctx.db.query("users").withIndex("email", (q) => q.eq("email", normalizedEmail)).first();
-    if (!user) {
-      throw new ConvexError("That person must create an InventSmith account before they can be added to this organization");
-    }
-
-    const existing = await getOrganizationMembership(ctx, args.organizationId, user._id);
-    if (existing?.status === "active") {
-      if (existing.role === "owner") return { membershipId: existing._id, added: false };
-      await ctx.db.patch(existing._id, { role: args.role, updatedAt: Date.now() });
-      return { membershipId: existing._id, added: false };
-    }
-
-    await assertSeatAvailable(ctx, args.organizationId);
-    const now = Date.now();
-    if (existing) {
-      await ctx.db.patch(existing._id, { role: args.role, status: "active", updatedAt: now });
-      return { membershipId: existing._id, added: true };
-    }
-    const membershipId = await ctx.db.insert("organizationMemberships", {
-      organizationId: args.organizationId,
-      userId: user._id,
-      role: args.role,
-      status: "active",
-      createdAt: now,
-      updatedAt: now,
-    });
-    return { membershipId, added: true };
+    throw new ConvexError("Direct member assignment is disabled; send an organization invitation and wait for explicit acceptance");
   },
 });
 
