@@ -28,4 +28,12 @@ describe("organization-aware account deletion", () => {
     expect(source).toContain("source.metadata?.storageId");
     expect(source).toContain('query("inventionAccessGrants").withIndex("by_inventionId"');
   });
+
+  it("removes usage rows only when the owned personal organization itself is deleted", () => {
+    expect(source).toContain('query("organizationDailyUsage")');
+    expect(source).toContain('withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId))');
+    expect(source).toContain("organizationUsageRowsDeleted += organizationUsage.length");
+    expect(source).toContain("usageRowsDeleted: usage.length + organizationUsageRowsDeleted");
+    expect(source).toContain("Company/studio ledgers are intentionally untouched when a member leaves");
+  });
 });
