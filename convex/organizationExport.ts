@@ -23,29 +23,15 @@ export const getOrganizationStructuredExport = query({
     const organization = await ctx.db.get(args.organizationId);
     if (!organization || organization.status === "closed") throw new ConvexError("Organization not found");
 
-    const memberships = await ctx.db
-      .query("organizationMemberships")
-      .withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId))
-      .collect();
+    const memberships = await ctx.db.query("organizationMemberships").withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId)).collect();
     const members = [];
     for (const membership of memberships) {
       const user = await ctx.db.get(membership.userId);
-      members.push({
-        userId: membership.userId,
-        name: user?.name,
-        email: user?.email,
-        role: membership.role,
-        status: membership.status,
-        createdAt: membership.createdAt,
-        updatedAt: membership.updatedAt,
-      });
+      members.push({ userId: membership.userId, name: user?.name, email: user?.email, role: membership.role, status: membership.status, createdAt: membership.createdAt, updatedAt: membership.updatedAt });
     }
 
     const inventions = bounded(
-      await ctx.db
-        .query("inventions")
-        .withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId))
-        .take(INVENTION_LIMIT + 1),
+      await ctx.db.query("inventions").withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId)).take(INVENTION_LIMIT + 1),
       INVENTION_LIMIT,
       "Invention count",
     );
@@ -88,33 +74,22 @@ export const getOrganizationStructuredExport = query({
         stageProgress: stages,
         conversations: bounded(conversations, ROW_LIMIT, "Conversation count"),
         conversationMessages: bounded(messages, EVENT_LIMIT, "Message count"),
-        documents: bounded(documents, ROW_LIMIT, "Document count").map((document) => ({
-          _id: document._id,
-          inventionId: document.inventionId,
-          fileName: document.fileName,
-          createdAt: document.createdAt,
-          binaryContentIncluded: false,
-        })),
+        documents: bounded(documents, ROW_LIMIT, "Document count").map((document) => ({ _id: document._id, inventionId: document.inventionId, fileName: document.fileName, createdAt: document.createdAt, binaryContentIncluded: false })),
         validationResearch: bounded(validationResearch, ROW_LIMIT, "Validation research count"),
         accessGrants: bounded(grants, ROW_LIMIT, "Access-grant count"),
       });
     }
 
-    const [dailyUsage, subscriptionEvents] = await Promise.all([
-      ctx.db
-        .query("organizationDailyUsage")
-        .withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId))
-        .take(EVENT_LIMIT + 1),
-      ctx.db
-        .query("subscriptionEvents")
-        .withIndex("by_appliedOrganizationId", (q) => q.eq("appliedOrganizationId", args.organizationId))
-        .take(ROW_LIMIT + 1),
+    const [dailyUsage, subscriptionEvents, invitations] = await Promise.all([
+      ctx.db.query("organizationDailyUsage").withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId)).take(EVENT_LIMIT + 1),
+      ctx.db.query("subscriptionEvents").withIndex("by_appliedOrganizationId", (q) => q.eq("appliedOrganizationId", args.organizationId)).take(ROW_LIMIT + 1),
+      ctx.db.query("organizationInvitations").withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId)).take(ROW_LIMIT + 1),
     ]);
 
     return {
-      exportVersion: 3,
+      exportVersion: 4,
       generatedAt: Date.now(),
-      scope: "Organization-owned InventSmith structured project and billing-attribution data. Binary bytes and authentication secrets are not embedded.",
+      scope: "Organization-owned InventSmith structured project, membership invitation, and billing-attribution data. Binary bytes and authentication secrets are not embedded.",
       organization: {
         organizationId: organization._id,
         name: organization.name,
@@ -128,6 +103,7 @@ export const getOrganizationStructuredExport = query({
         updatedAt: organization.updatedAt,
       },
       members,
+      invitations: bounded(invitations, ROW_LIMIT, "Organization invitation count"),
       inventions: inventionBundles,
       dailyUsage: bounded(dailyUsage, EVENT_LIMIT, "Organization usage-history count"),
       subscriptionEvents: bounded(subscriptionEvents, ROW_LIMIT, "Organization subscription-event count"),
