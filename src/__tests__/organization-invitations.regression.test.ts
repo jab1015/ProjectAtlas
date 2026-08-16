@@ -49,6 +49,17 @@ describe("organization invitations", () => {
     expect(invitations).toContain('status: "active"');
   });
 
+  it("keeps the legacy direct-add API fail-closed instead of bypassing invitation consent", () => {
+    const legacyStart = organizations.indexOf("export const addMemberByEmail");
+    const legacyEnd = organizations.indexOf("export const updateMemberRole", legacyStart);
+    const legacyMutation = organizations.slice(legacyStart, legacyEnd);
+    expect(legacyStart).toBeGreaterThanOrEqual(0);
+    expect(legacyMutation).toContain("Direct member assignment is disabled");
+    expect(legacyMutation).toContain("explicit acceptance");
+    expect(legacyMutation).not.toContain('status: "active"');
+    expect(legacyMutation).not.toContain('insert("organizationMemberships"');
+  });
+
   it("supports revocation and expiration without granting invention access", () => {
     expect(invitations).toContain("revokeInvitation");
     expect(invitations).toContain('status: "revoked"');
