@@ -36,6 +36,12 @@ const FINANCE_REVIEW: RequiredProfessionalReview = {
   scope: "Review financial assumptions, entity/tax/accounting implications, funding structure, disclosures, securities or lending consequences, and suitability of projections for external authorized use.",
 };
 
+const SOFTWARE_SECURITY_REVIEW: RequiredProfessionalReview = {
+  specialty: "other",
+  requiredCredentials: "Qualified application-security/privacy professional with experience appropriate to the product's data sensitivity, threat model, platforms, integrations, and regulated context",
+  scope: "Review authentication/authorization, sensitive-data handling, threat model, dependency/integration risk, privacy/retention/deletion controls, incident readiness, security testing, and any regulated privacy/security obligations. InventSmith preparation is not a penetration test, certification, privacy legal opinion, or compliance approval.",
+};
+
 export function requiredProfessionalReviews(kind: string): RequiredProfessionalReview[] {
   if ([
     "preliminary_prior_art_landscape",
@@ -69,6 +75,7 @@ export function requiredProfessionalReviews(kind: string): RequiredProfessionalR
   ].includes(kind)) return [ENGINEERING_REVIEW];
 
   if (kind === "regulatory_readiness_screening") return [REGULATORY_REVIEW];
+  if (kind === "software_security_privacy_readiness") return [SOFTWARE_SECURITY_REVIEW];
 
   if (["financial_model", "funding_readiness_assessment"].includes(kind)) return [FINANCE_REVIEW];
 
