@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, CheckCircle2, Hammer, ShieldCheck, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AtlasLogo } from "@/components/atlas/atlas-logo";
+import { INVENTSMITH_PUBLIC_JOURNEY } from "@/lib/inventsmithJourney";
 import { useEffect } from "react";
 import { trackLandingPageViewed, trackGetStartedClicked } from "@/lib/analytics";
 
@@ -22,24 +23,6 @@ function MadeThisBadge() {
     </div>
   );
 }
-
-const JOURNEY_STAGES = [
-  "Idea Capture",
-  "Validation",
-  "Market Research",
-  "Patent Research",
-  "Product Design",
-  "Engineering",
-  "Prototype",
-  "Testing",
-  "IP Protection",
-  "Manufacturing",
-  "Funding",
-  "Branding",
-  "Marketing",
-  "Sales",
-  "Growth",
-];
 
 export default function HomePage() {
   useEffect(() => {
@@ -129,10 +112,10 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {JOURNEY_STAGES.map((stage, index) => (
-                  <div key={stage} className="rounded-xl border border-border bg-card p-4">
-                    <p className="text-xs font-semibold text-primary">{String(index + 1).padStart(2, "0")}</p>
-                    <p className="mt-2 text-sm font-medium text-foreground">{stage}</p>
+                {INVENTSMITH_PUBLIC_JOURNEY.map((stage) => (
+                  <div key={stage.id} className="rounded-xl border border-border bg-card p-4">
+                    <p className="text-xs font-semibold text-primary">{String(stage.id).padStart(2, "0")}</p>
+                    <p className="mt-2 text-sm font-medium text-foreground">{stage.name}</p>
                   </div>
                 ))}
               </div>
@@ -193,7 +176,7 @@ export default function HomePage() {
               <ul className="space-y-3">
                 <li><Link href="/privacy" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Privacy Notice</Link></li>
                 <li><Link href="/terms" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Terms of Service</Link></li>
-                <li><a href="mailto:team@atlas.madethis.app" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Contact</a></li>
+                <li><a href="mailto:support@madethis.com" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Contact</a></li>
               </ul>
             </div>
           </div>
