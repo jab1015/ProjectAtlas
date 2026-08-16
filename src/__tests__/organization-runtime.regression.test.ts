@@ -25,12 +25,32 @@ describe("InventSmith organization runtime", () => {
     expect(organizationSource).toContain("ensurePersonalOrganizationForUser");
   });
 
-  it("requires active organization membership and explicit authorization for shared inventions", () => {
+  it("requires active organization membership before any explicit invention grant", () => {
+    const membershipCheck = organizationSource.indexOf("const membership = await getOrganizationMembership(ctx, invention.organizationId, userId)");
+    const grantCheck = organizationSource.indexOf("const explicitGrant = await ctx.db");
+    expect(membershipCheck).toBeGreaterThan(-1);
+    expect(grantCheck).toBeGreaterThan(membershipCheck);
     expect(organizationSource).toContain('membership.status !== "active"');
     expect(organizationSource).toContain("defaultInventionAccessForRole");
     expect(organizationSource).toContain("requireInventionEditAccess");
     expect(organizationSource).toContain("requireInventionManageAccess");
     expect(organizationSource).toContain("Target user must be an active organization member");
+  });
+
+  it("enforces purchased seat capacity and protects the owner membership", () => {
+    expect(organizationSource).toContain("countOccupiedSeats");
+    expect(organizationSource).toContain("getOrganizationPlanPolicy(organization.planKey).includedSeatLimit");
+    expect(organizationSource).toContain("Organization included-seat limit reached");
+    expect(organizationSource).toContain("addMemberByEmail");
+    expect(organizationSource).toContain("updateMemberRole");
+    expect(organizationSource).toContain("removeMember");
+    expect(organizationSource).toContain("Transfer organization ownership before removing the owner");
+  });
+
+  it("does not clone a personal paid entitlement when creating another company or studio", () => {
+    expect(organizationSource).toContain("createOrganization");
+    expect(organizationSource).toContain('planKey: "explorer"');
+    expect(organizationSource).toContain("Billing activation upgrades this");
   });
 
   it("shares one usage allowance across organization members and inventions", () => {
