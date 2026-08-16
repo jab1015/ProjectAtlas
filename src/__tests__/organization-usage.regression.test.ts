@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { classifyCostOperation, emptyCostClassSummary, addCostClassUsage } from "../../convex/costEconomicsLogic";
+import { addCostClassUsage, buildObservedCostProfile, classifyCostOperation, emptyCostClassSummary } from "../../convex/costEconomicsLogic";
 
 function convexSource(file: string) {
   return readFileSync(join(process.cwd(), "convex", file), "utf8");
@@ -83,8 +83,23 @@ describe("organization-scoped usage accounting", () => {
     expect(source).toContain("byProvider");
     expect(source).toContain("providerCoverageByCostUnits");
     expect(source).toContain("addCostClassUsage");
+    expect(source).toContain("observedCostProfile");
     expect(source).toContain("estimatedVariableCostUsd: null");
     expect(source).toContain("calibrationReady");
+  });
+
+  it("derives normal, heavy and Studio overlap scenarios only from observed cost units", () => {
+    const profile = buildObservedCostProfile([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    expect(profile.sampleSize).toBe(10);
+    expect(profile.averageCostUnitsPerInvention).toBe(5.5);
+    expect(profile.medianCostUnitsPerInvention).toBe(5);
+    expect(profile.heavyUseP90CostUnitsPerInvention).toBe(9);
+    expect(profile.maxObservedCostUnitsPerInvention).toBe(10);
+    expect(profile.studioOverlap.top3CostUnits).toBe(27);
+    expect(profile.studioOverlap.top6CostUnits).toBe(45);
+    expect(profile.calibrationConfidence).toBe("directional");
+    expect(buildObservedCostProfile([]).calibrationConfidence).toBe("insufficient");
+    expect(buildObservedCostProfile(Array.from({ length: 30 }, (_, index) => index + 1)).calibrationConfidence).toBe("representative");
   });
 
   it("persists Ask InventSmith token/research attribution into execution events", () => {
