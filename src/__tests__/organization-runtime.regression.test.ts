@@ -111,11 +111,11 @@ describe("InventSmith organization runtime", () => {
     expect(productDesignSource).toContain("canTierRunWorkKind(usageScope.plan");
   });
 
-  it("lets every authorized invention reader see the complete Journey Center", () => {
+  it("lets every authorized invention reader see the complete product-type-aware Journey Center", () => {
     expect(journeySource).not.toContain("invention.userId !== userId");
     expect(journeySource).not.toContain("getAuthUserId");
     expect(journeySource).toContain("requireInventionReadAccess(ctx, args.inventionId)");
-    expect(journeySource).toContain("FULL_JOURNEY_STAGES");
+    expect(journeySource).toContain("journeyStagesForProductType(classification.productType)");
   });
 
   it("keeps Stages 6-15 collaborative while enforcing complete-journey organization entitlement", () => {
