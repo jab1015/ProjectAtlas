@@ -9,6 +9,7 @@ const workspaceSource = readFileSync("convex/inventionWorkspace.ts", "utf8");
 const workStateSource = readFileSync("convex/atlasWorkState.ts", "utf8");
 const nativeCadSource = readFileSync("convex/nativeCad.ts", "utf8");
 const productDesignSource = readFileSync("convex/productDesign.ts", "utf8");
+const journeySource = readFileSync("convex/journeyCenter.ts", "utf8");
 
 describe("InventSmith organization runtime", () => {
   it("keeps organization-native tenancy represented in the Convex schema", () => {
@@ -94,6 +95,13 @@ describe("InventSmith organization runtime", () => {
     expect(productDesignSource).toContain("requireInventionReadAccess(ctx, args.inventionId)");
     expect(productDesignSource).toContain("resolveInventionUsageScope(ctx, args.inventionId)");
     expect(productDesignSource).toContain("canTierRunWorkKind(usageScope.plan");
+  });
+
+  it("lets every authorized invention reader see the complete Journey Center", () => {
+    expect(journeySource).not.toContain("invention.userId !== userId");
+    expect(journeySource).not.toContain("getAuthUserId");
+    expect(journeySource).toContain("requireInventionReadAccess(ctx, args.inventionId)");
+    expect(journeySource).toContain("FULL_JOURNEY_STAGES");
   });
 
   it("keeps canonical invention ownership attribution stable when collaborators initialize missing records", () => {
