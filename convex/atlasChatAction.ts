@@ -7,9 +7,21 @@ import { internalAction } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { CHAT_MODEL_CONTEXT_MAX_CHARACTERS, shouldUseExternalResearch, truncateModelContext } from "./chatPolicyLogic";
 import { summarizeKeyProjectOperations } from "./projectStateSummaryLogic";
+import { costUnitsFromTokens } from "./workOrchestratorLogic";
 
 const getAnswerContext = makeFunctionReference<"query", { userMessageId: Id<"conversationMessages"> }, any>("atlasChat:getAnswerContext");
-const saveAnswer = makeFunctionReference<"mutation", { userMessageId: Id<"conversationMessages">; assistantMessageId: Id<"conversationMessages">; content: string; error?: string; completedAt: number }, unknown>("atlasChat:saveAnswer");
+const saveAnswer = makeFunctionReference<"mutation", {
+  userMessageId: Id<"conversationMessages">;
+  assistantMessageId: Id<"conversationMessages">;
+  content: string;
+  error?: string;
+  completedAt: number;
+  actualCostUnits?: number;
+  externalResearch?: boolean;
+  provider?: string;
+  model?: string;
+  providerUsage?: unknown;
+}, unknown>("atlasChat:saveAnswer");
 
 function compactWorkItem(item: any) {
   return {
@@ -39,8 +51,9 @@ export const answerQuestion = internalAction({
       const externalResearch = shouldUseExternalResearch(question);
       const operationalSummary = summarizeKeyProjectOperations(data.workItems);
       const client = new OpenAI({ apiKey });
+      const model = process.env.ATLAS_OPENAI_MODEL ?? "gpt-5.4-mini";
       const response = await client.responses.create({
-        model: process.env.ATLAS_OPENAI_MODEL ?? "gpt-5.4-mini",
+        model,
         max_output_tokens: 5000,
         reasoning: { effort: "medium" },
         tools: externalResearch ? [{ type: "web_search" as const, search_context_size: "medium" as const }] : undefined,
@@ -140,7 +153,22 @@ export const answerQuestion = internalAction({
         ],
       });
       const content = response.output_text.trim() || "I could not form a reliable answer from the current InventSmith project state.";
-      await ctx.runMutation(saveAnswer, { userMessageId, assistantMessageId, content, completedAt: Date.now() });
+      const totalTokens = response.usage?.total_tokens;
+      await ctx.runMutation(saveAnswer, {
+        userMessageId,
+        assistantMessageId,
+        content,
+        completedAt: Date.now(),
+        actualCostUnits: costUnitsFromTokens(totalTokens),
+        externalResearch,
+        provider: "openai",
+        model,
+        providerUsage: {
+          totalTokens: totalTokens ?? null,
+          inputTokens: response.usage?.input_tokens ?? null,
+          outputTokens: response.usage?.output_tokens ?? null,
+        },
+      });
       return { answered: true, externalResearch };
     } catch (error) {
       const message = error instanceof Error ? error.message : "InventSmith chat failed";
