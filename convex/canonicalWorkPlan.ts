@@ -1,3 +1,5 @@
+import { workKindAppliesToProductType, type InventionProductType } from "./inventionClassificationLogic";
+
 export interface CanonicalWorkPlanItem {
   kind: string;
   title: string;
@@ -42,7 +44,19 @@ export const CANONICAL_WORK_PLAN: readonly CanonicalWorkPlanItem[] = [
   { kind: "package_assembly", title: "Assemble the invention feasibility and development package", priority: 20, estimatedCostUnits: 16, deliverableKind: "invention_feasibility_development_package", dependsOnKinds: ["feasibility_recommendation"] },
 ] as const;
 
-export function missingCanonicalWorkKinds(existingKinds: Iterable<string>) {
+function pruneDependencies<T extends CanonicalWorkPlanItem>(items: T[]): T[] {
+  const kinds = new Set(items.map((item) => item.kind));
+  return items.map((item) => ({
+    ...item,
+    dependsOnKinds: item.dependsOnKinds?.filter((kind) => kinds.has(kind)),
+  }));
+}
+
+export function canonicalWorkPlanForProductType(productType: InventionProductType): CanonicalWorkPlanItem[] {
+  return pruneDependencies(CANONICAL_WORK_PLAN.filter((item) => workKindAppliesToProductType(item.kind, productType)).map((item) => ({ ...item, dependsOnKinds: item.dependsOnKinds ? [...item.dependsOnKinds] : undefined })));
+}
+
+export function missingCanonicalWorkKinds(existingKinds: Iterable<string>, productType: InventionProductType = "physical") {
   const existing = new Set(existingKinds);
-  return CANONICAL_WORK_PLAN.filter((item) => !existing.has(item.kind));
+  return canonicalWorkPlanForProductType(productType).filter((item) => !existing.has(item.kind));
 }
