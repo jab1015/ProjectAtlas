@@ -123,10 +123,23 @@ async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
     ? await ctx.db.query("subscriptionEvents").withIndex("by_customerEmail", (q) => q.eq("customerEmail", user.email!)).take(ROW_LIMIT + 1)
     : [];
   const personalOrganizationIdSet = new Set(personalOrganizationIdValues.map(String));
-  const subscriptionEvents = matchingSubscriptionEvents.filter((event) => !event.appliedOrganizationId || personalOrganizationIdSet.has(String(event.appliedOrganizationId)));
+  const subscriptionEvents = matchingSubscriptionEvents.filter((event) => {
+    const belongsToUser = event.appliedUserId === userId;
+    const belongsToPersonalOrganization = Boolean(event.appliedOrganizationId && personalOrganizationIdSet.has(String(event.appliedOrganizationId)));
+    if (!belongsToUser && !belongsToPersonalOrganization) return false;
+    if (event.appliedOrganizationId && !belongsToPersonalOrganization) return false;
+    return true;
+  });
+
   const normalizedEmail = user.email?.trim().toLowerCase();
+  const usersForEmail = normalizedEmail
+    ? await ctx.db.query("users").withIndex("email", (q) => q.eq("email", normalizedEmail)).collect()
+    : [];
+  const emailUniquelyBelongsToUser = usersForEmail.length === 1 && usersForEmail[0]._id === userId;
   const [emailInvitationRows, accountInvitationRows] = await Promise.all([
-    normalizedEmail ? invitationRowsForEmail(ctx, normalizedEmail) : Promise.resolve([]),
+    emailUniquelyBelongsToUser && normalizedEmail
+      ? invitationRowsForEmail(ctx, normalizedEmail).then((rows) => rows.filter((row) => !row.acceptedByUserId || row.acceptedByUserId === userId))
+      : Promise.resolve([]),
     invitationRowsForAccount(ctx, userId),
   ]);
   const organizationInvitationsById = new Map<string, (typeof accountInvitationRows)[number]>();
