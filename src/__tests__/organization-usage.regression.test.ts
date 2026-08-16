@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { classifyCostOperation, emptyCostClassSummary, addCostClassUsage } from "../../convex/costEconomicsLogic";
 
 function convexSource(file: string) {
   return readFileSync(join(process.cwd(), "convex", file), "utf8");
@@ -31,14 +32,32 @@ describe("organization-scoped usage accounting", () => {
     expect(source).toContain('scope = "organization"');
   });
 
-  it("reports cost units by organization, invention and work kind without inventing a dollar conversion", () => {
+  it("reports cost units by organization, invention, work kind and operation class without inventing a dollar conversion", () => {
     const source = convexSource("organizationUsage.ts");
     expect(source).toContain("getOrganizationUsageOverview");
     expect(source).toContain('query("inventions")');
     expect(source).toContain('query("atlasExecutionEvents")');
     expect(source).toContain('query("atlasWorkItems")');
     expect(source).toContain("byWorkKind");
+    expect(source).toContain("byOperationClass");
+    expect(source).toContain("addCostClassUsage");
     expect(source).toContain("estimatedVariableCostUsd: null");
-    expect(source).toContain("Cost units are measured");
+    expect(source).toContain("calibrationReady");
+  });
+
+  it("classifies expensive generation separately from routine work", () => {
+    expect(classifyCostOperation("brief_analysis")).toBe("light");
+    expect(classifyCostOperation("pricing_strategy")).toBe("standard");
+    expect(classifyCostOperation("preliminary_prior_art")).toBe("expensive");
+    expect(classifyCostOperation("native_cad_generation")).toBe("premium");
+    expect(classifyCostOperation("product_render_generation")).toBe("premium");
+
+    const summary = emptyCostClassSummary();
+    addCostClassUsage(summary, "brief_analysis", 2, true);
+    addCostClassUsage(summary, "preliminary_prior_art", 12, true);
+    addCostClassUsage(summary, "product_render_generation", 30, true);
+    expect(summary.light).toEqual({ costUnits: 2, completions: 1 });
+    expect(summary.expensive).toEqual({ costUnits: 12, completions: 1 });
+    expect(summary.premium).toEqual({ costUnits: 30, completions: 1 });
   });
 });
