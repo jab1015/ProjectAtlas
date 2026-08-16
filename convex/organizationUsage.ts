@@ -1,8 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { query } from "./_generated/server";
-import { getOrganizationMembership } from "./organizations";
+import { requireOrganizationRole } from "./organizations";
 import { getOrganizationPlanPolicy } from "./organizationPolicyLogic";
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { addCostClassUsage, buildObservedCostProfile, emptyCostClassSummary } from "./costEconomicsLogic";
 
 function utcDateKey(timestamp: number) {
@@ -10,7 +9,11 @@ function utcDateKey(timestamp: number) {
 }
 
 /**
- * Organization-scoped usage reporting for pricing/cost-to-serve analysis.
+ * Organization-scoped internal usage reporting for pricing/cost-to-serve analysis.
+ *
+ * This endpoint exposes provider and operation-class economics, so it is limited
+ * to organization Owner/Admin roles. Ordinary members can use the separate
+ * current-usage endpoint without receiving internal provider/cost attribution.
  *
  * Enforcement usage comes from organizationDailyUsage. Cost attribution comes
  * from the immutable invention execution ledger, where cost-bearing work and
@@ -26,10 +29,7 @@ export const getOrganizationUsageOverview = query({
     days: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new ConvexError("Authentication required");
-    const membership = await getOrganizationMembership(ctx, args.organizationId, userId);
-    if (!membership || membership.status !== "active") throw new ConvexError("Organization access required");
+    await requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"]);
 
     const organization = await ctx.db.get(args.organizationId);
     if (!organization || organization.status !== "active") throw new ConvexError("Organization not found");
