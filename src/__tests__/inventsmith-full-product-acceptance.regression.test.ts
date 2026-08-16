@@ -106,6 +106,20 @@ describe("InventSmith complete idea-to-market repository acceptance contract", (
     expect(legacyGuard).toContain("router.replace(`${rootPath}/journey`)");
   });
 
+  it("keeps repository auth wiring present while leaving deployed session persistence to live acceptance", () => {
+    const auth = readFileSync(join(process.cwd(), "convex/auth.ts"), "utf8");
+    const authConfig = readFileSync(join(process.cwd(), "convex/auth.config.ts"), "utf8");
+    const journey = readFileSync(join(process.cwd(), "src/app/(app)/invention/[id]/journey/page.tsx"), "utf8");
+
+    expect(auth).toContain("convexAuth");
+    expect(auth).toContain("Password");
+    expect(auth).toContain("isAuthenticated");
+    expect(authConfig).toContain("process.env.CONVEX_SITE_URL");
+    expect(authConfig).toContain('applicationID: "convex"');
+    expect(journey).toContain("useConvexAuth");
+    expect(journey).toContain('router.push("/sign-in")');
+  });
+
   it("keeps subscription entitlement and privacy/export/deletion behavior inside the full-product contract", () => {
     const entitlement = readFileSync(join(process.cwd(), "convex/entitlementPolicyLogic.ts"), "utf8");
     const subscription = readFileSync(join(process.cwd(), "convex/subscriptionPolicyLogic.ts"), "utf8");
