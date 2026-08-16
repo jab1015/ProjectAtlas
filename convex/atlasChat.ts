@@ -7,6 +7,7 @@ import { canAskWithinDailyAllowance, utcDateKey } from "./usagePolicyLogic";
 import { FULL_JOURNEY_STAGES } from "./fullJourneyDefinition";
 import { requireInventionEditAccess, requireInventionReadAccess } from "./organizations";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
+import { ensureOrganizationDailyUsage } from "./organizationDailyUsage";
 
 const answerQuestion = makeFunctionReference<
   "action",
@@ -49,10 +50,12 @@ export const ask = mutation({
 
     const now = Date.now();
     const dateKey = utcDateKey(now);
-    const dailyUsage = await ctx.db
-      .query("atlasDailyUsage")
-      .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey))
-      .unique();
+    const dailyUsage = usageScope.scope === "organization"
+      ? await ensureOrganizationDailyUsage(ctx, usageScope.organizationId, dateKey, now)
+      : await ctx.db
+          .query("atlasDailyUsage")
+          .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey))
+          .unique();
     if (!canAskWithinDailyAllowance(usageScope.plan, dailyUsage?.chatQuestions ?? 0)) {
       throw new ConvexError("InventSmith chat's daily allowance has been reached. It resets at 00:00 UTC.");
     }
@@ -104,13 +107,14 @@ export const ask = mutation({
         characterCount: cleaned.length,
         userId: String(userId),
         usageScope: usageScope.scope,
-        usageUserId: String(usageScope.usageUserId),
+        usageOrganizationId: usageScope.organizationId ? String(usageScope.organizationId) : undefined,
+        usageUserId: usageScope.scope === "legacy_user" ? String(usageScope.usageUserId) : undefined,
       },
       createdAt: now,
     });
     if (dailyUsage) {
       await ctx.db.patch(dailyUsage._id, { chatQuestions: dailyUsage.chatQuestions + 1, updatedAt: now });
-    } else {
+    } else if (usageScope.scope === "legacy_user") {
       await ctx.db.insert("atlasDailyUsage", {
         userId: usageScope.usageUserId,
         dateKey,
