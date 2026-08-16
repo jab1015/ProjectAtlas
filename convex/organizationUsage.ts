@@ -3,14 +3,15 @@ import { query } from "./_generated/server";
 import { getOrganizationMembership } from "./organizations";
 import { getOrganizationPlanPolicy } from "./organizationPolicyLogic";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { addCostClassUsage, emptyCostClassSummary } from "./costEconomicsLogic";
 
 /**
  * Organization-scoped usage reporting for pricing/cost-to-serve analysis.
  *
  * Cost units are deliberately reported as measured InventSmith units rather
- * than converted to dollars here. Dollar calibration belongs in a separate
- * economics layer because model/image/research prices can change and one
- * token-derived unit is not equivalent to every image/CAD operation.
+ * than silently converted to dollars. The light/standard/expensive/premium
+ * split shows which workflows drive cost before vendor-specific dollar
+ * calibration is locked.
  */
 export const getOrganizationUsageOverview = query({
   args: {
@@ -36,6 +37,7 @@ export const getOrganizationUsageOverview = query({
     let totalCostUnits = 0;
     let completedWorkEvents = 0;
     const byWorkKind = new Map<string, { costUnits: number; completions: number }>();
+    const byOperationClass = emptyCostClassSummary();
     const inventionUsage = [];
 
     for (const invention of inventions) {
@@ -47,16 +49,20 @@ export const getOrganizationUsageOverview = query({
       const periodEvents = events.filter((event) => event.createdAt >= since);
       const inventionCostUnits = periodEvents.reduce((sum, event) => sum + Math.max(0, event.costUnits ?? 0), 0);
       const inventionCompletions = periodEvents.filter((event) => event.eventType === "work_completed").length;
+      const inventionClasses = emptyCostClassSummary();
       totalCostUnits += inventionCostUnits;
       completedWorkEvents += inventionCompletions;
 
       for (const event of periodEvents) {
         if (!event.costUnits || event.costUnits <= 0) continue;
         const kind = event.workItemId ? workKindById.get(String(event.workItemId)) ?? "unknown_work" : "unattributed";
+        const completed = event.eventType === "work_completed";
         const current = byWorkKind.get(kind) ?? { costUnits: 0, completions: 0 };
         current.costUnits += event.costUnits;
-        if (event.eventType === "work_completed") current.completions += 1;
+        if (completed) current.completions += 1;
         byWorkKind.set(kind, current);
+        addCostClassUsage(byOperationClass, kind, event.costUnits, completed);
+        addCostClassUsage(inventionClasses, kind, event.costUnits, completed);
       }
 
       inventionUsage.push({
@@ -65,6 +71,7 @@ export const getOrganizationUsageOverview = query({
         status: invention.status,
         costUnits: inventionCostUnits,
         completedWorkEvents: inventionCompletions,
+        byOperationClass: inventionClasses,
       });
     }
 
@@ -88,13 +95,16 @@ export const getOrganizationUsageOverview = query({
       autonomousUsage: {
         totalCostUnits,
         completedWorkEvents,
+        byOperationClass,
         byWorkKind: [...byWorkKind.entries()]
           .map(([kind, value]) => ({ kind, ...value }))
           .sort((a, b) => b.costUnits - a.costUnits),
       },
       economics: {
         estimatedVariableCostUsd: null,
-        note: "Cost units are measured. Dollar conversion remains unset until model, search, image, CAD, extraction and artifact costs are calibrated independently.",
+        grossMarginEstimate: null,
+        calibrationReady: totalCostUnits > 0,
+        note: "Measured usage is now split into light, standard, expensive and premium operations. Dollar conversion remains unset until model, search, image, CAD, extraction and artifact costs are calibrated independently from real production usage.",
       },
     };
   },
