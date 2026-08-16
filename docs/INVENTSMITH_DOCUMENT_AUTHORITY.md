@@ -18,7 +18,7 @@ Read these first, in this order:
 
 Older `ATLAS_*` roadmaps, reset plans, automation plans, release plans, controlled-pilot plans, stage blueprints, research architecture documents, Bibles and other historical material remain useful for compatible detail and subsystem history. They do not override the current InventSmith master specification or current plan/progress checkpoint.
 
-In particular, any older statement that says or implies that only Stages 1–4 are the destination; Stages 5–15 are merely future scope; a controlled pilot equals overall completion; Product Design/CAD/manufacturing/funding/launch are outside the intended product; the customer-facing product is Atlas; subscriptions are purely user-scoped; the architecture is inherently single-user/single-invention; the old $39/$79/$149 pricing ladder remains authoritative; organization seats multiply paid AI allowance; or repository-green alone means production acceptance is superseded.
+In particular, any older statement that says or implies that only Stages 1–4 are the destination; Stages 5–15 are merely future scope; a controlled pilot equals overall completion; Product Design/CAD/manufacturing/funding/launch are outside the intended product; the customer-facing product is Atlas; subscriptions are purely user-scoped; the architecture is inherently single-user/single-invention; the old $39/$79/$149 pricing ladder remains authoritative; organization seats multiply paid AI allowance; software/apps are outside InventSmith's invention scope; regulated inventions must be blanket-rejected rather than professionally gated; or repository-green alone means production acceptance is superseded.
 
 ## Current locked product/architecture decisions
 
@@ -32,6 +32,12 @@ In particular, any older statement that says or implies that only Stages 1–4 a
 - Invention-level sharing and bounded professional/guest access are required.
 - Pending team invitations reserve seats and require recipient consent before membership is created.
 - Until email ownership is cryptographically/operationally verified, a later account may not claim a pre-signup invitation merely by registering the invited address.
+- **Physical, software, and hybrid products are first-class invention types.** Apps, SaaS, APIs and other software products are supported rather than rejected merely because they are not physical.
+- Pure software routes through software product specification, UX, architecture, data/API design, security/privacy readiness, prototype/build planning, QA/beta and distribution/release rather than physical CAD/RFQ/manufacturing work.
+- Hybrid products run both the physical and software branches before applicable combined stages are complete.
+- Regulated/safety-sensitive inventions are generally supported with explicit qualified professional/regulatory/engineering/security/privacy gates rather than being blanket-rejected.
+- InventSmith refuses harmful/abusive development such as weapon/destructive-device development, malware/credential theft/unauthorized cyberattack tooling, covert/unauthorized surveillance, fraud/theft/deceptive abuse, and dangerous chemical/biological/radiological weaponization.
+- Ordinary service/business concepts without a new physical, software or hybrid product are routed outside the invention-development workflow.
 - Pricing direction: **Explorer $0 → Inventor $39 → Pro $99 → Enterprise $199 → Studio $299+**.
 - Studio direction begins with **Studio 3 $299 / 3 active inventions** and **Studio 6 $399 / 6 active inventions**; larger capacity remains economics-driven/custom.
 - Exact compute/storage/premium-generation allowances remain unlocked until measured cost-to-serve is sufficiently calibrated. Current daily usage ceilings are safety caps, not final commercial promises.
@@ -40,9 +46,9 @@ In particular, any older statement that says or implies that only Stages 1–4 a
 
 ## Current implementation truth
 
-The organization schema, shared organization usage ledger, organization-scoped entitlement foundation, invention-level authorization/sharing foundations, organization-safe privacy/export/deletion behavior, measured cost-unit attribution/scenario reporting, consent-based team invitation foundation, complete journey wiring and genuine prototype/quote/launch/professional evidence gates are implemented on `inventsmith/full-product-build`.
+The organization schema, shared organization usage ledger, organization-scoped entitlement foundation, invention-level authorization/sharing foundations, organization-safe privacy/export/deletion behavior, measured cost-unit attribution/scenario reporting, consent-based team invitation foundation, complete journey wiring, genuine prototype/quote/launch/professional evidence gates, and product-type classification/routing foundation are implemented on `inventsmith/full-product-build`.
 
-Atlas CI #443 on `6ec6429ac3ff7bf75d4e018a972b1e1338b5a59a` is the latest fully verified checkpoint before the deployment-runbook/authority documentation refresh. The current documentation head must receive its own full green CI pass before being pinned for MadeThis replication.
+Atlas CI #463 on `e533dd96f1768e4cff36a502ee9779f3b97c5cb4` fully passed the classification/routing implementation through operational checks, both TypeScript targets, regression tests, production dependency audit and Next production build. Later business-only classification/documentation commits require a fresh full green CI pass before the new SHA is pinned for MadeThis replication.
 
 ## Continuation rule
 
