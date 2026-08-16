@@ -15,7 +15,7 @@ The target journey is:
 
 **Idea → Evidence → Validation → Market Research → Prior Art / Patent Readiness → Product Design → CAD / Engineering → Prototype → Manufacturing → Branding → Intellectual Property / Legal → Pricing → Marketing → Sales → Funding → Launch → Growth**
 
-For physical inventions, Product Design naturally includes CAD/engineering, physical prototype and manufacturing work. For software inventions, the equivalent middle journey dynamically becomes software product design, UX, architecture/data/security, software prototype/build planning, QA/beta and distribution/release. Hybrid inventions run both applicable branches. Incremental releases may deliver portions of this journey, but release boundaries must never be mistaken for the final product specification. InventSmith is not complete until the applicable complete idea-to-market operating system below is implemented and acceptance-tested.
+For physical inventions, Product Design naturally includes CAD/engineering, physical prototype and manufacturing work. For software inventions, the equivalent middle journey dynamically becomes software product design, UX, architecture/data/security, software prototype/build planning, QA/beta and distribution/release. Hybrid inventions run both applicable branches. Incremental releases may deliver portions of this journey, but release boundaries must never be mistaken for the final product specification. InventSmith is not complete until the complete idea-to-market operating system applicable to that invention type is implemented and acceptance-tested.
 
 ## 2. Engine owns progress
 
