@@ -57,7 +57,9 @@ describe("InventSmith organization-native policy", () => {
     expect(canManageBilling("owner")).toBe(true);
     expect(canManageBilling("admin")).toBe(false);
 
-    expect(defaultInventionAccessForRole("professional")).toBe("review");
+    expect(defaultInventionAccessForRole("professional")).toBeNull();
+    expect(defaultInventionAccessForRole("viewer")).toBe("view");
+    expect(defaultInventionAccessForRole("member")).toBe("edit");
     expect(canReadInvention("review")).toBe(true);
     expect(canEditInvention("review")).toBe(false);
     expect(canManageInventionAccess("edit")).toBe(false);
