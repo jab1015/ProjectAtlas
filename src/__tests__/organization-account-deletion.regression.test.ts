@@ -42,9 +42,12 @@ describe("organization-aware account deletion", () => {
     expect(source).toContain("subscriptionEventsAnonymized: personalSubscriptionEvents.length");
   });
 
-  it("anonymizes invitations addressed to the deleted account and releases pending seats", () => {
+  it("anonymizes invitations addressed or securely bound to the deleted account and releases pending seats", () => {
     expect(source).toContain("invitationRowsForEmail");
-    expect(source).toContain('withIndex("by_email_status"');
+    expect(source).toContain("invitationRowsForAccount");
+    expect(source).toContain('row.acceptedByUserId === userId');
+    expect(source).toContain("invitationRowsById");
+    expect(source).toContain("changed email after the");
     expect(source).toContain("deleted-invite-${row._id}@invalid.local");
     expect(source).toContain('row.status === "pending" ? "revoked" : row.status');
     expect(source).toContain("acceptedByUserId: row.acceptedByUserId === userId ? undefined : row.acceptedByUserId");
