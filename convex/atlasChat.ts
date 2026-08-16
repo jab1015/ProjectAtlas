@@ -8,6 +8,7 @@ import { FULL_JOURNEY_STAGES } from "./fullJourneyDefinition";
 import { requireInventionEditAccess, requireInventionReadAccess } from "./organizations";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { ensureOrganizationDailyUsage } from "./organizationDailyUsage";
+import { classifyCostOperation } from "./costEconomicsLogic";
 
 const answerQuestion = makeFunctionReference<
   "action",
@@ -246,6 +247,11 @@ export const saveAnswer = internalMutation({
     content: v.string(),
     error: v.optional(v.string()),
     completedAt: v.number(),
+    actualCostUnits: v.optional(v.number()),
+    externalResearch: v.optional(v.boolean()),
+    provider: v.optional(v.string()),
+    model: v.optional(v.string()),
+    providerUsage: v.optional(v.any()),
   },
   handler: async (ctx, args) => {
     const userMessage = await ctx.db.get(args.userMessageId);
@@ -261,11 +267,27 @@ export const saveAnswer = internalMutation({
       error: args.error,
       updatedAt: args.completedAt,
     });
+
+    const usageScope = await resolveInventionUsageScope(ctx, userMessage.inventionId);
+    const operationKind = args.externalResearch ? "ask_inventsmith_research" : "ask_inventsmith";
+    const costUnits = Math.max(0, args.actualCostUnits ?? 0);
     await ctx.db.insert("atlasExecutionEvents", {
       inventionId: userMessage.inventionId,
       eventType: args.error ? "chat_failed" : "chat_answered",
       actorType: "atlas",
       summary: args.error ? "InventSmith chat could not complete." : "InventSmith answered from the complete invention project state.",
+      costUnits: costUnits > 0 ? costUnits : undefined,
+      metadata: {
+        operationKind,
+        operationClass: classifyCostOperation(operationKind),
+        usageScope: usageScope?.scope,
+        usageOrganizationId: usageScope?.organizationId ? String(usageScope.organizationId) : undefined,
+        usageUserId: usageScope?.scope === "legacy_user" ? String(usageScope.usageUserId) : undefined,
+        externalResearch: Boolean(args.externalResearch),
+        provider: args.provider,
+        model: args.model,
+        providerUsage: args.providerUsage,
+      },
       createdAt: args.completedAt,
     });
     return assistantMessage._id;
