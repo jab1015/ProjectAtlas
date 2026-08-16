@@ -6,13 +6,18 @@ import {
   defaultInventionAccessForRole,
 } from "./organizationPolicyLogic";
 import { getOrganizationMembership, resolveInventionAccess } from "./organizations";
+import {
+  classifyInvention,
+  unsupportedInventionMessage,
+} from "./inventionClassificationLogic";
+import { initializeClassifiedInvention } from "./inventionInitialization";
 
 /**
  * Organization-native invention entry points.
  *
- * Legacy invention routes can remain operational while the UI migrates. New
- * organization-aware surfaces should use these functions so ownership,
- * capacity and access are enforced from the organization boundary.
+ * New inventions are classified before persistence so unsupported harmful or
+ * abusive concepts never receive a normal workspace. Supported physical,
+ * software, hybrid and regulated inventions receive a tailored work plan.
  */
 export const create = mutation({
   args: {
@@ -43,6 +48,17 @@ export const create = mutation({
     if (!title) throw new ConvexError("Invention title is required");
     if (title.length > 200) throw new ConvexError("Invention title must be 200 characters or fewer");
 
+    const brief = {
+      title,
+      problemStatement: args.problemStatement?.trim() || undefined,
+      targetAudience: args.targetAudience?.trim() || undefined,
+      solutionDescription: args.solutionDescription?.trim() || undefined,
+    };
+    const classification = classifyInvention(brief);
+    if (classification.supportClass === "unsupported") {
+      throw new ConvexError(unsupportedInventionMessage(classification));
+    }
+
     const activeInventions = await ctx.db
       .query("inventions")
       .withIndex("by_organizationId_status", (q) =>
@@ -57,10 +73,7 @@ export const create = mutation({
     const inventionId = await ctx.db.insert("inventions", {
       userId,
       organizationId: args.organizationId,
-      title,
-      problemStatement: args.problemStatement?.trim() || undefined,
-      targetAudience: args.targetAudience?.trim() || undefined,
-      solutionDescription: args.solutionDescription?.trim() || undefined,
+      ...brief,
       currentStageId: 1,
       createdAt: now,
       updatedAt: now,
@@ -79,23 +92,27 @@ export const create = mutation({
       updatedAt: now,
     });
 
-    await ctx.db.insert("inventionRecords", {
+    const plan = await initializeClassifiedInvention(ctx, inventionId, userId, brief, classification, now);
+
+    await ctx.db.insert("stageProgress", {
       inventionId,
-      userId,
-      schemaVersion: 1,
-      lifecycleStatus: "intake",
-      riskClass: "standard",
-      structuredBrief: {
-        title,
-        problemStatement: args.problemStatement?.trim() || undefined,
-        targetAudience: args.targetAudience?.trim() || undefined,
-        solutionDescription: args.solutionDescription?.trim() || undefined,
-      },
-      createdAt: now,
+      stageId: 1,
+      readinessScore: 100,
+      completedFields: ["title", "problemStatement", "targetAudience", "solutionDescription"],
+      completedAt: now,
       updatedAt: now,
     });
 
-    return { inventionId };
+    return {
+      inventionId,
+      classification: {
+        productType: classification.productType,
+        supportClass: classification.supportClass,
+        categories: classification.categories,
+        professionalReviewAreas: classification.professionalReviewAreas,
+      },
+      workPlanCount: plan.totalCount,
+    };
   },
 });
 
