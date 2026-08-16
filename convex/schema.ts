@@ -33,11 +33,60 @@ export default defineSchema({
     billingCustomerId: v.optional(v.string()),
     subscriptionCurrentPeriodEnd: v.optional(v.number()),
     subscriptionUpdatedAt: v.optional(v.number()),
+    personalOrganizationId: v.optional(v.id("organizations")),
     // Extension point: Inventor Twin
     inventorTwin: v.optional(v.null()),
   })
     .index("email", ["email"])
     .index("by_role", ["role"]),
+
+  // ── InventSmith: Organization-native tenancy ───────────────────────────────
+  organizations: defineTable({
+    name: v.string(),
+    kind: v.union(v.literal("personal"), v.literal("company"), v.literal("studio")),
+    planKey: v.union(
+      v.literal("explorer"),
+      v.literal("inventor"),
+      v.literal("pro"),
+      v.literal("enterprise"),
+      v.literal("studio_3"),
+      v.literal("studio_6"),
+      v.literal("studio_custom")
+    ),
+    status: v.union(v.literal("active"), v.literal("suspended"), v.literal("closed")),
+    createdByUserId: v.id("users"),
+    billingCustomerId: v.optional(v.string()),
+    subscriptionId: v.optional(v.string()),
+    subscriptionStatus: v.optional(v.union(
+      v.literal("trialing"), v.literal("active"), v.literal("past_due"), v.literal("canceled"),
+      v.literal("unpaid"), v.literal("incomplete"), v.literal("paused")
+    )),
+    subscriptionCurrentPeriodEnd: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_createdByUserId", ["createdByUserId"])
+    .index("by_kind", ["kind"])
+    .index("by_status", ["status"]),
+
+  organizationMemberships: defineTable({
+    organizationId: v.id("organizations"),
+    userId: v.id("users"),
+    role: v.union(
+      v.literal("owner"),
+      v.literal("admin"),
+      v.literal("member"),
+      v.literal("viewer"),
+      v.literal("professional")
+    ),
+    status: v.union(v.literal("active"), v.literal("invited"), v.literal("suspended"), v.literal("removed")),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_organizationId", ["organizationId"])
+    .index("by_userId", ["userId"])
+    .index("by_organizationId_userId", ["organizationId", "userId"])
+    .index("by_userId_status", ["userId", "status"]),
 
   subscriptionEvents: defineTable({
     providerEventId: v.string(),
@@ -80,12 +129,28 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
     status: v.union(v.literal("active"), v.literal("archived")),
-    // Extension point: Team workspaces
-    organizationId: v.optional(v.string()),
+    // Optional during migration; all new inventions should be organization-owned.
+    organizationId: v.optional(v.id("organizations")),
   })
     .index("by_userId", ["userId"])
     .index("by_userId_status", ["userId", "status"])
-    .index("by_status", ["status"]),
+    .index("by_status", ["status"])
+    .index("by_organizationId", ["organizationId"])
+    .index("by_organizationId_status", ["organizationId", "status"]),
+
+  inventionAccessGrants: defineTable({
+    inventionId: v.id("inventions"),
+    organizationId: v.id("organizations"),
+    userId: v.id("users"),
+    access: v.union(v.literal("manage"), v.literal("edit"), v.literal("view"), v.literal("review")),
+    grantedByUserId: v.id("users"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_inventionId", ["inventionId"])
+    .index("by_userId", ["userId"])
+    .index("by_inventionId_userId", ["inventionId", "userId"])
+    .index("by_organizationId_userId", ["organizationId", "userId"]),
 
   // Canonical structured memory for an invention. Chat and generated
   // deliverables read from this record instead of treating conversation
