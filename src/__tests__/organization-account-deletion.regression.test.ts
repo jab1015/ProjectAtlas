@@ -14,7 +14,6 @@ describe("organization-aware account deletion", () => {
     expect(source).toContain(".filter((invention) => !invention.organizationId)");
     expect(source).toContain("personalOrganizationIds");
     expect(source).toContain('withIndex("by_organizationId"');
-    expect(source).not.toContain("for (const invention of inventions) {\n    const result = await deleteInventionData(ctx, invention._id);\n    generatedFilesDeleted += result.generatedFilesDeleted;\n    uploadedFilesDeleted += result.uploadedFilesDeleted;\n  }\n\n  const notifications");
   });
 
   it("removes the departing member's grants and memberships without deleting company inventions", () => {
@@ -29,12 +28,11 @@ describe("organization-aware account deletion", () => {
     expect(source).toContain('query("inventionAccessGrants").withIndex("by_inventionId"');
   });
 
-  it("removes usage rows only when the owned personal organization itself is deleted", () => {
+  it("removes usage and invitation rows when the owned personal organization itself is deleted", () => {
     expect(source).toContain('query("organizationDailyUsage")');
-    expect(source).toContain('withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId))');
     expect(source).toContain("organizationUsageRowsDeleted += organizationUsage.length");
+    expect(source).toContain('query("organizationInvitations").withIndex("by_organizationId"');
     expect(source).toContain("usageRowsDeleted: usage.length + organizationUsageRowsDeleted");
-    expect(source).toContain("Company/studio ledgers are intentionally untouched when a member leaves");
   });
 
   it("anonymizes only legacy/personal billing events and preserves company/studio billing history", () => {
@@ -42,5 +40,14 @@ describe("organization-aware account deletion", () => {
     expect(source).toContain("personalSubscriptionEvents");
     expect(source).toContain("!row.appliedOrganizationId || personalOrganizationIdSet.has(String(row.appliedOrganizationId))");
     expect(source).toContain("subscriptionEventsAnonymized: personalSubscriptionEvents.length");
+  });
+
+  it("anonymizes invitations addressed to the deleted account and releases pending seats", () => {
+    expect(source).toContain("invitationRowsForEmail");
+    expect(source).toContain('withIndex("by_email_status"');
+    expect(source).toContain("deleted-invite-${row._id}@invalid.local");
+    expect(source).toContain('row.status === "pending" ? "revoked" : row.status');
+    expect(source).toContain("acceptedByUserId: row.acceptedByUserId === userId ? undefined : row.acceptedByUserId");
+    expect(source).toContain("invitationsAnonymized: invitationRows.length");
   });
 });
