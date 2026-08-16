@@ -1,17 +1,14 @@
 import { ConvexError, v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { getOrganizationMembership, requireOrganizationRole } from "./organizations";
-import { utcDateKey } from "./usagePolicyLogic";
 
 /**
- * Transfer company/studio ownership without creating a quota-reset loophole.
+ * Transfer company/studio ownership.
  *
- * `organizations.createdByUserId` is also the transitional shared usage/billing
- * anchor until the persisted usage ledger is keyed directly by organization.
- * For that reason it moves with ownership for now. Transfer is refused after
- * any shared usage has been consumed/reserved today; the owner can retry after
- * the UTC usage reset. Once the organization-native ledger replaces this
- * transition, that restriction can be removed.
+ * Usage reservations are now keyed directly by organization + UTC day, so
+ * changing the human owner cannot reset or multiply the organization's shared
+ * allowance. `createdByUserId` remains the current organization owner/billing
+ * contact reference for backward compatibility and moves with the owner.
  */
 export const transferOwnership = mutation({
   args: {
@@ -35,26 +32,12 @@ export const transferOwnership = mutation({
       throw new ConvexError("The new owner must already be an active organization member");
     }
 
-    const dateKey = utcDateKey(Date.now());
-    const currentUsage = await ctx.db
-      .query("atlasDailyUsage")
-      .withIndex("by_userId_dateKey", (q) => q.eq("userId", currentOwnerUserId).eq("dateKey", dateKey))
-      .unique();
-    if (
-      currentUsage &&
-      (currentUsage.autonomousCostUnits > 0 ||
-        (currentUsage.reservedAutonomousCostUnits ?? 0) > 0 ||
-        currentUsage.chatQuestions > 0)
-    ) {
-      throw new ConvexError("Ownership transfer is available after the shared daily usage allowance resets at 00:00 UTC");
-    }
-
     const now = Date.now();
     await ctx.db.patch(currentOwnerMembership._id, { role: "admin", updatedAt: now });
     await ctx.db.patch(targetMembership._id, { role: "owner", updatedAt: now });
     await ctx.db.patch(organization._id, {
-      // Transitional field doubles as the organization billing/usage owner.
-      // Move it so account deletion never leaves a dangling user reference.
+      // Keep the compatibility owner/billing-contact reference aligned with the
+      // authoritative owner membership. Usage no longer depends on this field.
       createdByUserId: args.newOwnerUserId,
       updatedAt: now,
     });
