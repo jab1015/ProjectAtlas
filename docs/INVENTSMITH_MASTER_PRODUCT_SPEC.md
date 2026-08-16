@@ -129,17 +129,17 @@ Repository implementation, live runtime acceptance, physical-world evidence and 
 
 ## 14. Current build priority — August 16, 2026
 
-The organization schema, organization authorization foundation, active/archive capacity, shared organization usage ledger, organization entitlement/billing foundation, privacy/export/deletion boundaries, cost-unit attribution/scenario reporting and safe consent-based invitation foundation are now materially implemented on the full-product branch.
+The full-product branch now materially implements the complete journey plus the organization-native security/resource foundation: organization authorization, active/archive capacity, shared organization usage, organization entitlement/billing foundation, privacy/export/deletion boundaries, consent-based invitations, cost-unit attribution/scenario reporting, authenticated evidence ingestion/retry, Ask InventSmith write-back, Product Design/CAD, downstream lifecycle departments and genuine prototype/quote/launch/professional gates.
 
 Immediate dependency order is therefore:
 
-1. Verify the newest branch head through the complete CI stack and repair any failures.
-2. Finish targeted specialized accounting/legacy creator-authorization audit.
-3. Complete invitation/sharing edge-case acceptance while preserving verified-email identity safety.
-4. Collect/calibrate representative provider/runtime cost-to-serve data.
-5. Lock seats/storage/compute/premium-generation allowances from measured economics.
-6. Reconcile external billing products and public/account pricing to the locked entitlement policy.
-7. Run complete repository acceptance.
-8. Only after GitHub implementation is complete, pin it for MadeThis replication and run live authenticated multi-user/multi-invention acceptance.
+1. Keep the current repository/documentation head fully green in the complete CI pipeline and repair any concrete code-only acceptance blocker discovered by final inspection.
+2. Preserve measured cost-to-serve instrumentation and collect representative production/provider observations; do not invent dollar economics merely to finish repository work.
+3. Pin the exact fully green GitHub SHA and provide it to MadeThis for deterministic replication once no repository-only blocker remains.
+4. After replication, perform live authenticated multi-user/multi-invention acceptance, including migration, invitation identity/consent, shared resource concurrency, binary evidence extraction, Ask InventSmith write-back, privacy/deletion and real billing/webhook behavior.
+5. Use genuine physical prototype evidence, manufacturer quotes, post-launch market evidence and qualified professional review wherever those gates are required. Never synthesize those facts merely to claim completion.
+6. Lock final commercial compute/storage/premium-generation allowances and reconcile external billing products after representative provider/runtime economics are measured sufficiently to support sustainable limits.
 
-No future progress report may describe InventSmith as substantially complete without clearly distinguishing repository implementation from live, physical, professional, organization-security and billing acceptance.
+`docs/ATLAS_DEPLOYMENT_RUNBOOK.md` is the authoritative handoff/live-acceptance checklist despite its legacy filename.
+
+No future progress report may describe InventSmith as fully production-accepted without clearly distinguishing repository implementation from live, physical, professional, organization-security, billing and artifact-quality acceptance.
