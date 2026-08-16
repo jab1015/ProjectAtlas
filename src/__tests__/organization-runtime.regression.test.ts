@@ -11,6 +11,8 @@ const nativeCadSource = readFileSync("convex/nativeCad.ts", "utf8");
 const productDesignSource = readFileSync("convex/productDesign.ts", "utf8");
 const journeySource = readFileSync("convex/journeyCenter.ts", "utf8");
 const lifecycleSource = readFileSync("convex/lifecycleDepartments.ts", "utf8");
+const departmentExtensionsSource = readFileSync("convex/departmentExtensions.ts", "utf8");
+const deliverableDownloadsSource = readFileSync("convex/deliverableDownloads.ts", "utf8");
 
 describe("InventSmith organization runtime", () => {
   it("keeps organization-native tenancy represented in the Convex schema", () => {
@@ -114,6 +116,15 @@ describe("InventSmith organization runtime", () => {
     expect(lifecycleSource).toContain("resolveInventionUsageScope(ctx, args.inventionId)");
     expect(lifecycleSource).toContain("getOrganizationPlanPolicy(usageScope.plan).completeJourney");
     expect(lifecycleSource).toContain("Pro or higher entitlement");
+  });
+
+  it("lets authorized readers see supplemental department work and downloadable deliverables", () => {
+    expect(departmentExtensionsSource).not.toContain("invention.userId !== userId");
+    expect(departmentExtensionsSource).not.toContain("getAuthUserId");
+    expect(departmentExtensionsSource).toContain("requireInventionReadAccess(ctx, args.inventionId)");
+    expect(deliverableDownloadsSource).not.toContain("invention.userId !== userId");
+    expect(deliverableDownloadsSource).not.toContain("getAuthUserId");
+    expect(deliverableDownloadsSource).toContain("requireInventionReadAccess(ctx, args.inventionId)");
   });
 
   it("keeps canonical invention ownership attribution stable when collaborators initialize missing records", () => {
