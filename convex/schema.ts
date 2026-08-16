@@ -62,6 +62,7 @@ export default defineSchema({
       v.literal("unpaid"), v.literal("incomplete"), v.literal("paused")
     )),
     subscriptionCurrentPeriodEnd: v.optional(v.number()),
+    subscriptionUpdatedAt: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -92,6 +93,14 @@ export default defineSchema({
     providerEventId: v.string(),
     customerEmail: v.string(),
     tier: v.union(v.literal("inventor"), v.literal("pro"), v.literal("enterprise")),
+    organizationPlanKey: v.optional(v.union(
+      v.literal("inventor"),
+      v.literal("pro"),
+      v.literal("enterprise"),
+      v.literal("studio_3"),
+      v.literal("studio_6"),
+      v.literal("studio_custom")
+    )),
     status: v.union(
       v.literal("trialing"), v.literal("active"), v.literal("past_due"), v.literal("canceled"),
       v.literal("unpaid"), v.literal("incomplete"), v.literal("paused")
@@ -101,10 +110,12 @@ export default defineSchema({
     currentPeriodEnd: v.optional(v.number()),
     occurredAt: v.number(),
     appliedUserId: v.optional(v.id("users")),
+    appliedOrganizationId: v.optional(v.id("organizations")),
     receivedAt: v.number(),
   })
     .index("by_providerEventId", ["providerEventId"])
-    .index("by_customerEmail", ["customerEmail"]),
+    .index("by_customerEmail", ["customerEmail"])
+    .index("by_appliedOrganizationId", ["appliedOrganizationId"]),
 
   privacyRequests: defineTable({
     userId: v.id("users"),
