@@ -80,9 +80,12 @@ export const inviteMemberByEmail = mutation({
     const pending = existingInvitations.find((invitation) => invitation.status === "pending" && invitation.expiresAt > now);
     for (const invitation of existingInvitations) await expirePendingInvitation(ctx, invitation, now);
 
+    // Migration-safe account binding: acceptedByUserId is pre-populated while
+    // status is pending, then remains the same user when status becomes accepted.
+    // Status, not the presence of this field, is the source of truth for consent.
     if (pending) {
       await ctx.db.patch(pending._id, {
-        targetUserId: intendedUser._id,
+        acceptedByUserId: intendedUser._id,
         role: args.role,
         invitedByUserId,
         expiresAt: now + INVITATION_TTL_MS,
@@ -101,10 +104,10 @@ export const inviteMemberByEmail = mutation({
     const invitationId = await ctx.db.insert("organizationInvitations", {
       organizationId: args.organizationId,
       email,
-      targetUserId: intendedUser._id,
       role: args.role as InviteRole,
       status: "pending",
       invitedByUserId,
+      acceptedByUserId: intendedUser._id,
       expiresAt,
       createdAt: now,
       updatedAt: now,
@@ -172,10 +175,9 @@ export const getMyPendingInvitations = query({
     const result = [];
     for (const invitation of invitations) {
       if (invitation.expiresAt <= now) continue;
-      // Old invitations created before account binding are intentionally hidden
-      // until an organization administrator reissues them, which safely writes
-      // targetUserId instead of trusting a mutable email address alone.
-      if (!invitation.targetUserId || invitation.targetUserId !== userId) continue;
+      // Invitations created before stable account binding are intentionally hidden
+      // until an organization administrator reissues them.
+      if (!invitation.acceptedByUserId || invitation.acceptedByUserId !== userId) continue;
       const organization = await ctx.db.get(invitation.organizationId);
       if (!organization || organization.status !== "active") continue;
       result.push({
@@ -202,10 +204,10 @@ export const acceptInvitation = mutation({
 
     const invitation = await ctx.db.get(args.invitationId);
     if (!invitation || invitation.status !== "pending") throw new ConvexError("Invitation is no longer available");
-    if (!invitation.targetUserId) {
+    if (!invitation.acceptedByUserId) {
       throw new ConvexError("This invitation predates secure account binding and must be reissued by an organization administrator");
     }
-    if (invitation.targetUserId !== userId) throw new ConvexError("This invitation belongs to a different InventSmith account");
+    if (invitation.acceptedByUserId !== userId) throw new ConvexError("This invitation belongs to a different InventSmith account");
     if (invitation.email !== userEmail) throw new ConvexError("This invitation email no longer matches the intended account; ask an organization administrator to reissue it");
     const intendedUser = await getUniqueAccountByEmail(ctx, invitation.email);
     if (!intendedUser || intendedUser._id !== userId) throw new ConvexError("This invitation belongs to a different InventSmith account");
