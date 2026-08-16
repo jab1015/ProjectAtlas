@@ -36,4 +36,11 @@ describe("organization-aware account deletion", () => {
     expect(source).toContain("usageRowsDeleted: usage.length + organizationUsageRowsDeleted");
     expect(source).toContain("Company/studio ledgers are intentionally untouched when a member leaves");
   });
+
+  it("anonymizes only legacy/personal billing events and preserves company/studio billing history", () => {
+    expect(source).toContain("matchingSubscriptionEvents");
+    expect(source).toContain("personalSubscriptionEvents");
+    expect(source).toContain("!row.appliedOrganizationId || personalOrganizationIdSet.has(String(row.appliedOrganizationId))");
+    expect(source).toContain("subscriptionEventsAnonymized: personalSubscriptionEvents.length");
+  });
 });
