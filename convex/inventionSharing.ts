@@ -12,11 +12,12 @@ export const listAssignments = query({
     await requireInventionManageAccess(ctx, args.inventionId);
     const invention = await ctx.db.get(args.inventionId);
     if (!invention?.organizationId) throw new ConvexError("Migrate invention to an organization first");
+    const organizationId = invention.organizationId;
 
     const [memberships, grants] = await Promise.all([
       ctx.db
         .query("organizationMemberships")
-        .withIndex("by_organizationId", (q) => q.eq("organizationId", invention.organizationId))
+        .withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId))
         .collect(),
       ctx.db
         .query("inventionAccessGrants")
