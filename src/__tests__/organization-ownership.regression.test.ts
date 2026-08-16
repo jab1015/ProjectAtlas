@@ -1,0 +1,31 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { describe, expect, it } from "vitest";
+
+const source = readFileSync(join(process.cwd(), "convex/organizationOwnership.ts"), "utf8");
+
+describe("organization ownership transfer", () => {
+  it("requires the current owner and an existing active member", () => {
+    expect(source).toContain('requireOrganizationRole(\n      ctx,\n      args.organizationId,\n      ["owner"]');
+    expect(source).toContain("targetMembership.status !== \"active\"");
+    expect(source).toContain("The new owner must already be an active organization member");
+  });
+
+  it("does not allow personal organizations to transfer ownership", () => {
+    expect(source).toContain('organization.kind === "personal"');
+    expect(source).toContain("Personal InventSmith ownership cannot be transferred");
+  });
+
+  it("prevents a same-day shared-usage reset through ownership hopping", () => {
+    expect(source).toContain('query("atlasDailyUsage")');
+    expect(source).toContain("currentUsage.autonomousCostUnits > 0");
+    expect(source).toContain("currentUsage.chatQuestions > 0");
+    expect(source).toContain("resets at 00:00 UTC");
+  });
+
+  it("moves the transitional billing/usage owner and demotes the previous owner to admin", () => {
+    expect(source).toContain('{ role: "admin", updatedAt: now }');
+    expect(source).toContain('{ role: "owner", updatedAt: now }');
+    expect(source).toContain("createdByUserId: args.newOwnerUserId");
+  });
+});
