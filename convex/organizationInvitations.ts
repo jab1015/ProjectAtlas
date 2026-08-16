@@ -63,8 +63,8 @@ export const inviteMemberByEmail = mutation({
     if (inviter?.email?.trim().toLowerCase() === email) throw new ConvexError("You already belong to this organization");
 
     // Password auth currently has no verified-email delivery provider. Until one
-    // is configured, invitations are deliberately bound to an account that
-    // already exists rather than trusting an unverified address registered later.
+    // is configured, invitations are deliberately bound to a specific account
+    // that already exists rather than trusting an address registered later.
     const intendedUser = await getUniqueAccountByEmail(ctx, email);
     if (!intendedUser) {
       throw new ConvexError("That person must create an InventSmith account before a secure invitation can be issued");
@@ -82,6 +82,7 @@ export const inviteMemberByEmail = mutation({
 
     if (pending) {
       await ctx.db.patch(pending._id, {
+        targetUserId: intendedUser._id,
         role: args.role,
         invitedByUserId,
         expiresAt: now + INVITATION_TTL_MS,
@@ -100,6 +101,7 @@ export const inviteMemberByEmail = mutation({
     const invitationId = await ctx.db.insert("organizationInvitations", {
       organizationId: args.organizationId,
       email,
+      targetUserId: intendedUser._id,
       role: args.role as InviteRole,
       status: "pending",
       invitedByUserId,
@@ -140,7 +142,12 @@ export const revokeInvitation = mutation({
     const invitation = await ctx.db.get(args.invitationId);
     if (!invitation || invitation.organizationId !== args.organizationId) throw new ConvexError("Invitation not found");
     if (invitation.status !== "pending") return { revoked: false };
-    await ctx.db.patch(invitation._id, { status: "revoked", updatedAt: Date.now() });
+    const now = Date.now();
+    if (invitation.expiresAt <= now) {
+      await ctx.db.patch(invitation._id, { status: "expired", updatedAt: now });
+      return { revoked: false };
+    }
+    await ctx.db.patch(invitation._id, { status: "revoked", updatedAt: now });
     return { revoked: true };
   },
 });
@@ -165,6 +172,10 @@ export const getMyPendingInvitations = query({
     const result = [];
     for (const invitation of invitations) {
       if (invitation.expiresAt <= now) continue;
+      // Old invitations created before account binding are intentionally hidden
+      // until an organization administrator reissues them, which safely writes
+      // targetUserId instead of trusting a mutable email address alone.
+      if (!invitation.targetUserId || invitation.targetUserId !== userId) continue;
       const organization = await ctx.db.get(invitation.organizationId);
       if (!organization || organization.status !== "active") continue;
       result.push({
@@ -191,7 +202,11 @@ export const acceptInvitation = mutation({
 
     const invitation = await ctx.db.get(args.invitationId);
     if (!invitation || invitation.status !== "pending") throw new ConvexError("Invitation is no longer available");
-    if (invitation.email !== userEmail) throw new ConvexError("This invitation belongs to a different email address");
+    if (!invitation.targetUserId) {
+      throw new ConvexError("This invitation predates secure account binding and must be reissued by an organization administrator");
+    }
+    if (invitation.targetUserId !== userId) throw new ConvexError("This invitation belongs to a different InventSmith account");
+    if (invitation.email !== userEmail) throw new ConvexError("This invitation email no longer matches the intended account; ask an organization administrator to reissue it");
     const intendedUser = await getUniqueAccountByEmail(ctx, invitation.email);
     if (!intendedUser || intendedUser._id !== userId) throw new ConvexError("This invitation belongs to a different InventSmith account");
 
