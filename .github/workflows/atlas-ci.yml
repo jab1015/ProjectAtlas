@@ -31,6 +31,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Verify operational scripts
+        run: |
+          node --check scripts/check-deployment-readiness.mjs
+          node --check scripts/verify-live-deployment.mjs
+
       - name: Typecheck web
         run: npx tsc --noEmit
 
