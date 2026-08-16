@@ -10,7 +10,7 @@ describe("organization-aware personal data export", () => {
     expect(source).toContain("personalExportScope");
     expect(source).toContain("personalOrganizationIds");
     expect(source).toContain("!invention.organizationId || personalOrganizationIds.has(String(invention.organizationId))");
-    expect(source).toContain("Company/studio invention and usage data is excluded from this personal export");
+    expect(source).toContain("Company/studio invention, usage, and organization billing data is excluded from this personal export");
   });
 
   it("reports organization affiliations without treating company projects as personal data", () => {
@@ -26,6 +26,16 @@ describe("organization-aware personal data export", () => {
     expect(organizationExport).toContain('query("organizationDailyUsage")');
     expect(organizationExport).toContain("dailyUsage");
     expect(organizationExport).toContain('requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"])');
+  });
+
+  it("keeps company/studio billing history organization-scoped even when the owner email matches", () => {
+    expect(source).toContain("matchingSubscriptionEvents");
+    expect(source).toContain("personalOrganizationIdSet");
+    expect(source).toContain("!event.appliedOrganizationId || personalOrganizationIdSet.has(String(event.appliedOrganizationId))");
+    expect(organizationExport).toContain('query("subscriptionEvents")');
+    expect(organizationExport).toContain('withIndex("by_appliedOrganizationId"');
+    expect(organizationExport).toContain("subscriptionEvents: bounded(subscriptionEvents");
+    expect(organizationExport).toContain("subscriptionUpdatedAt: organization.subscriptionUpdatedAt");
   });
 
   it("keeps binary bytes and authentication secrets out of the JSON export", () => {
