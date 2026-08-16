@@ -30,11 +30,20 @@ function personalOrganizationName(name?: string, email?: string): string {
 }
 
 async function countOccupiedSeats(ctx: AuthCtx, organizationId: Id<"organizations">): Promise<number> {
-  const memberships = await ctx.db
-    .query("organizationMemberships")
-    .withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId))
-    .collect();
-  return memberships.filter((membership) => membership.status === "active" || membership.status === "invited").length;
+  const [memberships, invitations] = await Promise.all([
+    ctx.db
+      .query("organizationMemberships")
+      .withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId))
+      .collect(),
+    ctx.db
+      .query("organizationInvitations")
+      .withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId))
+      .collect(),
+  ]);
+  const now = Date.now();
+  const membershipSeats = memberships.filter((membership) => membership.status === "active" || membership.status === "invited").length;
+  const invitationSeats = invitations.filter((invitation) => invitation.status === "pending" && invitation.expiresAt > now).length;
+  return membershipSeats + invitationSeats;
 }
 
 async function assertSeatAvailable(ctx: AuthCtx, organizationId: Id<"organizations">) {
