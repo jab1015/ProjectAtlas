@@ -71,6 +71,13 @@ describe("organization-scoped usage accounting", () => {
     expect(source).toContain('scope = "organization"');
   });
 
+  it("restricts detailed provider/cost economics to organization owners and admins", () => {
+    const source = convexSource("organizationUsage.ts");
+    expect(source).toContain('requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"])');
+    expect(source).not.toContain("getAuthUserId");
+    expect(source).not.toContain("getOrganizationMembership");
+  });
+
   it("reports cost units by organization, invention, operation kind/class and provider without inventing dollars", () => {
     const source = convexSource("organizationUsage.ts");
     expect(source).toContain("getOrganizationUsageOverview");
