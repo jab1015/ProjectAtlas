@@ -62,4 +62,13 @@ describe("backend authorization boundaries", () => {
     expect(exportedFunctionBlock(file, "getConversation")).toContain("requireInventionReadAccess");
     expect(exportedFunctionBlock(file, "ask")).toContain("requireInventionEditAccess");
   });
+
+  it("uses organization-aware access for the invention evidence locker", () => {
+    const file = source("files.ts");
+    expect(file).not.toContain("invention.userId !== userId");
+    expect(exportedFunctionBlock(file, "generateInventionEvidenceUploadUrl")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "registerInventionEvidence")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "listInventionEvidence")).toContain("requireInventionReadAccess");
+    expect(exportedFunctionBlock(file, "removeInventionEvidence")).toContain("requireInventionManageAccess");
+  });
 });
