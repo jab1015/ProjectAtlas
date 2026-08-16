@@ -158,6 +158,7 @@ async function ensurePersonalOrganizationForUser(ctx: MutationCtx, userId: Id<"u
     subscriptionId: user.subscriptionId,
     subscriptionStatus: user.subscriptionStatus,
     subscriptionCurrentPeriodEnd: user.subscriptionCurrentPeriodEnd,
+    subscriptionUpdatedAt: user.subscriptionUpdatedAt,
     createdAt: now,
     updatedAt: now,
   });
