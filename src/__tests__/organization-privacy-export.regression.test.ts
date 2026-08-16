@@ -28,19 +28,23 @@ describe("organization-aware personal data export", () => {
     expect(organizationExport).toContain('requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"])');
   });
 
-  it("keeps company/studio billing history organization-scoped even when the owner email matches", () => {
+  it("keeps subscription history bound to the user or owned personal organization instead of mutable email alone", () => {
     expect(source).toContain("matchingSubscriptionEvents");
     expect(source).toContain("personalOrganizationIdSet");
-    expect(source).toContain("!event.appliedOrganizationId || personalOrganizationIdSet.has(String(event.appliedOrganizationId))");
+    expect(source).toContain("event.appliedUserId === userId");
+    expect(source).toContain("belongsToPersonalOrganization");
+    expect(source).toContain("if (!belongsToUser && !belongsToPersonalOrganization) return false");
     expect(organizationExport).toContain('query("subscriptionEvents")');
     expect(organizationExport).toContain('withIndex("by_appliedOrganizationId"');
     expect(organizationExport).toContain("subscriptionEvents: bounded(subscriptionEvents");
     expect(organizationExport).toContain("subscriptionUpdatedAt: organization.subscriptionUpdatedAt");
   });
 
-  it("includes invitations by current email or stable account binding without treating binding as consent", () => {
+  it("includes invitations by stable binding and uses email-only legacy rows only when the address uniquely identifies this account", () => {
     expect(source).toContain("invitationRowsForEmail");
     expect(source).toContain("invitationRowsForAccount");
+    expect(source).toContain("emailUniquelyBelongsToUser");
+    expect(source).toContain("!row.acceptedByUserId || row.acceptedByUserId === userId");
     expect(source).toContain("row.acceptedByUserId === userId");
     expect(source).toContain("organizationInvitationsById");
     expect(source).toContain("Invitation status, not the presence of an account-binding field, is the source of truth for consent");
