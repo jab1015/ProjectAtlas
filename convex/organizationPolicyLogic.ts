@@ -27,90 +27,28 @@ export interface OrganizationPlanPolicy {
  * here until production cost-to-serve measurements support a sustainable limit.
  */
 export const ORGANIZATION_PLAN_POLICIES: Record<OrganizationPlanKey, OrganizationPlanPolicy> = {
-  explorer: {
-    key: "explorer",
-    displayName: "Explorer",
-    monthlyPriceUsd: 0,
-    activeInventionLimit: 1,
-    includedSeatLimit: 1,
-    completeJourney: false,
-    professionalWorkspace: false,
-  },
-  inventor: {
-    key: "inventor",
-    displayName: "Inventor",
-    monthlyPriceUsd: 39,
-    activeInventionLimit: 1,
-    includedSeatLimit: 1,
-    completeJourney: false,
-    professionalWorkspace: false,
-  },
-  pro: {
-    key: "pro",
-    displayName: "Pro",
-    monthlyPriceUsd: 99,
-    activeInventionLimit: 1,
-    includedSeatLimit: 1,
-    completeJourney: true,
-    professionalWorkspace: false,
-  },
-  enterprise: {
-    key: "enterprise",
-    displayName: "Enterprise",
-    monthlyPriceUsd: 199,
-    activeInventionLimit: 2,
-    includedSeatLimit: 3,
-    completeJourney: true,
-    professionalWorkspace: true,
-  },
-  studio_3: {
-    key: "studio_3",
-    displayName: "Studio 3",
-    monthlyPriceUsd: 299,
-    activeInventionLimit: 3,
-    includedSeatLimit: 5,
-    completeJourney: true,
-    professionalWorkspace: true,
-  },
-  studio_6: {
-    key: "studio_6",
-    displayName: "Studio 6",
-    monthlyPriceUsd: 399,
-    activeInventionLimit: 6,
-    includedSeatLimit: 8,
-    completeJourney: true,
-    professionalWorkspace: true,
-  },
-  studio_custom: {
-    key: "studio_custom",
-    displayName: "Studio Custom",
-    monthlyPriceUsd: null,
-    activeInventionLimit: null,
-    includedSeatLimit: null,
-    completeJourney: true,
-    professionalWorkspace: true,
-  },
+  explorer: { key: "explorer", displayName: "Explorer", monthlyPriceUsd: 0, activeInventionLimit: 1, includedSeatLimit: 1, completeJourney: false, professionalWorkspace: false },
+  inventor: { key: "inventor", displayName: "Inventor", monthlyPriceUsd: 39, activeInventionLimit: 1, includedSeatLimit: 1, completeJourney: false, professionalWorkspace: false },
+  pro: { key: "pro", displayName: "Pro", monthlyPriceUsd: 99, activeInventionLimit: 1, includedSeatLimit: 1, completeJourney: true, professionalWorkspace: false },
+  enterprise: { key: "enterprise", displayName: "Enterprise", monthlyPriceUsd: 199, activeInventionLimit: 2, includedSeatLimit: 3, completeJourney: true, professionalWorkspace: true },
+  studio_3: { key: "studio_3", displayName: "Studio 3", monthlyPriceUsd: 299, activeInventionLimit: 3, includedSeatLimit: 5, completeJourney: true, professionalWorkspace: true },
+  studio_6: { key: "studio_6", displayName: "Studio 6", monthlyPriceUsd: 399, activeInventionLimit: 6, includedSeatLimit: 8, completeJourney: true, professionalWorkspace: true },
+  studio_custom: { key: "studio_custom", displayName: "Studio Custom", monthlyPriceUsd: null, activeInventionLimit: null, includedSeatLimit: null, completeJourney: true, professionalWorkspace: true },
 };
 
 export function normalizeOrganizationPlanKey(value: unknown): OrganizationPlanKey {
   switch (value) {
     case "explorer":
-    case "free":
-      return "explorer";
+    case "free": return "explorer";
     case "inventor":
-    case "starter":
-      return "inventor";
+    case "starter": return "inventor";
     case "pro":
-    case "inventor_pro":
-      return "pro";
-    case "enterprise":
-      return "enterprise";
+    case "inventor_pro": return "pro";
+    case "enterprise": return "enterprise";
     case "studio_3":
     case "studio_6":
-    case "studio_custom":
-      return value;
-    default:
-      return "explorer";
+    case "studio_custom": return value;
+    default: return "explorer";
   }
 }
 
@@ -132,17 +70,18 @@ export function canManageBilling(role: OrganizationRole): boolean {
   return role === "owner";
 }
 
-export function defaultInventionAccessForRole(role: OrganizationRole): InventionAccess {
+/**
+ * Professionals are organization members for seat/account administration but do
+ * not inherit visibility into the invention portfolio. They must receive an
+ * explicit inventionAccessGrant for each project they review.
+ */
+export function defaultInventionAccessForRole(role: OrganizationRole): InventionAccess | null {
   switch (role) {
     case "owner":
-    case "admin":
-      return "manage";
-    case "member":
-      return "edit";
-    case "viewer":
-      return "view";
-    case "professional":
-      return "review";
+    case "admin": return "manage";
+    case "member": return "edit";
+    case "viewer": return "view";
+    case "professional": return null;
   }
 }
 
