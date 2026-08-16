@@ -12,7 +12,7 @@ InventSmith is measured against the complete journey:
 
 **Idea → Evidence → Validation → Market Research → Prior Art / Patent Readiness → Product Design → CAD / Engineering → Prototype → Manufacturing → Branding → Intellectual Property / Legal → Pricing → Marketing → Sales → Funding / Pitch → Launch → Growth**
 
-The retired controlled-pilot completion percentage must never be used as overall InventSmith completion.
+The retired controlled-pilot 80% figure must never be used as overall InventSmith completion.
 
 ## August 16 architecture expansion
 
@@ -59,22 +59,25 @@ Implemented on the full-product branch:
 - organization-readable department artifacts and deliverable downloads;
 - creator/ownership attribution preserved for compatibility;
 - Studio plan keys recognized by usage policy;
-- regression coverage protecting organization runtime and access boundaries.
+- dedicated `organizationDailyUsage` ledger keyed by organization + UTC day;
+- Ask InventSmith daily allowance enforcement against the organization plan and shared organization ledger;
+- autonomous-work reservation and settlement against the organization ledger, including stale-output cost settlement;
+- migration-safe bootstrap from existing same-day member usage so deployment does not reset allowances;
+- legacy inventions without `organizationId` preserved on the original user-scoped usage path;
+- organization usage API reporting from the shared ledger;
+- regression coverage protecting organization runtime, access boundaries and shared usage accounting.
 
-Latest completed organization authorization checkpoint passed the full CI pipeline before the usage-accounting workstream began.
+The organization-scoped usage checkpoint has passed both web and Convex TypeScript verification. Its dedicated regression tests passed; the first full CI run exposed only a stale progress-document wording assertion, which this checkpoint corrects.
 
 ### In progress now
 
-**Organization-scoped usage/cost accounting.**
+**Organization + invention + operation-class cost attribution.**
 
-Ask InventSmith already resolves an organization-owned invention's organization plan, but the legacy daily usage record is still keyed to the individual user. That must be migrated so multiple members share the organization's allowance rather than multiplying it by seat count.
-
-Next implementation must enforce this server-side and remain backward compatible with legacy single-user inventions.
+Shared allowance enforcement is now organization-native. The next cost-control pass is to make cost attribution sufficiently complete and queryable to measure real cost-to-serve by organization, invention and operation class without inventing a dollar conversion before provider/runtime calibration exists.
 
 ### Still required
 
-- organization-scoped usage accounting across Ask InventSmith, autonomous work and other expensive operations;
-- organization/invention operation-cost attribution;
+- organization/invention operation-cost attribution across expensive operations;
 - organization-scoped subscription/billing authority and webhook reconciliation;
 - remaining backend owner-only authorization audit/conversion;
 - organization/team/member management UI;
@@ -125,24 +128,23 @@ Patent intelligence feeds Product Design so design candidates deliberately explo
 
 ## Cost-control direction
 
-The old per-user daily-unit concept is insufficient for an organization-native product. Adding organization members must not multiply the same organization's expensive-work allowance.
+The old per-user daily-unit concept is insufficient for an organization-native product. Adding organization members must not multiply the same organization's expensive-work allowance. Organization-owned inventions now enforce chat and autonomous-work usage through one organization/day ledger; legacy inventions remain user-scoped.
 
 Meter/attribute work to organization + invention and classify expensive operations such as deep/current research, AI reasoning, evidence extraction, image generation, CAD/design generation, artifact generation and major downstream regeneration. Final plan allowances will be based on measured normal/heavy/worst-reasonable cost-to-serve.
 
 ## Current implementation order
 
-1. Finish organization-scoped usage accounting.
-2. Add organization + invention + operation-class cost attribution.
-3. Move subscription/billing authority to organization scope with backward-compatible migration.
-4. Complete remaining owner-only backend authorization audit.
-5. Build team/member/invitation management.
-6. Build invention-level sharing and professional/guest review access.
-7. Make privacy/export/deletion/member-removal/ownership-transfer behavior organization-safe.
-8. Build representative cost-to-serve economics.
-9. Lock plan allowances/seats/storage/premium generation.
-10. Reconcile public/account/checkout billing products to final policy.
-11. Run full repository acceptance.
-12. Only after GitHub completion, replicate to MadeThis and run live authenticated multi-user/multi-invention acceptance.
+1. Complete organization + invention + operation-class cost attribution.
+2. Move subscription/billing authority to organization scope with backward-compatible migration.
+3. Complete remaining owner-only backend authorization audit.
+4. Build team/member/invitation management.
+5. Build invention-level sharing and professional/guest review access.
+6. Make privacy/export/deletion/member-removal/ownership-transfer behavior organization-safe.
+7. Build representative cost-to-serve economics.
+8. Lock plan allowances/seats/storage/premium generation.
+9. Reconcile public/account/checkout billing products to final policy.
+10. Run full repository acceptance.
+11. Only after GitHub completion, replicate to MadeThis and run live authenticated multi-user/multi-invention acceptance.
 
 ## New-chat handoff
 
@@ -152,7 +154,7 @@ A new chat should read these three files in order:
 2. `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`
 3. `docs/ATLAS_BUILD_PROGRESS.md`
 
-Then inspect branch `inventsmith/full-product-build` and draft PR #24. Resume with organization-scoped usage/cost accounting. Do not restart the product plan, do not merge PR #24, and do not hand the project to MadeThis yet.
+Then inspect branch `inventsmith/full-product-build` and draft PR #24. Resume with organization + invention + operation-class cost attribution. Do not restart the product plan, do not merge PR #24, and do not hand the project to MadeThis yet.
 
 ## Final acceptance boundary
 
