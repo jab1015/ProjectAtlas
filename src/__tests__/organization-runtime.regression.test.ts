@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 const schemaSource = readFileSync("convex/schema.ts", "utf8");
 const organizationSource = readFileSync("convex/organizations.ts", "utf8");
+const invitationSource = readFileSync("convex/organizationInvitations.ts", "utf8");
 const usageScopeSource = readFileSync("convex/organizationUsageScope.ts", "utf8");
 const chatSource = readFileSync("convex/atlasChat.ts", "utf8");
 const workspaceSource = readFileSync("convex/inventionWorkspace.ts", "utf8");
@@ -50,11 +51,14 @@ describe("InventSmith organization runtime", () => {
     expect(organizationSource).toContain("Target user must be an active organization member");
   });
 
-  it("enforces purchased seat capacity and protects the owner membership", () => {
-    expect(organizationSource).toContain("countOccupiedSeats");
-    expect(organizationSource).toContain("getOrganizationPlanPolicy(organization.planKey).includedSeatLimit");
-    expect(organizationSource).toContain("Organization included-seat limit reached");
+  it("enforces purchased seat capacity through consent-based invitations and protects the owner membership", () => {
+    expect(invitationSource).toContain("countReservedSeats");
+    expect(invitationSource).toContain("getOrganizationPlanPolicy(organization.planKey)");
+    expect(invitationSource).toContain("Organization included-seat limit reached");
+    expect(invitationSource).toContain("projectedReservedSeats");
+    expect(invitationSource).toContain("projectedReservedSeats > policy.includedSeatLimit");
     expect(organizationSource).toContain("addMemberByEmail");
+    expect(organizationSource).toContain("Direct member assignment is disabled");
     expect(organizationSource).toContain("updateMemberRole");
     expect(organizationSource).toContain("removeMember");
     expect(organizationSource).toContain("Transfer organization ownership before removing the owner");
