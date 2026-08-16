@@ -24,6 +24,7 @@ async function personalExportScope(ctx: QueryCtx, userId: Id<"users">) {
     .withIndex("by_userId", (q) => q.eq("userId", userId))
     .collect();
   const personalOrganizationIds = new Set<string>();
+  const personalOrganizationIdValues: Id<"organizations">[] = [];
   const organizationAffiliations = [];
   for (const membership of memberships) {
     if (membership.status === "removed") continue;
@@ -31,6 +32,7 @@ async function personalExportScope(ctx: QueryCtx, userId: Id<"users">) {
     if (!organization) continue;
     if (membership.role === "owner" && organization.kind === "personal") {
       personalOrganizationIds.add(String(organization._id));
+      personalOrganizationIdValues.push(organization._id);
     }
     organizationAffiliations.push({
       organizationId: organization._id,
@@ -49,7 +51,7 @@ async function personalExportScope(ctx: QueryCtx, userId: Id<"users">) {
     !invention.organizationId || personalOrganizationIds.has(String(invention.organizationId))
   );
 
-  return { user, inventions, organizationAffiliations };
+  return { user, inventions, organizationAffiliations, personalOrganizationIdValues };
 }
 
 async function buildInventionBundle(ctx: QueryCtx, invention: any) {
@@ -102,7 +104,7 @@ async function buildInventionBundle(ctx: QueryCtx, invention: any) {
 }
 
 async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
-  const { user, inventions: scopedInventions, organizationAffiliations } = await personalExportScope(ctx, userId);
+  const { user, inventions: scopedInventions, organizationAffiliations, personalOrganizationIdValues } = await personalExportScope(ctx, userId);
   const inventions = requireWithinLimit(scopedInventions, INVENTION_LIMIT, "personal invention count");
   const inventionBundles = [];
   for (const invention of inventions) inventionBundles.push(await buildInventionBundle(ctx, invention));
@@ -114,14 +116,26 @@ async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
     ctx.db.query("purchases").withIndex("by_userId", (q) => q.eq("userId", userId)).take(ROW_LIMIT + 1),
   ]);
 
+  const personalOrganizationUsage = [];
+  for (const organizationId of personalOrganizationIdValues) {
+    const rows = await ctx.db
+      .query("organizationDailyUsage")
+      .withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId))
+      .take(EVENT_LIMIT + 1);
+    personalOrganizationUsage.push(...requireWithinLimit(rows, EVENT_LIMIT, "personal organization usage-history count"));
+    if (personalOrganizationUsage.length > EVENT_LIMIT) {
+      throw new ConvexError("Your personal organization usage history exceeds the self-service export limit. Submit a formal data-export request for a coordinated complete package.");
+    }
+  }
+
   const subscriptionEvents = user.email
     ? await ctx.db.query("subscriptionEvents").withIndex("by_customerEmail", (q) => q.eq("customerEmail", user.email!)).take(ROW_LIMIT + 1)
     : [];
 
   return {
-    exportVersion: 2,
+    exportVersion: 3,
     generatedAt: Date.now(),
-    scope: "InventSmith personal account data. Company/studio invention data is excluded from this personal export even if this user originally created the invention. Organization-authorized exports are handled separately. Uploaded/generated binary file bytes are not embedded in this JSON.",
+    scope: "InventSmith personal account data. Company/studio invention and usage data is excluded from this personal export even if this user originally created the invention. Organization-authorized exports are handled separately. Uploaded/generated binary file bytes are not embedded in this JSON.",
     profile: {
       _id: user._id,
       _creationTime: user._creationTime,
@@ -142,6 +156,7 @@ async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
     organizationAffiliations,
     inventions: inventionBundles,
     dailyUsage: requireWithinLimit(usage, EVENT_LIMIT, "usage-history count"),
+    personalOrganizationDailyUsage: personalOrganizationUsage,
     notifications: requireWithinLimit(notifications, EVENT_LIMIT, "notification count"),
     privacyRequests: requireWithinLimit(privacyRequests, ROW_LIMIT, "privacy-request count"),
     purchases: requireWithinLimit(purchases, ROW_LIMIT, "purchase count").map((purchase) => ({
