@@ -23,6 +23,15 @@ describe("InventSmith organization-native policy", () => {
     expect(ORGANIZATION_PLAN_POLICIES.studio_custom.activeInventionLimit).toBeNull();
   });
 
+  it("locks the intended active-invention and included-seat ladder", () => {
+    expect(ORGANIZATION_PLAN_POLICIES.explorer).toMatchObject({ activeInventionLimit: 1, includedSeatLimit: 1 });
+    expect(ORGANIZATION_PLAN_POLICIES.inventor).toMatchObject({ activeInventionLimit: 1, includedSeatLimit: 1 });
+    expect(ORGANIZATION_PLAN_POLICIES.pro).toMatchObject({ activeInventionLimit: 1, includedSeatLimit: 1 });
+    expect(ORGANIZATION_PLAN_POLICIES.enterprise).toMatchObject({ activeInventionLimit: 2, includedSeatLimit: 3 });
+    expect(ORGANIZATION_PLAN_POLICIES.studio_3).toMatchObject({ activeInventionLimit: 3, includedSeatLimit: 5 });
+    expect(ORGANIZATION_PLAN_POLICIES.studio_6).toMatchObject({ activeInventionLimit: 6, includedSeatLimit: 8 });
+  });
+
   it("preserves legacy tier aliases during migration", () => {
     expect(normalizeOrganizationPlanKey("free")).toBe("explorer");
     expect(normalizeOrganizationPlanKey("starter")).toBe("inventor");
@@ -33,6 +42,10 @@ describe("InventSmith organization-native policy", () => {
   it("treats archived inventions as outside the active-slot count supplied to policy", () => {
     expect(canCreateActiveInvention("explorer", 0)).toBe(true);
     expect(canCreateActiveInvention("explorer", 1)).toBe(false);
+    expect(canCreateActiveInvention("pro", 0)).toBe(true);
+    expect(canCreateActiveInvention("pro", 1)).toBe(false);
+    expect(canCreateActiveInvention("enterprise", 1)).toBe(true);
+    expect(canCreateActiveInvention("enterprise", 2)).toBe(false);
     expect(canCreateActiveInvention("studio_3", 2)).toBe(true);
     expect(canCreateActiveInvention("studio_3", 3)).toBe(false);
   });
