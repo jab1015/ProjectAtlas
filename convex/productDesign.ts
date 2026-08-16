@@ -1,7 +1,8 @@
 import { mutation, query } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { canTierRunWorkKind } from "./entitlementPolicyLogic";
+import { requireInventionEditAccess, requireInventionReadAccess } from "./organizations";
+import { resolveInventionUsageScope } from "./organizationUsageScope";
 
 export const DESIGN_WORK = [
   {
@@ -69,22 +70,14 @@ export const DESIGN_WORK = [
   },
 ] as const;
 
-async function requireOwner(ctx: Parameters<typeof getAuthUserId>[0] & { db: any }, inventionId: any) {
-  const userId = await getAuthUserId(ctx);
-  if (!userId) throw new ConvexError("Authentication required");
-  const invention = await ctx.db.get(inventionId);
-  if (!invention || invention.userId !== userId) throw new ConvexError("Invention not found or access denied");
-  const user = await ctx.db.get(userId);
-  if (!user) throw new ConvexError("Inventor profile not found");
-  return { userId, invention, user };
-}
-
 export const ensureProductDesignWorkspace = mutation({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, args) => {
-    const { user } = await requireOwner(ctx, args.inventionId);
-    if (!canTierRunWorkKind(user.subscriptionTier, "design_candidate_generation")) {
-      throw new ConvexError("Product Design requires a Pro or Enterprise entitlement");
+    await requireInventionEditAccess(ctx, args.inventionId);
+    const usageScope = await resolveInventionUsageScope(ctx, args.inventionId);
+    if (!usageScope) throw new ConvexError("Invention not found");
+    if (!canTierRunWorkKind(usageScope.plan, "design_candidate_generation")) {
+      throw new ConvexError("Product Design requires a Pro or higher entitlement");
     }
 
     const existing = await ctx.db
@@ -121,7 +114,7 @@ export const ensureProductDesignWorkspace = mutation({
         eventType: "work_queued",
         actorType: "system",
         summary: `InventSmith opened the Product Design department and queued ${created} design work items.`,
-        metadata: { department: "product_design", created, requiredHandoff: "patent_design_handoff" },
+        metadata: { department: "product_design", created, requiredHandoff: "patent_design_handoff", usageScope: usageScope.scope },
         createdAt: now,
       });
     }
@@ -133,7 +126,9 @@ export const ensureProductDesignWorkspace = mutation({
 export const getProductDesignWorkspace = query({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, args) => {
-    const { invention } = await requireOwner(ctx, args.inventionId);
+    await requireInventionReadAccess(ctx, args.inventionId);
+    const invention = await ctx.db.get(args.inventionId);
+    if (!invention) throw new ConvexError("Invention not found");
     const [workItems, deliverables, evidence] = await Promise.all([
       ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q: any) => q.eq("inventionId", args.inventionId)).collect(),
       ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q: any) => q.eq("inventionId", args.inventionId)).collect(),
