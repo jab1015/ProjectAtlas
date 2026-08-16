@@ -31,6 +31,13 @@ describe("InventSmith organization runtime", () => {
     expect(organizationSource).toContain("ensurePersonalOrganizationForUser");
   });
 
+  it("preserves inherited billing event ordering when creating a personal organization", () => {
+    expect(organizationSource).toContain("billingCustomerId: user.billingCustomerId");
+    expect(organizationSource).toContain("subscriptionId: user.subscriptionId");
+    expect(organizationSource).toContain("subscriptionCurrentPeriodEnd: user.subscriptionCurrentPeriodEnd");
+    expect(organizationSource).toContain("subscriptionUpdatedAt: user.subscriptionUpdatedAt");
+  });
+
   it("requires active organization membership before any explicit invention grant", () => {
     const membershipCheck = organizationSource.indexOf("const membership = await getOrganizationMembership(ctx, invention.organizationId, userId)");
     const grantCheck = organizationSource.indexOf("const explicitGrant = await ctx.db");
