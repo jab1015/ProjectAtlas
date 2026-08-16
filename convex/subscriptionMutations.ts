@@ -70,8 +70,14 @@ export const applySubscriptionEvent = internalMutation({
         args.billingCustomerId &&
         organization.billingCustomerId === args.billingCustomerId
       );
+      const existingSubscriptionMatch = Boolean(
+        organization?.subscriptionId &&
+        args.subscriptionId &&
+        organization.subscriptionId === args.subscriptionId
+      );
       const ownerActivationMatch = Boolean(
         !organization?.billingCustomerId &&
+        !organization?.subscriptionId &&
         ownerEmail &&
         ownerEmail === args.customerEmail.trim().toLowerCase()
       );
@@ -80,7 +86,7 @@ export const applySubscriptionEvent = internalMutation({
         organization.status === "active" &&
         ownerMembership &&
         ownerMembership.userId === organization.createdByUserId &&
-        (existingCustomerMatch || ownerActivationMatch)
+        (existingCustomerMatch || existingSubscriptionMatch || ownerActivationMatch)
       );
       // Billing recency is independent from organization profile/team edits.
       const stale = Boolean(organization && (organization.subscriptionUpdatedAt ?? 0) > args.occurredAt);
