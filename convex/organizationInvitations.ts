@@ -17,6 +17,12 @@ function normalizeEmail(email: string) {
   return normalized;
 }
 
+async function getUniqueAccountByEmail(ctx: MutationCtx, email: string) {
+  const users = await ctx.db.query("users").withIndex("email", (q) => q.eq("email", email)).collect();
+  if (users.length !== 1) return null;
+  return users[0];
+}
+
 async function countReservedSeats(ctx: MutationCtx, organizationId: Id<"organizations">, now: number) {
   const [memberships, invitations] = await Promise.all([
     ctx.db
@@ -56,11 +62,15 @@ export const inviteMemberByEmail = mutation({
     const inviter = await ctx.db.get(invitedByUserId);
     if (inviter?.email?.trim().toLowerCase() === email) throw new ConvexError("You already belong to this organization");
 
-    const existingUser = await ctx.db.query("users").withIndex("email", (q) => q.eq("email", email)).first();
-    if (existingUser) {
-      const membership = await getOrganizationMembership(ctx, args.organizationId, existingUser._id);
-      if (membership?.status === "active") throw new ConvexError("That person already belongs to this organization");
+    // Password auth currently has no verified-email delivery provider. Until one
+    // is configured, invitations are deliberately bound to an account that
+    // already exists rather than trusting an unverified address registered later.
+    const intendedUser = await getUniqueAccountByEmail(ctx, email);
+    if (!intendedUser) {
+      throw new ConvexError("That person must create an InventSmith account before a secure invitation can be issued");
     }
+    const membership = await getOrganizationMembership(ctx, args.organizationId, intendedUser._id);
+    if (membership?.status === "active") throw new ConvexError("That person already belongs to this organization");
 
     const now = Date.now();
     const existingInvitations = await ctx.db
@@ -144,6 +154,9 @@ export const getMyPendingInvitations = query({
     const email = user?.email?.trim().toLowerCase();
     if (!email) return [];
 
+    const usersForEmail = await ctx.db.query("users").withIndex("email", (q) => q.eq("email", email)).collect();
+    if (usersForEmail.length !== 1 || usersForEmail[0]._id !== userId) return [];
+
     const now = Date.now();
     const invitations = await ctx.db
       .query("organizationInvitations")
@@ -174,11 +187,13 @@ export const acceptInvitation = mutation({
     if (!userId) throw new ConvexError("Authentication required");
     const user = await ctx.db.get(userId);
     const userEmail = user?.email?.trim().toLowerCase();
-    if (!userEmail) throw new ConvexError("A verified account email is required to accept an invitation");
+    if (!userEmail) throw new ConvexError("An account email is required to accept an invitation");
 
     const invitation = await ctx.db.get(args.invitationId);
     if (!invitation || invitation.status !== "pending") throw new ConvexError("Invitation is no longer available");
     if (invitation.email !== userEmail) throw new ConvexError("This invitation belongs to a different email address");
+    const intendedUser = await getUniqueAccountByEmail(ctx, invitation.email);
+    if (!intendedUser || intendedUser._id !== userId) throw new ConvexError("This invitation belongs to a different InventSmith account");
 
     const now = Date.now();
     if (invitation.expiresAt <= now) {
