@@ -15,6 +15,7 @@ const PLANS = [
       "Core validation, competitor research, market feasibility, and preliminary prior-art work",
       "Evidence Locker and inventor project record",
     ],
+    featured: false,
   },
   {
     name: "Inventor",
@@ -28,6 +29,7 @@ const PLANS = [
       "Technical/material/manufacturing feasibility and regulatory screening",
       "IP readiness, feature/prior-art comparison, product requirements, BOM/cost, and development-risk work",
     ],
+    featured: false,
   },
   {
     name: "Pro",
@@ -55,6 +57,7 @@ const PLANS = [
       "Higher active-invention capacity",
       "Higher daily autonomous-work and Ask InventSmith allowances",
     ],
+    featured: false,
   },
 ] as const;
 
