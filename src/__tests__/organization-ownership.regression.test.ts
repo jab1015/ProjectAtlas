@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const source = readFileSync(join(process.cwd(), "convex/organizationOwnership.ts"), "utf8");
+const page = readFileSync(join(process.cwd(), "src/app/(app)/organizations/page.tsx"), "utf8");
 
 describe("organization ownership transfer", () => {
   it("requires the current owner and an existing active member", () => {
@@ -27,5 +28,13 @@ describe("organization ownership transfer", () => {
     expect(source).toContain('{ role: "admin", updatedAt: now }');
     expect(source).toContain('{ role: "owner", updatedAt: now }');
     expect(source).toContain("createdByUserId: args.newOwnerUserId");
+  });
+
+  it("exposes ownership transfer only from the owner-facing company/studio team UI and requires confirmation", () => {
+    expect(page).toContain("organizationOwnership:transferOwnership");
+    expect(page).toContain('selected.role !== "owner"');
+    expect(page).toContain('selected.kind === "personal"');
+    expect(page).toContain("window.confirm");
+    expect(page).toContain("Transfer ownership");
   });
 });
