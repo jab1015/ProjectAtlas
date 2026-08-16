@@ -36,6 +36,11 @@ function subscriptionHasAccess(status: SubscriptionStatus, currentPeriodEnd: num
   return (status === "past_due" || status === "canceled") && currentPeriodEnd !== undefined && currentPeriodEnd > now;
 }
 
+function billingPlanMatchesBaseTier(plan: OrganizationBillingPlan, tier: PaidAtlasTier) {
+  if (plan === "studio_3" || plan === "studio_6" || plan === "studio_custom") return tier === "enterprise";
+  return plan === tier;
+}
+
 export function effectiveTierForSubscription(tier: PaidAtlasTier, status: SubscriptionStatus, currentPeriodEnd: number | undefined, now: number): AtlasTier {
   return subscriptionHasAccess(status, currentPeriodEnd, now) ? tier : "free";
 }
@@ -67,14 +72,17 @@ export function validateSubscriptionWebhookPayload(value: unknown): Subscription
   const organizationPlanKey = typeof body.organizationPlanKey === "string"
     ? body.organizationPlanKey as OrganizationBillingPlan
     : undefined;
+  const tier = body.tier as PaidAtlasTier;
   // Studio/organization plan overrides can never be applied to the legacy
-  // per-user subscription path.
+  // per-user subscription path, and the exact org plan must agree with the
+  // provider's compatibility tier.
   if (organizationPlanKey && !organizationId) return null;
+  if (organizationPlanKey && !billingPlanMatchesBaseTier(organizationPlanKey, tier)) return null;
 
   return {
     eventId: body.eventId.trim(),
     customerEmail: body.customerEmail.trim().toLowerCase(),
-    tier: body.tier as PaidAtlasTier,
+    tier,
     organizationPlanKey,
     status: body.status as SubscriptionStatus,
     subscriptionId: typeof body.subscriptionId === "string" ? body.subscriptionId.trim() || undefined : undefined,
