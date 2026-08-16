@@ -1,0 +1,229 @@
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { ConvexError, v } from "convex/values";
+import { mutation, query, type MutationCtx } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
+import { getOrganizationMembership, requireOrganizationRole } from "./organizations";
+import { getOrganizationPlanPolicy } from "./organizationPolicyLogic";
+
+const INVITATION_TTL_MS = 14 * 24 * 60 * 60 * 1000;
+
+type InviteRole = "admin" | "member" | "viewer" | "professional";
+
+function normalizeEmail(email: string) {
+  const normalized = email.trim().toLowerCase();
+  if (!/^\S+@\S+\.\S+$/.test(normalized) || normalized.length > 320) {
+    throw new ConvexError("Enter a valid email address");
+  }
+  return normalized;
+}
+
+async function countReservedSeats(ctx: MutationCtx, organizationId: Id<"organizations">, now: number) {
+  const [memberships, invitations] = await Promise.all([
+    ctx.db
+      .query("organizationMemberships")
+      .withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId))
+      .collect(),
+    ctx.db
+      .query("organizationInvitations")
+      .withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId))
+      .collect(),
+  ]);
+  const members = memberships.filter((membership) => membership.status === "active" || membership.status === "invited").length;
+  const pendingInvites = invitations.filter((invitation) => invitation.status === "pending" && invitation.expiresAt > now).length;
+  return members + pendingInvites;
+}
+
+async function expirePendingInvitation(ctx: MutationCtx, invitation: any, now: number) {
+  if (invitation.status === "pending" && invitation.expiresAt <= now) {
+    await ctx.db.patch(invitation._id, { status: "expired", updatedAt: now });
+    return true;
+  }
+  return false;
+}
+
+export const inviteMemberByEmail = mutation({
+  args: {
+    organizationId: v.id("organizations"),
+    email: v.string(),
+    role: v.union(v.literal("admin"), v.literal("member"), v.literal("viewer"), v.literal("professional")),
+  },
+  handler: async (ctx, args) => {
+    const { userId: invitedByUserId } = await requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"]);
+    const organization = await ctx.db.get(args.organizationId);
+    if (!organization || organization.status !== "active") throw new ConvexError("Organization not found");
+
+    const email = normalizeEmail(args.email);
+    const inviter = await ctx.db.get(invitedByUserId);
+    if (inviter?.email?.trim().toLowerCase() === email) throw new ConvexError("You already belong to this organization");
+
+    const existingUser = await ctx.db.query("users").withIndex("email", (q) => q.eq("email", email)).first();
+    if (existingUser) {
+      const membership = await getOrganizationMembership(ctx, args.organizationId, existingUser._id);
+      if (membership?.status === "active") throw new ConvexError("That person already belongs to this organization");
+    }
+
+    const now = Date.now();
+    const existingInvitations = await ctx.db
+      .query("organizationInvitations")
+      .withIndex("by_organizationId_email", (q) => q.eq("organizationId", args.organizationId).eq("email", email))
+      .collect();
+    const pending = existingInvitations.find((invitation) => invitation.status === "pending" && invitation.expiresAt > now);
+    for (const invitation of existingInvitations) await expirePendingInvitation(ctx, invitation, now);
+
+    if (pending) {
+      await ctx.db.patch(pending._id, {
+        role: args.role,
+        invitedByUserId,
+        expiresAt: now + INVITATION_TTL_MS,
+        updatedAt: now,
+      });
+      return { invitationId: pending._id, created: false, expiresAt: now + INVITATION_TTL_MS };
+    }
+
+    const policy = getOrganizationPlanPolicy(organization.planKey);
+    const reservedSeats = await countReservedSeats(ctx, args.organizationId, now);
+    if (policy.includedSeatLimit !== null && reservedSeats >= policy.includedSeatLimit) {
+      throw new ConvexError("Organization included-seat limit reached");
+    }
+
+    const expiresAt = now + INVITATION_TTL_MS;
+    const invitationId = await ctx.db.insert("organizationInvitations", {
+      organizationId: args.organizationId,
+      email,
+      role: args.role as InviteRole,
+      status: "pending",
+      invitedByUserId,
+      expiresAt,
+      createdAt: now,
+      updatedAt: now,
+    });
+    return { invitationId, created: true, expiresAt };
+  },
+});
+
+export const listOrganizationInvitations = query({
+  args: { organizationId: v.id("organizations") },
+  handler: async (ctx, args) => {
+    await requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"]);
+    const now = Date.now();
+    const invitations = await ctx.db
+      .query("organizationInvitations")
+      .withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId))
+      .collect();
+    return invitations
+      .filter((invitation) => invitation.status === "pending" && invitation.expiresAt > now)
+      .sort((a, b) => b.updatedAt - a.updatedAt)
+      .map((invitation) => ({
+        invitationId: invitation._id,
+        email: invitation.email,
+        role: invitation.role,
+        expiresAt: invitation.expiresAt,
+        createdAt: invitation.createdAt,
+      }));
+  },
+});
+
+export const revokeInvitation = mutation({
+  args: { organizationId: v.id("organizations"), invitationId: v.id("organizationInvitations") },
+  handler: async (ctx, args) => {
+    await requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"]);
+    const invitation = await ctx.db.get(args.invitationId);
+    if (!invitation || invitation.organizationId !== args.organizationId) throw new ConvexError("Invitation not found");
+    if (invitation.status !== "pending") return { revoked: false };
+    await ctx.db.patch(invitation._id, { status: "revoked", updatedAt: Date.now() });
+    return { revoked: true };
+  },
+});
+
+export const getMyPendingInvitations = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Authentication required");
+    const user = await ctx.db.get(userId);
+    const email = user?.email?.trim().toLowerCase();
+    if (!email) return [];
+
+    const now = Date.now();
+    const invitations = await ctx.db
+      .query("organizationInvitations")
+      .withIndex("by_email_status", (q) => q.eq("email", email).eq("status", "pending"))
+      .collect();
+    const result = [];
+    for (const invitation of invitations) {
+      if (invitation.expiresAt <= now) continue;
+      const organization = await ctx.db.get(invitation.organizationId);
+      if (!organization || organization.status !== "active") continue;
+      result.push({
+        invitationId: invitation._id,
+        organizationId: organization._id,
+        organizationName: organization.name,
+        organizationKind: organization.kind,
+        role: invitation.role,
+        expiresAt: invitation.expiresAt,
+      });
+    }
+    return result.sort((a, b) => a.expiresAt - b.expiresAt);
+  },
+});
+
+export const acceptInvitation = mutation({
+  args: { invitationId: v.id("organizationInvitations") },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Authentication required");
+    const user = await ctx.db.get(userId);
+    const userEmail = user?.email?.trim().toLowerCase();
+    if (!userEmail) throw new ConvexError("A verified account email is required to accept an invitation");
+
+    const invitation = await ctx.db.get(args.invitationId);
+    if (!invitation || invitation.status !== "pending") throw new ConvexError("Invitation is no longer available");
+    if (invitation.email !== userEmail) throw new ConvexError("This invitation belongs to a different email address");
+
+    const now = Date.now();
+    if (invitation.expiresAt <= now) {
+      await ctx.db.patch(invitation._id, { status: "expired", updatedAt: now });
+      throw new ConvexError("This invitation has expired");
+    }
+
+    const organization = await ctx.db.get(invitation.organizationId);
+    if (!organization || organization.status !== "active") throw new ConvexError("Organization is no longer available");
+
+    const policy = getOrganizationPlanPolicy(organization.planKey);
+    const memberships = await ctx.db
+      .query("organizationMemberships")
+      .withIndex("by_organizationId", (q) => q.eq("organizationId", organization._id))
+      .collect();
+    const occupiedMembershipSeats = memberships.filter((membership) => membership.status === "active" || membership.status === "invited").length;
+    const existing = memberships.find((membership) => membership.userId === userId);
+    if (!existing && policy.includedSeatLimit !== null && occupiedMembershipSeats >= policy.includedSeatLimit) {
+      throw new ConvexError("The organization no longer has an available seat for this invitation");
+    }
+
+    let membershipId: Id<"organizationMemberships">;
+    if (existing) {
+      if (existing.status === "active") {
+        membershipId = existing._id;
+      } else {
+        await ctx.db.patch(existing._id, { role: invitation.role, status: "active", updatedAt: now });
+        membershipId = existing._id;
+      }
+    } else {
+      membershipId = await ctx.db.insert("organizationMemberships", {
+        organizationId: organization._id,
+        userId,
+        role: invitation.role,
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+
+    await ctx.db.patch(invitation._id, {
+      status: "accepted",
+      acceptedByUserId: userId,
+      updatedAt: now,
+    });
+    return { organizationId: organization._id, membershipId, role: invitation.role };
+  },
+});
