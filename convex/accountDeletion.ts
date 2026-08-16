@@ -37,9 +37,19 @@ async function deleteInventionData(
     .collect();
   for (const row of documents) {
     if (row.storageId) {
-      // Legacy documents stored this as string. Fail closed if an invalid storage
-      // reference is encountered rather than silently claiming deletion.
       await ctx.storage.delete(row.storageId as Id<"_storage">);
+      uploadedFilesDeleted += 1;
+    }
+  }
+
+  const evidenceSources = await ctx.db
+    .query("evidenceSources")
+    .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
+    .collect();
+  for (const source of evidenceSources) {
+    const storageId = source.metadata?.storageId as Id<"_storage"> | undefined;
+    if (storageId) {
+      await ctx.storage.delete(storageId);
       uploadedFilesDeleted += 1;
     }
   }
@@ -54,13 +64,14 @@ async function deleteInventionData(
     ctx.db.query("inventionDecisions").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
     ctx.db.query("inventionAssumptions").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
     ctx.db.query("evidenceFindings").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
-    ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    Promise.resolve(evidenceSources),
     ctx.db.query("inventionRecords").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
     ctx.db.query("stageProgress").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
     ctx.db.query("conversationMessages").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
     ctx.db.query("conversations").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
     Promise.resolve(documents),
     ctx.db.query("validationResearch").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    ctx.db.query("inventionAccessGrants").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
   ]);
 
   for (const rows of groups) {
@@ -79,10 +90,40 @@ export async function deleteAccountData(
   if (!user) throw new Error("Account already deleted or user record missing");
   if (user.role === "admin") throw new Error("Administrator accounts cannot be deleted through the privacy queue");
 
-  const inventions = await ctx.db
-    .query("inventions")
+  const memberships = await ctx.db
+    .query("organizationMemberships")
     .withIndex("by_userId", (q) => q.eq("userId", userId))
     .collect();
+
+  const personalOrganizationIds: Id<"organizations">[] = [];
+  for (const membership of memberships) {
+    if (membership.status !== "active") continue;
+    const organization = await ctx.db.get(membership.organizationId);
+    if (!organization || organization.status === "closed") continue;
+    if (membership.role === "owner" && organization.kind !== "personal") {
+      throw new Error("Transfer or close company/studio ownership before deleting this account");
+    }
+    if (membership.role === "owner" && organization.kind === "personal") {
+      personalOrganizationIds.push(organization._id);
+    }
+  }
+
+  const legacyInventions = (await ctx.db
+    .query("inventions")
+    .withIndex("by_userId", (q) => q.eq("userId", userId))
+    .collect())
+    .filter((invention) => !invention.organizationId);
+
+  const deletableById = new Map<string, (typeof legacyInventions)[number]>();
+  for (const invention of legacyInventions) deletableById.set(String(invention._id), invention);
+  for (const organizationId of personalOrganizationIds) {
+    const inventions = await ctx.db
+      .query("inventions")
+      .withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId))
+      .collect();
+    for (const invention of inventions) deletableById.set(String(invention._id), invention);
+  }
+  const inventions = [...deletableById.values()];
 
   let generatedFilesDeleted = 0;
   let uploadedFilesDeleted = 0;
@@ -90,6 +131,25 @@ export async function deleteAccountData(
     const result = await deleteInventionData(ctx, invention._id);
     generatedFilesDeleted += result.generatedFilesDeleted;
     uploadedFilesDeleted += result.uploadedFilesDeleted;
+  }
+
+  // A departing member loses their grants/memberships but cannot delete company
+  // or studio inventions merely because they originally created the record.
+  const accessGrants = await ctx.db
+    .query("inventionAccessGrants")
+    .withIndex("by_userId", (q) => q.eq("userId", userId))
+    .collect();
+  for (const grant of accessGrants) await ctx.db.delete(grant._id);
+  for (const membership of memberships) await ctx.db.delete(membership._id);
+
+  for (const organizationId of personalOrganizationIds) {
+    const remainingMemberships = await ctx.db
+      .query("organizationMemberships")
+      .withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId))
+      .collect();
+    for (const membership of remainingMemberships) await ctx.db.delete(membership._id);
+    const organization = await ctx.db.get(organizationId);
+    if (organization) await ctx.db.delete(organizationId);
   }
 
   const notifications = await ctx.db
@@ -104,8 +164,6 @@ export async function deleteAccountData(
     .collect();
   for (const row of usage) await ctx.db.delete(row._id);
 
-  // Financial transaction rows may need to be retained for accounting, but
-  // InventSmith does not retain the deleted user's identity on them.
   const purchases = await ctx.db
     .query("purchases")
     .withIndex("by_userId", (q) => q.eq("userId", userId))
@@ -133,8 +191,6 @@ export async function deleteAccountData(
     });
   }
 
-  // Delete Convex Auth material in dependency order. This mirrors the auth
-  // schema so no reusable credential or active session survives deletion.
   const sessions = await ctx.db
     .query("authSessions")
     .withIndex("userId", (q) => q.eq("userId", userId))
@@ -146,8 +202,6 @@ export async function deleteAccountData(
       .collect();
     for (const token of refreshTokens) await ctx.db.delete(token._id);
 
-    // authVerifiers has no sessionId index in Convex Auth, so account deletion
-    // performs a bounded full scan and removes only verifiers tied to this user.
     const verifiers = await ctx.db.query("authVerifiers").collect();
     for (const verifier of verifiers) {
       if (verifier.sessionId === session._id) await ctx.db.delete(verifier._id);
