@@ -17,11 +17,16 @@ export interface InventionClassification {
 }
 
 const SOFTWARE_PATTERNS = [
-  /\b(app|application|software|saas|platform|website|web app|mobile app|ios|android|api|algorithm|cloud service|digital service|browser extension|desktop software|ai assistant|machine learning)\b/i,
+  /\b(app|software|saas|software platform|website|web app|mobile app|ios|android|api|algorithm|cloud service|digital service|browser extension|desktop software|ai assistant|machine learning)\b/i,
 ];
 
 const PHYSICAL_PATTERNS = [
-  /\b(device|tool|mechanism|hardware|sensor|electronics|circuit|enclosure|assembly|material|manufactur|prototype|mechanical|motor|pump|valve|container|packaging|wearable|fixture|appliance|product)\b/i,
+  /\b(device|tool|mechanism|hardware|sensor|electronics|circuit|enclosure|assembly|material|manufactur|prototype|mechanical|motor|pump|valve|container|packaging|wearable|fixture|appliance|physical product)\b/i,
+];
+
+const NON_PRODUCT_BUSINESS_PATTERNS = [
+  /\b(open|start|run|launch) (?:a |an )?(?:landscaping|cleaning|consulting|restaurant|cafe|coffee shop|salon|barbershop|lawn care|housekeeping|moving|staffing|accounting|bookkeeping|marketing agency|real estate agency|property management) (?:business|company|service|agency|firm|shop)?\b/i,
+  /\b(service business|consulting business|local service company|brick[- ]and[- ]mortar business)\b/i,
 ];
 
 const REGULATED_CATEGORIES: Array<{ category: string; review: string; patterns: RegExp[] }> = [
@@ -61,6 +66,17 @@ export function classifyInvention(input: InventionClassificationInput): Inventio
       categories: unsupported.map((item) => item.category),
       professionalReviewAreas: [],
       unsupportedReason: unsupported.map((item) => item.reason).join(" "),
+    };
+  }
+
+  const nonProductBusiness = !software && !physical && NON_PRODUCT_BUSINESS_PATTERNS.some((pattern) => pattern.test(text));
+  if (nonProductBusiness) {
+    return {
+      productType: "physical",
+      supportClass: "unsupported",
+      categories: ["business-only concept"],
+      professionalReviewAreas: [],
+      unsupportedReason: "InventSmith develops inventions and product concepts. This appears to be an ordinary service/business concept without a new physical, software, or hybrid product to develop.",
     };
   }
 
