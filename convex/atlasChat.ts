@@ -6,6 +6,7 @@ import { canAskChatQuestion, isValidChatContent } from "./chatPolicyLogic";
 import { canAskWithinDailyAllowance, utcDateKey } from "./usagePolicyLogic";
 import { FULL_JOURNEY_STAGES } from "./fullJourneyDefinition";
 import { requireInventionEditAccess, requireInventionReadAccess } from "./organizations";
+import { resolveInventionUsageScope } from "./organizationUsageScope";
 
 const answerQuestion = makeFunctionReference<
   "action",
@@ -43,16 +44,19 @@ export const ask = mutation({
     const cleaned = content.trim();
     if (!isValidChatContent(cleaned)) throw new ConvexError("Message must be between 1 and 4,000 characters");
     const { userId } = await requireInventionEditAccess(ctx, inventionId);
+    const usageScope = await resolveInventionUsageScope(ctx, inventionId);
+    if (!usageScope) throw new ConvexError("Invention not found");
+
     const now = Date.now();
-    const [user, invention] = await Promise.all([ctx.db.get(userId), ctx.db.get(inventionId)]);
-    if (!invention) throw new ConvexError("Invention not found");
-    const organization = invention.organizationId ? await ctx.db.get(invention.organizationId) : null;
-    const allowancePlan = organization?.planKey ?? user?.subscriptionTier;
     const dateKey = utcDateKey(now);
-    const dailyUsage = await ctx.db.query("atlasDailyUsage").withIndex("by_userId_dateKey", (q) => q.eq("userId", userId).eq("dateKey", dateKey)).unique();
-    if (!canAskWithinDailyAllowance(allowancePlan, dailyUsage?.chatQuestions ?? 0)) {
+    const dailyUsage = await ctx.db
+      .query("atlasDailyUsage")
+      .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey))
+      .unique();
+    if (!canAskWithinDailyAllowance(usageScope.plan, dailyUsage?.chatQuestions ?? 0)) {
       throw new ConvexError("InventSmith chat's daily allowance has been reached. It resets at 00:00 UTC.");
     }
+
     let conversation = await ctx.db
       .query("conversations")
       .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
@@ -96,13 +100,25 @@ export const ask = mutation({
       eventType: "chat_requested",
       actorType: "inventor",
       summary: "An authorized collaborator asked InventSmith a project question.",
-      metadata: { characterCount: cleaned.length, userId: String(userId) },
+      metadata: {
+        characterCount: cleaned.length,
+        userId: String(userId),
+        usageScope: usageScope.scope,
+        usageUserId: String(usageScope.usageUserId),
+      },
       createdAt: now,
     });
     if (dailyUsage) {
       await ctx.db.patch(dailyUsage._id, { chatQuestions: dailyUsage.chatQuestions + 1, updatedAt: now });
     } else {
-      await ctx.db.insert("atlasDailyUsage", { userId, dateKey, autonomousCostUnits: 0, completedWorkItems: 0, chatQuestions: 1, updatedAt: now });
+      await ctx.db.insert("atlasDailyUsage", {
+        userId: usageScope.usageUserId,
+        dateKey,
+        autonomousCostUnits: 0,
+        completedWorkItems: 0,
+        chatQuestions: 1,
+        updatedAt: now,
+      });
     }
     await ctx.db.patch(conversation._id, { updatedAt: now });
     await ctx.scheduler.runAfter(0, answerQuestion, { userMessageId, assistantMessageId });
