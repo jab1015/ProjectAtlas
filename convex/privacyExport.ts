@@ -128,14 +128,18 @@ async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
     }
   }
 
-  const subscriptionEvents = user.email
+  const matchingSubscriptionEvents = user.email
     ? await ctx.db.query("subscriptionEvents").withIndex("by_customerEmail", (q) => q.eq("customerEmail", user.email!)).take(ROW_LIMIT + 1)
     : [];
+  const personalOrganizationIdSet = new Set(personalOrganizationIdValues.map(String));
+  const subscriptionEvents = matchingSubscriptionEvents.filter((event) =>
+    !event.appliedOrganizationId || personalOrganizationIdSet.has(String(event.appliedOrganizationId))
+  );
 
   return {
-    exportVersion: 3,
+    exportVersion: 4,
     generatedAt: Date.now(),
-    scope: "InventSmith personal account data. Company/studio invention and usage data is excluded from this personal export even if this user originally created the invention. Organization-authorized exports are handled separately. Uploaded/generated binary file bytes are not embedded in this JSON.",
+    scope: "InventSmith personal account data. Company/studio invention, usage, and organization billing data is excluded from this personal export even if this user originally created the invention or paid for the organization. Organization-authorized exports are handled separately. Uploaded/generated binary file bytes are not embedded in this JSON.",
     profile: {
       _id: user._id,
       _creationTime: user._creationTime,
