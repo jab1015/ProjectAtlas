@@ -4,12 +4,13 @@ import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { auth } from "./auth";
 import { constantTimeEqualAscii, validateFulfillmentPayload } from "./webhookSecurityLogic";
-import { validateSubscriptionWebhookPayload, type SubscriptionStatus } from "./subscriptionPolicyLogic";
+import { validateSubscriptionWebhookPayload, type OrganizationBillingPlan, type SubscriptionStatus } from "./subscriptionPolicyLogic";
 
 const http = httpRouter();
 const MAX_WEBHOOK_BYTES = 64 * 1024;
 const applySubscriptionEvent = makeFunctionReference<"mutation", {
   providerEventId: string; customerEmail: string; tier: "inventor" | "pro" | "enterprise";
+  organizationPlanKey?: OrganizationBillingPlan;
   status: SubscriptionStatus; subscriptionId?: string; billingCustomerId?: string;
   organizationId?: Id<"organizations">; currentPeriodEnd?: number; occurredAt: number;
 }, unknown>("subscriptionMutations:applySubscriptionEvent");
@@ -187,6 +188,7 @@ http.route({
       providerEventId: body.eventId,
       customerEmail: body.customerEmail,
       tier: body.tier,
+      organizationPlanKey: body.organizationPlanKey,
       status: body.status,
       subscriptionId: body.subscriptionId,
       billingCustomerId: body.customerId,
