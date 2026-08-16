@@ -16,7 +16,7 @@ The complete destination remains:
 
 **Idea → Evidence → Validation → Market Research → Prior Art / Patent Readiness → Product Design → CAD / Engineering → Prototype → Manufacturing → Branding → Intellectual Property / Legal → Pricing → Marketing → Sales → Funding / Pitch → Launch → Growth**
 
-The retired controlled-pilot scope and old Atlas completion percentages are historical only and must not be used as overall InventSmith completion.
+The retired controlled-pilot 80% figure must never be used as overall InventSmith completion. The retired controlled-pilot scope and old Atlas completion percentages are historical only.
 
 ## Locked organization architecture
 
