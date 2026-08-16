@@ -42,4 +42,24 @@ describe("backend authorization boundaries", () => {
       expect(exportedFunctionBlock(file, name)).toContain("requireOwnedResearch");
     }
   });
+
+  it("uses organization-aware access for the primary invention workspace", () => {
+    const file = source("inventionWorkspace.ts");
+    expect(file).not.toContain("invention.userId !== userId");
+    for (const name of ["getWorkspaceState", "getStatusBriefing", "getReviewQueue", "getDeliverableLibrary", "getPilotEvaluation"]) {
+      expect(exportedFunctionBlock(file, name)).toMatch(/requireInventionReadAccess|getAccessibleInvention/);
+    }
+    expect(exportedFunctionBlock(file, "ensureInventionRecord")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "kickAutonomousWork")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "respondToBlockedWork")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "resolveDecision")).toContain("requireInventionManageAccess");
+    expect(exportedFunctionBlock(file, "resolveApprovalRequest")).toContain("requireInventionManageAccess");
+  });
+
+  it("uses organization-aware access for Ask InventSmith", () => {
+    const file = source("atlasChat.ts");
+    expect(file).not.toContain("invention.userId !== userId");
+    expect(exportedFunctionBlock(file, "getConversation")).toContain("requireInventionReadAccess");
+    expect(exportedFunctionBlock(file, "ask")).toContain("requireInventionEditAccess");
+  });
 });
