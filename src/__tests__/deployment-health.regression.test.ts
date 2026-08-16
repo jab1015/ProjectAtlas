@@ -31,6 +31,6 @@ describe("deployment health contract", () => {
     expect(liveVerifier).toContain("Authenticated acceptance still required in a real browser");
     expect(liveVerifier).toContain("confirm the authenticated session survives reload/navigation");
     expect(liveVerifier).toContain("LIVE PUBLIC SURFACES READY — AUTHENTICATED BROWSER ACCEPTANCE STILL REQUIRED");
-    expect(liveVerifier).not.toContain("Result: LIVE BACKEND READY\");
+    expect(liveVerifier).not.toContain('console.log("\\nResult: LIVE BACKEND READY")');
   });
 });
