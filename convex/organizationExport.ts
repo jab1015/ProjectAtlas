@@ -100,8 +100,17 @@ export const getOrganizationStructuredExport = query({
       });
     }
 
+    const dailyUsage = bounded(
+      await ctx.db
+        .query("organizationDailyUsage")
+        .withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId))
+        .take(EVENT_LIMIT + 1),
+      EVENT_LIMIT,
+      "Organization usage-history count",
+    );
+
     return {
-      exportVersion: 1,
+      exportVersion: 2,
       generatedAt: Date.now(),
       scope: "Organization-owned InventSmith structured project data. Binary bytes and authentication secrets are not embedded.",
       organization: {
@@ -117,6 +126,7 @@ export const getOrganizationStructuredExport = query({
       },
       members,
       inventions: inventionBundles,
+      dailyUsage,
       excludedSecrets: ["password hashes", "auth sessions", "refresh tokens", "verification codes", "server/API keys", "webhook secrets"],
     };
   },
