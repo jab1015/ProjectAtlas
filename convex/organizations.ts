@@ -7,6 +7,7 @@ import {
   canManageInventionAccess,
   canManageOrganization,
   defaultInventionAccessForRole,
+  getOrganizationPlanPolicy,
   normalizeOrganizationPlanKey,
   type InventionAccess,
   type OrganizationRole,
@@ -26,6 +27,23 @@ function personalOrganizationName(name?: string, email?: string): string {
   const local = email?.split("@")[0]?.trim();
   if (local) return `${local}'s InventSmith`;
   return "My InventSmith";
+}
+
+async function countOccupiedSeats(ctx: AuthCtx, organizationId: Id<"organizations">): Promise<number> {
+  const memberships = await ctx.db
+    .query("organizationMemberships")
+    .withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId))
+    .collect();
+  return memberships.filter((membership) => membership.status === "active" || membership.status === "invited").length;
+}
+
+async function assertSeatAvailable(ctx: AuthCtx, organizationId: Id<"organizations">) {
+  const organization = await ctx.db.get(organizationId);
+  if (!organization || organization.status !== "active") throw new ConvexError("Organization not found");
+  const seatLimit = getOrganizationPlanPolicy(organization.planKey).includedSeatLimit;
+  if (seatLimit === null) return;
+  const occupiedSeats = await countOccupiedSeats(ctx, organizationId);
+  if (occupiedSeats >= seatLimit) throw new ConvexError("Organization included-seat limit reached");
 }
 
 export async function getOrganizationMembership(
@@ -70,6 +88,12 @@ export async function resolveInventionAccess(
     return invention.userId === userId ? "manage" : null;
   }
 
+  // Active organization membership is always the outer security boundary.
+  // An old explicit invention grant can never resurrect access for a removed or
+  // suspended organization member.
+  const membership = await getOrganizationMembership(ctx, invention.organizationId, userId);
+  if (!membership || membership.status !== "active") return null;
+
   const explicitGrant = await ctx.db
     .query("inventionAccessGrants")
     .withIndex("by_inventionId_userId", (q) =>
@@ -78,8 +102,6 @@ export async function resolveInventionAccess(
     .first();
   if (explicitGrant) return explicitGrant.access;
 
-  const membership = await getOrganizationMembership(ctx, invention.organizationId, userId);
-  if (!membership || membership.status !== "active") return null;
   return defaultInventionAccessForRole(membership.role);
 }
 
@@ -181,6 +203,39 @@ export const migrateMyLegacyInventions = mutation({
   },
 });
 
+export const createOrganization = mutation({
+  args: {
+    name: v.string(),
+    kind: v.union(v.literal("company"), v.literal("studio")),
+  },
+  handler: async (ctx, args) => {
+    const userId = await requireUserId(ctx);
+    const name = args.name.trim();
+    if (!name || name.length > 160) throw new ConvexError("Organization name must be between 1 and 160 characters");
+    const now = Date.now();
+    const organizationId = await ctx.db.insert("organizations", {
+      name,
+      kind: args.kind,
+      // New organizations start unentitled. Billing activation upgrades this
+      // organization rather than copying an existing user's paid entitlement.
+      planKey: "explorer",
+      status: "active",
+      createdByUserId: userId,
+      createdAt: now,
+      updatedAt: now,
+    });
+    await ctx.db.insert("organizationMemberships", {
+      organizationId,
+      userId,
+      role: "owner",
+      status: "active",
+      createdAt: now,
+      updatedAt: now,
+    });
+    return { organizationId };
+  },
+});
+
 export const getMyOrganizations = query({
   args: {},
   handler: async (ctx) => {
@@ -195,15 +250,110 @@ export const getMyOrganizations = query({
       if (membership.status !== "active") continue;
       const organization = await ctx.db.get(membership.organizationId);
       if (!organization || organization.status !== "active") continue;
+      const planPolicy = getOrganizationPlanPolicy(organization.planKey);
       result.push({
         organizationId: organization._id,
         name: organization.name,
         kind: organization.kind,
         planKey: organization.planKey,
         role: membership.role,
+        activeInventionLimit: planPolicy.activeInventionLimit,
+        includedSeatLimit: planPolicy.includedSeatLimit,
       });
     }
     return result;
+  },
+});
+
+export const listOrganizationMembers = query({
+  args: { organizationId: v.id("organizations") },
+  handler: async (ctx, args) => {
+    await requireOrganizationRole(ctx, args.organizationId);
+    const memberships = await ctx.db
+      .query("organizationMemberships")
+      .withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId))
+      .collect();
+    const visible = memberships.filter((membership) => membership.status !== "removed");
+    return Promise.all(visible.map(async (membership) => {
+      const user = await ctx.db.get(membership.userId);
+      return {
+        membershipId: membership._id,
+        userId: membership.userId,
+        name: user?.name,
+        email: user?.email,
+        role: membership.role,
+        status: membership.status,
+      };
+    }));
+  },
+});
+
+export const addMemberByEmail = mutation({
+  args: {
+    organizationId: v.id("organizations"),
+    email: v.string(),
+    role: v.union(v.literal("admin"), v.literal("member"), v.literal("viewer"), v.literal("professional")),
+  },
+  handler: async (ctx, args) => {
+    await requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"]);
+    const normalizedEmail = args.email.trim().toLowerCase();
+    if (!normalizedEmail) throw new ConvexError("Member email is required");
+    const user = await ctx.db.query("users").withIndex("email", (q) => q.eq("email", normalizedEmail)).first();
+    if (!user) {
+      throw new ConvexError("That person must create an InventSmith account before they can be added to this organization");
+    }
+
+    const existing = await getOrganizationMembership(ctx, args.organizationId, user._id);
+    if (existing?.status === "active") {
+      if (existing.role === "owner") return { membershipId: existing._id, added: false };
+      await ctx.db.patch(existing._id, { role: args.role, updatedAt: Date.now() });
+      return { membershipId: existing._id, added: false };
+    }
+
+    await assertSeatAvailable(ctx, args.organizationId);
+    const now = Date.now();
+    if (existing) {
+      await ctx.db.patch(existing._id, { role: args.role, status: "active", updatedAt: now });
+      return { membershipId: existing._id, added: true };
+    }
+    const membershipId = await ctx.db.insert("organizationMemberships", {
+      organizationId: args.organizationId,
+      userId: user._id,
+      role: args.role,
+      status: "active",
+      createdAt: now,
+      updatedAt: now,
+    });
+    return { membershipId, added: true };
+  },
+});
+
+export const updateMemberRole = mutation({
+  args: {
+    organizationId: v.id("organizations"),
+    userId: v.id("users"),
+    role: v.union(v.literal("admin"), v.literal("member"), v.literal("viewer"), v.literal("professional")),
+  },
+  handler: async (ctx, args) => {
+    await requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"]);
+    const membership = await getOrganizationMembership(ctx, args.organizationId, args.userId);
+    if (!membership || membership.status !== "active") throw new ConvexError("Active organization member not found");
+    if (membership.role === "owner") throw new ConvexError("Organization ownership cannot be changed through member-role management");
+    await ctx.db.patch(membership._id, { role: args.role, updatedAt: Date.now() });
+    return { membershipId: membership._id };
+  },
+});
+
+export const removeMember = mutation({
+  args: { organizationId: v.id("organizations"), userId: v.id("users") },
+  handler: async (ctx, args) => {
+    const { userId: actingUserId } = await requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"]);
+    const membership = await getOrganizationMembership(ctx, args.organizationId, args.userId);
+    if (!membership || membership.status !== "active") return { removed: false };
+    if (membership.role === "owner") throw new ConvexError("Transfer organization ownership before removing the owner");
+    if (actingUserId === args.userId) throw new ConvexError("Use leave-organization flow to remove your own membership");
+    await ctx.db.patch(membership._id, { status: "removed", updatedAt: Date.now() });
+    return { removed: true };
   },
 });
 
