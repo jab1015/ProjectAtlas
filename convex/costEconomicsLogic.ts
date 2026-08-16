@@ -20,6 +20,7 @@ const EXPENSIVE_WORK_KINDS = new Set([
   "design_candidate_scoring",
   "product_design_specification",
   "cad_model_specification",
+  "ask_inventsmith_research",
 ]);
 
 const LIGHT_WORK_KINDS = new Set([
