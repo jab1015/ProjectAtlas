@@ -405,6 +405,22 @@ export default defineSchema({
     .index("by_userId", ["userId"])
     .index("by_userId_dateKey", ["userId", "dateKey"]),
 
+  // Additive organization-native usage ledger. Legacy user rows remain intact
+  // for inventions that have not yet been migrated to an organization.
+  organizationDailyUsage: defineTable({
+    organizationId: v.id("organizations"),
+    dateKey: v.string(),
+    autonomousCostUnits: v.number(),
+    reservedAutonomousCostUnits: v.optional(v.number()),
+    completedWorkItems: v.number(),
+    chatQuestions: v.number(),
+    legacyBaselineCapturedAt: v.optional(v.number()),
+    legacyMemberCount: v.optional(v.number()),
+    updatedAt: v.number(),
+  })
+    .index("by_organizationId", ["organizationId"])
+    .index("by_organizationId_dateKey", ["organizationId", "dateKey"]),
+
   atlasDeliverables: defineTable({
     inventionId: v.id("inventions"),
     workItemId: v.optional(v.id("atlasWorkItems")),
