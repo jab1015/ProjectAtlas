@@ -6,156 +6,139 @@
 **Current continuation checkpoint:** `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`  
 **Active build branch:** `inventsmith/full-product-build` / draft PR #24 — intentionally unmerged
 
-## Current product destination
+## Product vision
 
-InventSmith is measured against the complete journey:
+InventSmith — The Inventor OS by Modern Methods — is an organization-native operating system that takes an inventor from a raw idea through the complete evidence-backed journey to market while hiding unnecessary process complexity from the inventor.
+
+> The inventor should never have to think about InventSmith. InventSmith should think about the inventor.
+
+The complete destination remains:
 
 **Idea → Evidence → Validation → Market Research → Prior Art / Patent Readiness → Product Design → CAD / Engineering → Prototype → Manufacturing → Branding → Intellectual Property / Legal → Pricing → Marketing → Sales → Funding / Pitch → Launch → Growth**
 
-The retired controlled-pilot 80% figure must never be used as overall InventSmith completion.
+The retired controlled-pilot scope and old Atlas completion percentages are historical only and must not be used as overall InventSmith completion.
 
-## August 16 architecture expansion
-
-InventSmith is now being built as an **organization-native, multi-user, multi-invention system from inception**.
+## Locked organization architecture
 
 Canonical hierarchy:
 
 **User → Organization / Company → Memberships → Invention Workspaces**
 
-A single inventor is a one-member organization. Billing/entitlements ultimately belong to the organization. Inventions can be active or archived; active-invention slots are subscription capacity, while archiving preserves all invention evidence, research, CAD, documents and history.
+A single inventor is a one-member personal organization. Organizations support multiple active/archived inventions, server-enforced roles, invention-level sharing, organization-scoped billing/entitlements and a shared expensive-work allowance. Archiving frees an active-invention slot without deleting evidence, CAD, research, documents, decisions or history.
 
-Required roles are Owner, Admin, Member, Viewer and Professional/Guest Reviewer, with invention-level access isolation and server-side authorization.
+Roles: Owner, Admin, Member, Viewer, Professional/Guest Reviewer. Organization-owned inventions survive member departure. Destructive organization actions and billing authority remain appropriately restricted.
 
-## Current pricing direction
+## Pricing direction
 
 | Plan | Monthly price | Capacity direction |
 |---|---:|---|
-| Explorer | $0 | Evaluation / tightly bounded usage |
-| Inventor | $39 | 1 individual invention; validation/feasibility/IP-readiness focus |
-| Pro | $99 | 1 complete idea-to-market individual invention |
-| Enterprise | $199 | Multi-invention/team capacity |
+| Explorer | $0 | Evaluation / tightly bounded expensive work |
+| Inventor | $39 | Serious validation, feasibility and IP-readiness |
+| Pro | $99 | Core complete idea-to-market individual plan including Product Design + CAD |
+| Enterprise | $199 | Multi-invention/team capacity and greater throughput |
 | Studio 3 | $299 | 3 active inventions + professional organization workflow |
 | Studio 6 | $399 | 6 active inventions + professional organization workflow |
-| Studio Custom | Custom | Larger capacity based on measured cost-to-serve |
+| Studio Custom | Custom | Larger capacity based on measured economics |
 
-Exact included seats, storage, AI/CAD/render/research allowances and larger Studio capacities remain intentionally **unlocked** until the real cost-to-serve model is completed.
+Exact included seats, storage, AI/CAD/render/research allowances and larger Studio capacity remain unlocked until measured economics justify them.
 
-## Organization implementation status
+## Organization implementation — completed repository foundation
 
 Implemented on the full-product branch:
 
-- additive organization runtime/schema foundation;
-- personal-organization compatibility/migration direction;
-- organization policy and plan-capacity logic;
-- organization-native invention creation;
-- active-invention capacity enforcement;
-- organization invention listing;
-- archive/restore with restore-time capacity revalidation;
-- Read/Edit/Manage invention authorization helpers;
-- main invention workspace organization authorization;
-- Manage-only consequential decisions and approvals;
-- Ask InventSmith collaborator access with Edit required to submit questions/incur AI work;
-- Evidence Locker organization read/edit/manage boundaries;
-- organization-readable department artifacts and deliverable downloads;
-- creator/ownership attribution preserved for compatibility;
-- Studio plan keys recognized by usage policy;
-- dedicated `organizationDailyUsage` ledger keyed by organization + UTC day;
-- Ask InventSmith daily allowance enforcement against the organization plan and shared organization ledger;
-- autonomous-work reservation and settlement against the organization ledger, including stale-output cost settlement;
-- migration-safe bootstrap from existing same-day member usage so deployment does not reset allowances;
-- legacy inventions without `organizationId` preserved on the original user-scoped usage path;
-- organization usage API reporting from the shared ledger;
-- regression coverage protecting organization runtime, access boundaries and shared usage accounting.
+- additive organization schema/runtime foundation and personal-organization migration compatibility;
+- organization-native invention creation/listing plus active/archive capacity enforcement;
+- Read/Edit/Manage authorization across main workspace, Ask InventSmith, Evidence Locker, Product Design, Native CAD, Journey Center, lifecycle departments, downloads and evidence-extraction retry;
+- Manage-only consequential decisions/approvals;
+- invention-level access grants and bounded Professional/Guest Reviewer foundations;
+- ownership transfer and organization-safe member/account deletion semantics;
+- organization navigation/team UI foundations;
+- organization-owned inventions preserved when members leave;
+- personal versus company/studio privacy/export boundaries.
 
-The organization-scoped usage checkpoint has passed both web and Convex TypeScript verification. Its dedicated regression tests passed; the first full CI run exposed only a stale progress-document wording assertion, which this checkpoint corrects.
+## Shared expensive-resource accounting — completed
 
-### In progress now
+Organization-owned inventions use a shared `organizationDailyUsage` ledger keyed by organization + UTC day. Legacy inventions without an organization remain on the user ledger for backward compatibility.
 
-**Organization + invention + operation-class cost attribution.**
+Implemented behavior includes Ask InventSmith allowance checks/accounting, autonomous-work reservation/settlement, migration-safe same-day baseline capture, race-safe reservation inside Convex mutations, stale-output settlement/release, Native CAD specialized settlement on the organization ledger, and central settlement for concept boards/product renders/brand boards. Adding seats does not multiply an organization's paid compute allowance.
 
-Shared allowance enforcement is now organization-native. The next cost-control pass is to make cost attribution sufficiently complete and queryable to measure real cost-to-serve by organization, invention and operation class without inventing a dollar conversion before provider/runtime calibration exists.
+## Cost attribution and economics — current state
 
-### Still required
+Measured cost units are attributable/reportable by organization, invention, operation kind and operation class (`light`, `standard`, `expensive`, `premium`), with provider/model metadata where available. Ask InventSmith records model-token units, live-research usage and provider/model attribution; autonomous work carries work/event cost units.
 
-- organization/invention operation-cost attribution across expensive operations;
-- organization-scoped subscription/billing authority and webhook reconciliation;
-- remaining backend owner-only authorization audit/conversion;
-- organization/team/member management UI;
-- invitations and invention-level sharing;
-- Professional/Guest Reviewer assignment workflow;
-- organization-aware privacy/export/member removal/account deletion/organization deletion/ownership transfer semantics;
-- cost-to-serve ledger and final plan allowance modeling;
-- live multi-user/multi-invention acceptance.
+Observed cost-to-serve scenario reporting now covers average/median behavior, P90 heavy use, maximum observed use, and Studio overlap scenarios for the top 3 and top 6 concurrent invention workloads. Confidence is tied to observed sample size. Cost units are intentionally not converted into fabricated dollars before provider/runtime calibration.
 
-## Full-product capability checkpoint
+Detailed internal provider/cost economics are Owner/Admin-only; ordinary collaborators can see authorized product usage without receiving Modern Methods' internal economics model.
 
-The repository already contains material implementation across the complete idea-to-market destination, including:
+## Organization billing / entitlement foundation — completed in repository
 
-- persistent invention record and evidence provenance;
-- Evidence Locker with CSV/text and supported binary extraction/retry;
-- downstream evidence-impact/staleness propagation;
-- Validation, Market Research and Patent Readiness workspaces;
-- Patent → Product Design handoff;
-- evidence-backed Product Design candidate generation/scoring/selection;
-- native preliminary CAD with STEP/STL/DXF and editable source;
-- boxes, cylinders, hollow tubes, frustums, custom-profile extrusion, external/internal helical threads and annular revolved-profile/sealing geometry;
-- orthographic/dimensioned and exploded views;
-- selected-product multi-view renders;
-- engineering/professional-review gates;
-- prototype strategy plus real physical-test evidence gate;
-- manufacturing/RFQ workflow plus real quote evidence gate;
-- branding and generated visual brand concept board;
-- IP/legal draft/handoff work and professional routing;
-- pricing, marketing, sales, funding, pitch, launch and growth departments;
-- editable native PowerPoint pitch deck;
-- financial CSV + Excel-readable multi-sheet workbook output;
-- artifact/document downloads;
-- Ask InventSmith grounded across project work/evidence/decisions/dependencies/reviews;
-- full-product repository acceptance contract;
-- corrected InventSmith public branding, favicon, journey, FAQ and pricing surfaces;
-- legacy irrelevant storefront surfaces retired without breaking fulfilled legacy downloads;
-- checkout entitlement truth boundary corrected;
-- two-surface live verifier for backend/frontend with browser session persistence retained as a genuine live gate;
-- deployment/verification scripts syntax-checked by CI.
+Implemented additively:
 
-## CAD/manufacturing truth boundary
+- organization-targeted subscription events and organization `planKey` entitlement authority;
+- legacy personal subscriptions preserved/mirrored for migration compatibility;
+- billing recency (`subscriptionUpdatedAt`) preserved, including personal-organization inheritance;
+- organization billing history separated from unrelated personal exports;
+- Studio 3/6/Custom lifecycle entitlement kept organization-only;
+- lifecycle webhook continuity after ownership transfer using already-bound billing customer/subscription identity;
+- first activation remains constrained to the current owner boundary;
+- later provider events may authenticate against an established customer ID or subscription ID without erasing missing identifiers.
 
-InventSmith must design products and produce useful engineering artifacts, but generated CAD is preliminary until evidence supports production-release claims. Critical tolerances, fits, sealing compression, loads, safety, materials, manufacturing details and other consequential engineering values remain provisional until engineering/prototype evidence validates them.
+Live checkout/product activation still depends on the actual external billing provider. InventSmith does not invent an internal payment processor.
 
-## Patent/design truth boundary
+## Team invitations and sharing — implemented safe foundation
 
-Patent intelligence feeds Product Design so design candidates deliberately explore meaningful structural/functional differentiation from relevant prior art. InventSmith must not claim patentability, freedom-to-operate, validity or legal clearance without qualified professional review.
+Organization membership UI now uses a consent-based invitation flow rather than silently assigning membership.
 
-## Cost-control direction
+- pending invitations reserve purchased seats;
+- Owner/Admin can invite and revoke within policy;
+- acceptance creates membership only after recipient consent;
+- invitation records carry explicit role/status/expiry/audit attribution;
+- invitation history is included in authorized organization exports;
+- invitation PII is included in the recipient's personal export where appropriate;
+- account deletion revokes/removes relevant pending invitation PII and personal-organization deletion removes its invitations;
+- seat counting includes pending invitations so direct/legacy paths cannot overbook capacity.
 
-The old per-user daily-unit concept is insufficient for an organization-native product. Adding organization members must not multiply the same organization's expensive-work allowance. Organization-owned inventions now enforce chat and autonomous-work usage through one organization/day ledger; legacy inventions remain user-scoped.
+**Security boundary:** current password authentication does not provide verified-email ownership. Therefore pre-signup email invitations are not allowed to auto-grant membership merely because a later account claims the invited email. Current safe acceptance is bound to a pre-existing uniquely matched InventSmith account. True pre-signup invitations remain gated on verified-email delivery/authentication.
 
-Meter/attribute work to organization + invention and classify expensive operations such as deep/current research, AI reasoning, evidence extraction, image generation, CAD/design generation, artifact generation and major downstream regeneration. Final plan allowances will be based on measured normal/heavy/worst-reasonable cost-to-serve.
+## Complete idea-to-market capability already present
 
-## Current implementation order
+Material repository implementation exists across the complete destination, including persistent invention/evidence records; structured/binary Evidence Locker ingestion; downstream evidence impact/staleness; Validation; Market Research; Patent Readiness and patent-to-design handoff; evidence-backed Product Design; native preliminary CAD with STEP/STL/DXF/editable source and multiple supported geometry classes; dimensioned/exploded views and renders; engineering/professional review gates; prototype planning and physical-evidence gate; manufacturing/RFQ and real-quote gate; branding; IP/legal drafts and professional routing; pricing/marketing/sales/funding/pitch/launch/growth departments; editable native PPTX; financial CSV and Excel-readable workbook; document/artifact library; and Ask InventSmith grounded across project state.
 
-1. Complete organization + invention + operation-class cost attribution.
-2. Move subscription/billing authority to organization scope with backward-compatible migration.
-3. Complete remaining owner-only backend authorization audit.
-4. Build team/member/invitation management.
-5. Build invention-level sharing and professional/guest review access.
-6. Make privacy/export/deletion/member-removal/ownership-transfer behavior organization-safe.
-7. Build representative cost-to-serve economics.
-8. Lock plan allowances/seats/storage/premium generation.
-9. Reconcile public/account/checkout billing products to final policy.
-10. Run full repository acceptance.
-11. Only after GitHub completion, replicate to MadeThis and run live authenticated multi-user/multi-invention acceptance.
+Customer-facing branding is InventSmith / The Inventor OS / Modern Methods. Legacy Atlas identifiers remain only where compatibility requires them.
+
+## Truth and safety boundaries
+
+Generated CAD remains preliminary until engineering/prototype evidence validates production-release dimensions, tolerances, materials, fits, sealing, loads, safety and manufacturing details. Patent intelligence is research/readiness, not a patentability, FTO, validity or legal-clearance opinion. InventSmith never fabricates a physical prototype, manufacturer quote, launch result, professional review, legal authorization or other real-world evidence.
+
+## Verified CI checkpoint
+
+The last fully verified production checkpoint before the newest invitation/privacy commits is GitHub Actions **Atlas CI #396**, head `08bb04d1b22489da8694dd524be9f971b05a3775`, with dependency install, operational-script verification, web typecheck, Convex typecheck, regressions, production dependency audit and Next production build all passing.
+
+The newer invitation/privacy/economics/documentation head must receive a fresh complete CI pass before it becomes the next verified checkpoint.
+
+## Remaining repository work
+
+1. Run and repair the complete CI stack on the current invitation/privacy/economics/documentation head.
+2. Finish the targeted audit for any remaining specialized accounting or legacy creator-only authorization paths.
+3. Complete invitation/sharing edge-case acceptance and verified-email readiness boundary.
+4. Continue collecting representative cost-to-serve observations; calibrate provider/runtime dollars and confidence before final commercial allowances are locked.
+5. Lock plan seats/storage/premium-generation/compute allowances from measured economics.
+6. Reconcile public/account pricing and external billing-provider products only after economics and entitlement policy are locked.
+7. Run complete repository acceptance.
+8. Keep PR #24 unmerged until implementation is complete and founder approval is given.
+9. Only after GitHub completion, pin the implementation for MadeThis replication and run live authenticated multi-user/multi-invention acceptance.
+
+## Final acceptance boundary
+
+Repository-green is not production acceptance. Final acceptance still requires real authentication/session persistence, migration against real users/inventions, multi-user role/isolation tests, active/archive slot enforcement under real subscriptions, real billing/webhook behavior, concurrent organization-scoped resource accounting, privacy/export/deletion/member-removal behavior, representative uploaded evidence, a full idea-to-market invention, CAD/render/document quality review, real physical/quote/launch evidence where required, professional review where required, and final MadeThis/live replication acceptance.
 
 ## New-chat handoff
 
-A new chat should read these three files in order:
+Read, in order:
 
 1. `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`
 2. `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`
 3. `docs/ATLAS_BUILD_PROGRESS.md`
+4. `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md`
 
-Then inspect branch `inventsmith/full-product-build` and draft PR #24. Resume with organization + invention + operation-class cost attribution. Do not restart the product plan, do not merge PR #24, and do not hand the project to MadeThis yet.
-
-## Final acceptance boundary
-
-InventSmith is not complete because CI is green or a deployment returns HTTP 200. Final acceptance still requires real authenticated session persistence, organization migration, role/isolation tests, organization billing and usage enforcement, representative evidence ingestion, full idea-to-market execution, CAD/render/document quality review, physical prototype/quote/launch evidence where applicable, professional review where required, and final MadeThis/live replication acceptance.
+Then inspect branch `inventsmith/full-product-build` and draft PR #24. Resume with CI verification of the newest invitation/privacy/economics head and continue the remaining production-readiness audit. Do not restart planning, do not merge PR #24, and do not hand the project to MadeThis yet.
