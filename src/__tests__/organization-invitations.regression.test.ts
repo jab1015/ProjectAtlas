@@ -11,6 +11,7 @@ describe("organization invitations", () => {
   it("uses an additive invitation ledger with bounded statuses and lookup indexes", () => {
     expect(schema).toContain("organizationInvitations: defineTable");
     expect(schema).toContain('v.literal("pending"), v.literal("accepted"), v.literal("revoked"), v.literal("expired")');
+    expect(schema).toContain('targetUserId: v.optional(v.id("users"))');
     expect(schema).toContain('.index("by_organizationId_email", ["organizationId", "email"])');
     expect(schema).toContain('.index("by_email_status", ["email", "status"])');
   });
@@ -24,11 +25,19 @@ describe("organization invitations", () => {
     expect(organizations).toContain('invitation.status === "pending" && invitation.expiresAt > now');
   });
 
-  it("does not trust a later unverified signup to claim a pre-signup email invite", () => {
+  it("binds each secure invitation to the exact pre-existing account, not only a mutable email", () => {
     expect(invitations).toContain("getUniqueAccountByEmail");
     expect(invitations).toContain("must create an InventSmith account before a secure invitation can be issued");
     expect(invitations).toContain("users.length !== 1");
-    expect(invitations).toContain("intendedUser._id !== userId");
+    expect(invitations).toContain("targetUserId: intendedUser._id");
+    expect(invitations).toContain("invitation.targetUserId !== userId");
+  });
+
+  it("fails closed for pre-binding invitations and requires administrator reissue", () => {
+    expect(invitations).toContain("if (!invitation.targetUserId)");
+    expect(invitations).toContain("predates secure account binding and must be reissued");
+    expect(invitations).toContain("if (!invitation.targetUserId || invitation.targetUserId !== userId) continue");
+    expect(invitations).toContain("invitation email no longer matches the intended account");
   });
 
   it("grants membership only after explicit acceptance by the intended authenticated account", () => {
