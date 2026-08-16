@@ -43,4 +43,11 @@ describe("Ask InventSmith material-input capture", () => {
     expect(chatPage).toContain("captureInventorChatEvidence");
     expect(chatPage).toContain("Material inventor input can become project evidence");
   });
+
+  it("uses organization-aware edit authorization rather than legacy creator ownership", () => {
+    const capture = readFileSync(join(process.cwd(), "convex/chatEvidenceCapture.ts"), "utf8");
+    expect(capture).toContain('import { requireInventionEditAccess } from "./organizations"');
+    expect(capture).toContain("await requireInventionEditAccess(ctx, args.inventionId)");
+    expect(capture).not.toContain("invention.userId !== userId");
+  });
 });
