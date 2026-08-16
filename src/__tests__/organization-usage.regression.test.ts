@@ -63,22 +63,38 @@ describe("organization-scoped usage accounting", () => {
     expect(source).toContain('scope = "organization"');
   });
 
-  it("reports cost units by organization, invention, work kind and operation class without inventing a dollar conversion", () => {
+  it("reports cost units by organization, invention, operation kind/class and provider without inventing dollars", () => {
     const source = convexSource("organizationUsage.ts");
     expect(source).toContain("getOrganizationUsageOverview");
+    expect(source).toContain('query("organizationDailyUsage")');
     expect(source).toContain('query("inventions")');
     expect(source).toContain('query("atlasExecutionEvents")');
     expect(source).toContain('query("atlasWorkItems")');
-    expect(source).toContain("byWorkKind");
+    expect(source).toContain("byOperationKind");
     expect(source).toContain("byOperationClass");
+    expect(source).toContain("byProvider");
+    expect(source).toContain("providerCoverageByCostUnits");
     expect(source).toContain("addCostClassUsage");
     expect(source).toContain("estimatedVariableCostUsd: null");
     expect(source).toContain("calibrationReady");
   });
 
-  it("classifies expensive generation separately from routine work", () => {
+  it("persists Ask InventSmith token/research attribution into execution events", () => {
+    const chat = convexSource("atlasChat.ts");
+    const chatAction = convexSource("atlasChatAction.ts");
+    expect(chatAction).toContain("costUnitsFromTokens");
+    expect(chatAction).toContain('provider: "openai"');
+    expect(chatAction).toContain("providerUsage");
+    expect(chat).toContain('"ask_inventsmith_research"');
+    expect(chat).toContain("classifyCostOperation(operationKind)");
+    expect(chat).toContain("costUnits: costUnits > 0 ? costUnits : undefined");
+  });
+
+  it("classifies expensive generation and research separately from routine work", () => {
     expect(classifyCostOperation("brief_analysis")).toBe("light");
     expect(classifyCostOperation("pricing_strategy")).toBe("standard");
+    expect(classifyCostOperation("ask_inventsmith")).toBe("standard");
+    expect(classifyCostOperation("ask_inventsmith_research")).toBe("expensive");
     expect(classifyCostOperation("preliminary_prior_art")).toBe("expensive");
     expect(classifyCostOperation("native_cad_generation")).toBe("premium");
     expect(classifyCostOperation("product_render_generation")).toBe("premium");
