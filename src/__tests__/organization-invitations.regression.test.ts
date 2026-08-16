@@ -11,7 +11,7 @@ describe("organization invitations", () => {
   it("uses an additive invitation ledger with bounded statuses and lookup indexes", () => {
     expect(schema).toContain("organizationInvitations: defineTable");
     expect(schema).toContain('v.literal("pending"), v.literal("accepted"), v.literal("revoked"), v.literal("expired")');
-    expect(schema).toContain('targetUserId: v.optional(v.id("users"))');
+    expect(schema).toContain('acceptedByUserId: v.optional(v.id("users"))');
     expect(schema).toContain('.index("by_organizationId_email", ["organizationId", "email"])');
     expect(schema).toContain('.index("by_email_status", ["email", "status"])');
   });
@@ -29,14 +29,15 @@ describe("organization invitations", () => {
     expect(invitations).toContain("getUniqueAccountByEmail");
     expect(invitations).toContain("must create an InventSmith account before a secure invitation can be issued");
     expect(invitations).toContain("users.length !== 1");
-    expect(invitations).toContain("targetUserId: intendedUser._id");
-    expect(invitations).toContain("invitation.targetUserId !== userId");
+    expect(invitations).toContain("acceptedByUserId: intendedUser._id");
+    expect(invitations).toContain("invitation.acceptedByUserId !== userId");
+    expect(invitations).toContain("Status, not the presence of this field, is the source of truth for consent");
   });
 
   it("fails closed for pre-binding invitations and requires administrator reissue", () => {
-    expect(invitations).toContain("if (!invitation.targetUserId)");
+    expect(invitations).toContain("if (!invitation.acceptedByUserId)");
     expect(invitations).toContain("predates secure account binding and must be reissued");
-    expect(invitations).toContain("if (!invitation.targetUserId || invitation.targetUserId !== userId) continue");
+    expect(invitations).toContain("if (!invitation.acceptedByUserId || invitation.acceptedByUserId !== userId) continue");
     expect(invitations).toContain("invitation email no longer matches the intended account");
   });
 
