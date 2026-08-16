@@ -9,7 +9,7 @@ describe("InventSmith legacy invention workspace guard", () => {
       "utf8"
     );
 
-    expect(source).toContain("state.currentStage.id >= 5");
+    expect(source).toContain("state.currentStageId >= 5");
     expect(source).toContain('router.replace(`${rootPath}/journey`)');
     expect(source).toContain("Opening the complete InventSmith journey");
   });
