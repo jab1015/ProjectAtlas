@@ -13,8 +13,8 @@ function utcDateKey(timestamp: number) {
  * Organization-scoped usage reporting for pricing/cost-to-serve analysis.
  *
  * Enforcement usage comes from organizationDailyUsage. Cost attribution comes
- * from the immutable invention execution ledger, where every cost-bearing work
- * completion/failure already carries inventionId, workItemId and costUnits.
+ * from the immutable invention execution ledger, where cost-bearing work and
+ * Ask InventSmith answers carry invention identity and measured cost units.
  * Keeping these views reconciled avoids inventing a second source of truth.
  *
  * Cost units are deliberately not converted to dollars until provider-specific
@@ -60,12 +60,16 @@ export const getOrganizationUsageOverview = query({
     );
 
     let totalCostUnits = 0;
+    let autonomousEventCostUnits = 0;
+    let chatCostUnits = 0;
     let completedWorkEvents = 0;
     let costBearingEvents = 0;
     let attributedCostEvents = 0;
     let unattributedCostUnits = 0;
+    let providerAttributedCostUnits = 0;
     const byWorkKind = new Map<string, { costUnits: number; completions: number }>();
     const byOperationClass = emptyCostClassSummary();
+    const byProvider = new Map<string, { costUnits: number; operations: number }>();
     const inventionUsage = [];
 
     for (const invention of inventions) {
@@ -88,9 +92,12 @@ export const getOrganizationUsageOverview = query({
         if (!event.costUnits || event.costUnits <= 0) continue;
         costBearingEvents += 1;
         inventionCostBearingEvents += 1;
-        const resolvedKind = event.workItemId ? workKindById.get(String(event.workItemId)) : undefined;
+        const metadata = event.metadata && typeof event.metadata === "object" ? event.metadata as Record<string, unknown> : {};
+        const metadataKind = typeof metadata.operationKind === "string" ? metadata.operationKind : undefined;
+        const workKind = event.workItemId ? workKindById.get(String(event.workItemId)) : undefined;
+        const resolvedKind = workKind ?? metadataKind;
         const kind = resolvedKind ?? "unattributed";
-        const completed = event.eventType === "work_completed";
+        const completed = event.eventType === "work_completed" || event.eventType === "chat_answered";
         if (resolvedKind) {
           attributedCostEvents += 1;
           inventionAttributedEvents += 1;
@@ -98,6 +105,19 @@ export const getOrganizationUsageOverview = query({
           unattributedCostUnits += event.costUnits;
           inventionUnattributedCostUnits += event.costUnits;
         }
+
+        if (event.eventType === "chat_answered") chatCostUnits += event.costUnits;
+        else autonomousEventCostUnits += event.costUnits;
+
+        const provider = typeof metadata.provider === "string" ? metadata.provider : undefined;
+        if (provider) {
+          providerAttributedCostUnits += event.costUnits;
+          const currentProvider = byProvider.get(provider) ?? { costUnits: 0, operations: 0 };
+          currentProvider.costUnits += event.costUnits;
+          currentProvider.operations += 1;
+          byProvider.set(provider, currentProvider);
+        }
+
         const current = byWorkKind.get(kind) ?? { costUnits: 0, completions: 0 };
         current.costUnits += event.costUnits;
         if (completed) current.completions += 1;
@@ -124,7 +144,7 @@ export const getOrganizationUsageOverview = query({
     }
 
     const policy = getOrganizationPlanPolicy(organization.planKey);
-    const ledgerVsEventDelta = sharedUsage.autonomousCostUnits - totalCostUnits;
+    const autonomousLedgerVsEventDelta = sharedUsage.autonomousCostUnits - autonomousEventCostUnits;
     return {
       organization: {
         organizationId: organization._id,
@@ -145,11 +165,26 @@ export const getOrganizationUsageOverview = query({
         ...sharedUsage,
         dailyRows: dailyUsageRows.length,
       },
-      autonomousUsage: {
+      measuredCostUsage: {
         totalCostUnits,
+        autonomousCostUnits: autonomousEventCostUnits,
+        askInventSmithCostUnits: chatCostUnits,
+        completedWorkEvents,
+        byOperationClass,
+        byOperationKind: [...byWorkKind.entries()]
+          .map(([kind, value]) => ({ kind, ...value }))
+          .sort((a, b) => b.costUnits - a.costUnits),
+        byProvider: [...byProvider.entries()]
+          .map(([provider, value]) => ({ provider, ...value }))
+          .sort((a, b) => b.costUnits - a.costUnits),
+      },
+      // Keep the former key while downstream reporting migrates to measuredCostUsage.
+      autonomousUsage: {
+        totalCostUnits: autonomousEventCostUnits,
         completedWorkEvents,
         byOperationClass,
         byWorkKind: [...byWorkKind.entries()]
+          .filter(([kind]) => !kind.startsWith("ask_inventsmith"))
           .map(([kind, value]) => ({ kind, ...value }))
           .sort((a, b) => b.costUnits - a.costUnits),
       },
@@ -159,11 +194,13 @@ export const getOrganizationUsageOverview = query({
         unattributedCostEvents: costBearingEvents - attributedCostEvents,
         unattributedCostUnits,
         coverage: costBearingEvents === 0 ? 1 : attributedCostEvents / costBearingEvents,
-        ledgerVsEventCostUnitDelta: ledgerVsEventDelta,
-        fullyReconciled: ledgerVsEventDelta === 0 && unattributedCostUnits === 0,
+        providerAttributedCostUnits,
+        providerCoverageByCostUnits: totalCostUnits === 0 ? 1 : providerAttributedCostUnits / totalCostUnits,
+        autonomousLedgerVsEventCostUnitDelta: autonomousLedgerVsEventDelta,
+        fullyReconciled: autonomousLedgerVsEventDelta === 0 && unattributedCostUnits === 0,
         notes: [
-          "A non-zero ledger/event delta can include same-day migration baseline usage or metered operations that do not yet emit cost-bearing execution events.",
-          "Ask InventSmith questions are enforced through the shared organization ledger by question count, but provider token/search cost is not yet persisted as a cost-bearing execution event.",
+          "A non-zero autonomous ledger/event delta can include same-day migration baseline usage or older cost events created before full attribution metadata existed.",
+          "Ask InventSmith model usage is now recorded separately from autonomous allowance units so chat question entitlements and provider cost measurement remain distinct controls.",
         ],
       },
       economics: {
@@ -171,7 +208,7 @@ export const getOrganizationUsageOverview = query({
         grossMarginEstimate: null,
         calibrationReady: totalCostUnits > 0,
         providerPricingCaptured: false,
-        note: "Measured autonomous work is attributable by organization, invention, work kind and light/standard/expensive/premium class. Dollar conversion remains unset until model, search, image, CAD, extraction, storage and artifact costs are calibrated from real production usage; Ask InventSmith provider usage is the next attribution gap.",
+        note: "Measured usage is attributable by organization, invention, operation kind and light/standard/expensive/premium class. Ask InventSmith now records OpenAI model/token metadata. Dollar conversion remains unset until model, web-search, image, CAD, extraction, storage and artifact unit prices are calibrated from real production usage.",
       },
     };
   },
