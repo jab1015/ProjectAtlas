@@ -79,4 +79,15 @@ describe("backend authorization boundaries", () => {
     expect(file).not.toContain("invention.userId !== userId");
     expect(block).toContain("requireInventionEditAccess");
   });
+
+  it("uses organization-aware authorization across the legacy journey engine surfaces", () => {
+    const file = source("journeyEngine.ts");
+    expect(exportedFunctionBlock(file, "getInventionState")).toContain("resolveInventionAccess");
+    expect(exportedFunctionBlock(file, "updateStageProgress")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "updateInventionField")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "advanceStage")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "deleteInvention")).toContain("requireInventionManageAccess");
+    expect(exportedFunctionBlock(file, "deleteInvention")).toContain("resolveInventionUsageScope");
+    expect(exportedFunctionBlock(file, "deleteInvention")).toContain("ensureOrganizationDailyUsage");
+  });
 });
