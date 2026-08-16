@@ -100,19 +100,21 @@ export const getOrganizationStructuredExport = query({
       });
     }
 
-    const dailyUsage = bounded(
-      await ctx.db
+    const [dailyUsage, subscriptionEvents] = await Promise.all([
+      ctx.db
         .query("organizationDailyUsage")
         .withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId))
         .take(EVENT_LIMIT + 1),
-      EVENT_LIMIT,
-      "Organization usage-history count",
-    );
+      ctx.db
+        .query("subscriptionEvents")
+        .withIndex("by_appliedOrganizationId", (q) => q.eq("appliedOrganizationId", args.organizationId))
+        .take(ROW_LIMIT + 1),
+    ]);
 
     return {
-      exportVersion: 2,
+      exportVersion: 3,
       generatedAt: Date.now(),
-      scope: "Organization-owned InventSmith structured project data. Binary bytes and authentication secrets are not embedded.",
+      scope: "Organization-owned InventSmith structured project and billing-attribution data. Binary bytes and authentication secrets are not embedded.",
       organization: {
         organizationId: organization._id,
         name: organization.name,
@@ -121,12 +123,14 @@ export const getOrganizationStructuredExport = query({
         status: organization.status,
         subscriptionStatus: organization.subscriptionStatus,
         subscriptionCurrentPeriodEnd: organization.subscriptionCurrentPeriodEnd,
+        subscriptionUpdatedAt: organization.subscriptionUpdatedAt,
         createdAt: organization.createdAt,
         updatedAt: organization.updatedAt,
       },
       members,
       inventions: inventionBundles,
-      dailyUsage,
+      dailyUsage: bounded(dailyUsage, EVENT_LIMIT, "Organization usage-history count"),
+      subscriptionEvents: bounded(subscriptionEvents, ROW_LIMIT, "Organization subscription-event count"),
       excludedSecrets: ["password hashes", "auth sessions", "refresh tokens", "verification codes", "server/API keys", "webhook secrets"],
     };
   },
