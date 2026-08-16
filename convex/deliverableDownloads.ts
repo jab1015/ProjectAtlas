@@ -1,7 +1,7 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { query } from "./_generated/server";
 import { contentToReadableText } from "./deliverableLogic";
+import { requireInventionReadAccess } from "./organizations";
 import {
   csvDataUrl,
   financialModelMarkdownToCsv,
@@ -12,10 +12,9 @@ import {
 export const getInventionArtifactDownloads = query({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new ConvexError("Authentication required");
+    await requireInventionReadAccess(ctx, args.inventionId);
     const invention = await ctx.db.get(args.inventionId);
-    if (!invention || invention.userId !== userId) throw new ConvexError("Invention not found or access denied");
+    if (!invention) throw new ConvexError("Invention not found");
 
     const deliverables = await ctx.db
       .query("atlasDeliverables")
