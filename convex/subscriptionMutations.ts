@@ -1,9 +1,20 @@
 import { v } from "convex/values";
 import { internalMutation } from "./_generated/server";
-import { effectiveTierForSubscription } from "./subscriptionPolicyLogic";
+import {
+  effectiveOrganizationPlanForSubscription,
+  effectiveTierForSubscription,
+  type OrganizationBillingPlan,
+} from "./subscriptionPolicyLogic";
 
 function organizationPlanForEffectiveTier(tier: "free" | "inventor" | "pro" | "enterprise") {
   return tier === "free" ? "explorer" as const : tier;
+}
+
+function requestedOrganizationPlan(
+  tier: "inventor" | "pro" | "enterprise",
+  organizationPlanKey: OrganizationBillingPlan | undefined,
+): OrganizationBillingPlan {
+  return organizationPlanKey ?? tier;
 }
 
 export const applySubscriptionEvent = internalMutation({
@@ -11,6 +22,14 @@ export const applySubscriptionEvent = internalMutation({
     providerEventId: v.string(),
     customerEmail: v.string(),
     tier: v.union(v.literal("inventor"), v.literal("pro"), v.literal("enterprise")),
+    organizationPlanKey: v.optional(v.union(
+      v.literal("inventor"),
+      v.literal("pro"),
+      v.literal("enterprise"),
+      v.literal("studio_3"),
+      v.literal("studio_6"),
+      v.literal("studio_custom"),
+    )),
     status: v.union(
       v.literal("trialing"), v.literal("active"), v.literal("past_due"), v.literal("canceled"),
       v.literal("unpaid"), v.literal("incomplete"), v.literal("paused")
@@ -33,15 +52,71 @@ export const applySubscriptionEvent = internalMutation({
 
     if (args.organizationId) {
       const organization = await ctx.db.get(args.organizationId);
-      const billingOwner = organization ? await ctx.db.get(organization.createdByUserId) : null;
+      const ownerMemberships = organization
+        ? (await ctx.db
+            .query("organizationMemberships")
+            .withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId!))
+            .collect())
+            .filter((membership) => membership.status === "active" && membership.role === "owner")
+        : [];
+      const ownerMembership = ownerMemberships.length === 1 ? ownerMemberships[0] : null;
+      const billingOwner = ownerMembership ? await ctx.db.get(ownerMembership.userId) : null;
       const ownerEmail = billingOwner?.email?.trim().toLowerCase();
       const validTarget = Boolean(
         organization &&
         organization.status === "active" &&
+        ownerMembership &&
+        ownerMembership.userId === organization.createdByUserId &&
         ownerEmail &&
         ownerEmail === args.customerEmail.trim().toLowerCase()
       );
       const stale = Boolean(organization && organization.updatedAt > args.occurredAt);
+      const eventId = await ctx.db.insert("subscriptionEvents", {
+        providerEventId: args.providerEventId,
+        customerEmail: args.customerEmail,
+        // subscriptionEvents retains the legacy/base tier for migration-safe
+        // history. The exact Studio plan is authoritative on the organization.
+        tier: args.tier,
+        status: args.status,
+        subscriptionId: args.subscriptionId,
+        billingCustomerId: args.billingCustomerId,
+        currentPeriodEnd: args.currentPeriodEnd,
+        occurredAt: args.occurredAt,
+        // Compatibility attribution only. Entitlement is written solely to the
+        // organization below; this user does not receive a duplicate allowance.
+        appliedUserId: validTarget && !stale ? ownerMembership?.userId : undefined,
+        receivedAt,
+      });
+      if (!validTarget) return { duplicate: false, applied: false, eventId, invalidOrganizationTarget: true };
+      if (stale) return { duplicate: false, applied: false, eventId, stale: true };
+
+      const plan = requestedOrganizationPlan(args.tier, args.organizationPlanKey);
+      const effectivePlan = effectiveOrganizationPlanForSubscription(
+        plan,
+        args.status,
+        args.currentPeriodEnd,
+        receivedAt,
+      );
+      await ctx.db.patch(args.organizationId, {
+        planKey: effectivePlan,
+        subscriptionStatus: args.status,
+        subscriptionId: args.subscriptionId,
+        billingCustomerId: args.billingCustomerId,
+        subscriptionCurrentPeriodEnd: args.currentPeriodEnd,
+        updatedAt: args.occurredAt,
+      });
+      return {
+        duplicate: false,
+        applied: true,
+        eventId,
+        scope: "organization" as const,
+        organizationId: args.organizationId,
+        planKey: effectivePlan,
+      };
+    }
+
+    // Exact organization plans are invalid on the legacy user billing path.
+    if (args.organizationPlanKey) {
       const eventId = await ctx.db.insert("subscriptionEvents", {
         providerEventId: args.providerEventId,
         customerEmail: args.customerEmail,
@@ -51,22 +126,9 @@ export const applySubscriptionEvent = internalMutation({
         billingCustomerId: args.billingCustomerId,
         currentPeriodEnd: args.currentPeriodEnd,
         occurredAt: args.occurredAt,
-        appliedUserId: validTarget && !stale ? organization?.createdByUserId : undefined,
         receivedAt,
       });
-      if (!validTarget) return { duplicate: false, applied: false, eventId, invalidOrganizationTarget: true };
-      if (stale) return { duplicate: false, applied: false, eventId, stale: true };
-
-      const effectiveTier = effectiveTierForSubscription(args.tier, args.status, args.currentPeriodEnd, receivedAt);
-      await ctx.db.patch(args.organizationId, {
-        planKey: organizationPlanForEffectiveTier(effectiveTier),
-        subscriptionStatus: args.status,
-        subscriptionId: args.subscriptionId,
-        billingCustomerId: args.billingCustomerId,
-        subscriptionCurrentPeriodEnd: args.currentPeriodEnd,
-        updatedAt: args.occurredAt,
-      });
-      return { duplicate: false, applied: true, eventId, scope: "organization" as const };
+      return { duplicate: false, applied: false, eventId, invalidOrganizationPlanTarget: true };
     }
 
     const stale = Boolean(user && (user.subscriptionUpdatedAt ?? 0) > args.occurredAt);
