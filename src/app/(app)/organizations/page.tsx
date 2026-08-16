@@ -35,13 +35,34 @@ interface MemberSummary {
   status: string;
 }
 
+interface PendingInvitationSummary {
+  invitationId: string;
+  email: string;
+  role: AssignableRole;
+  expiresAt: number;
+  createdAt: number;
+}
+
+interface MyInvitationSummary {
+  invitationId: string;
+  organizationId: string;
+  organizationName: string;
+  organizationKind: "personal" | "company" | "studio";
+  role: AssignableRole;
+  expiresAt: number;
+}
+
 const getMyOrganizations = makeFunctionReference<"query", Record<string, never>, OrganizationSummary[]>("organizations:getMyOrganizations");
 const createOrganization = makeFunctionReference<"mutation", { name: string; kind: "company" | "studio" }, { organizationId: string }>("organizations:createOrganization");
 const listOrganizationMembers = makeFunctionReference<"query", { organizationId: string }, MemberSummary[]>("organizations:listOrganizationMembers");
-const addMemberByEmail = makeFunctionReference<"mutation", { organizationId: string; email: string; role: AssignableRole }, { membershipId: string; added: boolean }>("organizations:addMemberByEmail");
 const updateMemberRole = makeFunctionReference<"mutation", { organizationId: string; userId: string; role: AssignableRole }, { membershipId: string }>("organizations:updateMemberRole");
 const removeMember = makeFunctionReference<"mutation", { organizationId: string; userId: string }, { removed: boolean }>("organizations:removeMember");
 const transferOwnership = makeFunctionReference<"mutation", { organizationId: string; newOwnerUserId: string }, { transferred: boolean; reason?: string }>("organizationOwnership:transferOwnership");
+const inviteMemberByEmail = makeFunctionReference<"mutation", { organizationId: string; email: string; role: AssignableRole }, { invitationId: string; created: boolean; expiresAt: number }>("organizationInvitations:inviteMemberByEmail");
+const listOrganizationInvitations = makeFunctionReference<"query", { organizationId: string }, PendingInvitationSummary[]>("organizationInvitations:listOrganizationInvitations");
+const getMyPendingInvitations = makeFunctionReference<"query", Record<string, never>, MyInvitationSummary[]>("organizationInvitations:getMyPendingInvitations");
+const revokeInvitation = makeFunctionReference<"mutation", { organizationId: string; invitationId: string }, { revoked: boolean }>("organizationInvitations:revokeInvitation");
+const acceptInvitation = makeFunctionReference<"mutation", { invitationId: string }, { organizationId: string; membershipId: string; role: AssignableRole }>("organizationInvitations:acceptInvitation");
 
 const PLAN_NAMES: Record<OrganizationPlanKey, string> = {
   explorer: "Explorer",
@@ -65,18 +86,27 @@ function capacity(value: number | null, singular: string, plural: string) {
   return `${value} ${value === 1 ? singular : plural}`;
 }
 
+function invitationExpiry(expiresAt: number) {
+  return new Date(expiresAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
 export default function OrganizationsPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useConvexAuth();
   const organizations = useQuery(getMyOrganizations, isAuthenticated ? {} : "skip");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = useMemo(() => organizations?.find((organization) => organization.organizationId === selectedId) ?? organizations?.[0] ?? null, [organizations, selectedId]);
+  const canManageMembers = selected?.role === "owner" || selected?.role === "admin";
   const members = useQuery(listOrganizationMembers, isAuthenticated && selected ? { organizationId: selected.organizationId } : "skip");
+  const pendingInvitations = useQuery(listOrganizationInvitations, isAuthenticated && selected && canManageMembers ? { organizationId: selected.organizationId } : "skip");
+  const myInvitations = useQuery(getMyPendingInvitations, isAuthenticated ? {} : "skip");
   const createOrganizationAction = useMutation(createOrganization);
-  const addMemberAction = useMutation(addMemberByEmail);
   const updateRoleAction = useMutation(updateMemberRole);
   const removeMemberAction = useMutation(removeMember);
   const transferOwnershipAction = useMutation(transferOwnership);
+  const inviteMemberAction = useMutation(inviteMemberByEmail);
+  const revokeInvitationAction = useMutation(revokeInvitation);
+  const acceptInvitationAction = useMutation(acceptInvitation);
 
   const [newOrgName, setNewOrgName] = useState("");
   const [newOrgKind, setNewOrgKind] = useState<"company" | "studio">("company");
@@ -94,8 +124,6 @@ export default function OrganizationsPage() {
 
   if (isLoading || !isAuthenticated) return null;
 
-  const canManageMembers = selected?.role === "owner" || selected?.role === "admin";
-
   const handleCreateOrganization = async () => {
     const name = newOrgName.trim();
     if (!name) return;
@@ -109,14 +137,24 @@ export default function OrganizationsPage() {
     }
   };
 
-  const handleAddMember = async () => {
+  const handleInviteMember = async () => {
     if (!selected || !memberEmail.trim()) return;
     try {
-      const result = await addMemberAction({ organizationId: selected.organizationId, email: memberEmail.trim(), role: memberRole });
+      const result = await inviteMemberAction({ organizationId: selected.organizationId, email: memberEmail.trim(), role: memberRole });
       setMemberEmail("");
-      setMessage(result.added ? "Team member added." : "That user already belonged to the organization; their role was updated where permitted.");
+      setMessage(result.created ? "Invitation created. The seat is reserved until the invitation expires or is revoked." : "The existing invitation was refreshed and its role updated.");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "InventSmith could not add that member.");
+      setMessage(error instanceof Error ? error.message : "InventSmith could not create that invitation.");
+    }
+  };
+
+  const handleAcceptInvitation = async (invitation: MyInvitationSummary) => {
+    try {
+      const result = await acceptInvitationAction({ invitationId: invitation.invitationId });
+      setSelectedId(result.organizationId);
+      setMessage(`You joined ${invitation.organizationName} as ${result.role}.`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "InventSmith could not accept that invitation.");
     }
   };
 
@@ -145,6 +183,20 @@ export default function OrganizationsPage() {
         </div>
 
         {message && <div role="status" className="mt-6 rounded-lg border border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground">{message}</div>}
+
+        {myInvitations && myInvitations.length > 0 && (
+          <Card className="mt-6 border-primary/30">
+            <CardHeader><div className="flex items-center gap-2 text-muted-foreground"><UserPlus className="h-4 w-4" /><span className="text-xs font-medium uppercase tracking-widest">Invitations</span></div><CardTitle>Organizations inviting you</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              {myInvitations.map((invitation) => (
+                <div key={invitation.invitationId} className="flex flex-col gap-3 rounded-lg border border-border p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div><p className="font-medium">{invitation.organizationName}</p><p className="mt-1 text-xs text-muted-foreground">{invitation.organizationKind} · invited as <span className="capitalize">{invitation.role}</span> · expires {invitationExpiry(invitation.expiresAt)}</p></div>
+                  <Button type="button" size="sm" onClick={() => void handleAcceptInvitation(invitation)}>Accept invitation</Button>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1.6fr]">
           <div className="space-y-6">
@@ -201,16 +253,30 @@ export default function OrganizationsPage() {
                   </CardContent>
                 </Card>
 
+                {canManageMembers && pendingInvitations && pendingInvitations.length > 0 && (
+                  <Card>
+                    <CardHeader><CardTitle>Pending invitations</CardTitle></CardHeader>
+                    <CardContent className="space-y-3">
+                      {pendingInvitations.map((invitation) => (
+                        <div key={invitation.invitationId} className="flex flex-col gap-3 rounded-lg border border-border p-4 sm:flex-row sm:items-center sm:justify-between">
+                          <div><p className="font-medium">{invitation.email}</p><p className="mt-1 text-xs text-muted-foreground">Invited as <span className="capitalize">{invitation.role}</span> · seat reserved until {invitationExpiry(invitation.expiresAt)}</p></div>
+                          <Button type="button" size="sm" variant="ghost" className="text-destructive" onClick={() => void revokeInvitationAction({ organizationId: selected.organizationId, invitationId: invitation.invitationId }).then(() => setMessage("Invitation revoked; the reserved seat is available again.")).catch((error) => setMessage(error instanceof Error ? error.message : "Invitation revocation failed."))}>Revoke</Button>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+
                 {canManageMembers && (
                   <Card>
-                    <CardHeader><div className="flex items-center gap-2 text-muted-foreground"><UserPlus className="h-4 w-4" /><span className="text-xs font-medium uppercase tracking-widest">Add teammate</span></div><CardTitle>Add an existing InventSmith user</CardTitle></CardHeader>
+                    <CardHeader><div className="flex items-center gap-2 text-muted-foreground"><UserPlus className="h-4 w-4" /><span className="text-xs font-medium uppercase tracking-widest">Invite teammate</span></div><CardTitle>Invite an InventSmith user</CardTitle></CardHeader>
                     <CardContent className="space-y-4">
                       <Input type="email" value={memberEmail} onChange={(event) => setMemberEmail(event.target.value)} placeholder="teammate@example.com" />
                       <select value={memberRole} onChange={(event) => setMemberRole(event.target.value as AssignableRole)} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
                         {ASSIGNABLE_ROLES.map((role) => <option key={role.value} value={role.value}>{role.label} — {role.detail}</option>)}
                       </select>
-                      <p className="text-xs text-muted-foreground">The person must already have an InventSmith account. Invitation-before-signup will be added as a separate secure flow; this action never bypasses the purchased seat limit.</p>
-                      <Button type="button" disabled={!memberEmail.trim()} onClick={() => void handleAddMember()}><UserPlus className="mr-2 h-4 w-4" />Add team member</Button>
+                      <p className="text-xs leading-relaxed text-muted-foreground">Invitations reserve an included seat and expire after 14 days. Because verified-email delivery is not yet configured, the recipient must already have an InventSmith account with this exact email. They accept the invitation from their Organizations page; no membership or invention access is granted before acceptance.</p>
+                      <Button type="button" disabled={!memberEmail.trim()} onClick={() => void handleInviteMember()}><UserPlus className="mr-2 h-4 w-4" />Create invitation</Button>
                     </CardContent>
                   </Card>
                 )}
