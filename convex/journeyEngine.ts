@@ -15,6 +15,13 @@ import { materiallyChanged, shouldRequeueWorkKind, staleReasonForField } from ".
 import { CANONICAL_WORK_PLAN } from "./canonicalWorkPlan";
 import { FULL_JOURNEY_STAGES } from "./fullJourneyDefinition";
 import { POST_CANONICAL_WORK_PLAN } from "./fullProductWorkPlan";
+import {
+  requireInventionEditAccess,
+  requireInventionManageAccess,
+  resolveInventionAccess,
+} from "./organizations";
+import { resolveInventionUsageScope } from "./organizationUsageScope";
+import { ensureOrganizationDailyUsage } from "./organizationDailyUsage";
 
 interface StageConfigEntry {
   id: number;
@@ -97,8 +104,10 @@ export const getInventionState = query({
   handler: async (ctx, { inventionId }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
+    const access = await resolveInventionAccess(ctx, inventionId, userId);
+    if (!access) return null;
     const invention = await ctx.db.get(inventionId);
-    if (!invention || invention.userId !== userId) return null;
+    if (!invention) return null;
 
     const currentStageConfig = stageConfig.find((stage) => stage.id === invention.currentStageId);
     if (!currentStageConfig) return null;
@@ -265,10 +274,7 @@ export const createInvention = mutation({
 export const updateStageProgress = mutation({
   args: { inventionId: v.id("inventions"), stageId: v.number(), field: v.string(), value: v.string() },
   handler: async (ctx, { inventionId, stageId, field, value }) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-    const invention = await ctx.db.get(inventionId);
-    if (!invention || invention.userId !== userId) throw new Error("Not found");
+    await requireInventionEditAccess(ctx, inventionId);
     const stage = stageConfig.find((item) => item.id === stageId);
     if (!stage) throw new Error("Invalid stage");
     const now = Date.now();
@@ -294,10 +300,9 @@ export const updateInventionField = mutation({
     value: v.string(),
   },
   handler: async (ctx, { inventionId, field, value }) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    await requireInventionEditAccess(ctx, inventionId);
     const invention = await ctx.db.get(inventionId);
-    if (!invention || invention.userId !== userId) throw new Error("Not found");
+    if (!invention) throw new Error("Not found");
     const previous = invention[field];
     const now = Date.now();
     await ctx.db.patch(inventionId, { [field]: value, updatedAt: now });
@@ -335,10 +340,9 @@ export const updateInventionField = mutation({
 export const advanceStage = mutation({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    await requireInventionEditAccess(ctx, inventionId);
     const invention = await ctx.db.get(inventionId);
-    if (!invention || invention.userId !== userId) throw new Error("Not found");
+    if (!invention) throw new Error("Not found");
     const currentStage = stageConfig.find((stage) => stage.id === invention.currentStageId);
     if (!currentStage) throw new Error("Invalid stage");
 
@@ -366,11 +370,10 @@ export const advanceStage = mutation({
 export const deleteInvention = mutation({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new ConvexError("Not authenticated");
+    const { userId } = await requireInventionManageAccess(ctx, inventionId);
     const invention = await ctx.db.get(inventionId);
     if (!invention) throw new ConvexError("Invention not found");
-    if (invention.userId !== userId) throw new ConvexError("Not authorized to delete this invention");
+    const usageScope = await resolveInventionUsageScope(ctx, inventionId);
 
     const stageProgressRows = await ctx.db.query("stageProgress").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
     for (const row of stageProgressRows) await ctx.db.delete(row._id);
@@ -382,8 +385,16 @@ export const deleteInvention = mutation({
     for (const row of documentRows) await ctx.db.delete(row._id);
     const validationResearchRows = await ctx.db.query("validationResearch").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
     for (const row of validationResearchRows) await ctx.db.delete(row._id);
-    const notificationRows = await ctx.db.query("notifications").withIndex("by_userId", (q) => q.eq("userId", userId)).collect();
-    for (const row of notificationRows) if (row.inventionId === inventionId) await ctx.db.delete(row._id);
+
+    const notificationUserIds = new Set<string>([String(invention.userId), String(userId)]);
+    if (invention.organizationId) {
+      const memberships = await ctx.db.query("organizationMemberships").withIndex("by_organizationId", (q) => q.eq("organizationId", invention.organizationId!)).collect();
+      for (const membership of memberships) notificationUserIds.add(String(membership.userId));
+    }
+    for (const notificationUserId of notificationUserIds) {
+      const notificationRows = await ctx.db.query("notifications").withIndex("by_userId", (q) => q.eq("userId", notificationUserId as typeof userId)).collect();
+      for (const row of notificationRows) if (row.inventionId === inventionId) await ctx.db.delete(row._id);
+    }
 
     const generatedMediaRows = await ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
     for (const row of generatedMediaRows) if (row.storageId) await ctx.storage.delete(row.storageId);
@@ -407,6 +418,7 @@ export const deleteInvention = mutation({
       ctx.db.query("evidenceFindings").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
       Promise.resolve(evidenceSourceRows),
       ctx.db.query("inventionRecords").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      ctx.db.query("inventionAccessGrants").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
     ]);
 
     const reservedByDate = new Map<string, number>();
@@ -414,10 +426,19 @@ export const deleteInvention = mutation({
       if (row.reservedCostUnits && row.reservationDateKey) reservedByDate.set(row.reservationDateKey, (reservedByDate.get(row.reservationDateKey) ?? 0) + row.reservedCostUnits);
     }
     for (const [dateKey, reservedUnits] of reservedByDate) {
-      const usage = await ctx.db.query("atlasDailyUsage").withIndex("by_userId_dateKey", (q) => q.eq("userId", userId).eq("dateKey", dateKey)).unique();
-      if (usage) await ctx.db.patch(usage._id, { reservedAutonomousCostUnits: Math.max(0, (usage.reservedAutonomousCostUnits ?? 0) - reservedUnits), updatedAt: Date.now() });
+      if (usageScope?.scope === "organization") {
+        const usage = await ensureOrganizationDailyUsage(ctx, usageScope.organizationId, dateKey, Date.now());
+        await ctx.db.patch(usage._id, {
+          reservedAutonomousCostUnits: Math.max(0, (usage.reservedAutonomousCostUnits ?? 0) - reservedUnits),
+          updatedAt: Date.now(),
+        });
+      } else if (usageScope?.scope === "legacy_user") {
+        const usage = await ctx.db.query("atlasDailyUsage").withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey)).unique();
+        if (usage) await ctx.db.patch(usage._id, { reservedAutonomousCostUnits: Math.max(0, (usage.reservedAutonomousCostUnits ?? 0) - reservedUnits), updatedAt: Date.now() });
+      }
     }
     for (const rows of canonicalRowGroups) for (const row of rows) await ctx.db.delete(row._id);
+
     await ctx.db.delete(inventionId);
     return { success: true };
   },
