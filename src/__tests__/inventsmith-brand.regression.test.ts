@@ -32,9 +32,12 @@ describe("InventSmith customer-facing brand", () => {
     expect(existsSync(join(ROOT, "public/Logo.png"))).toBe(true);
   });
 
-  it("does not keep legacy Atlas logo assets that a deployment could accidentally reuse", () => {
+  it("does not keep legacy Atlas logo or favicon assets that a deployment could accidentally reuse", () => {
     expect(existsSync(join(ROOT, "public/logo.svg"))).toBe(false);
     expect(existsSync(join(ROOT, "public/logo-mark.svg"))).toBe(false);
+    expect(existsSync(join(ROOT, "src/app/icon.svg"))).toBe(false);
+    const layout = readFileSync(join(ROOT, "src/app/layout.tsx"), "utf8");
+    expect(layout).toContain('{ icon: "/Logo.png", shortcut: "/Logo.png", apple: "/Logo.png" }');
   });
 
   it("does not expose Atlas as the current customer-facing product name", () => {
