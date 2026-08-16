@@ -226,9 +226,16 @@ export const acceptInvitation = mutation({
       .query("organizationMemberships")
       .withIndex("by_organizationId", (q) => q.eq("organizationId", organization._id))
       .collect();
-    const occupiedMembershipSeats = memberships.filter((membership) => membership.status === "active" || membership.status === "invited").length;
     const existing = memberships.find((membership) => membership.userId === userId);
-    if (!existing && policy.includedSeatLimit !== null && occupiedMembershipSeats >= policy.includedSeatLimit) {
+
+    // Acceptance converts this pending invitation into a membership rather than
+    // consuming a second seat. Recalculate the projected reservation total so a
+    // plan downgrade or stale over-reservation cannot push the organization past
+    // its current included-seat limit.
+    const reservedSeats = await countReservedSeats(ctx, organization._id, now);
+    const existingAlreadyOccupiesSeat = Boolean(existing && (existing.status === "active" || existing.status === "invited"));
+    const projectedReservedSeats = reservedSeats - 1 + (existingAlreadyOccupiesSeat ? 0 : 1);
+    if (policy.includedSeatLimit !== null && projectedReservedSeats > policy.includedSeatLimit) {
       throw new ConvexError("The organization no longer has an available seat for this invitation");
     }
 
