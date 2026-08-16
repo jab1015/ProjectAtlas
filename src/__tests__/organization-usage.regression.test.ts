@@ -54,6 +54,14 @@ describe("organization-scoped usage accounting", () => {
     expect(workState).toContain("stale output was discarded");
   });
 
+  it("settles native CAD reservations on the same organization ledger used to reserve them", () => {
+    const cad = convexSource("nativeCad.ts");
+    expect(cad).toContain('usageScope.scope === "organization" && usageScope.organizationId');
+    expect(cad).toContain("ensureOrganizationDailyUsage(ctx, usageScope.organizationId, key, now)");
+    expect(cad).toContain("reservedAutonomousCostUnits: Math.max(0");
+    expect(cad).toContain('query("atlasDailyUsage")');
+  });
+
   it("lets the current-usage API report an authorized organization's shared allowance", () => {
     const source = convexSource("atlasUsage.ts");
     expect(source).toContain('organizationId: v.optional(v.id("organizations"))');
