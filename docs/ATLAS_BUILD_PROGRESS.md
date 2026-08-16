@@ -1,173 +1,129 @@
 # InventSmith Build Progress
 
-**Last updated:** August 15, 2026  
+**Last updated:** August 16, 2026  
 **Product destination:** Complete Idea-to-Market Inventor OS  
 **Authoritative product specification:** `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`  
-**Supporting long-range roadmap:** `docs/ATLAS_PRODUCT_ROADMAP.md` (legacy filename retained for continuity)  
-**Current implementation baseline:** controlled-pilot / feasibility foundation
+**Current continuation checkpoint:** `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`  
+**Active build branch:** `inventsmith/full-product-build` / draft PR #24 — intentionally unmerged
 
-## Critical scope correction — August 15, 2026
+## Product vision
 
-InventSmith must be measured against the complete idea-to-market product vision, not only the previously narrowed controlled-pilot release.
+InventSmith — The Inventor OS by Modern Methods — is an organization-native operating system that takes an inventor from a raw idea through the complete evidence-backed journey to market while hiding unnecessary process complexity from the inventor.
 
-The controlled-pilot implementation remains useful foundation work, but it is **not the finished InventSmith product**.
+> The inventor should never have to think about InventSmith. InventSmith should think about the inventor.
 
-The required destination is:
+The common destination remains idea → evidence → validation → market/prior-art readiness → applicable product development → commercialization → launch → growth. Physical inventions use Product Design/CAD/Engineering/Prototype/Manufacturing; software inventions use Software Product Design/UX/Architecture/Data/Security/Prototype-Build/QA-Beta/Distribution; hybrid inventions use both applicable branches.
 
-**Idea → Evidence → Validation → Market Research → Prior Art / Patent Readiness → Product Design → CAD / Engineering → Prototype → Manufacturing → Branding → Intellectual Property / Legal → Pricing → Marketing → Sales → Funding / Pitch → Launch → Growth**
+The retired controlled-pilot 80% figure must never be used as overall InventSmith completion. The retired controlled-pilot scope and old Atlas completion percentages are historical only.
 
-The inventor should not need to understand or manually manage this process. InventSmith must know what comes next, perform reversible internal work autonomously, request evidence or approval when required, and route work to qualified professionals when professional authority or judgment is necessary.
+## Locked organization architecture
 
-## Completion accounting rule
+Canonical hierarchy:
 
-Do not publish a single optimistic completion percentage that treats the controlled-pilot subset as the whole product.
+**User → Organization / Company → Memberships → Invention Workspaces**
 
-Progress must distinguish:
+A single inventor is a one-member personal organization. Organizations support multiple active/archived inventions, server-enforced roles, invention-level sharing, organization-scoped billing/entitlements and a shared expensive-work allowance. Archiving frees an active-invention slot without deleting evidence, design/CAD/software work, research, documents, decisions or history.
 
-1. **Foundation / controlled-pilot implementation** — work already built around the canonical invention record, orchestration, evidence, feasibility, documents, security, subscriptions and deployment.
-2. **Complete InventSmith destination** — the full master specification in `INVENTSMITH_MASTER_PRODUCT_SPEC.md`.
+Roles: Owner, Admin, Member, Viewer, Professional/Guest Reviewer. Organization-owned inventions survive member departure. Destructive organization actions and billing authority remain appropriately restricted.
 
-Until the complete capability matrix is code-audited, the repository must not claim a precise overall full-product percentage. The earlier **80%** figure applied only to the narrowed controlled-pilot scope and is retired as an overall InventSmith completion number.
+## Pricing direction
 
-## Current verified foundation
+| Plan | Monthly price | Capacity direction |
+|---|---:|---|
+| Explorer | $0 | Evaluation / tightly bounded expensive work |
+| Inventor | $39 | Serious validation, feasibility and IP-readiness |
+| Pro | $99 | Core complete idea-to-market individual plan including applicable physical or software product development |
+| Enterprise | $199 | Multi-invention/team capacity and greater throughput |
+| Studio 3 | $299 | 3 active inventions + professional organization workflow |
+| Studio 6 | $399 | 6 active inventions + professional organization workflow |
+| Studio Custom | Custom | Larger capacity based on measured economics |
 
-Repository and managed deployment work has established substantial foundation capability, including:
+Exact included seats, storage, AI/CAD/render/research/software-generation allowances and larger Studio capacity remain unlocked until measured economics justify them.
 
-- canonical invention record and structured ledgers;
-- assumptions/evidence/findings/decision tracking;
-- autonomous dependency orchestration;
-- bounded work execution, leases, retries and recovery;
-- finite cost budgets and entitlement enforcement;
-- evidence verification/trust controls;
-- feasibility-package generation;
-- preliminary prior-art/IP-readiness workflow foundation;
-- technical-feasibility workflow foundation;
-- market/competitor research foundation;
-- materials/manufacturing analysis foundation;
-- regulatory screening foundation;
-- preliminary BOM/cost work;
-- development-risk analysis;
-- engineering handoff foundation;
-- concept imagery;
-- PDF/DOCX generation;
-- Ask InventSmith grounding;
-- inventor status briefing;
-- work/document library foundation;
-- subscriptions, account deletion and structured data export;
-- restricted-category safety gating;
-- professional-review gates;
-- operational health checks and CI/deployment tooling.
+## Organization implementation — completed repository foundation
 
-The August 15 MadeThis synchronization reported passing web + Convex TypeScript, 178 tests across 31 files, production dependency audit with zero known production vulnerabilities, production builds, Convex production deployment, Vercel READY, and live HTTP 200. These are deployment/build achievements, not proof of full product acceptance.
+Implemented on the full-product branch:
 
-## Live acceptance defects discovered August 15, 2026
+- additive organization schema/runtime and personal-organization migration compatibility;
+- organization-native invention creation/listing plus active/archive capacity enforcement;
+- Read/Edit/Manage authorization across main workspace, Ask InventSmith, Evidence Locker, Product Design, Native CAD, Journey Center, Journey Engine, lifecycle departments, downloads, chat-evidence capture and evidence-extraction retry;
+- Manage-only consequential decisions/approvals and destructive invention actions;
+- invention-level access grants and bounded Professional/Guest Reviewer foundations;
+- ownership transfer and organization-safe member/account deletion semantics;
+- organization navigation/team UI foundations;
+- organization-owned inventions preserved when members leave;
+- personal versus company/studio privacy/export boundaries.
 
-Initial founder testing of the live MadeThis deployment immediately identified gaps that prevent acceptance:
+## Invention classification and dynamic routing — completed repository implementation
 
-- legacy Atlas logo remains visible in the live authenticated header;
-- official InventSmith logo is not visible on the tested surface;
-- Validation is visible and can be rebuilt, but the complete invention journey is not discoverable;
-- prior-art/patent research is not visibly accessible from the tested invention experience;
-- technical/product-design progression is not visibly accessible;
-- CAD/3D/exploded-view/manufacturing-design outputs are not available as required destination capabilities;
-- legal/IP/professional work is not visibly accessible;
-- the inventor is not being shown a clear complete path from the current stage to downstream work.
+Organization-native onboarding now classifies inventions before normal persistence using migration-safe structured-record data rather than a destructive schema migration.
 
-These defects demonstrate why build/test/deployment success must be separated from functional product acceptance.
+- **Physical:** receives applicable physical Product Design, native CAD/engineering, physical prototype and manufacturing work.
+- **Software:** apps, SaaS, APIs, web/mobile/desktop and AI-enabled software are supported as first-class inventions. Pure software does not receive irrelevant native CAD, physical prototype or manufacturer-quote tasks.
+- **Hybrid:** connected hardware/software products run both branches.
+- **Regulated review:** medical/diagnostic, children's/life safety, structural, automotive/aerospace, regulated electrical/comms, and regulated financial/health/privacy software remain supported while qualified professional gates are required where appropriate.
+- **Unsupported:** harmful/abusive weapon/destructive, malware/credential-theft/unauthorized cyberattack, covert surveillance/stalking, fraud/theft/deceptive abuse, and dangerous chemical/biological/radiological weaponization concepts are rejected before a normal organization-invention workspace is created.
+- **Business-only:** ordinary service/business concepts with no new physical/software/hybrid product are routed outside the invention workflow.
 
-## Mandatory capability matrix
+Software stages 5–7 are dynamically represented as **Software Product Design → Software Prototype & Build → Software Engineering & Release Readiness**. The software work plan covers product specification, UX flows, architecture, data/API design, security/privacy readiness, prototype/build planning, implementation planning, QA/acceptance, beta readiness and distribution/release planning. Hybrid stages require both applicable physical and software work.
 
-| Capability | Destination requirement | Current status |
-|---|---|---|
-| Idea intake and persistent invention record | Required | Foundation exists; live UX requires acceptance |
-| Evidence/file upload | Upload surveys, interviews, PDFs, DOCX, spreadsheets/CSV, images, sketches, prototype results, quotes, decks, professional/legal material; classify and propagate evidence | **Must be completed/verified** |
-| Validation | Use inventor evidence + autonomous research; confidence and assumption tracking | Partial/live-visible |
-| Market/competitor research | Evidence-backed market sizing, segments, alternatives and competitors | Foundation exists; live UX/output requires acceptance |
-| Patent/prior-art intelligence | Search, compare, preserve coverage, identify differentiators/design constraints, attorney handoff | Foundation exists but complete live experience must be exposed/verified |
-| Product design | Generate candidates, compare trade-offs, score and refine strongest design | **Major implementation priority** |
-| CAD/3D design | Supported-category editable/preliminary CAD and appropriate STEP/STL/DXF outputs | **Not yet accepted; mandatory build target** |
-| Exploded/dimensioned views | Assemblies, parts, exploded views, orthographic/dimensioned drawings | **Not yet accepted; mandatory build target** |
-| Engineering package | Requirements, materials, tolerances where supported, BOM, assembly, DFM/DFA, revision control | Partial foundation; must be completed |
-| Prototype loop | Prototype plan, testing, uploaded evidence, failure analysis, design revision | **Must be built/completed** |
-| Manufacturing/factory guidance | Processes, factory types/candidates, RFQ, quote comparison, QC, tooling, logistics | Partial planning/foundation; **must be completed** |
-| Legal/contracts/NDAs | Identify need, prepare drafts/handoffs, professional review gates, track status | **Must be built/completed** |
-| Professional routing | Tell inventor which professional/provider is needed, why, what to send/ask; recommend candidates where possible | **Must be built/completed** |
-| Branding | Name/positioning/identity/messaging and assets | Roadmap capability; must be completed |
-| Pricing | Unit economics, pricing scenarios, break-even | Roadmap capability; must be completed |
-| Marketing | GTM, messaging, channels, assets, calendar | Roadmap capability; must be completed |
-| Sales | Channels, funnel, toolkit, projections | Roadmap capability; must be completed |
-| Pitch deck/funding | Evidence-backed deck with product renders, financial model, funding strategy, FAQ | **Mandatory; must be built/completed** |
-| Launch | Readiness, launch playbook, feedback/performance loop | Roadmap capability; must be completed |
-| Growth | 90-day audit, roadmap, real-data iteration and reporting | Roadmap capability; must be completed |
-| Documents/exports | Visible versioned library with format-appropriate exports | Foundation exists; expand to full journey |
-| Ask InventSmith | Grounded in complete invention record and all relevant evidence/work | Foundation exists; full-journey grounding required |
-| Correct InventSmith branding | Official logo/name across all customer-facing surfaces | **Live defect — fix required** |
+The live onboarding UI uses the organization-native classified `organizationInventions:create` path. The legacy creator remains for migration compatibility rather than being used by current onboarding. Runtime risk triage still prevents unsupported legacy concepts from autonomous execution.
 
-## CAD and product-design acceptance rule
+Regression coverage protects physical/software/hybrid routing, regulated support, unsupported rejection, business-only routing, dependency integrity, software entitlement, organization-native pre-persistence classification and live onboarding routing.
 
-InventSmith is not complete if it only generates concept imagery or a design description.
+## Shared expensive-resource accounting — completed
 
-For supported physical-product categories it must be able to progress toward a real design package containing appropriate 3D/CAD geometry, assemblies/parts, exploded views, dimensioned/orthographic views, materials, BOM, manufacturing recommendations, prototype artifacts and presentation-quality renders.
+Organization-owned inventions use a shared `organizationDailyUsage` ledger keyed by organization + UTC day. Legacy inventions without an organization remain on the user ledger for backward compatibility. Ask InventSmith, autonomous work, Native CAD and visual generation reserve/settle against the correct shared organization capacity; race protections and stale-output settlement remain intact. Adding seats does not multiply an organization's paid compute allowance.
 
-Design maturity must be explicit:
+## Cost attribution and economics — current state
 
-1. Concept Visualization
-2. Preliminary CAD
-3. Prototype Candidate
-4. Engineering Reviewed
-5. Manufacturing Released
+Measured cost units are attributable/reportable by organization, invention, operation kind and operation class (`light`, `standard`, `expensive`, `premium`), with provider/model metadata where available. Observed cost-to-serve reporting covers average/median, P90 heavy use, maximum observed use and Studio top-3/top-6 overlap. Cost units are intentionally not converted into fabricated dollars before provider/runtime calibration. Detailed provider/cost economics are Owner/Admin-only.
 
-InventSmith may create preliminary CAD and manufacturing-preparation artifacts, but safety-critical or consequential engineering cannot be represented as Manufacturing Released until required qualified engineering review is recorded.
+## Organization billing / entitlement foundation — completed in repository
 
-## Evidence upload acceptance rule
+Organization-targeted subscription events, organization `planKey` entitlement, legacy personal compatibility, billing recency, organization billing-history separation, Studio organization-only lifecycle entitlement and ownership-transfer billing continuity are implemented additively. Live checkout/product activation still depends on the actual external billing provider.
 
-Evidence upload is a core workflow, not a generic attachment feature.
+## Team invitations and privacy hardening — completed repository foundation
 
-When an inventor uploads material such as a 100-person SurveyMonkey study or interview notes, InventSmith must:
+Consent-based invitations reserve seats, recheck capacity at acceptance, bind safely to intended existing accounts, fail closed for unsafe legacy unbound invitations, and follow organization/personal privacy/export/deletion boundaries. Direct membership assignment is retired as a consent bypass. True pre-signup invitations remain gated on verified-email delivery/authentication.
 
-1. store the original artifact and provenance;
-2. associate it with the correct invention;
-3. classify the evidence type;
-4. extract structured findings where appropriate;
-5. record methodology/sample/context when available;
-6. make it available to relevant work such as Validation;
-7. update confidence/findings without fabricating provenance;
-8. mark affected downstream work stale or refresh it when material conclusions change.
+## Complete idea-to-market capability already present
 
-## Legal/professional acceptance rule
+Material repository implementation exists across persistent invention/evidence records; authenticated binary Evidence Locker ingestion/extraction/retry; downstream staleness; Ask InventSmith write-back; Validation; Market Research; Patent Readiness; physical Product Design/native CAD and renders; software Product Design/engineering routing; engineering/security/privacy/professional review; physical prototype evidence gate; manufacturing/RFQ real-quote gate; branding; IP/legal; pricing/marketing/sales/funding/pitch/launch/growth; actual-launch evidence gate; editable PPTX; financial CSV/Excel-readable workbook; artifact/document library; and Ask InventSmith grounding.
 
-InventSmith must tell a first-time inventor when an NDA, contract, patent professional, engineer, regulatory specialist, testing lab, manufacturer, accountant, funding specialist or other professional/provider is needed. It must explain what to do, prepare the relevant brief/draft/checklist, and identify suitable candidate provider types or specific candidates where integrations/research permit.
+Generated/modelled work cannot satisfy genuine prototype, supplier-quote, software-test/deployment, launch-result or professional-review gates.
 
-It must not impersonate a licensed professional or silently represent unreviewed specialist work as professionally approved.
+Customer-facing branding is InventSmith / The Inventor OS / Modern Methods. Legacy Atlas identifiers remain only where compatibility requires them.
 
-## Current build priorities
+## Truth and safety boundaries
 
-1. Fix live InventSmith branding/logo and expose the complete journey/navigation.
-2. Complete and verify evidence/file upload with downstream evidence propagation.
-3. Expose and complete market, patent/prior-art, technical-feasibility and design-preparation work in the inventor experience.
-4. Build the evidence-backed Product Design Department: multiple candidates → scoring/trade-offs → selected/refined design.
-5. Build supported-category CAD/3D generation, STEP/STL/DXF as appropriate, assemblies, exploded/dimensioned views, renders and revision control.
-6. Build the prototype planning/testing/evidence/revision loop.
-7. Build manufacturing/factory discovery, RFQ, quote comparison and production-readiness workflow.
-8. Build legal/contracts/NDA/IP/professional-routing workflow.
-9. Complete branding, pricing, marketing and sales stages.
-10. Build evidence-backed pitch deck, financial model, funding strategy and investor package.
-11. Complete launch and growth stages.
-12. Run complete live idea-to-market acceptance and professional review.
+Generated CAD remains preliminary until engineering/prototype evidence supports production release. Software plans/specifications must not be represented as implemented, tested or deployed software without real execution evidence. Patent intelligence is research/readiness, not a patentability/FTO/legal opinion. InventSmith never fabricates a physical prototype, manufacturer quote, software test/deployment result, launch result, professional review, legal authorization or other real-world evidence.
 
-## Progress update rule
+## Verified CI checkpoint
 
-Update this document whenever a material capability is implemented, deployed, live-verified, or found missing.
+GitHub Actions **Atlas CI #463**, head `e533dd96f1768e4cff36a502ee9779f3b97c5cb4`, fully passed operational-script verification, web TypeScript, Convex TypeScript, full regression tests including the initial product-type routing suite, production dependency audit and Next production build.
 
-Every update must distinguish:
+The subsequent business-only classification and authoritative-document updates must receive a final full green CI pass before their resulting SHA becomes the MadeThis synchronization pin.
 
-- planned;
-- code implemented;
-- repository tested;
-- deployed;
-- live functionally verified;
-- professional review required/completed.
+## Remaining work / acceptance
 
-No capability is complete merely because code exists or a deployment returns HTTP 200.
+1. Run the final complete CI stack on the current classification/routing/documentation head and fix any failure.
+2. Pin the final green SHA and provide it to MadeThis for synchronization into the managed source while preserving data/auth/storage/domain/billing infrastructure.
+3. Continue representative cost-to-serve/provider-dollar calibration without guessing final commercial limits.
+4. Once MadeThis resolves its managed Convex deployment-runner blocker, perform authenticated live acceptance of physical/software/hybrid routing, organizations, shared resource accounting, evidence, Ask InventSmith, privacy/deletion and real billing/webhooks.
+5. Run representative full journeys with genuine physical evidence, manufacturer quotes, software execution/test/deployment evidence, launch/market evidence and qualified professional review where applicable.
 
-No future report may use the old controlled-pilot completion percentage as the overall InventSmith completion percentage.
+## Final acceptance boundary
+
+Repository-green is not production acceptance. Final acceptance still requires real authentication/session persistence, migration against real users/inventions, product-type routing, multi-user role/isolation tests, active/archive enforcement, real billing/webhooks, concurrent organization resource accounting, privacy/export/deletion, representative evidence uploads, physical/software/hybrid journey testing, artifact-quality review and genuine physical/software/professional/market evidence where required.
+
+## New-chat handoff
+
+Read, in order:
+
+1. `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`
+2. `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`
+3. `docs/ATLAS_BUILD_PROGRESS.md`
+4. `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md`
+
+Then inspect branch `inventsmith/full-product-build` and draft PR #24. Treat CI #463 / `e533dd96f1768e4cff36a502ee9779f3b97c5cb4` as the latest fully verified checkpoint unless a newer complete run is green. Do not restart completed organization/accounting/invitation/classification work and do not merge PR #24. Immediate next action: final CI, then pin the resulting SHA for MadeThis synchronization.

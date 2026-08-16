@@ -1,74 +1,76 @@
 /**
  * InventSmith Inventor Journey Engine
  *
- * The Engine owns progress. The UI is purely presentational.
- * All 15 stages are defined here. Enabling stage 5+ = one config change.
+ * The journey engine exposes the complete idea-to-market product journey.
+ * The legacy stageProgress records remain supported for compatibility, while
+ * operational readiness is derived from the canonical work ledger whenever a
+ * stage has real work initialized.
  */
 
-import { mutation, query, internalMutation, internalQuery } from "./_generated/server";
+import { mutation, query, internalQuery } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 import { materiallyChanged, shouldRequeueWorkKind, staleReasonForField } from "./stalenessLogic";
+import { CANONICAL_WORK_PLAN } from "./canonicalWorkPlan";
+import { FULL_JOURNEY_STAGES } from "./fullJourneyDefinition";
+import { POST_CANONICAL_WORK_PLAN } from "./fullProductWorkPlan";
+import {
+  requireInventionEditAccess,
+  requireInventionManageAccess,
+  resolveInventionAccess,
+} from "./organizations";
+import { resolveInventionUsageScope } from "./organizationUsageScope";
+import { ensureOrganizationDailyUsage } from "./organizationDailyUsage";
 
-// ── Stage Configuration (single source of truth) ────────────────────────────
+interface StageConfigEntry {
+  id: number;
+  name: string;
+  enabled: boolean;
+  requiredTier: "free" | "pro";
+  completionCriteria: string[];
+  nextAction: string;
+  comingSoon: boolean;
+}
 
-export const stageConfig = [
-  {
-    id: 1,
-    name: "Idea Capture",
-    enabled: true,
-    requiredTier: "free",
-    completionCriteria: ["title", "problemStatement", "targetAudience", "solutionDescription"],
-    nextAction: "Describe your invention — what problem does it solve and who is it for?",
-    comingSoon: false,
-  },
-  {
-    id: 2,
-    name: "Validation",
-    enabled: true,
-    requiredTier: "free",
-    completionCriteria: ["validationMethod", "targetMarketSize", "competitorAnalysis"],
-    nextAction: "Validate your idea — confirm there's a real market and real demand.",
-    comingSoon: false,
-  },
-  {
-    id: 3,
-    name: "Market Research",
-    enabled: true,
-    requiredTier: "free",
-    completionCriteria: ["marketSegment", "customerPersona", "pricePoint"],
-    nextAction: "Define your market — who will buy this, and at what price?",
-    comingSoon: false,
-  },
-  {
-    id: 4,
-    name: "Patent Research",
-    enabled: true,
-    requiredTier: "free",
-    completionCriteria: ["priorArtSearch", "patentabilityAssessment", "inventionDisclosure"],
-    nextAction: "Research patents — ensure your invention is novel and protectable.",
-    comingSoon: false,
-  },
-  { id: 5, name: "Product Design", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 6, name: "Engineering", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 7, name: "Prototype", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 8, name: "Testing", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 9, name: "IP Protection", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 10, name: "Manufacturing", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 11, name: "Funding", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 12, name: "Branding", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 13, name: "Marketing", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 14, name: "Sales", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-  { id: 15, name: "Growth", enabled: false, requiredTier: "pro", completionCriteria: [] as string[], nextAction: "", comingSoon: true },
-];
+const legacyCriteria: Record<number, string[]> = {
+  1: ["title", "problemStatement", "targetAudience", "solutionDescription"],
+  2: ["validationMethod", "targetMarketSize", "competitorAnalysis"],
+  3: ["marketSegment", "customerPersona", "pricePoint"],
+  4: ["priorArtSearch", "patentabilityAssessment", "inventionDisclosure"],
+};
 
-// ── Readiness Helpers ────────────────────────────────────────────────────────
+const stageNextActions: Record<number, string> = {
+  1: "Describe the invention, problem, intended user, and proposed solution.",
+  2: "Let InventSmith validate assumptions, demand, evidence quality, and feasibility.",
+  3: "Let InventSmith research customers, competitors, alternatives, and market evidence.",
+  4: "Let Patent Readiness research prior art and hand differentiation constraints to Product Design.",
+  5: "Let Product Design turn the evidence into candidate designs, selected architecture, CAD, drawings, and engineering review artifacts.",
+  6: "Build and test the smallest useful prototype; upload physical-test evidence when InventSmith asks for it.",
+  7: "Prepare factory requirements, source manufacturers, assemble RFQs, compare quotes, and verify production readiness.",
+  8: "Develop the product name, positioning, identity, messaging, and brand-production brief.",
+  9: "Prepare IP strategy, invention disclosure, NDAs, contracts, status tracking, and qualified legal handoffs.",
+  10: "Build pricing evidence, unit economics, margin, break-even, and price-validation plans.",
+  11: "Build the go-to-market strategy, messaging, channels, assets, and pre-launch calendar.",
+  12: "Build the sales channels, toolkit, funnel, projections, and post-purchase experience.",
+  13: "Build the financial model, funding strategy, pitch deck, investor FAQ, and investor-ready package.",
+  14: "Run launch readiness, launch playbook, feedback loops, and launch-performance analysis.",
+  15: "Measure post-launch evidence and run the growth, retention, and optimization system.",
+};
+
+export const stageConfig: StageConfigEntry[] = FULL_JOURNEY_STAGES.map((stage) => ({
+  id: stage.id,
+  name: stage.name,
+  enabled: true,
+  requiredTier: stage.id <= 4 ? "free" : "pro",
+  completionCriteria: legacyCriteria[stage.id] ?? [],
+  nextAction: stageNextActions[stage.id] ?? `Continue ${stage.name}.`,
+  comingSoon: false,
+}));
 
 function computeReadinessScore(completedFields: string[], criteria: string[]): number {
   if (criteria.length === 0) return 0;
-  const completed = criteria.filter((c) => completedFields.includes(c)).length;
+  const completed = criteria.filter((criterion) => completedFields.includes(criterion)).length;
   return Math.round((completed / criteria.length) * 100);
 }
 
@@ -80,119 +82,87 @@ function scoreToReadinessState(score: number): ReadinessState {
   return "Not Ready";
 }
 
-// ── Public Queries ───────────────────────────────────────────────────────────
+function workReadinessForStage(stageId: number, workItems: Array<{ kind: string; status: string }>) {
+  const definition = FULL_JOURNEY_STAGES.find((stage) => stage.id === stageId);
+  if (!definition || definition.requiredWorkKinds.length === 0) return null;
+  const relevant = definition.requiredWorkKinds
+    .map((kind) => workItems.find((item) => item.kind === kind))
+    .filter(Boolean) as Array<{ kind: string; status: string }>;
+  if (relevant.length === 0) return null;
+  const complete = relevant.filter((item) => item.status === "completed").length;
+  return {
+    initialized: relevant.length,
+    required: definition.requiredWorkKinds.length,
+    completed: complete,
+    score: Math.round((complete / definition.requiredWorkKinds.length) * 100),
+    allComplete: relevant.length === definition.requiredWorkKinds.length && complete === definition.requiredWorkKinds.length,
+  };
+}
 
-/**
- * The primary UI query. Returns everything the dashboard and stage workspace
- * need to render. The UI does NOT compute anything from this — it's purely
- * presentational.
- */
 export const getInventionState = query({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
-
+    const access = await resolveInventionAccess(ctx, inventionId, userId);
+    if (!access) return null;
     const invention = await ctx.db.get(inventionId);
-    if (!invention || invention.userId !== userId) return null;
+    if (!invention) return null;
 
-    const currentStageConfig = stageConfig.find((s) => s.id === invention.currentStageId);
+    const currentStageConfig = stageConfig.find((stage) => stage.id === invention.currentStageId);
     if (!currentStageConfig) return null;
-
-    // Fetch stage progress for current stage
-    const progress = await ctx.db
-      .query("stageProgress")
-      .withIndex("by_inventionId_stageId", (q) =>
-        q.eq("inventionId", inventionId).eq("stageId", invention.currentStageId)
-      )
-      .first();
+    const [progress, workItems] = await Promise.all([
+      ctx.db.query("stageProgress").withIndex("by_inventionId_stageId", (q) => q.eq("inventionId", inventionId).eq("stageId", invention.currentStageId)).first(),
+      ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    ]);
 
     const completedFields = progress?.completedFields ?? [];
-    const readinessScore = computeReadinessScore(completedFields, currentStageConfig.completionCriteria);
-    const readinessState = scoreToReadinessState(readinessScore);
+    const ledgerReadiness = workReadinessForStage(invention.currentStageId, workItems);
+    const legacyReadiness = computeReadinessScore(completedFields, currentStageConfig.completionCriteria);
+    const readinessScore = ledgerReadiness?.score ?? legacyReadiness;
 
     return {
       invention,
       currentStage: currentStageConfig,
       stageConfig,
-      readinessState,
-      readinessScore, // internal — UI must not render this number
+      readinessState: scoreToReadinessState(readinessScore),
+      readinessScore,
       nextAction: currentStageConfig.nextAction,
       completedFields,
+      operationalReadiness: ledgerReadiness,
     };
   },
 });
 
-/**
- * Returns a user's inventions list for /inventions page.
- */
 export const getUserInventions = query({
   args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return [];
-
-    const inventions = await ctx.db
-      .query("inventions")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .collect();
-
-    // For each invention, get its current stage progress
-    const result = await Promise.all(
-      inventions.map(async (invention) => {
-        const progress = await ctx.db
-          .query("stageProgress")
-          .withIndex("by_inventionId_stageId", (q) =>
-            q.eq("inventionId", invention._id).eq("stageId", invention.currentStageId)
-          )
-          .first();
-
-        const stage = stageConfig.find((s) => s.id === invention.currentStageId);
-        const completedFields = progress?.completedFields ?? [];
-        const readinessScore = stage
-          ? computeReadinessScore(completedFields, stage.completionCriteria)
-          : 0;
-        const readinessState = scoreToReadinessState(readinessScore);
-
-        return {
-          ...invention,
-          stageName: stage?.name ?? "Unknown",
-          readinessState,
-        };
-      })
-    );
-
-    return result;
+    const inventions = await ctx.db.query("inventions").withIndex("by_userId", (q) => q.eq("userId", userId)).collect();
+    return await Promise.all(inventions.map(async (invention) => {
+      const [progress, workItems] = await Promise.all([
+        ctx.db.query("stageProgress").withIndex("by_inventionId_stageId", (q) => q.eq("inventionId", invention._id).eq("stageId", invention.currentStageId)).first(),
+        ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).collect(),
+      ]);
+      const stage = stageConfig.find((item) => item.id === invention.currentStageId);
+      const ledgerReadiness = workReadinessForStage(invention.currentStageId, workItems);
+      const legacyReadiness = stage ? computeReadinessScore(progress?.completedFields ?? [], stage.completionCriteria) : 0;
+      const readinessScore = ledgerReadiness?.score ?? legacyReadiness;
+      return { ...invention, stageName: stage?.name ?? "Unknown", readinessState: scoreToReadinessState(readinessScore) };
+    }));
   },
 });
 
-/**
- * Returns the user's active invention (first one), if any.
- * Used after sign-in to determine onboarding vs dashboard redirect.
- */
 export const getActiveInvention = query({
   args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
-
-    const invention = await ctx.db
-      .query("inventions")
-      .withIndex("by_userId_status", (q) =>
-        q.eq("userId", userId).eq("status", "active")
-      )
-      .first();
-
-    return invention ?? null;
+    return await ctx.db.query("inventions").withIndex("by_userId_status", (q) => q.eq("userId", userId).eq("status", "active")).first() ?? null;
   },
 });
 
-// ── Mutations ────────────────────────────────────────────────────────────────
-
-/**
- * Creates a new invention from onboarding answers.
- * Stage 1 is automatically completed when all 4 fields are set.
- */
 export const createInvention = mutation({
   args: {
     title: v.string(),
@@ -203,7 +173,6 @@ export const createInvention = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
-
     const now = Date.now();
 
     const inventionId = await ctx.db.insert("inventions", {
@@ -234,223 +203,66 @@ export const createInvention = mutation({
       updatedAt: now,
     });
 
-    await ctx.db.insert("atlasWorkItems", {
-      inventionId,
-      kind: "idea_capture",
-      title: "Capture the invention brief",
-      status: "completed",
-      priority: 100,
-      outputSummary: "InventSmith created the first structured record of the invention.",
-      attemptCount: 1,
-      createdAt: now,
-      startedAt: now,
-      completedAt: now,
-      updatedAt: now,
-    });
-
-    const followOnWork = [
-      {
-        kind: "assumptions_unknowns",
-        title: "Build the assumptions and unknowns register",
-        priority: 75,
-        estimatedCostUnits: 8,
-        deliverableKind: "assumptions_unknowns_register",
-        dependsOnKinds: ["brief_analysis"],
-      },
-      {
-        kind: "market_feasibility",
-        title: "Assess market feasibility and demand signals",
-        priority: 70,
-        estimatedCostUnits: 15,
-        deliverableKind: "market_feasibility_report",
-        dependsOnKinds: ["brief_analysis", "competitor_discovery"],
-      },
-      {
-        kind: "preliminary_prior_art",
-        title: "Build a preliminary prior-art landscape",
-        priority: 65,
-        estimatedCostUnits: 18,
-        deliverableKind: "preliminary_prior_art_landscape",
-        dependsOnKinds: ["brief_analysis"],
-      },
-      {
-        kind: "technical_feasibility",
-        title: "Assess technical feasibility and product risks",
-        priority: 60,
-        estimatedCostUnits: 12,
-        deliverableKind: "technical_feasibility_assessment",
-        dependsOnKinds: ["brief_analysis"],
-      },
-      {
-        kind: "materials_manufacturing",
-        title: "Research materials and manufacturing approaches",
-        priority: 50,
-        estimatedCostUnits: 15,
-        deliverableKind: "materials_manufacturing_assessment",
-        dependsOnKinds: ["technical_feasibility", "preliminary_prior_art"],
-      },
-      {
-        kind: "regulatory_screening",
-        title: "Screen potentially applicable regulatory requirements",
-        priority: 45,
-        estimatedCostUnits: 15,
-        deliverableKind: "regulatory_readiness_screening",
-        dependsOnKinds: ["technical_feasibility"],
-      },
-      {
-        kind: "ip_readiness",
-        title: "Prepare the patent-professional readiness brief",
-        priority: 40,
-        estimatedCostUnits: 12,
-        deliverableKind: "ip_readiness_brief",
-        dependsOnKinds: ["preliminary_prior_art", "technical_feasibility"],
-      },
-      {
-        kind: "feature_prior_art_comparison",
-        title: "Compare proposed features with the prior-art landscape",
-        priority: 58,
-        estimatedCostUnits: 12,
-        deliverableKind: "feature_prior_art_comparison",
-        dependsOnKinds: ["preliminary_prior_art", "technical_feasibility"],
-      },
-      {
-        kind: "distinguishing_features",
-        title: "Develop distinguishing feature hypotheses and alternative embodiments",
-        priority: 56,
-        estimatedCostUnits: 10,
-        deliverableKind: "distinguishing_features_alternative_embodiments",
-        dependsOnKinds: ["feature_prior_art_comparison"],
-      },
-      {
-        kind: "product_requirements",
-        title: "Draft the initial product requirements",
-        priority: 48,
-        estimatedCostUnits: 12,
-        deliverableKind: "initial_product_requirements",
-        dependsOnKinds: ["market_feasibility", "technical_feasibility", "distinguishing_features"],
-      },
-      {
-        kind: "design_directions",
-        title: "Prepare preliminary product design directions",
-        priority: 43,
-        estimatedCostUnits: 14,
-        deliverableKind: "product_design_directions",
-        dependsOnKinds: ["product_requirements", "materials_manufacturing"],
-      },
-      {
-        kind: "preliminary_bom_cost",
-        title: "Prepare a preliminary bill of materials and cost range",
-        priority: 42,
-        estimatedCostUnits: 14,
-        deliverableKind: "preliminary_bom_cost_range",
-        dependsOnKinds: ["product_requirements", "materials_manufacturing"],
-      },
-      {
-        kind: "concept_image_generation",
-        title: "Generate a concept visualization board",
-        priority: 41,
-        estimatedCostUnits: 30,
-        deliverableKind: "concept_visualization_board",
-        dependsOnKinds: ["design_directions"],
-      },
-      {
-        kind: "development_risks",
-        title: "Map development risks, costs, and dependencies",
-        priority: 38,
-        estimatedCostUnits: 10,
-        deliverableKind: "development_risks_costs_dependencies",
-        dependsOnKinds: ["market_feasibility", "preliminary_bom_cost", "regulatory_screening"],
-      },
-      {
-        kind: "engineering_handoff",
-        title: "Prepare the engineering professional handoff brief",
-        priority: 36,
-        estimatedCostUnits: 10,
-        deliverableKind: "engineering_handoff_brief",
-        dependsOnKinds: ["product_requirements", "preliminary_bom_cost", "development_risks"],
-      },
-      {
-        kind: "evidence_verification",
-        title: "Verify material sources and claim support",
-        priority: 35,
-        estimatedCostUnits: 18,
-        deliverableKind: "evidence_verification_report",
-        dependsOnKinds: ["assumptions_unknowns", "ip_readiness", "development_risks"],
-      },
-      {
-        kind: "feasibility_recommendation",
-        title: "Prepare the proceed, revise, pause, or stop recommendation",
-        priority: 30,
-        estimatedCostUnits: 10,
-        deliverableKind: "feasibility_recommendation",
-        dependsOnKinds: ["ip_readiness", "evidence_verification"],
-      },
-      {
-        kind: "package_assembly",
-        title: "Assemble the invention feasibility and development package",
-        priority: 20,
-        estimatedCostUnits: 16,
-        deliverableKind: "invention_feasibility_development_package",
-        dependsOnKinds: ["feasibility_recommendation"],
-      },
-    ];
-
-    for (const item of followOnWork) {
+    for (const item of CANONICAL_WORK_PLAN) {
+      const completed = item.initiallyCompleted === true;
       await ctx.db.insert("atlasWorkItems", {
         inventionId,
-        ...item,
+        kind: item.kind,
+        title: item.title,
+        status: completed ? "completed" : "queued",
+        priority: item.priority,
+        inputSnapshot: item.instructions ? { department: item.kind === "patent_design_handoff" ? "patent_readiness" : "canonical", instructions: item.instructions } : undefined,
+        outputSummary: completed ? "InventSmith created the first structured record of the invention." : undefined,
+        attemptCount: completed ? 1 : 0,
+        maxAttempts: completed ? undefined : 3,
+        estimatedCostUnits: item.estimatedCostUnits,
+        deliverableKind: item.deliverableKind,
+        dependsOnKinds: item.dependsOnKinds,
+        createdAt: now,
+        startedAt: completed ? now : undefined,
+        completedAt: completed ? now : undefined,
+        updatedAt: now,
+      });
+    }
+
+    for (const item of POST_CANONICAL_WORK_PLAN) {
+      await ctx.db.insert("atlasWorkItems", {
+        inventionId,
+        kind: item.kind,
+        title: item.title,
         status: "queued",
+        priority: item.priority,
+        inputSnapshot: item.inputSnapshot,
         attemptCount: 0,
         maxAttempts: 3,
+        estimatedCostUnits: item.estimatedCostUnits,
+        deliverableKind: item.deliverableKind,
+        dependsOnKinds: item.dependsOnKinds,
         createdAt: now,
         updatedAt: now,
       });
     }
 
-    await ctx.db.insert("atlasWorkItems", {
-      inventionId,
-      kind: "brief_analysis",
-      title: "Analyze the invention brief",
-      status: "queued",
-      priority: 90,
-      attemptCount: 0,
-      maxAttempts: 3,
-      estimatedCostUnits: 8,
-      deliverableKind: "invention_brief_analysis",
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    await ctx.db.insert("atlasWorkItems", {
-      inventionId,
-      kind: "competitor_discovery",
-      title: "Research competing products and alternatives",
-      status: "queued",
-      priority: 80,
-      attemptCount: 0,
-      maxAttempts: 3,
-      estimatedCostUnits: 15,
-      deliverableKind: "competitor_landscape",
-      createdAt: now,
-      updatedAt: now,
-    });
-
     await ctx.db.insert("atlasExecutionEvents", {
       inventionId,
       eventType: "work_queued",
       actorType: "system",
-      summary: "InventSmith created the initial autonomous feasibility and IP-readiness work plan.",
-      metadata: { queuedWorkCount: followOnWork.length + 2 },
+      summary: "InventSmith created the complete autonomous idea-to-market work plan, including Product Design/CAD and every downstream department.",
+      metadata: {
+        canonicalWorkCount: CANONICAL_WORK_PLAN.length,
+        postCanonicalWorkCount: POST_CANONICAL_WORK_PLAN.length,
+        totalWorkCount: CANONICAL_WORK_PLAN.length + POST_CANONICAL_WORK_PLAN.length,
+        includesPatentDesignHandoff: true,
+        includesNativeCad: POST_CANONICAL_WORK_PLAN.some((item) => item.kind === "native_cad_generation"),
+      },
       createdAt: now,
     });
 
-    // Stage 1 is complete: all 4 criteria fulfilled from onboarding
-    const stage1Criteria = stageConfig[0].completionCriteria;
     await ctx.db.insert("stageProgress", {
       inventionId,
       stageId: 1,
       readinessScore: 100,
-      completedFields: stage1Criteria,
+      completedFields: stageConfig[0].completionCriteria,
       completedAt: now,
       updatedAt: now,
     });
@@ -459,112 +271,46 @@ export const createInvention = mutation({
   },
 });
 
-/**
- * Records a completed field in stage progress and recomputes readiness.
- * Called on blur from stage workspace fields.
- */
 export const updateStageProgress = mutation({
-  args: {
-    inventionId: v.id("inventions"),
-    stageId: v.number(),
-    field: v.string(),
-    value: v.string(),
-  },
+  args: { inventionId: v.id("inventions"), stageId: v.number(), field: v.string(), value: v.string() },
   handler: async (ctx, { inventionId, stageId, field, value }) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-
-    const invention = await ctx.db.get(inventionId);
-    if (!invention || invention.userId !== userId) throw new Error("Not found");
-
-    const stage = stageConfig.find((s) => s.id === stageId);
+    await requireInventionEditAccess(ctx, inventionId);
+    const stage = stageConfig.find((item) => item.id === stageId);
     if (!stage) throw new Error("Invalid stage");
-
     const now = Date.now();
-
-    // Get or create progress record
-    const existing = await ctx.db
-      .query("stageProgress")
-      .withIndex("by_inventionId_stageId", (q) =>
-        q.eq("inventionId", inventionId).eq("stageId", stageId)
-      )
-      .first();
-
-    // Only record field if value is non-empty
+    const existing = await ctx.db.query("stageProgress").withIndex("by_inventionId_stageId", (q) => q.eq("inventionId", inventionId).eq("stageId", stageId)).first();
     const shouldMark = value.trim().length > 0;
-
-    let completedFields: string[];
-
+    let completedFields = existing?.completedFields ? [...existing.completedFields] : [];
+    if (shouldMark && !completedFields.includes(field)) completedFields.push(field);
+    if (!shouldMark) completedFields = completedFields.filter((item) => item !== field);
+    const readinessScore = computeReadinessScore(completedFields, stage.completionCriteria);
     if (existing) {
-      completedFields = [...existing.completedFields];
-      if (shouldMark && !completedFields.includes(field)) {
-        completedFields.push(field);
-      } else if (!shouldMark && completedFields.includes(field)) {
-        completedFields = completedFields.filter((f) => f !== field);
-      }
-
-      const readinessScore = computeReadinessScore(completedFields, stage.completionCriteria);
-      const isComplete = readinessScore === 100;
-
-      await ctx.db.patch(existing._id, {
-        completedFields,
-        readinessScore,
-        completedAt: isComplete ? (existing.completedAt ?? now) : undefined,
-        updatedAt: now,
-      });
+      await ctx.db.patch(existing._id, { completedFields, readinessScore, completedAt: readinessScore === 100 ? existing.completedAt ?? now : undefined, updatedAt: now });
     } else {
-      completedFields = shouldMark ? [field] : [];
-      const readinessScore = computeReadinessScore(completedFields, stage.completionCriteria);
-
-      await ctx.db.insert("stageProgress", {
-        inventionId,
-        stageId,
-        readinessScore,
-        completedFields,
-        completedAt: readinessScore === 100 ? now : undefined,
-        updatedAt: now,
-      });
+      await ctx.db.insert("stageProgress", { inventionId, stageId, readinessScore, completedFields, completedAt: readinessScore === 100 ? now : undefined, updatedAt: now });
     }
-
-    // Update invention's updatedAt
     await ctx.db.patch(inventionId, { updatedAt: now });
   },
 });
 
-/**
- * Updates an invention field directly (used by Stage 1 inline edit).
- */
 export const updateInventionField = mutation({
   args: {
     inventionId: v.id("inventions"),
-    field: v.union(
-      v.literal("title"),
-      v.literal("problemStatement"),
-      v.literal("targetAudience"),
-      v.literal("solutionDescription")
-    ),
+    field: v.union(v.literal("title"), v.literal("problemStatement"), v.literal("targetAudience"), v.literal("solutionDescription")),
     value: v.string(),
   },
   handler: async (ctx, { inventionId, field, value }) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-
+    await requireInventionEditAccess(ctx, inventionId);
     const invention = await ctx.db.get(inventionId);
-    if (!invention || invention.userId !== userId) throw new Error("Not found");
-
+    if (!invention) throw new Error("Not found");
     const previous = invention[field];
     const now = Date.now();
-    await ctx.db.patch(inventionId, {
-      [field]: value,
-      updatedAt: now,
-    });
+    await ctx.db.patch(inventionId, { [field]: value, updatedAt: now });
     if (!materiallyChanged(previous, value)) return;
 
     const record = await ctx.db.query("inventionRecords").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).unique();
     if (record) {
-      const structuredBrief = record.structuredBrief && typeof record.structuredBrief === "object"
-        ? record.structuredBrief as Record<string, unknown>
-        : {};
+      const structuredBrief = record.structuredBrief && typeof record.structuredBrief === "object" ? record.structuredBrief as Record<string, unknown> : {};
       await ctx.db.patch(record._id, { structuredBrief: { ...structuredBrief, [field]: value }, updatedAt: now });
     }
 
@@ -574,23 +320,11 @@ export const updateInventionField = mutation({
       ctx.db.query("evidenceFindings").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
       ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
     ]);
-    for (const deliverable of deliverables) {
-      await ctx.db.patch(deliverable._id, { staleReason: reason, updatedAt: now });
-    }
-    for (const finding of findings) {
-      if (finding.status !== "stale") await ctx.db.patch(finding._id, { status: "stale", updatedAt: now });
-    }
+    for (const deliverable of deliverables) await ctx.db.patch(deliverable._id, { staleReason: reason, updatedAt: now });
+    for (const finding of findings) if (finding.status !== "stale") await ctx.db.patch(finding._id, { status: "stale", updatedAt: now });
     for (const item of workItems) {
       if (!shouldRequeueWorkKind(item.kind) || item.status === "running") continue;
-      await ctx.db.patch(item._id, {
-        status: "queued",
-        attemptCount: 0,
-        completedAt: undefined,
-        blockedReason: undefined,
-        humanGateType: undefined,
-        lastError: undefined,
-        updatedAt: now,
-      });
+      await ctx.db.patch(item._id, { status: "queued", attemptCount: 0, completedAt: undefined, blockedReason: undefined, humanGateType: undefined, lastError: undefined, updatedAt: now });
     }
     await ctx.db.insert("atlasExecutionEvents", {
       inventionId,
@@ -603,145 +337,73 @@ export const updateInventionField = mutation({
   },
 });
 
-/**
- * Advances the invention to the next enabled stage if current stage is complete.
- */
 export const advanceStage = mutation({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-
+    await requireInventionEditAccess(ctx, inventionId);
     const invention = await ctx.db.get(inventionId);
-    if (!invention || invention.userId !== userId) throw new Error("Not found");
-
-    const currentStage = stageConfig.find((s) => s.id === invention.currentStageId);
+    if (!invention) throw new Error("Not found");
+    const currentStage = stageConfig.find((stage) => stage.id === invention.currentStageId);
     if (!currentStage) throw new Error("Invalid stage");
 
-    // Check if current stage is complete
-    const progress = await ctx.db
-      .query("stageProgress")
-      .withIndex("by_inventionId_stageId", (q) =>
-        q.eq("inventionId", inventionId).eq("stageId", invention.currentStageId)
-      )
-      .first();
+    const [progress, workItems] = await Promise.all([
+      ctx.db.query("stageProgress").withIndex("by_inventionId_stageId", (q) => q.eq("inventionId", inventionId).eq("stageId", invention.currentStageId)).first(),
+      ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    ]);
+    const ledgerReadiness = workReadinessForStage(invention.currentStageId, workItems);
+    const legacyScore = computeReadinessScore(progress?.completedFields ?? [], currentStage.completionCriteria);
+    const ready = ledgerReadiness ? ledgerReadiness.allComplete : legacyScore >= 75;
+    if (!ready) throw new Error("Stage not complete enough to advance");
 
-    const completedFields = progress?.completedFields ?? [];
-    const score = computeReadinessScore(completedFields, currentStage.completionCriteria);
-
-    if (score < 75) throw new Error("Stage not complete enough to advance");
-
-    // Find next enabled stage
-    const nextStage = stageConfig.find(
-      (s) => s.id > invention.currentStageId && s.enabled
-    );
-
-    if (!nextStage) return null; // Already at last enabled stage
-
+    const nextStage = stageConfig.find((stage) => stage.id > invention.currentStageId && stage.enabled);
+    if (!nextStage) return null;
     const now = Date.now();
-    await ctx.db.patch(inventionId, {
-      currentStageId: nextStage.id,
-      updatedAt: now,
-    });
+    await ctx.db.patch(inventionId, { currentStageId: nextStage.id, updatedAt: now });
 
-    // ── onStageEnter hook ────────────────────────────────────────────────────
-    // Stage 2 (Validation): automatically trigger research so the founder
-    // arrives at the stage with generated content ready to review.
-    // This is non-blocking — research runs in the background via an action.
-    // Each section is generated and persisted independently (not batched).
-    // Section failures are isolated; remaining sections continue.
     if (nextStage.id === 2) {
-      console.log(`[Stage2] Stage 2 entered: inventionId=${inventionId}`);
-      console.log(`[Stage2] onStageEnter executing: scheduling triggerValidationResearch for inventionId=${inventionId}`);
-      await ctx.scheduler.runAfter(
-        0,
-        internal.validationResearchOrchestration.runValidationResearchOrchestration,
-        { inventionId }
-      );
-      console.log(`[Stage2] onStageEnter executed: triggerValidationResearch scheduled for inventionId=${inventionId}`);
+      await ctx.scheduler.runAfter(0, internal.validationResearchOrchestration.runValidationResearchOrchestration, { inventionId });
     }
-    // Future stages: add additional onStageEnter hooks here.
-
     return nextStage.id;
   },
 });
 
-/**
- * Deletes an invention and all owned child records.
- * Only the owning user may call this mutation.
- * Cleans up all legacy and canonical invention-owned records.
- */
 export const deleteInvention = mutation({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new ConvexError("Not authenticated");
-
+    const { userId } = await requireInventionManageAccess(ctx, inventionId);
     const invention = await ctx.db.get(inventionId);
     if (!invention) throw new ConvexError("Invention not found");
-    if (invention.userId !== userId) throw new ConvexError("Not authorized to delete this invention");
+    const usageScope = await resolveInventionUsageScope(ctx, inventionId);
 
-    // ── Delete owned child records ───────────────────────────────────────────
+    const stageProgressRows = await ctx.db.query("stageProgress").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+    for (const row of stageProgressRows) await ctx.db.delete(row._id);
+    const conversationMessageRows = await ctx.db.query("conversationMessages").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+    for (const row of conversationMessageRows) await ctx.db.delete(row._id);
+    const conversationRows = await ctx.db.query("conversations").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+    for (const row of conversationRows) await ctx.db.delete(row._id);
+    const documentRows = await ctx.db.query("documents").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+    for (const row of documentRows) await ctx.db.delete(row._id);
+    const validationResearchRows = await ctx.db.query("validationResearch").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+    for (const row of validationResearchRows) await ctx.db.delete(row._id);
 
-    // 1. stageProgress rows
-    const stageProgressRows = await ctx.db
-      .query("stageProgress")
-      .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
-      .collect();
-    for (const row of stageProgressRows) {
-      await ctx.db.delete(row._id);
+    const notificationUserIds = new Set<string>([String(invention.userId), String(userId)]);
+    if (invention.organizationId) {
+      const memberships = await ctx.db.query("organizationMemberships").withIndex("by_organizationId", (q) => q.eq("organizationId", invention.organizationId!)).collect();
+      for (const membership of memberships) notificationUserIds.add(String(membership.userId));
+    }
+    for (const notificationUserId of notificationUserIds) {
+      const notificationRows = await ctx.db.query("notifications").withIndex("by_userId", (q) => q.eq("userId", notificationUserId as typeof userId)).collect();
+      for (const row of notificationRows) if (row.inventionId === inventionId) await ctx.db.delete(row._id);
     }
 
-    // 2. conversations rows
-    const conversationMessageRows = await ctx.db
-      .query("conversationMessages")
-      .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
-      .collect();
-    for (const row of conversationMessageRows) {
-      await ctx.db.delete(row._id);
-    }
-
-    const conversationRows = await ctx.db
-      .query("conversations")
-      .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
-      .collect();
-    for (const row of conversationRows) {
-      await ctx.db.delete(row._id);
-    }
-
-    // 3. documents rows
-    const documentRows = await ctx.db
-      .query("documents")
-      .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
-      .collect();
-    for (const row of documentRows) {
-      await ctx.db.delete(row._id);
-    }
-
-    // 4. validationResearch rows
-    const validationResearchRows = await ctx.db
-      .query("validationResearch")
-      .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
-      .collect();
-    for (const row of validationResearchRows) {
-      await ctx.db.delete(row._id);
-    }
-
-    // 5. notifications referencing this invention
-    const notificationRows = await ctx.db
-      .query("notifications")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .collect();
-    for (const row of notificationRows) {
-      if (row.inventionId === inventionId) {
-        await ctx.db.delete(row._id);
-      }
-    }
-
-    // 6. Canonical InventSmith records. Delete dependency rows before deliverables.
     const generatedMediaRows = await ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
-    for (const row of generatedMediaRows) {
-      if (row.storageId) await ctx.storage.delete(row.storageId);
+    for (const row of generatedMediaRows) if (row.storageId) await ctx.storage.delete(row.storageId);
+    const evidenceSourceRows = await ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+    for (const row of evidenceSourceRows) {
+      const storageId = row.metadata?.storageId;
+      if (typeof storageId === "string") {
+        try { await ctx.storage.delete(storageId as any); } catch { /* storage may already be absent */ }
+      }
     }
 
     const canonicalRowGroups = await Promise.all([
@@ -754,51 +416,35 @@ export const deleteInvention = mutation({
       ctx.db.query("inventionDecisions").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
       ctx.db.query("inventionAssumptions").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
       ctx.db.query("evidenceFindings").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
-      ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      Promise.resolve(evidenceSourceRows),
       ctx.db.query("inventionRecords").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      ctx.db.query("inventionAccessGrants").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
     ]);
 
-    // Return cost reservations held by this invention before its work rows are removed.
     const reservedByDate = new Map<string, number>();
     for (const row of canonicalRowGroups[4]) {
-      if (row.reservedCostUnits && row.reservationDateKey) {
-        reservedByDate.set(row.reservationDateKey, (reservedByDate.get(row.reservationDateKey) ?? 0) + row.reservedCostUnits);
-      }
+      if (row.reservedCostUnits && row.reservationDateKey) reservedByDate.set(row.reservationDateKey, (reservedByDate.get(row.reservationDateKey) ?? 0) + row.reservedCostUnits);
     }
     for (const [dateKey, reservedUnits] of reservedByDate) {
-      const usage = await ctx.db
-        .query("atlasDailyUsage")
-        .withIndex("by_userId_dateKey", (q) => q.eq("userId", userId).eq("dateKey", dateKey))
-        .unique();
-      if (usage) {
+      if (usageScope?.scope === "organization") {
+        const usage = await ensureOrganizationDailyUsage(ctx, usageScope.organizationId, dateKey, Date.now());
         await ctx.db.patch(usage._id, {
           reservedAutonomousCostUnits: Math.max(0, (usage.reservedAutonomousCostUnits ?? 0) - reservedUnits),
           updatedAt: Date.now(),
         });
+      } else if (usageScope?.scope === "legacy_user") {
+        const usage = await ctx.db.query("atlasDailyUsage").withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey)).unique();
+        if (usage) await ctx.db.patch(usage._id, { reservedAutonomousCostUnits: Math.max(0, (usage.reservedAutonomousCostUnits ?? 0) - reservedUnits), updatedAt: Date.now() });
       }
     }
+    for (const rows of canonicalRowGroups) for (const row of rows) await ctx.db.delete(row._id);
 
-    for (const rows of canonicalRowGroups) {
-      for (const row of rows) {
-        await ctx.db.delete(row._id);
-      }
-    }
-
-    // ── Delete the invention itself ──────────────────────────────────────────
     await ctx.db.delete(inventionId);
-
     return { success: true };
   },
 });
 
-// ── Internal queries used by seed ───────────────────────────────────────────
-
 export const getStageProgressForInvention = internalQuery({
   args: { inventionId: v.id("inventions") },
-  handler: async (ctx, { inventionId }) => {
-    return ctx.db
-      .query("stageProgress")
-      .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
-      .collect();
-  },
+  handler: async (ctx, { inventionId }) => await ctx.db.query("stageProgress").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
 });

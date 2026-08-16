@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, CircleDot, Compass, Lightbulb, MessageCircle } from "lucide-react";
+import { ArrowRight, CheckCircle2, CircleDot, Compass, FileUp, Lightbulb, MessageCircle } from "lucide-react";
 import type { StatusBriefing as StatusBriefingData } from "@convex/statusBriefingLogic";
 import { Button } from "@/components/ui/button";
 
@@ -12,8 +12,13 @@ function EmptyLine({ children }: { children: React.ReactNode }) {
   return <p className="text-sm leading-relaxed text-muted-foreground">{children}</p>;
 }
 
+function isEvidenceRequest(title: string, detail: string) {
+  return /survey|surveymonkey|interview|transcript|evidence|prototype\s*(test|result)|test\s*result|factory\s*quote|manufacturer\s*quote|rfq|document|report|upload/i.test(`${title} ${detail}`);
+}
+
 export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
   const primaryNeed = briefing.needsInventor[0];
+  const evidenceNeeded = primaryNeed ? isEvidenceRequest(primaryNeed.title, primaryNeed.detail) : false;
 
   return (
     <section aria-labelledby="atlas-briefing-title" className="space-y-6">
@@ -37,13 +42,14 @@ export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
               <p className="text-sm leading-relaxed text-muted-foreground">{primaryNeed.detail}</p>
               {briefing.needsInventor.length > 1 && (
                 <p className="text-xs text-muted-foreground">
-                  {briefing.needsInventor.length - 1} more item{briefing.needsInventor.length === 2 ? "" : "s"} will follow.
+                  {briefing.needsInventor.length - 1} additional inventor item{briefing.needsInventor.length === 2 ? "" : "s"} remain in the review queue. InventSmith will surface each only when it becomes actionable.
                 </p>
               )}
             </div>
             <Button asChild className="shrink-0 gap-2">
-              <Link href={`/invention/${inventionId}/review`}>
-                Review and decide
+              <Link href={evidenceNeeded ? `/invention/${inventionId}/evidence` : `/invention/${inventionId}/review`}>
+                {evidenceNeeded ? <FileUp className="h-4 w-4" aria-hidden="true" /> : null}
+                {evidenceNeeded ? "Upload requested evidence" : "Review and decide"}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </Button>
@@ -126,7 +132,7 @@ export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
             ))}
           </ul>
         ) : (
-          <EmptyLine>Evidence-checked findings will appear here—not guesses or unfinished research.</EmptyLine>
+          <EmptyLine>Evidence-checked findings will appear here. Draft research and unverified evidence remain visible in their departments without being presented as confirmed discoveries.</EmptyLine>
         )}
       </article>
     </section>

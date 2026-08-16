@@ -11,11 +11,10 @@ import { trackUpgradeCompleted } from "@/lib/analytics";
 function SuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const plan = searchParams.get("plan") ?? "Pro";
+  const plan = searchParams.get("plan") ?? "paid plan";
 
   useEffect(() => {
     trackUpgradeCompleted(plan);
-    // Redirect to dashboard after 3 seconds
     const timer = setTimeout(() => {
       router.push("/dashboard");
     }, 3000);
@@ -32,13 +31,13 @@ function SuccessContent() {
           className="text-3xl font-bold tracking-tight text-foreground"
           style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
         >
-          Welcome to {plan}
+          Checkout complete
         </h1>
         <p className="mt-3 text-muted-foreground">
-          Thank you for upgrading. Your full inventor journey is now unlocked.
+          Thank you. InventSmith will apply your updated plan when the confirmed billing event reaches your account.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Redirecting to your dashboard in a moment…
+          If confirmation is still processing, your existing access remains in place until the subscription update is verified. Redirecting to your dashboard in a moment…
         </p>
       </div>
       <Button asChild variant="outline">

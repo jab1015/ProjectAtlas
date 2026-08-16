@@ -55,6 +55,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Verify operational scripts
+        run: |
+          node --check scripts/check-deployment-readiness.mjs
+          node --check scripts/verify-live-deployment.mjs
+
       - name: Typecheck web
         run: npx tsc --noEmit
 
@@ -75,5 +80,7 @@ jobs:
 
       - name: Record deployment boundary
         run: |
-          echo "Convex development deployment completed."
-          echo "Run npm run verify:live -- https://<deployment>.convex.site after server environment secrets are configured."
+          echo "InventSmith Convex development deployment completed."
+          echo "After server environment secrets and the replicated frontend are configured, run:"
+          echo "npm run verify:live -- https://<deployment>.convex.site https://<inventsmith-app>"
+          echo "That verifies backend health plus public InventSmith frontend surfaces; authenticated session persistence and representative inventor workflows still require live browser acceptance."

@@ -1,83 +1,149 @@
-# Atlas Controlled-Pilot Deployment Runbook
+# InventSmith Production Deployment and Acceptance Runbook
 
-**Status:** Pre-deployment  
-**Scope:** Idea-to-Feasibility and IP-Readiness controlled pilot
+**Status:** Repository implementation green; live replication/acceptance pending  
+**Product:** InventSmith — The Inventor OS by Modern Methods  
+**Updated:** August 16, 2026  
+**Legacy filename:** retained for compatibility with existing documentation links
 
-## 1. Local readiness
+## 1. Authority and release boundary
 
-Run `npm run readiness`. The command prints variable names and readiness states only; it never prints secret values. Resolve every `BLOCK` item before attempting a deployment. Treat `WARN` items as required manual checks for a pilot, not optional suggestions.
+This runbook implements the deployment and live-acceptance boundary defined by:
 
-Then run:
+1. `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`
+2. `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`
+3. `docs/ATLAS_BUILD_PROGRESS.md`
+4. `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md`
 
-1. `npx tsc --noEmit`
-2. `npx tsc -p convex/tsconfig.json --noEmit`
-3. `npm test`
-4. `npm run build`
+The retired Atlas controlled-pilot scope is historical and must not be used as the release definition. Repository-green is necessary but is not production acceptance.
 
-The normal build includes Convex code generation and therefore must target the intended deployment. GitHub pull requests also run Atlas CI: both TypeScript targets, the full regression suite, the production dependency audit, and the Next production build must pass before merge.
+## 2. Repository readiness before MadeThis handoff
 
-## 2. Provision Convex
+Before pinning a GitHub head for MadeThis replication:
 
-Use the Convex CLI's interactive development/deployment setup or the Convex dashboard to create and select the Atlas project. Confirm that `.env.local` contains the generated `CONVEX_DEPLOYMENT` and `NEXT_PUBLIC_CONVEX_URL` entries. Do not hand-invent deployment identifiers.
+1. Confirm the intended head is on `inventsmith/full-product-build` and draft PR #24 remains unmerged unless the founder explicitly approves otherwise.
+2. Run/verify the complete CI stack: operational-script verification; web TypeScript; Convex TypeScript; full regression suite; production dependency audit; Next production build.
+3. Confirm authoritative InventSmith documentation reflects the implementation head.
+4. Confirm no destructive schema migration, secret, generated credential or environment-specific value was committed.
+5. Record the exact commit SHA supplied to MadeThis so replication can be compared deterministically.
 
-After deployment, call `GET https://<deployment>.convex.site/api/health`. A pilot-ready response must return HTTP 200 with `ok: true`, `ready: true`, and `databaseReachable: true`. The endpoint exposes configuration booleans only; it must never expose secret values, user data, invention data, or detailed operational errors. Use this endpoint for external uptime monitoring.
+Atlas CI #463 on `e533dd96f1768e4cff36a502ee9779f3b97c5cb4` is the latest fully verified classification/routing code checkpoint before the final business-only/documentation updates. The final handoff SHA must itself receive a complete green CI pass.
 
-## 3. Configure secrets safely
+## 3. Runtime configuration
 
-Configure these in the Convex deployment environment, not in browser-exposed `NEXT_PUBLIC_*` variables:
+Use the actual deployment/provider configuration. Do not hand-invent identifiers or copy secrets into source control. Required runtime configuration includes the selected Convex deployment/site URL, authentication key material, OpenAI/provider credentials, fulfillment/subscription webhook secrets, and any production storage/search/image/CAD/software/provider credentials actually enabled by the replicated application.
 
-- `OPENAI_API_KEY`
-- `ATLAS_OPENAI_MODEL` (optional; defaults to the tested model)
-- `CONVEX_SITE_URL`
-- Convex Auth key material created by the auth provisioning flow
-- `PLATFORM_FULFILLMENT_SECRET`
-- `ATLAS_SUBSCRIPTION_WEBHOOK_SECRET` (independent from the fulfillment secret)
-- Any future monitoring, storage, or provider secrets
+Secrets belong in secure deployment environment configuration, never browser-exposed `NEXT_PUBLIC_*` variables unless intentionally public. Health/readiness checks may expose sanitized status only and must never expose secret values, tokens, user data or invention data.
 
-Never paste a secret into source files, screenshots, issues, chat messages, command output, or deployment logs. Use a masked dashboard field or an approved interactive secret-input flow. After configuration, verify only presence and a successful minimal call—not the value.
+## 4. Authentication and organization acceptance
 
-## 4. Pre-pilot smoke test
+Using disposable production-like accounts, verify:
 
-Create a new non-safety-critical US consumer-product invention and verify:
+- sign-up/sign-in/session persistence across refresh/navigation;
+- legacy single-user invention migration into the correct personal organization without losing evidence/documents/work/billing/history;
+- Owner/Admin/Member/Viewer/Professional-Guest server-side enforcement;
+- Viewer cannot mutate state;
+- Professional/Guest sees only explicitly granted invention/review access and no broad portfolio/billing;
+- invention-level isolation;
+- organization-owned inventions survive member departure;
+- ownership transfer preserves organization/billing continuity;
+- owner deletion cannot orphan a company/studio organization, including suspended-owner cases;
+- active/archive capacity follows the plan and archiving preserves history.
 
-- Intake creates a canonical invention record and a dependency-based work queue.
-- Only one leased work item runs at a time.
-- The 15-minute maintenance sweep resumes queued work and safely reclaims an expired lease without inventor interaction.
-- Two simultaneous claims for the same account reserve cost atomically and cannot exceed the tier's daily autonomous allowance.
-- A retried expired lease reuses its existing reservation instead of charging a second reservation.
-- Completion, terminal failure, a human gate, and test-invention deletion each settle or return their reservation.
-- Autonomous work and chat responses stop at their configured output-token ceilings.
-- The admin operations console rejects non-admin accounts and accurately surfaces terminal failures, expired leases, human gates, and current used/reserved daily cost.
-- Research stores exact source locators as unverified before the verification stage.
-- Missing source URLs cannot become sourced facts.
-- Human gates stop work and the review response resumes the same work item.
-- Consequential actions remain behind explicit approvals.
-- Evidence verification promotes only qualifying findings and deliverables.
-- Evidence promotion rejects missing, malformed, future-dated, or more-than-90-day-old source verification and requires refreshed research before relying on stale evidence.
-- The maintenance sweep marks outputs tied to expired trusted evidence stale, queues exactly one evidence refresh, and removes only its own freshness marker after successful re-verification.
-- Ask Atlas uses the invention record and labels draft evidence accurately.
-- Ask Atlas caps total model context, bounds each supplied record, and limits conversation reads while preserving the most recent messages.
-- The execution history records attempts, costs, failures, gates, and resolutions without secrets.
-- Signed subscription events are idempotent, out-of-order events cannot overwrite newer state, canceled/past-due access follows the paid-period rule, and unrecognized free-tier claims are rejected.
-- Explorer, Inventor, and Pro accounts cannot claim work above their backend entitlement even if a client attempts to invoke the queue directly.
-- Deleting the test invention removes all invention-owned child records.
-- An account-deletion privacy request cannot be manually marked completed; it must use the deletion executor.
-- A paid account deletion fails closed until the administrator records that external billing was cancelled or otherwise resolved.
-- The deletion executor removes every invention and generated/uploaded storage object, clears usage and notifications, anonymizes retained transaction/subscription rows, invalidates auth sessions and refresh tokens, deletes auth accounts/verification codes, and finally removes the user record.
-- Run one deletion restoration test against a disposable pilot account: confirm the deleted identity cannot sign in, deleted data cannot be recovered from normal application queries, retained financial rows contain no user identity, and the privacy request retains an auditable completion summary.
+## 5. Invitation acceptance
 
-## 5. Operations gate
+Verify pending invitations reserve seats, cannot overbook capacity, recheck projected capacity at acceptance, require recipient consent, release reservations on revocation/expiry, remain bound to the intended account across email changes/reuse, fail closed for legacy unbound invitations, cannot be bypassed through retired direct-add membership, and do not enable pre-signup email claiming until email ownership is actually verified.
 
-Before inviting a pilot inventor, name owners for:
+## 6. Shared organization resource accounting
 
-- External monitoring of `/api/health` and alert response
-- OpenAI and Convex spend alerts
-- Data export/backups and restoration testing
-- Incident response and key rotation
-- User deletion/privacy requests
-- Prompt/model change approval
-- Rollback decision and deployment access
+With at least two collaborators acting concurrently, verify Ask InventSmith and autonomous AI/research/generation allowances are organization-shared rather than multiplied per user; concurrent reservations cannot exceed capacity; retries/reclaimed leases do not double-charge; stale/discarded outputs settle correctly; Native CAD/visual generation use the same shared ledger; deletion releases reservations correctly; legacy inventions without `organizationId` continue on the legacy user ledger; and internal provider economics remain appropriately restricted.
 
-## 6. Release rule
+## 7. Evidence Locker and Ask InventSmith acceptance
 
-Do not describe Atlas as patentability, freedom-to-operate, legal, regulatory, or engineering approval. Do not enable safety-critical categories. A pilot release is authorized only after the full representative-case evaluation in the build-progress document is complete and its blockers are closed or explicitly accepted by the release owner.
+With an authorized Editor/Manager, upload representative CSV/XLSX, PDF/DOCX and image/reference evidence. Verify Edit authorization, server-side binary extraction/retry, uploader provenance, authorized failed-extraction retry, downstream evidence use/staleness propagation, grounded Ask InventSmith responses, material chat-to-evidence write-back, and Viewer/Guest boundaries.
+
+## 8. Invention classification and journey-routing acceptance
+
+Run classification before evaluating a complete journey.
+
+### Physical representative case
+
+Create a non-safety-critical physical product. Verify classification reports `physical`, the journey includes applicable Product Design/CAD/Engineering, physical Prototype and Manufacturing work, and software-only work is not unnecessarily required.
+
+### Software representative case
+
+Create a genuine software product such as an app/SaaS concept. Verify classification reports `software` and the middle journey becomes:
+
+**Software Product Design → Software Prototype & Build → Software Engineering & Release Readiness**
+
+Verify the queue includes software product specification, UX/user-flow design, architecture, data/API design, security/privacy readiness, prototype/build planning, implementation planning, QA/acceptance, beta readiness and distribution/release planning. Confirm pure software is **not** blocked waiting for native CAD, physical prototype evidence, manufacturer RFQs or manufacturer quote evidence.
+
+Do not treat specifications/plans as proof code was implemented, tests passed, a beta ran or production/app-store deployment occurred; require real execution/deployment evidence for those claims.
+
+### Hybrid representative case
+
+Create a connected hardware/software product. Verify classification reports `hybrid`, both physical and software work branches are queued, and combined stages are not marked complete until their applicable requirements are satisfied.
+
+### Regulated representative case
+
+Use a harmless regulated example such as a medical/health, children's safety or privacy-sensitive software concept. Verify it remains supported while `professional_review_required` / applicable engineering, regulatory, security/privacy or legal review boundaries are visible and enforceable. The system must not blanket-reject legitimate regulated invention work merely because qualified review is needed.
+
+### Unsupported scope
+
+Verify harmful/abusive weapon/destructive, malware/credential theft/unauthorized cyberattack, covert surveillance/stalking, fraud/theft/deceptive abuse and dangerous chemical/biological/radiological weaponization concepts do not receive a normal organization invention workspace. This is a product-support/safety boundary and should not be presented as a blanket legal conclusion.
+
+### Non-product business concept
+
+Verify an ordinary service-business idea with no new physical/software/hybrid product is routed outside the invention-development workflow rather than being forced through CAD/patent/prototype/software stages.
+
+## 9. Complete idea-to-market representative journey
+
+Run representative physical, software and hybrid inventions through the complete **applicable** journey as evidence permits. InventSmith must own sequencing/dependencies without requiring the inventor to manually manage departments.
+
+For physical/hybrid cases review validation/research, Product Design Specification, CAD/drawings/renders, engineering handoff, prototype plan, RFQ/manufacturing package and downstream commercial artifacts. For software/hybrid cases review product specification, UX flows, architecture, data/API design, security/privacy readiness, implementation/test/beta/release plans and downstream commercial artifacts. Across all product types review branding, legal/professional drafts, pricing/GTM/sales/funding, editable pitch deck, financial workbook, launch plan and growth reporting.
+
+## 10. Genuine evidence gates
+
+These gates must use real evidence; fixtures, forecasts or AI-generated claims cannot satisfy them merely to mark acceptance complete.
+
+### Physical prototype
+InventSmith may prepare prototype/test plans, but prototype assessment requires genuine physical prototype-test evidence.
+
+### Manufacturing
+InventSmith may prepare sourcing/RFQ work, but quote comparison and quote-based unit economics require genuine manufacturer/RFQ evidence.
+
+### Software implementation / testing / release
+InventSmith may prepare architecture, implementation, QA, beta and release plans, but it must not claim source was implemented, tests passed, a beta succeeded, an app-store submission occurred or production deployment succeeded without corresponding real execution/deployment evidence.
+
+### Launch and growth
+Modeled forecasts do not satisfy launch-performance analysis; genuine post-launch sales/analytics/market evidence is required.
+
+### Professional review
+Routing/preparation is not completed professional review. Qualified professional outcomes must be recorded before gated conclusions are treated as approved.
+
+## 11. Artifact quality acceptance
+
+Human-review representative outputs rather than checking file existence alone. For physical/hybrid products verify native CAD/editable geometry, STEP/STL/DXF usability, dimensions/exploded views and product renders. For software/hybrid products verify specifications, architecture/data/API artifacts, UX flows, security/privacy readiness and implementation/test/release plans are coherent and traceable to evidence. Across all types verify brand boards, editable PPTX, financial spreadsheet/CSV and PDF/DOCX outputs are usable and carry appropriate limitations.
+
+Generated CAD remains preliminary until engineering/prototype evidence supports production release. Software planning remains planning until real implementation/test/deployment evidence exists.
+
+## 12. Billing and entitlement acceptance
+
+After external billing is configured, verify organization `planKey` authority, signed/idempotent/out-of-order-safe provider events, ownership-transfer continuity, cancellation/past-due behavior, Studio organization-only plans, active-invention/seat limits, organization-shared compute, public/account pricing alignment, and Pro/Enterprise entitlement for the appropriate software work kinds.
+
+Do not finalize compute/storage/premium-generation allowances from guesses; lock them after representative provider/runtime economics support sustainable policy.
+
+## 13. Privacy, deletion and restoration acceptance
+
+Using disposable accounts/organizations, verify personal export boundaries, authorized organization exports, member departure preservation, invitation cleanup, company/studio owner deletion safety, personal-organization deletion lifecycle, external billing resolution before destructive deletion where required, deleted-identity sign-in prevention and retained-record anonymization that cannot transfer identity through mutable/reused email.
+
+## 14. Operational readiness
+
+Before release, assign owners for health/uptime alerts, provider/Convex spend alerts, backups/restoration, incident response/key rotation, privacy/deletion requests, prompt/model/provider changes, rollback/deployment access and billing/webhook incidents.
+
+## 15. Release rule
+
+InventSmith must never be described as providing patentability/FTO/legal/regulatory opinions, production engineering approval, software security certification or proof of unperformed software implementation/testing/deployment. Consequential external actions remain behind appropriate gates.
+
+A GitHub head is **ready to hand to MadeThis** when repository CI is fully green, authoritative docs match the implementation, no known repository-only blocker remains, and the exact commit SHA can be supplied for deterministic replication.
+
+MadeThis replication is **not final product acceptance**. Final production acceptance occurs only after the replicated runtime passes live authentication, organization, classification/routing, resource-accounting, evidence, billing, privacy, applicable complete-journey, artifact-quality and genuine physical/software/professional/market gates above.

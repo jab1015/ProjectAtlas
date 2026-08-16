@@ -35,11 +35,59 @@ describe("backend authorization boundaries", () => {
     expect(block).toContain("purchase.productId");
   });
 
-  it("requires ownership for every legacy validation-research write", () => {
+  it("requires organization-aware edit access for every validation-research write", () => {
     const file = source("validationResearchMutations.ts");
+    expect(file).toContain("requireInventionEditAccess");
     expect(exportedFunctionBlock(file, "triggerValidationResearch")).toContain("requireOwnedInvention");
     for (const name of ["approveValidationSection", "editValidationSection", "refreshValidationSection"]) {
       expect(exportedFunctionBlock(file, name)).toContain("requireOwnedResearch");
     }
+  });
+
+  it("uses organization-aware access for the primary invention workspace", () => {
+    const file = source("inventionWorkspace.ts");
+    expect(file).not.toContain("invention.userId !== userId");
+    for (const name of ["getWorkspaceState", "getStatusBriefing", "getReviewQueue", "getDeliverableLibrary", "getPilotEvaluation"]) {
+      expect(exportedFunctionBlock(file, name)).toMatch(/requireInventionReadAccess|getAccessibleInvention/);
+    }
+    expect(exportedFunctionBlock(file, "ensureInventionRecord")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "kickAutonomousWork")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "respondToBlockedWork")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "resolveDecision")).toContain("requireInventionManageAccess");
+    expect(exportedFunctionBlock(file, "resolveApprovalRequest")).toContain("requireInventionManageAccess");
+  });
+
+  it("uses organization-aware access for Ask InventSmith", () => {
+    const file = source("atlasChat.ts");
+    expect(file).not.toContain("invention.userId !== userId");
+    expect(exportedFunctionBlock(file, "getConversation")).toContain("requireInventionReadAccess");
+    expect(exportedFunctionBlock(file, "ask")).toContain("requireInventionEditAccess");
+  });
+
+  it("uses organization-aware access for the invention evidence locker", () => {
+    const file = source("files.ts");
+    expect(file).not.toContain("invention.userId !== userId");
+    expect(exportedFunctionBlock(file, "generateInventionEvidenceUploadUrl")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "registerInventionEvidence")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "listInventionEvidence")).toContain("requireInventionReadAccess");
+    expect(exportedFunctionBlock(file, "removeInventionEvidence")).toContain("requireInventionManageAccess");
+  });
+
+  it("uses organization-aware edit access for evidence extraction retries", () => {
+    const file = source("evidenceExtractionControl.ts");
+    const block = exportedFunctionBlock(file, "retryEvidenceExtraction");
+    expect(file).not.toContain("invention.userId !== userId");
+    expect(block).toContain("requireInventionEditAccess");
+  });
+
+  it("uses organization-aware authorization across the legacy journey engine surfaces", () => {
+    const file = source("journeyEngine.ts");
+    expect(exportedFunctionBlock(file, "getInventionState")).toContain("resolveInventionAccess");
+    expect(exportedFunctionBlock(file, "updateStageProgress")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "updateInventionField")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "advanceStage")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "deleteInvention")).toContain("requireInventionManageAccess");
+    expect(exportedFunctionBlock(file, "deleteInvention")).toContain("resolveInventionUsageScope");
+    expect(exportedFunctionBlock(file, "deleteInvention")).toContain("ensureOrganizationDailyUsage");
   });
 });

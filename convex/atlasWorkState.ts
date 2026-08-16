@@ -6,28 +6,75 @@ import { canPromoteDeliverable, EVIDENCE_FRESHNESS_STALE_REASON, isSourceEligibl
 import { remainingAutonomousCostUnitsAfterReservations, utcDateKey } from "./usagePolicyLogic";
 import { requiredProfessionalReviews } from "./professionalReviewPolicy";
 import { canTierRunWorkKind } from "./entitlementPolicyLogic";
+import { resolveInventionUsageScope } from "./organizationUsageScope";
+import { ensureOrganizationDailyUsage, findOrganizationDailyUsage } from "./organizationDailyUsage";
 
 async function settleUsageReservation(
   ctx: MutationCtx,
   item: { reservedCostUnits?: number; reservationDateKey?: string },
-  userId: Id<"users">,
+  inventionId: Id<"inventions">,
   actualCostUnits: number,
   completedWorkItems: number,
   now: number
 ) {
+  const usageScope = await resolveInventionUsageScope(ctx, inventionId);
+  if (!usageScope) throw new ConvexError("Invention not found while settling usage");
   const dateKey = item.reservationDateKey ?? utcDateKey(now);
-  const usage = await ctx.db.query("atlasDailyUsage").withIndex("by_userId_dateKey", (q) => q.eq("userId", userId).eq("dateKey", dateKey)).unique();
+  const reservedCostUnits = item.reservedCostUnits ?? 0;
+
+  if (usageScope.scope === "organization") {
+    let organizationUsage = await findOrganizationDailyUsage(ctx, usageScope.organizationId, dateKey);
+
+    // A work item claimed immediately before this additive ledger deployed may
+    // still have its reservation in the former creator row. If no organization
+    // ledger exists yet, settle that pre-ledger reservation in place; the first
+    // later org operation will bootstrap from the already-settled legacy total.
+    if (!organizationUsage && reservedCostUnits > 0) {
+      const transitionalUsage = await ctx.db
+        .query("atlasDailyUsage")
+        .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey))
+        .unique();
+      if (transitionalUsage && (transitionalUsage.reservedAutonomousCostUnits ?? 0) >= reservedCostUnits) {
+        await ctx.db.patch(transitionalUsage._id, {
+          autonomousCostUnits: transitionalUsage.autonomousCostUnits + actualCostUnits,
+          reservedAutonomousCostUnits: Math.max(0, (transitionalUsage.reservedAutonomousCostUnits ?? 0) - reservedCostUnits),
+          completedWorkItems: transitionalUsage.completedWorkItems + completedWorkItems,
+          updatedAt: now,
+        });
+        return;
+      }
+    }
+
+    organizationUsage = organizationUsage ?? await ensureOrganizationDailyUsage(ctx, usageScope.organizationId, dateKey, now);
+    await ctx.db.patch(organizationUsage._id, {
+      autonomousCostUnits: organizationUsage.autonomousCostUnits + actualCostUnits,
+      reservedAutonomousCostUnits: Math.max(0, (organizationUsage.reservedAutonomousCostUnits ?? 0) - reservedCostUnits),
+      completedWorkItems: organizationUsage.completedWorkItems + completedWorkItems,
+      updatedAt: now,
+    });
+    return;
+  }
+
+  const usage = await ctx.db
+    .query("atlasDailyUsage")
+    .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey))
+    .unique();
   if (usage) {
     await ctx.db.patch(usage._id, {
       autonomousCostUnits: usage.autonomousCostUnits + actualCostUnits,
-      reservedAutonomousCostUnits: Math.max(0, (usage.reservedAutonomousCostUnits ?? 0) - (item.reservedCostUnits ?? 0)),
+      reservedAutonomousCostUnits: Math.max(0, (usage.reservedAutonomousCostUnits ?? 0) - reservedCostUnits),
       completedWorkItems: usage.completedWorkItems + completedWorkItems,
       updatedAt: now,
     });
   } else {
     await ctx.db.insert("atlasDailyUsage", {
-      userId, dateKey, autonomousCostUnits: actualCostUnits, reservedAutonomousCostUnits: 0,
-      completedWorkItems, chatQuestions: 0, updatedAt: now,
+      userId: usageScope.usageUserId,
+      dateKey,
+      autonomousCostUnits: actualCostUnits,
+      reservedAutonomousCostUnits: 0,
+      completedWorkItems,
+      chatQuestions: 0,
+      updatedAt: now,
     });
   }
 }
@@ -36,33 +83,56 @@ export const claimNextWork = internalMutation({
   args: { inventionId: v.id("inventions"), availableCostUnits: v.number(), now: v.number() },
   handler: async (ctx, args) => {
     const items = await ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect();
-    const invention = await ctx.db.get(args.inventionId);
-    if (!invention) throw new ConvexError("Invention not found");
-    const user = await ctx.db.get(invention.userId);
-    if (!user) throw new ConvexError("Invention owner not found");
+    const usageScope = await resolveInventionUsageScope(ctx, args.inventionId);
+    if (!usageScope) throw new ConvexError("Invention not found");
     const dateKey = utcDateKey(args.now);
-    const usage = await ctx.db.query("atlasDailyUsage").withIndex("by_userId_dateKey", (q) => q.eq("userId", invention.userId).eq("dateKey", dateKey)).unique();
+
+    const organizationUsage = usageScope.scope === "organization"
+      ? await ensureOrganizationDailyUsage(ctx, usageScope.organizationId, dateKey, args.now)
+      : null;
+    const legacyUsage = usageScope.scope === "legacy_user"
+      ? await ctx.db
+          .query("atlasDailyUsage")
+          .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey))
+          .unique()
+      : null;
+    const autonomousCostUnits = organizationUsage?.autonomousCostUnits ?? legacyUsage?.autonomousCostUnits ?? 0;
+    const reservedAutonomousCostUnits = organizationUsage?.reservedAutonomousCostUnits ?? legacyUsage?.reservedAutonomousCostUnits ?? 0;
+
     const serverAvailableUnits = remainingAutonomousCostUnitsAfterReservations(
-      user.subscriptionTier,
-      usage?.autonomousCostUnits ?? 0,
-      usage?.reservedAutonomousCostUnits ?? 0
+      usageScope.plan,
+      autonomousCostUnits,
+      reservedAutonomousCostUnits
     );
     const selection = selectNextWorkItem(
       items.map((item) => ({ ...item, _id: String(item._id) })),
       Math.min(args.availableCostUnits, serverAvailableUnits),
       args.now,
-      (kind) => canTierRunWorkKind(user.subscriptionTier, kind)
+      (kind) => canTierRunWorkKind(usageScope.plan, kind)
     );
     if (!selection.selected) return { workItemId: null, reason: selection.reason };
     const workItemId = selection.selected._id as typeof items[number]["_id"];
     const reservation = selection.selected.reservedCostUnits ?? selection.selected.estimatedCostUnits ?? 0;
     if (!selection.selected.reservedCostUnits && reservation > 0) {
-      if (usage) {
-        await ctx.db.patch(usage._id, { reservedAutonomousCostUnits: (usage.reservedAutonomousCostUnits ?? 0) + reservation, updatedAt: args.now });
-      } else {
+      if (organizationUsage) {
+        await ctx.db.patch(organizationUsage._id, {
+          reservedAutonomousCostUnits: (organizationUsage.reservedAutonomousCostUnits ?? 0) + reservation,
+          updatedAt: args.now,
+        });
+      } else if (legacyUsage) {
+        await ctx.db.patch(legacyUsage._id, {
+          reservedAutonomousCostUnits: (legacyUsage.reservedAutonomousCostUnits ?? 0) + reservation,
+          updatedAt: args.now,
+        });
+      } else if (usageScope.scope === "legacy_user") {
         await ctx.db.insert("atlasDailyUsage", {
-          userId: invention.userId, dateKey, autonomousCostUnits: 0, reservedAutonomousCostUnits: reservation,
-          completedWorkItems: 0, chatQuestions: 0, updatedAt: args.now,
+          userId: usageScope.usageUserId,
+          dateKey,
+          autonomousCostUnits: 0,
+          reservedAutonomousCostUnits: reservation,
+          completedWorkItems: 0,
+          chatQuestions: 0,
+          updatedAt: args.now,
         });
       }
     }
@@ -84,6 +154,11 @@ export const claimNextWork = internalMutation({
       actorType: "atlas",
       summary: `InventSmith claimed ${selection.selected.kind}.`,
       attemptNumber: selection.selected.attemptCount + 1,
+      metadata: {
+        usageScope: usageScope.scope,
+        usageOrganizationId: usageScope.organizationId ? String(usageScope.organizationId) : undefined,
+        usageUserId: usageScope.scope === "legacy_user" ? String(usageScope.usageUserId) : undefined,
+      },
       createdAt: args.now,
     });
     return { workItemId, reason: "selected" as const };
@@ -163,7 +238,7 @@ export const completeWork = internalMutation({
         metadata: { retryScheduled: true, staleInputDiscarded: true },
         createdAt: args.completedAt,
       });
-      await settleUsageReservation(ctx, workItem, currentInvention.userId, args.actualCostUnits, 0, args.completedAt);
+      await settleUsageReservation(ctx, workItem, workItem.inventionId, args.actualCostUnits, 0, args.completedAt);
       return;
     }
 
@@ -337,8 +412,7 @@ export const completeWork = internalMutation({
       metadata: { findingCount: findings.length, sourceCount: sourceIds.length, sourceCoverage },
       createdAt: args.completedAt,
     });
-    const invention = await ctx.db.get(workItem.inventionId);
-    if (invention) await settleUsageReservation(ctx, workItem, invention.userId, args.actualCostUnits, 1, args.completedAt);
+    await settleUsageReservation(ctx, workItem, workItem.inventionId, args.actualCostUnits, 1, args.completedAt);
 
     await ctx.db.patch(workItem._id, {
       status: "completed",
@@ -359,8 +433,7 @@ export const failWork = internalMutation({
     const item = await ctx.db.get(args.workItemId);
     if (!item) return { willRetry: false };
     const willRetry = shouldRetryWork(item.attemptCount, item.maxAttempts ?? 3);
-    const invention = await ctx.db.get(item.inventionId);
-    if (invention) await settleUsageReservation(ctx, item, invention.userId, 0, 0, args.failedAt);
+    await settleUsageReservation(ctx, item, item.inventionId, 0, 0, args.failedAt);
     await ctx.db.patch(item._id, {
       status: willRetry ? "queued" : "failed",
       lastError: args.error.slice(0, 1000),
@@ -393,8 +466,7 @@ export const blockWorkForHuman = internalMutation({
   handler: async (ctx, args) => {
     const item = await ctx.db.get(args.workItemId);
     if (!item) throw new ConvexError("Work item not found");
-    const invention = await ctx.db.get(item.inventionId);
-    if (invention) await settleUsageReservation(ctx, item, invention.userId, 0, 0, args.blockedAt);
+    await settleUsageReservation(ctx, item, item.inventionId, 0, 0, args.blockedAt);
     await ctx.db.patch(args.workItemId, {
       status: "blocked",
       blockedReason: args.reason,

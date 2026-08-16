@@ -9,6 +9,7 @@ export type AccountDeletionSummary = {
   notificationsDeleted: number;
   purchasesAnonymized: number;
   subscriptionEventsAnonymized: number;
+  invitationsAnonymized: number;
   authSessionsDeleted: number;
   authAccountsDeleted: number;
 };
@@ -20,10 +21,7 @@ async function deleteInventionData(
   let generatedFilesDeleted = 0;
   let uploadedFilesDeleted = 0;
 
-  const deliverables = await ctx.db
-    .query("atlasDeliverables")
-    .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
-    .collect();
+  const deliverables = await ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
   for (const row of deliverables) {
     if (row.storageId) {
       await ctx.storage.delete(row.storageId);
@@ -31,15 +29,19 @@ async function deleteInventionData(
     }
   }
 
-  const documents = await ctx.db
-    .query("documents")
-    .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
-    .collect();
+  const documents = await ctx.db.query("documents").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
   for (const row of documents) {
     if (row.storageId) {
-      // Legacy documents stored this as string. Fail closed if an invalid storage
-      // reference is encountered rather than silently claiming deletion.
       await ctx.storage.delete(row.storageId as Id<"_storage">);
+      uploadedFilesDeleted += 1;
+    }
+  }
+
+  const evidenceSources = await ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+  for (const source of evidenceSources) {
+    const storageId = source.metadata?.storageId as Id<"_storage"> | undefined;
+    if (storageId) {
+      await ctx.storage.delete(storageId);
       uploadedFilesDeleted += 1;
     }
   }
@@ -54,35 +56,65 @@ async function deleteInventionData(
     ctx.db.query("inventionDecisions").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
     ctx.db.query("inventionAssumptions").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
     ctx.db.query("evidenceFindings").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
-    ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    Promise.resolve(evidenceSources),
     ctx.db.query("inventionRecords").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
     ctx.db.query("stageProgress").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
     ctx.db.query("conversationMessages").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
     ctx.db.query("conversations").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
     Promise.resolve(documents),
     ctx.db.query("validationResearch").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    ctx.db.query("inventionAccessGrants").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
   ]);
-
-  for (const rows of groups) {
-    for (const row of rows) await ctx.db.delete(row._id);
-  }
+  for (const rows of groups) for (const row of rows) await ctx.db.delete(row._id);
 
   await ctx.db.delete(inventionId);
   return { generatedFilesDeleted, uploadedFilesDeleted };
 }
 
-export async function deleteAccountData(
-  ctx: MutationCtx,
-  userId: Id<"users">,
-): Promise<AccountDeletionSummary> {
+async function invitationRowsForEmail(ctx: MutationCtx, email: string) {
+  const statuses = ["pending", "accepted", "revoked", "expired"] as const;
+  const rows = [];
+  for (const status of statuses) {
+    rows.push(...await ctx.db.query("organizationInvitations").withIndex("by_email_status", (q) => q.eq("email", email).eq("status", status)).collect());
+  }
+  return rows;
+}
+
+async function invitationRowsForAccount(ctx: MutationCtx, userId: Id<"users">) {
+  // There is intentionally no acceptedByUserId index: invitations are normally
+  // addressed/looked up by email. Account deletion is rare and must also catch a
+  // pending invitation that was securely bound to this account before its email
+  // later changed, so a bounded lifecycle operation scans and filters by user ID.
+  const rows = await ctx.db.query("organizationInvitations").collect();
+  return rows.filter((row) => row.acceptedByUserId === userId);
+}
+
+export async function deleteAccountData(ctx: MutationCtx, userId: Id<"users">): Promise<AccountDeletionSummary> {
   const user = await ctx.db.get(userId);
   if (!user) throw new Error("Account already deleted or user record missing");
   if (user.role === "admin") throw new Error("Administrator accounts cannot be deleted through the privacy queue");
 
-  const inventions = await ctx.db
-    .query("inventions")
-    .withIndex("by_userId", (q) => q.eq("userId", userId))
-    .collect();
+  const memberships = await ctx.db.query("organizationMemberships").withIndex("by_userId", (q) => q.eq("userId", userId)).collect();
+  const personalOrganizationIds: Id<"organizations">[] = [];
+  for (const membership of memberships) {
+    if (membership.status === "removed") continue;
+    const organization = await ctx.db.get(membership.organizationId);
+    if (!organization || organization.status === "closed") continue;
+    if (membership.role === "owner" && organization.kind !== "personal") {
+      throw new Error("Transfer or close company/studio ownership before deleting this account");
+    }
+    if (membership.role === "owner" && organization.kind === "personal") personalOrganizationIds.push(organization._id);
+  }
+  const personalOrganizationIdSet = new Set(personalOrganizationIds.map(String));
+
+  const legacyInventions = (await ctx.db.query("inventions").withIndex("by_userId", (q) => q.eq("userId", userId)).collect()).filter((invention) => !invention.organizationId);
+  const deletableById = new Map<string, (typeof legacyInventions)[number]>();
+  for (const invention of legacyInventions) deletableById.set(String(invention._id), invention);
+  for (const organizationId of personalOrganizationIds) {
+    const orgInventions = await ctx.db.query("inventions").withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId)).collect();
+    for (const invention of orgInventions) deletableById.set(String(invention._id), invention);
+  }
+  const inventions = [...deletableById.values()];
 
   let generatedFilesDeleted = 0;
   let uploadedFilesDeleted = 0;
@@ -92,100 +124,115 @@ export async function deleteAccountData(
     uploadedFilesDeleted += result.uploadedFilesDeleted;
   }
 
-  const notifications = await ctx.db
-    .query("notifications")
-    .withIndex("by_userId", (q) => q.eq("userId", userId))
-    .collect();
-  for (const row of notifications) await ctx.db.delete(row._id);
+  const accessGrants = await ctx.db.query("inventionAccessGrants").withIndex("by_userId", (q) => q.eq("userId", userId)).collect();
+  for (const grant of accessGrants) await ctx.db.delete(grant._id);
+  for (const membership of memberships) await ctx.db.delete(membership._id);
 
-  const usage = await ctx.db
-    .query("atlasDailyUsage")
-    .withIndex("by_userId", (q) => q.eq("userId", userId))
-    .collect();
-  for (const row of usage) await ctx.db.delete(row._id);
+  let organizationUsageRowsDeleted = 0;
+  for (const organizationId of personalOrganizationIds) {
+    const organizationUsage = await ctx.db.query("organizationDailyUsage").withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId)).collect();
+    for (const row of organizationUsage) await ctx.db.delete(row._id);
+    organizationUsageRowsDeleted += organizationUsage.length;
 
-  // Financial transaction rows may need to be retained for accounting, but
-  // InventSmith does not retain the deleted user's identity on them.
-  const purchases = await ctx.db
-    .query("purchases")
-    .withIndex("by_userId", (q) => q.eq("userId", userId))
-    .collect();
-  for (const row of purchases) {
-    await ctx.db.patch(row._id, {
-      userId: undefined,
-      customerEmail: `deleted-${row._id}@invalid.local`,
-      customerName: undefined,
-    });
+    const invitations = await ctx.db.query("organizationInvitations").withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId)).collect();
+    for (const invitation of invitations) await ctx.db.delete(invitation._id);
+
+    const remainingMemberships = await ctx.db.query("organizationMemberships").withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId)).collect();
+    for (const membership of remainingMemberships) await ctx.db.delete(membership._id);
+    const organization = await ctx.db.get(organizationId);
+    if (organization) await ctx.db.delete(organizationId);
   }
 
-  const subscriptionEvents = user.email
-    ? await ctx.db
-        .query("subscriptionEvents")
-        .withIndex("by_customerEmail", (q) => q.eq("customerEmail", user.email!))
-        .collect()
+  const notifications = await ctx.db.query("notifications").withIndex("by_userId", (q) => q.eq("userId", userId)).collect();
+  for (const row of notifications) await ctx.db.delete(row._id);
+
+  const usage = await ctx.db.query("atlasDailyUsage").withIndex("by_userId", (q) => q.eq("userId", userId)).collect();
+  for (const row of usage) await ctx.db.delete(row._id);
+
+  const purchases = await ctx.db.query("purchases").withIndex("by_userId", (q) => q.eq("userId", userId)).collect();
+  for (const row of purchases) {
+    await ctx.db.patch(row._id, { userId: undefined, customerEmail: `deleted-${row._id}@invalid.local`, customerName: undefined });
+  }
+
+  const matchingSubscriptionEvents = user.email
+    ? await ctx.db.query("subscriptionEvents").withIndex("by_customerEmail", (q) => q.eq("customerEmail", user.email!)).collect()
     : [];
-  for (const row of subscriptionEvents) {
+  const personalSubscriptionEvents = matchingSubscriptionEvents.filter((row) => {
+    const belongsToUser = row.appliedUserId === userId;
+    const belongsToPersonalOrganization = Boolean(row.appliedOrganizationId && personalOrganizationIdSet.has(String(row.appliedOrganizationId)));
+    if (!belongsToUser && !belongsToPersonalOrganization) return false;
+    if (row.appliedOrganizationId && !belongsToPersonalOrganization) return false;
+    return true;
+  });
+  for (const row of personalSubscriptionEvents) {
     await ctx.db.patch(row._id, {
       customerEmail: `deleted-${row._id}@invalid.local`,
       appliedUserId: undefined,
+      appliedOrganizationId: undefined,
       subscriptionId: undefined,
       billingCustomerId: undefined,
     });
   }
 
-  // Delete Convex Auth material in dependency order. This mirrors the auth
-  // schema so no reusable credential or active session survives deletion.
-  const sessions = await ctx.db
-    .query("authSessions")
-    .withIndex("userId", (q) => q.eq("userId", userId))
-    .collect();
-  for (const session of sessions) {
-    const refreshTokens = await ctx.db
-      .query("authRefreshTokens")
-      .withIndex("sessionId", (q) => q.eq("sessionId", session._id))
-      .collect();
-    for (const token of refreshTokens) await ctx.db.delete(token._id);
+  const normalizedEmail = user.email?.trim().toLowerCase();
+  const usersForEmail = normalizedEmail
+    ? await ctx.db.query("users").withIndex("email", (q) => q.eq("email", normalizedEmail)).collect()
+    : [];
+  const emailUniquelyBelongsToUser = usersForEmail.length === 1 && usersForEmail[0]._id === userId;
+  const [emailInvitationRows, accountInvitationRows] = await Promise.all([
+    emailUniquelyBelongsToUser && normalizedEmail
+      ? invitationRowsForEmail(ctx, normalizedEmail).then((rows) => rows.filter((row) => !row.acceptedByUserId || row.acceptedByUserId === userId))
+      : Promise.resolve([]),
+    invitationRowsForAccount(ctx, userId),
+  ]);
+  const invitationRowsById = new Map<string, (typeof accountInvitationRows)[number]>();
+  for (const row of emailInvitationRows) invitationRowsById.set(String(row._id), row);
+  for (const row of accountInvitationRows) invitationRowsById.set(String(row._id), row);
+  const invitationRows = [...invitationRowsById.values()];
+  for (const row of invitationRows) {
+    // Company/studio invitation history may remain with the organization, but
+    // the departing person's email/account reference is removed. Pending seats
+    // are released immediately even if the account changed email after the
+    // invitation was securely bound.
+    await ctx.db.patch(row._id, {
+      email: `deleted-invite-${row._id}@invalid.local`,
+      status: row.status === "pending" ? "revoked" : row.status,
+      acceptedByUserId: row.acceptedByUserId === userId ? undefined : row.acceptedByUserId,
+      updatedAt: Date.now(),
+    });
+  }
 
-    // authVerifiers has no sessionId index in Convex Auth, so account deletion
-    // performs a bounded full scan and removes only verifiers tied to this user.
+  const sessions = await ctx.db.query("authSessions").withIndex("userId", (q) => q.eq("userId", userId)).collect();
+  for (const session of sessions) {
+    const refreshTokens = await ctx.db.query("authRefreshTokens").withIndex("sessionId", (q) => q.eq("sessionId", session._id)).collect();
+    for (const token of refreshTokens) await ctx.db.delete(token._id);
     const verifiers = await ctx.db.query("authVerifiers").collect();
-    for (const verifier of verifiers) {
-      if (verifier.sessionId === session._id) await ctx.db.delete(verifier._id);
-    }
+    for (const verifier of verifiers) if (verifier.sessionId === session._id) await ctx.db.delete(verifier._id);
     await ctx.db.delete(session._id);
   }
 
-  const accounts = await ctx.db
-    .query("authAccounts")
-    .withIndex("userIdAndProvider", (q) => q.eq("userId", userId))
-    .collect();
+  const accounts = await ctx.db.query("authAccounts").withIndex("userIdAndProvider", (q) => q.eq("userId", userId)).collect();
   for (const account of accounts) {
-    const codes = await ctx.db
-      .query("authVerificationCodes")
-      .withIndex("accountId", (q) => q.eq("accountId", account._id))
-      .collect();
+    const codes = await ctx.db.query("authVerificationCodes").withIndex("accountId", (q) => q.eq("accountId", account._id)).collect();
     for (const code of codes) await ctx.db.delete(code._id);
     await ctx.db.delete(account._id);
   }
 
   if (user.email) {
-    const rateLimits = await ctx.db
-      .query("authRateLimits")
-      .withIndex("identifier", (q) => q.eq("identifier", user.email!))
-      .collect();
+    const rateLimits = await ctx.db.query("authRateLimits").withIndex("identifier", (q) => q.eq("identifier", user.email!)).collect();
     for (const row of rateLimits) await ctx.db.delete(row._id);
   }
 
   await ctx.db.delete(userId);
-
   return {
     inventionsDeleted: inventions.length,
     generatedFilesDeleted,
     uploadedFilesDeleted,
-    usageRowsDeleted: usage.length,
+    usageRowsDeleted: usage.length + organizationUsageRowsDeleted,
     notificationsDeleted: notifications.length,
     purchasesAnonymized: purchases.length,
-    subscriptionEventsAnonymized: subscriptionEvents.length,
+    subscriptionEventsAnonymized: personalSubscriptionEvents.length,
+    invitationsAnonymized: invitationRows.length,
     authSessionsDeleted: sessions.length,
     authAccountsDeleted: accounts.length,
   };
