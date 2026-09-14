@@ -1,4 +1,4 @@
-# ATLAS RESEARCH ENGINE ARCHITECTURE
+# INVENTSMITH RESEARCH ENGINE ARCHITECTURE
 ## Part 2 — Sections 7–10: Provider Abstraction, Confidence, Human Review, Security
 
 **Version 1.0 — July 2026**
@@ -14,9 +14,9 @@
 
 ## Document Purpose
 
-This document is Part 2 of the Atlas Research Engine Architecture specification. It continues directly from Part 1 (Sections 1–6) and covers:
+This document is Part 2 of the InventSmith Research Engine Architecture specification. It continues directly from Part 1 (Sections 1–6) and covers:
 
-- **Section 7 — Provider Abstraction:** The provider-independent architecture layer that allows Atlas to integrate with any external data source without coupling to any specific vendor.
+- **Section 7 — Provider Abstraction:** The provider-independent architecture layer that allows InventSmith to integrate with any external data source without coupling to any specific vendor.
 - **Section 8 — Confidence Framework:** The complete system for scoring, representing, and acting on the reliability and completeness of research results.
 - **Section 9 — Human Review Flow:** The full workflow governing how founders interact with, review, approve, edit, override, and reject research results.
 - **Section 10 — Security, Privacy, Rate Limiting, and Cost Controls:** The architecture governing API key management, data privacy, cost budgets, rate limiting, circuit breakers, audit logging, and observability.
@@ -38,15 +38,15 @@ This is an architecture specification only. It defines what must be built, in wh
 
 ### 7.1 Overview and Purpose
 
-The Provider Abstraction Layer is the interface boundary between Atlas's Research Engine business logic and the external APIs and data sources that power it. Its purpose is to ensure that no Atlas business logic is coupled to the specifics of any external provider — not their request format, response schema, authentication mechanism, rate limit behavior, or pricing model.
+The Provider Abstraction Layer is the interface boundary between InventSmith's Research Engine business logic and the external APIs and data sources that power it. Its purpose is to ensure that no InventSmith business logic is coupled to the specifics of any external provider — not their request format, response schema, authentication mechanism, rate limit behavior, or pricing model.
 
-This architecture principle is non-negotiable. Providers change. APIs deprecate. Pricing structures shift. A competitor analysis that runs on SerpAPI today may need to run on Brave Search tomorrow. A patent search that uses the USPTO Public Search API may be supplemented by or replaced with a Google Patents integration. If Atlas business logic is coupled to any of these directly, every provider change requires business logic changes — creating fragility, increasing cost, and slowing iteration.
+This architecture principle is non-negotiable. Providers change. APIs deprecate. Pricing structures shift. A competitor analysis that runs on SerpAPI today may need to run on Brave Search tomorrow. A patent search that uses the USPTO Public Search API may be supplemented by or replaced with a Google Patents integration. If InventSmith business logic is coupled to any of these directly, every provider change requires business logic changes — creating fragility, increasing cost, and slowing iteration.
 
-The Provider Abstraction Layer solves this by defining stable interfaces that Atlas business logic calls, while providers implement those interfaces independently. Swapping a provider requires changing the provider implementation, not the research module.
+The Provider Abstraction Layer solves this by defining stable interfaces that InventSmith business logic calls, while providers implement those interfaces independently. Swapping a provider requires changing the provider implementation, not the research module.
 
 ### 7.2 Abstract Provider Interface
 
-Every provider in Atlas — regardless of category — implements the base `ResearchProvider` interface. This interface defines the minimum contract that every provider must satisfy.
+Every provider in InventSmith — regardless of category — implements the base `ResearchProvider` interface. This interface defines the minimum contract that every provider must satisfy.
 
 **Base ResearchProvider Interface:**
 
@@ -99,7 +99,7 @@ ProviderResponse {
   providerId: string         // Which provider responded
   status: "success" | "partial" | "error" | "rate_limited" | "timeout"
   rawResponse: any           // The verbatim API response, unmodified
-  normalizedResults: any[]   // Provider-normalized but not yet Atlas-normalized results
+  normalizedResults: any[]   // Provider-normalized but not yet InventSmith-normalized results
   resultCount: number        // How many results were returned
   totalAvailable: number | null  // How many total results exist (if provider reports this)
   cost: CostRecord           // Actual cost incurred by this request
@@ -108,7 +108,7 @@ ProviderResponse {
   errorCode: string | null   // Provider error code on failure
   errorMessage: string | null // Human-readable error message on failure
   retryable: boolean         // Whether this error is retryable
-  providerMetadata: any      // Provider-specific metadata (not used by Atlas logic)
+  providerMetadata: any      // Provider-specific metadata (not used by InventSmith logic)
 }
 ```
 
@@ -131,7 +131,7 @@ CostRecord {
 
 ### 7.3 Provider Categories
 
-Atlas organizes providers into categories. Each category maps to a family of research modules with shared interface requirements. A single provider may serve multiple categories if its API supports them.
+InventSmith organizes providers into categories. Each category maps to a family of research modules with shared interface requirements. A single provider may serve multiple categories if its API supports them.
 
 ---
 
@@ -202,7 +202,7 @@ Academic providers serve research modules that need peer-reviewed literature, in
 
 #### Category 2 — Patent Providers
 
-Patent providers serve Stage 4 (Patent Readiness) and Stage 9 (IP Protection) research modules. These are the highest-stakes research integrations in Atlas — the results directly inform multi-year IP strategy decisions.
+Patent providers serve Stage 4 (Patent Readiness) and Stage 9 (IP Protection) research modules. These are the highest-stakes research integrations in InventSmith — the results directly inform multi-year IP strategy decisions.
 
 **Interface extension (PatentProvider extends ResearchProvider):**
 
@@ -500,7 +500,7 @@ TrademarkHit {
 
 ### 7.4 Provider Registry
 
-The Provider Registry is the central catalog of all configured providers in Atlas. It is the source of truth for which providers are available, which are healthy, and which capabilities each provider offers.
+The Provider Registry is the central catalog of all configured providers in InventSmith. It is the source of truth for which providers are available, which are healthy, and which capabilities each provider offers.
 
 **Registry structure:**
 
@@ -575,7 +575,7 @@ A fallback is NOT attempted when the primary provider returns:
 
 ### 7.7 Provider Swapping
 
-Provider swapping is the operational procedure for replacing one provider with another without changing Atlas business logic. The procedure:
+Provider swapping is the operational procedure for replacing one provider with another without changing InventSmith business logic. The procedure:
 
 **Scenario A — Replacing a provider with a compatible substitute (same interface, different vendor):**
 
@@ -585,7 +585,7 @@ Provider swapping is the operational procedure for replacing one provider with a
 4. Deploy the configuration change
 5. Monitor error rates and confidence scores for 24 hours post-swap to validate quality
 
-Atlas business logic requires no changes. The research module's normalization function may need to be updated if the new provider's response schema differs from the old — but this is a provider-layer change, not a business logic change.
+InventSmith business logic requires no changes. The research module's normalization function may need to be updated if the new provider's response schema differs from the old — but this is a provider-layer change, not a business logic change.
 
 **Scenario B — Adding a new provider to an existing category (supplemental coverage):**
 
@@ -644,15 +644,15 @@ These providers support the Analytics Integration Layer for live KPI monitoring 
 
 ### 8.1 Overview and Purpose
 
-Every research result produced by the Atlas Research Engine carries a confidence score. The confidence score is not a vague quality signal — it is a structured, deterministic measurement that drives concrete downstream behaviors: whether the founder must review a result before it is used, whether the result can be auto-accepted, how prominently caveats are displayed, and how Atlas calibrates its own research quality over time.
+Every research result produced by the InventSmith Research Engine carries a confidence score. The confidence score is not a vague quality signal — it is a structured, deterministic measurement that drives concrete downstream behaviors: whether the founder must review a result before it is used, whether the result can be auto-accepted, how prominently caveats are displayed, and how InventSmith calibrates its own research quality over time.
 
 The confidence framework serves three constituencies:
 
-**The founder:** The confidence score tells the founder how much to trust what Atlas found. High confidence means Atlas is confident and the founder can accept with minimal scrutiny. Low confidence means Atlas is uncertain and the founder's judgment is required before the result is committed.
+**The founder:** The confidence score tells the founder how much to trust what InventSmith found. High confidence means InventSmith is confident and the founder can accept with minimal scrutiny. Low confidence means InventSmith is uncertain and the founder's judgment is required before the result is committed.
 
 **The Research Engine:** Confidence scores drive refresh scheduling, fallback triggering, and quality monitoring. A low-confidence result should be refreshed when better data becomes available. A pattern of low-confidence results from a specific provider signals a provider quality issue.
 
-**The Document Pipeline:** Documents assembled from research results carry the confidence of their inputs. The Document Pipeline uses confidence scores to determine whether a document section should be presented as "Atlas's finding" or as "Atlas's estimate — please verify."
+**The Document Pipeline:** Documents assembled from research results carry the confidence of their inputs. The Document Pipeline uses confidence scores to determine whether a document section should be presented as "InventSmith's finding" or as "InventSmith's estimate — please verify."
 
 ### 8.2 Confidence Score Schema
 
@@ -693,7 +693,7 @@ ConfidenceRecord {
   sources: SourceReference[]       // Full citation for each source consulted
   
   // Assumptions
-  assumptions: AssumptionRecord[]  // Every assumption Atlas made that should be confirmed
+  assumptions: AssumptionRecord[]  // Every assumption InventSmith made that should be confirmed
   
   // Temporal
   researchedAt: string             // ISO 8601 timestamp of research execution
@@ -727,15 +727,15 @@ SourceReference {
   title: string                    // Source title or name
   sourceType: SourceType           // Enum (see Section 8.4)
   publishedDate: string | null     // When this source was published or last updated
-  accessedDate: string             // When Atlas accessed this source
+  accessedDate: string             // When InventSmith accessed this source
   relevanceScore: number           // How relevant this specific source was to the result (0.0–1.0)
-  excerpt: string | null           // The specific excerpt or data point Atlas extracted from this source
+  excerpt: string | null           // The specific excerpt or data point InventSmith extracted from this source
 }
 
 AssumptionRecord {
   assumptionId: string
   statement: string                // The assumption in plain language
-  basis: string                    // Why Atlas is making this assumption
+  basis: string                    // Why InventSmith is making this assumption
   confirmationPrompt: string       // The question to ask the founder to confirm or override
   riskIfWrong: "low" | "medium" | "high"  // How much the result changes if this assumption is wrong
   isConfirmedByFounder: boolean    // Whether the founder has explicitly confirmed this assumption
@@ -748,11 +748,11 @@ The confidence framework defines three named thresholds that drive the Human Rev
 
 **Threshold 1 — AUTO_ACCEPT (Score ≥ 0.85)**
 
-A confidence score at or above 0.85 means Atlas is highly confident in the result. The evidence base is strong, sources are authoritative, the result is recent, and internal consistency is high.
+A confidence score at or above 0.85 means InventSmith is highly confident in the result. The evidence base is strong, sources are authoritative, the result is recent, and internal consistency is high.
 
 Behavioral implications:
 - The result is applied to the stage view and document pipeline without requiring explicit founder approval
-- The founder sees the result surfaced as "Atlas's finding" with a simple "Looks right / Edit" affordance
+- The founder sees the result surfaced as "InventSmith's finding" with a simple "Looks right / Edit" affordance
 - Proceeding past the result without interaction counts as implicit acceptance
 - The result is immediately eligible for use in document assembly
 - The founder is not interrupted by a review request — the result flows through automatically
@@ -760,19 +760,19 @@ Behavioral implications:
 
 **Threshold 2 — REVIEW_RECOMMENDED (Score 0.60–0.84)**
 
-A confidence score between 0.60 and 0.84 means Atlas has reasonable evidence but meaningful gaps or uncertainties exist. The result is usable but benefits from founder confirmation.
+A confidence score between 0.60 and 0.84 means InventSmith has reasonable evidence but meaningful gaps or uncertainties exist. The result is usable but benefits from founder confirmation.
 
 Behavioral implications:
 - The result is surfaced in the stage view with a "Please review" indicator
 - The founder sees the specific reasons why confidence is below AUTO_ACCEPT (e.g., "Only 2 sources consulted" or "Data is 45 days old")
-- The founder is prompted to review key figures with the question: "Do these findings look right? You can confirm, edit, or ask Atlas to research again."
+- The founder is prompted to review key figures with the question: "Do these findings look right? You can confirm, edit, or ask InventSmith to research again."
 - The result CAN flow into document assembly before founder review — but document sections built from REVIEW_RECOMMENDED results are annotated with "Pending your confirmation" in the document's metadata
 - The stage's readiness score is slightly penalized for unconfirmed REVIEW_RECOMMENDED results — not blocked, but not fully credited until confirmed
 - If the founder confirms without editing, confidence is upgraded to the confirmed score (see Section 8.7)
 
 **Threshold 3 — REQUIRES_REVIEW (Score < 0.60)**
 
-A confidence score below 0.60 means Atlas lacks sufficient evidence to be confident in this result. The result may be directionally useful but should not be relied upon without founder verification.
+A confidence score below 0.60 means InventSmith lacks sufficient evidence to be confident in this result. The result may be directionally useful but should not be relied upon without founder verification.
 
 Behavioral implications:
 - The result is surfaced with an explicit warning indicator
@@ -793,7 +793,7 @@ Behavioral implications:
 
 ### 8.4 Source Classification (Primary vs. Secondary)
 
-Every source Atlas consults is classified as primary or secondary. This classification affects the `sourceAuthority` component of the confidence score.
+Every source InventSmith consults is classified as primary or secondary. This classification affects the `sourceAuthority` component of the confidence score.
 
 **Primary Sources (higher weight in sourceAuthority scoring):**
 
@@ -903,7 +903,7 @@ While the component weights are fixed, the specific signals used to compute each
 
 ### 8.6 Evidence Used and Assumptions Made
 
-**Evidence representation:** Every research result's `ConfidenceRecord` includes the complete list of `SourceReference` objects for every source consulted. This is not a summary — every source Atlas touched is listed. The founder can inspect the exact evidence base for any result.
+**Evidence representation:** Every research result's `ConfidenceRecord` includes the complete list of `SourceReference` objects for every source consulted. This is not a summary — every source InventSmith touched is listed. The founder can inspect the exact evidence base for any result.
 
 **Minimum evidence requirements by threshold:**
 
@@ -913,9 +913,9 @@ While the component weights are fixed, the specific signals used to compute each
 | REVIEW_RECOMMENDED (0.60–0.84) | 0 primary (all secondary acceptable) | 1 total |
 | REQUIRES_REVIEW (< 0.60) | No minimum — any result with < 0.60 is REQUIRES_REVIEW regardless | Any |
 
-**Assumption classification:** Atlas makes assumptions when it cannot verify a fact through research but must use a value to proceed. Every assumption is explicitly listed in the result's `assumptions` array with:
+**Assumption classification:** InventSmith makes assumptions when it cannot verify a fact through research but must use a value to proceed. Every assumption is explicitly listed in the result's `assumptions` array with:
 - A plain-language statement of the assumption
-- The basis for making it (why Atlas assumed this rather than a different value)
+- The basis for making it (why InventSmith assumed this rather than a different value)
 - The confirmation prompt (what to ask the founder)
 - The risk if wrong (how much the result changes if the assumption is incorrect)
 
@@ -960,13 +960,13 @@ degradationMultiplier(t, moduleId) = max(minimumFloor, 1.0 - (daysSinceResearch 
 | Manufacturer Shortlist | 60 | 0.40 | Manufacturers open, close, and change specializations |
 | Grant Programs | 30 | 0.20 | Grant cycles open and close on monthly or quarterly cycles |
 
-**Degradation in the UI:** When the founder views a stage, the displayed confidence is the `effectiveConfidence(now)` — not the stored score from research time. If effective confidence has degraded below a threshold that the original research score exceeded (e.g., it started as AUTO_ACCEPT but has degraded to REVIEW_RECOMMENDED), the UI transitions the result's treatment to the lower threshold's behavior. The founder sees: "This research was last updated [N days ago]. The confidence has decreased with time. Atlas can refresh it now."
+**Degradation in the UI:** When the founder views a stage, the displayed confidence is the `effectiveConfidence(now)` — not the stored score from research time. If effective confidence has degraded below a threshold that the original research score exceeded (e.g., it started as AUTO_ACCEPT but has degraded to REVIEW_RECOMMENDED), the UI transitions the result's treatment to the lower threshold's behavior. The founder sees: "This research was last updated [N days ago]. The confidence has decreased with time. InventSmith can refresh it now."
 
 **Degradation does not delete results:** A degraded result is still served to the founder — it is not removed from the cache. Degradation changes the confidence label and triggers a background refresh job, but the old result remains available until a fresh result replaces it.
 
 ### 8.8 How Founder Approval Affects Confidence Calibration
 
-When a founder approves, edits, or rejects a research result, this action is a data signal about the quality of Atlas's research for that module. Over time, these signals calibrate Atlas's confidence scoring so that scores become more accurate — closer to what the founder actually confirms as correct.
+When a founder approves, edits, or rejects a research result, this action is a data signal about the quality of InventSmith's research for that module. Over time, these signals calibrate InventSmith's confidence scoring so that scores become more accurate — closer to what the founder actually confirms as correct.
 
 **Founder approval signal types:**
 
@@ -1004,7 +1004,7 @@ When a raw confidence score is computed for a module with calibration data:
 calibratedScore = min(1.0, rawScore × scoreAdjustmentFactor)
 ```
 
-If Atlas consistently over-estimates confidence (results are rejected despite high scores), `scoreAdjustmentFactor` < 1.0 brings scores down. If Atlas under-estimates (results are accepted even when scored low), `scoreAdjustmentFactor` > 1.0 brings scores up.
+If InventSmith consistently over-estimates confidence (results are rejected despite high scores), `scoreAdjustmentFactor` < 1.0 brings scores down. If InventSmith under-estimates (results are accepted even when scored low), `scoreAdjustmentFactor` > 1.0 brings scores up.
 
 **Calibration thresholds for adjustment:** The `scoreAdjustmentFactor` is only applied when `sampleCount ≥ 20`. Below 20 samples, raw scores are used without adjustment. This prevents calibration from being biased by small sample noise.
 
@@ -1016,7 +1016,7 @@ If Atlas consistently over-estimates confidence (results are rejected despite hi
 
 ### 9.1 Overview
 
-The Human Review Flow defines how research results transition from Atlas-produced outputs to founder-confirmed data that drives stage progress and document assembly. It is the implementation of one of Atlas's core constitutional principles: Atlas does the work, the founder reviews the work.
+The Human Review Flow defines how research results transition from InventSmith-produced outputs to founder-confirmed data that drives stage progress and document assembly. It is the implementation of one of InventSmith's core constitutional principles: InventSmith does the work, the founder reviews the work.
 
 The goal of the Human Review Flow is to make review as effortless as possible for high-quality results while ensuring the founder's judgment is captured for results where it matters. A founder who agrees with a high-confidence result should be able to confirm it with a single interaction — or no interaction at all. A founder who needs to correct a low-confidence result should have clear tools to do so without friction.
 
@@ -1038,7 +1038,7 @@ A research result has `effectiveConfidence` between 0.60 and 0.84 AND the result
 A research result contains one or more `AssumptionRecord` entries with `riskIfWrong: "high"`. These trigger review regardless of the overall confidence score. Even a 0.90-scored result that contains a high-risk assumption must surface the assumption for founder confirmation.
 
 **Condition 4 — Research result directly conflicts with prior founder-provided data:**
-If a research result produces a finding that directly contradicts information the founder has previously entered or confirmed (e.g., Atlas researches competitor pricing and finds a price that matches the founder's current stated price, but the competitive landscape shows a major new competitor the founder has not acknowledged), a review request is generated to surface the conflict.
+If a research result produces a finding that directly contradicts information the founder has previously entered or confirmed (e.g., InventSmith researches competitor pricing and finds a price that matches the founder's current stated price, but the competitive landscape shows a major new competitor the founder has not acknowledged), a review request is generated to surface the conflict.
 
 **Condition 5 — Scheduled research produces a material change:**
 A scheduled research refresh (Section 4, scheduledResearch hook) produces a result that differs materially from the previously approved version. "Materially different" is defined per module — for competitive pricing, a change of ≥ 15% in any competitor's price; for the competitive landscape, a net-new competitor added or a known competitor removed.
@@ -1053,8 +1053,8 @@ Research results are surfaced in the stage view UI. The surfacing pattern depend
 **AUTO_ACCEPT surfacing:**
 
 The result appears in the stage view as a populated field or structured data block with:
-- The finding displayed clearly in Atlas's standard research card format
-- A source attribution line: "Atlas researched this based on [N sources] — [timeframe]"
+- The finding displayed clearly in InventSmith's standard research card format
+- A source attribution line: "InventSmith researched this based on [N sources] — [timeframe]"
 - A subtle "Edit" affordance — visible on hover, not primary
 - No explicit review prompt
 - A small confidence indicator (green dot) visible in the card header
@@ -1067,7 +1067,7 @@ The result appears in the stage view as a populated field or data block with:
 - An amber indicator and label: "Review recommended"
 - A brief explanation of why review is recommended: "Confidence is moderate — 2 sources consulted. Please verify these findings match your knowledge."
 - Two primary actions: "Looks right, confirm" and "Edit this"
-- A secondary action: "Ask Atlas to research again"
+- A secondary action: "Ask InventSmith to research again"
 - Source details expanded by default (not collapsed behind a link)
 - The stage's readiness score shows partial credit for this field until confirmed
 
@@ -1075,10 +1075,10 @@ The result appears in the stage view as a populated field or data block with:
 
 The result appears in the stage view as a populated field or data block with:
 - The finding displayed with a red/warning indicator and label: "Your review is required"
-- A prominent explanation of the low confidence: the specific reasons why Atlas is uncertain
-- The list of assumptions made, with each high-risk assumption presented as a direct question: "Atlas assumed [X]. Is this correct?"
+- A prominent explanation of the low confidence: the specific reasons why InventSmith is uncertain
+- The list of assumptions made, with each high-risk assumption presented as a direct question: "InventSmith assumed [X]. Is this correct?"
 - Three primary actions: "Confirm this is right", "Edit and confirm", "This is wrong — let me enter it"
-- A secondary action: "Ask Atlas to research this again"
+- A secondary action: "Ask InventSmith to research this again"
 - A notice: "This stage cannot advance until you've confirmed this finding"
 - The field is highlighted in the stage's completion checklist as requiring action
 
@@ -1165,14 +1165,14 @@ When a founder finds that a research result is partially correct — some findin
 **What the founder can edit:**
 
 The research card UI presents the processed result as a structured, editable form where each field can be modified independently. For example:
-- In the Competitive Landscape module: each competitor row (name, price, channel, positioning) is individually editable. The founder can accept competitors Atlas found correctly and correct prices that are out of date.
-- In the Market Size module: each TAM/SAM/SOM value is editable. The founder can accept the TAM from Atlas's research but override the SOM with their own more specific estimate.
+- In the Competitive Landscape module: each competitor row (name, price, channel, positioning) is individually editable. The founder can accept competitors InventSmith found correctly and correct prices that are out of date.
+- In the Market Size module: each TAM/SAM/SOM value is editable. The founder can accept the TAM from InventSmith's research but override the SOM with their own more specific estimate.
 - In the Prior Art Search module: each patent result's relevance classification is editable. The founder can agree with "highly relevant" on some patents and downgrade others to "not relevant."
 
 **How edits are stored:**
 
 When the founder edits a research result:
-1. The original Atlas-generated values are preserved in `rawResult` and `processedResult` — never overwritten
+1. The original InventSmith-generated values are preserved in `rawResult` and `processedResult` — never overwritten
 2. The founder's modifications are stored in `founderOverride` as a delta object — only the fields the founder changed are stored, not the full result
 3. The downstream consumers (document pipeline, stage view) merge the override onto the base result: `mergedResult = { ...processedResult, ...founderOverride }`
 4. `founderEdited: true` is set
@@ -1180,17 +1180,17 @@ When the founder edits a research result:
 
 **Partial acceptance and confidence:**
 
-When the founder edits a research result, the effective confidence of the edited fields is elevated to 1.00 — the founder has confirmed those values directly. The effective confidence of unedited fields retains the original Atlas confidence score (post-calibration adjustment). This means a partially edited result can have field-level confidence heterogeneity — some fields founder-confirmed at 1.0, others at Atlas-scored confidence.
+When the founder edits a research result, the effective confidence of the edited fields is elevated to 1.00 — the founder has confirmed those values directly. The effective confidence of unedited fields retains the original InventSmith confidence score (post-calibration adjustment). This means a partially edited result can have field-level confidence heterogeneity — some fields founder-confirmed at 1.0, others at InventSmith-scored confidence.
 
 **Downstream treatment of edited results:**
 
-Documents assembled from an edited research result annotate edited fields with `source: "founder_confirmed"` rather than `source: "atlas_research"`. This matters for document audit purposes — the investor pitch deck's market size figure shows whether the number came from Atlas's research or from the founder's direct input.
+Documents assembled from an edited research result annotate edited fields with `source: "founder_confirmed"` rather than `source: "atlas_research"`. This matters for document audit purposes — the investor pitch deck's market size figure shows whether the number came from InventSmith's research or from the founder's direct input.
 
 **Override persistence:**
 
-Once the founder edits a result, the override persists across all future refreshes of that research module. When a scheduled or manual refresh produces a new version of the result, the founder's override is shown alongside the new Atlas result as a comparison: "Atlas now finds [new value]. You previously set this to [override value]. Do you want to update your override?"
+Once the founder edits a result, the override persists across all future refreshes of that research module. When a scheduled or manual refresh produces a new version of the result, the founder's override is shown alongside the new InventSmith result as a comparison: "InventSmith now finds [new value]. You previously set this to [override value]. Do you want to update your override?"
 
-The founder's override is NEVER automatically replaced by a new Atlas result, even if the new result has higher confidence. The founder's confirmed data is always preserved.
+The founder's override is NEVER automatically replaced by a new InventSmith result, even if the new result has higher confidence. The founder's confirmed data is always preserved.
 
 ### 9.7 Founder Rejection and Research Re-Run
 
@@ -1198,7 +1198,7 @@ When a founder rejects a research result — either because it is completely wro
 
 **Rejection triggers:**
 
-- Founder clicks "This is wrong — ask Atlas to research again" (automated re-run)
+- Founder clicks "This is wrong — ask InventSmith to research again" (automated re-run)
 - Founder clicks "This is wrong — I'll enter this myself" (manual override, no re-run)
 - Founder clicks "Reject this result" from the review menu
 
@@ -1208,7 +1208,7 @@ When a founder rejects a research result — either because it is completely wro
 |---|---|
 | "Research this again" | Triggers a `manualRefresh` job at Priority Level 1. The current result is marked with `founderRejected: true` but remains visible (with a "Rejected — refreshing" indicator) until the new result arrives. |
 | "I'll enter this myself" | Triggers the manual override path (Section 9.8). No re-run is initiated. |
-| "Research this differently" | Opens a prompt where the founder can provide context to Atlas: "The competitors you found are not the right ones — I'm competing more in the premium segment." This context is incorporated into the next research job's parameters. |
+| "Research this differently" | Opens a prompt where the founder can provide context to InventSmith: "The competitors you found are not the right ones — I'm competing more in the premium segment." This context is incorporated into the next research job's parameters. |
 
 **Re-run behavior after rejection:**
 
@@ -1221,35 +1221,35 @@ When a re-run is triggered by rejection:
 
 **If the re-run also produces a poor result:**
 
-If the founder rejects a re-run result as well, the system surfaces the "I'll enter this myself" option more prominently. After two rejections, Atlas acknowledges: "I wasn't able to find reliable information on this. You can enter the data directly, and I'll use what you provide going forward."
+If the founder rejects a re-run result as well, the system surfaces the "I'll enter this myself" option more prominently. After two rejections, InventSmith acknowledges: "I wasn't able to find reliable information on this. You can enter the data directly, and I'll use what you provide going forward."
 
-This graceful degradation is a constitutional requirement: the founder's journey must never be blocked by Atlas's inability to find data. Rejection → re-run → rejection → manual entry is always available as an escape path.
+This graceful degradation is a constitutional requirement: the founder's journey must never be blocked by InventSmith's inability to find data. Rejection → re-run → rejection → manual entry is always available as an escape path.
 
 ### 9.8 Manual Overrides (Founder Provides Their Own Data)
 
-Manual overrides allow the founder to provide their own data for a research field, superseding Atlas's research entirely. This is used when:
-- The founder has direct, personal knowledge that is more accurate than what Atlas found
-- Atlas's research repeatedly fails to find useful data
+Manual overrides allow the founder to provide their own data for a research field, superseding InventSmith's research entirely. This is used when:
+- The founder has direct, personal knowledge that is more accurate than what InventSmith found
+- InventSmith's research repeatedly fails to find useful data
 - The data is private or proprietary (e.g., the founder has a manufacturing relationship that gave them pricing not publicly available)
 - The founder simply prefers to control specific data points directly
 
 **Manual override entry:**
 
-When the founder selects "I'll enter this myself," the stage view transitions the research card from "Atlas-generated result" view to an editable form matching the module's output schema. The founder fills in their own values.
+When the founder selects "I'll enter this myself," the stage view transitions the research card from "InventSmith-generated result" view to an editable form matching the module's output schema. The founder fills in their own values.
 
 **Manual override storage:**
 
-Manual override data is stored in `founderOverride` with a special flag: `isManualOverride: true`. This distinguishes manual overrides (founder supplied the data) from edit overrides (founder corrected Atlas's data).
+Manual override data is stored in `founderOverride` with a special flag: `isManualOverride: true`. This distinguishes manual overrides (founder supplied the data) from edit overrides (founder corrected InventSmith's data).
 
 **Manual override precedence:**
 
-Manual overrides are the highest-precedence data in the system. No Atlas research, scheduled refresh, or automatic update can displace a manual override. The only way to remove a manual override is for the founder to explicitly clear it.
+Manual overrides are the highest-precedence data in the system. No InventSmith research, scheduled refresh, or automatic update can displace a manual override. The only way to remove a manual override is for the founder to explicitly clear it.
 
-When Atlas runs a scheduled research refresh for a module that has a manual override:
-1. Atlas runs the research and stores the new result
+When InventSmith runs a scheduled research refresh for a module that has a manual override:
+1. InventSmith runs the research and stores the new result
 2. The manual override remains active — the new result does not replace it
-3. The founder receives a notification: "Atlas has updated its research for [module name]. Your manually entered data is still being used. You can view Atlas's findings and decide whether to update your data."
-4. The founder can choose to adopt the new Atlas result, update their manual data, or keep the current manual data unchanged
+3. The founder receives a notification: "InventSmith has updated its research for [module name]. Your manually entered data is still being used. You can view InventSmith's findings and decide whether to update your data."
+4. The founder can choose to adopt the new InventSmith result, update their manual data, or keep the current manual data unchanged
 
 This ensures the founder always knows when new data is available while preserving their authority over their own overrides.
 
@@ -1261,13 +1261,13 @@ The specific protection rules:
 - Stage lifecycle hooks (onOpen, onStageEnter) do NOT enqueue research jobs for modules that have active manual overrides for stage-gating fields
 - Scheduled research jobs still run for override-protected modules — but their results are stored and surfaced for comparison, not applied
 - Manual refresh (founder-initiated) still runs for override-protected modules — the founder is explicitly asking to see new data
-- If a manual override is more than 90 days old, the stage view surfaces a gentle notification: "Your manually entered [field name] data is over 90 days old. Want Atlas to see if anything has changed?" — but this notification is informational only; it does not require action.
+- If a manual override is more than 90 days old, the stage view surfaces a gentle notification: "Your manually entered [field name] data is over 90 days old. Want InventSmith to see if anything has changed?" — but this notification is informational only; it does not require action.
 
 ### 9.9 Audit Trail for All Founder Decisions
 
 Every founder interaction with a research result is recorded in a permanent audit trail. This audit trail serves three purposes:
 
-1. **Transparency:** The founder can always see the history of any data point — what Atlas found, what they changed, when they changed it, and why.
+1. **Transparency:** The founder can always see the history of any data point — what InventSmith found, what they changed, when they changed it, and why.
 2. **Calibration:** The audit trail is the data source for the confidence calibration system (Section 8.8).
 3. **Compliance and accountability:** For high-stakes research (IP, pricing, legal compliance), having a record of what was researched, when, and what the founder confirmed provides a defensible record of due diligence.
 
@@ -1304,7 +1304,7 @@ ResearchAuditEvent {
 }
 
 AuditEventType = 
-  | "research_completed"           // Atlas completed a research job and stored a result
+  | "research_completed"           // InventSmith completed a research job and stored a result
   | "auto_accepted"                // System automatically accepted a high-confidence result
   | "founder_viewed"               // Founder opened the stage view where this result is surfaced
   | "founder_approved"             // Founder explicitly approved without editing
@@ -1313,7 +1313,7 @@ AuditEventType =
   | "founder_rejected_manual"      // Founder rejected and entered manually
   | "founder_override_entered"     // Founder provided manual override data
   | "founder_override_updated"     // Founder updated a manual override
-  | "founder_override_cleared"     // Founder removed a manual override and restored Atlas's result
+  | "founder_override_cleared"     // Founder removed a manual override and restored InventSmith's result
   | "scheduled_refresh_available"  // A scheduled refresh produced a new result; founder notified
   | "refresh_adopted"              // Founder adopted a scheduled refresh result to replace their previous data
   | "refresh_dismissed"            // Founder viewed a scheduled refresh result but kept their prior data
@@ -1321,9 +1321,9 @@ AuditEventType =
 
 **Audit log retention:** Audit events are retained for the lifetime of the invention record plus 7 years. They are never deleted as part of normal system operations. Deletion occurs only when the founder explicitly deletes their account and all associated data (GDPR-compliant deletion).
 
-**Founder access to audit history:** The founder can access the full audit history for any research result from the stage view by clicking "Research history" on any research card. The history view shows a timeline of all events: when Atlas researched it, what it found, when the founder viewed it, what they did with it, and when it was refreshed.
+**Founder access to audit history:** The founder can access the full audit history for any research result from the stage view by clicking "Research history" on any research card. The history view shows a timeline of all events: when InventSmith researched it, what it found, when the founder viewed it, what they did with it, and when it was refreshed.
 
-**Internal use of audit data:** The audit trail is also used by Atlas's internal monitoring (Section 10) for detecting patterns in founder engagement with research, identifying modules with high rejection rates (which signals quality issues), and tracking the overall Auto-Accept Rate as a system health metric.
+**Internal use of audit data:** The audit trail is also used by InventSmith's internal monitoring (Section 10) for detecting patterns in founder engagement with research, identifying modules with high rejection rates (which signals quality issues), and tracking the overall Auto-Accept Rate as a system health metric.
 
 ---
 
@@ -1331,11 +1331,11 @@ AuditEventType =
 
 ### 10.1 Overview
 
-The Research Engine makes external API calls on behalf of Atlas users. These calls involve sensitive data (the founder's invention details), financial cost (paid API calls), and operational risk (rate limit violations, budget overruns, provider outages). This section defines the architecture for managing all of these responsibly.
+The Research Engine makes external API calls on behalf of InventSmith users. These calls involve sensitive data (the founder's invention details), financial cost (paid API calls), and operational risk (rate limit violations, budget overruns, provider outages). This section defines the architecture for managing all of these responsibly.
 
 The security and cost architecture of the Research Engine is guided by four principles:
 
-1. **Confidentiality:** Inventor data is the founder's intellectual property. The minimum necessary data leaves Atlas's environment. Data that must leave is anonymized where possible.
+1. **Confidentiality:** Inventor data is the founder's intellectual property. The minimum necessary data leaves InventSmith's environment. Data that must leave is anonymized where possible.
 2. **Least privilege:** API credentials are scoped to the minimum necessary permissions. No key has more access than the specific operations it serves.
 3. **Defense in depth:** Cost and rate limit protections are enforced at multiple levels — per-request, per-stage, per-invention, per-month — so that a failure at any one level does not cause catastrophic overrun.
 4. **Full auditability:** Every API call, its cost, and its context is logged and queryable. No spending is unaccounted for.
@@ -1398,15 +1398,15 @@ Convex Actions (use node) → read process.env.PROVIDER_API_KEY_XXXX
 
 **Per-provider key scoping:**
 
-Where providers offer scoped API keys (permissions limited to specific operations), Atlas uses the most restrictive scope that covers the operations needed. For example:
+Where providers offer scoped API keys (permissions limited to specific operations), InventSmith uses the most restrictive scope that covers the operations needed. For example:
 - Shopify Admin API keys are scoped to read-only access for the analytics integration — no write permissions
 - OAuth tokens for analytics providers (GA4, Klaviyo) use the minimum OAuth scopes required for read access to performance data
 
-### 10.3 Data Privacy — What Inventor Data Leaves Atlas
+### 10.3 Data Privacy — What Inventor Data Leaves InventSmith
 
-Inventor data is the inventor's intellectual property. Every external API call that Atlas makes on an inventor's behalf transmits some form of the inventor's data to a third-party provider. This section defines what leaves Atlas, when it leaves, and what protections are applied.
+Inventor data is the inventor's intellectual property. Every external API call that InventSmith makes on an inventor's behalf transmits some form of the inventor's data to a third-party provider. This section defines what leaves InventSmith, when it leaves, and what protections are applied.
 
-**Data that leaves Atlas in research requests:**
+**Data that leaves InventSmith in research requests:**
 
 | Data Type | Transmitted To | Anonymization Applied | Retention at Provider |
 |---|---|---|---|
@@ -1417,7 +1417,7 @@ Inventor data is the inventor's intellectual property. Every external API call t
 | Domain/handle string (for availability check) | Namecheap, social checkers | Sent as exact string — no company context attached | None (availability checks are stateless) |
 | Invention description excerpts (for LLM synthesis) | Anthropic Claude, OpenAI | See LLM data policy below | Per provider DPA |
 
-**What NEVER leaves Atlas:**
+**What NEVER leaves InventSmith:**
 
 The following data is never transmitted to any external provider:
 - The founder's name, email, or account credentials
@@ -1430,15 +1430,15 @@ The following data is never transmitted to any external provider:
 
 **LLM data policy:**
 
-When Atlas sends inventor data to LLM providers for synthesis tasks:
+When InventSmith sends inventor data to LLM providers for synthesis tasks:
 1. The minimum necessary context is sent. Full stage histories are never sent; only the specific data needed for the synthesis task.
-2. Atlas uses Anthropic and OpenAI under Business Associate terms where applicable. Both providers commit to not using API input data for model training under API plans.
-3. Invention descriptions sent to LLMs are prefixed with "This data is confidential and belongs to a user of the Atlas platform. Do not retain, reference, or reproduce this data outside this conversation."
+2. InventSmith uses Anthropic and OpenAI under Business Associate terms where applicable. Both providers commit to not using API input data for model training under API plans.
+3. Invention descriptions sent to LLMs are prefixed with "This data is confidential and belongs to a user of the InventSmith platform. Do not retain, reference, or reproduce this data outside this conversation."
 4. LLM synthesis requests are structured so that the provider sees a category-level description, not a verbatim product description. For example: "A physical consumer goods product in the premium food storage category with a modular lid system" rather than "Rise Jars — premium borosilicate glass food storage jars with a patent-pending lid seal."
 
 **Anonymization techniques:**
 
-When product context must be sent to external providers, Atlas applies the following anonymization techniques in order of sensitivity:
+When product context must be sent to external providers, InventSmith applies the following anonymization techniques in order of sensitivity:
 
 1. **Category generalization:** Replace specific product descriptions with category-level terms where possible ("stainless steel cookware" → "cookware" for broad market sizing queries)
 2. **Keyword extraction:** Extract only the essential technology keywords for patent searches, without the product name or commercial context
@@ -1447,7 +1447,7 @@ When product context must be sent to external providers, Atlas applies the follo
 
 **Data Processing Agreements (DPAs):**
 
-All providers that receive any inventor data must have a Data Processing Agreement in place with Atlas's operating entity that includes:
+All providers that receive any inventor data must have a Data Processing Agreement in place with InventSmith's operating entity that includes:
 - Prohibition on use of API data for provider's own model training or product improvement
 - Data retention limits (no longer than 30 days for ephemeral API call data)
 - Security standards (SOC 2 Type II or equivalent)
@@ -1455,11 +1455,11 @@ All providers that receive any inventor data must have a Data Processing Agreeme
 
 ### 10.4 Rate Limiting Strategy Per Provider
 
-Rate limiting protects Atlas from two failure modes: (1) hitting provider-imposed limits that result in API errors and degraded research quality, and (2) runaway request generation that produces unexpected cost spikes.
+Rate limiting protects InventSmith from two failure modes: (1) hitting provider-imposed limits that result in API errors and degraded research quality, and (2) runaway request generation that produces unexpected cost spikes.
 
 **Rate limit tracking architecture:**
 
-Atlas maintains a live rate limit state for each provider in a Convex table (`providerRateLimitState`):
+InventSmith maintains a live rate limit state for each provider in a Convex table (`providerRateLimitState`):
 
 ```
 providerRateLimitState {
@@ -1471,21 +1471,21 @@ providerRateLimitState {
   lastUpdatedAt: string
   
   // Safety margins
-  safetyFactor: number             // Atlas uses only this fraction of the limit (e.g., 0.85 = use 85% of limit)
-  effectiveLimit: number           // limit × safetyFactor — the limit Atlas enforces
+  safetyFactor: number             // InventSmith uses only this fraction of the limit (e.g., 0.85 = use 85% of limit)
+  effectiveLimit: number           // limit × safetyFactor — the limit InventSmith enforces
 }
 ```
 
-**Safety margins:** Atlas does not consume 100% of a provider's rate limit. A safety factor is applied per provider:
-- Providers where Atlas is the only client on the account: 0.90 safety factor (use up to 90% of limit)
-- Providers where multiple Atlas environments share a key (development + staging + production): 0.50 safety factor
+**Safety margins:** InventSmith does not consume 100% of a provider's rate limit. A safety factor is applied per provider:
+- Providers where InventSmith is the only client on the account: 0.90 safety factor (use up to 90% of limit)
+- Providers where multiple InventSmith environments share a key (development + staging + production): 0.50 safety factor
 - Providers with strict per-minute limits (where exceeding is disruptive): 0.75 safety factor
 
 **Rate limit tracking sources:**
 
 Rate limit state is updated from two sources:
-1. **Provider response headers:** Most providers return rate limit headers in every response (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`). Atlas reads these on every response and updates the `providerRateLimitState` record.
-2. **Internal tracking:** For providers that do not return rate limit headers, Atlas tracks its own request counts against the known limits from the provider's documentation.
+1. **Provider response headers:** Most providers return rate limit headers in every response (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`). InventSmith reads these on every response and updates the `providerRateLimitState` record.
+2. **Internal tracking:** For providers that do not return rate limit headers, InventSmith tracks its own request counts against the known limits from the provider's documentation.
 
 **Rate limit enforcement in the queue:**
 
@@ -1497,7 +1497,7 @@ The Research Queue's dispatcher enforces rate limits before dispatching a job:
 
 **Per-provider rate limit defaults:**
 
-| Provider | Window | Provider Limit | Atlas Effective Limit (85%) | Strategy |
+| Provider | Window | Provider Limit | InventSmith Effective Limit (85%) | Strategy |
 |---|---|---|---|---|
 | Brave Search | Per month | 2,000 free / 10,000 paid | 8,500 per month | Paid plan; reserve capacity for P1/P2 jobs |
 | SerpAPI | Per month | 5,000 per plan | 4,250 per month | Monitor closely; escalate plan as volume grows |
@@ -1510,7 +1510,7 @@ The Research Queue's dispatcher enforces rate limits before dispatching a job:
 
 **Rate limit violation handling:**
 
-If a rate limit is hit unexpectedly (provider returns 429 before Atlas's internal counter expected it):
+If a rate limit is hit unexpectedly (provider returns 429 before InventSmith's internal counter expected it):
 1. Update `providerRateLimitState` immediately with the `Retry-After` header value (or 60 seconds if no header)
 2. Mark the current job as `"rate_limited"` and re-enqueue with the retry scheduled for the reset time
 3. Trigger provider fallback evaluation (is another provider available for this module?)
@@ -1588,7 +1588,7 @@ In addition to the per-invention lifetime budget, each stage has a cost cap that
 | Stage 1 — Idea Capture | 25 | Light research; web search only |
 | Stage 2 — Validation | 50 | Community research; review sentiment |
 | Stage 3 — Market Research | 150 | Most expensive market data stage |
-| Stage 4 — Patent Readiness | 200 | Prior art search is the most expensive research task in Atlas |
+| Stage 4 — Patent Readiness | 200 | Prior art search is the most expensive research task in InventSmith |
 | Stage 5 — Product Design | 75 | Regulatory and material research |
 | Stage 6 — Prototype | 50 | Vendor research |
 | Stage 7 — Manufacturing | 100 | Manufacturer research and compliance data |
@@ -1609,7 +1609,7 @@ When the Research Queue dispatcher evaluates a job, it checks both the per-stage
 
 ### 10.7 Global Monthly Cost Budget
 
-At the platform level, Atlas maintains a global monthly budget for all Research Engine API spending across all inventions and all founders.
+At the platform level, InventSmith maintains a global monthly budget for all Research Engine API spending across all inventions and all founders.
 
 **Global monthly budget structure:**
 
@@ -1654,7 +1654,7 @@ The global budget is reviewed and adjusted at the beginning of each month. Adjus
 
 **Cost monitoring dashboard:**
 
-The Research Engine exposes cost monitoring data through Convex queries accessible by Atlas's operational tooling. The monitoring view provides:
+The Research Engine exposes cost monitoring data through Convex queries accessible by InventSmith's operational tooling. The monitoring view provides:
 
 - Real-time spend against monthly budget (global and per-provider breakdown)
 - Per-invention spend ranking (which inventions are consuming the most budget)
@@ -1677,7 +1677,7 @@ The Research Engine exposes cost monitoring data through Convex queries accessib
 
 **Alert delivery:**
 
-All alerts are delivered through Atlas's monitoring infrastructure. Informational and Warning alerts are logged and visible in the monitoring dashboard. Critical and Emergency alerts trigger notifications to the on-call engineering team via Slack or equivalent communication channel.
+All alerts are delivered through InventSmith's monitoring infrastructure. Informational and Warning alerts are logged and visible in the monitoring dashboard. Critical and Emergency alerts trigger notifications to the on-call engineering team via Slack or equivalent communication channel.
 
 ### 10.9 Automatic Cost Circuit Breakers
 
@@ -1696,7 +1696,7 @@ When global monthly spending reaches 100% of budget:
 
 When a single invention reaches 100% of its per-invention budget:
 - All research jobs for that `inventionId` are paused regardless of priority, EXCEPT Priority Level 1 (user interactive — founder is actively waiting for a result).
-- The stage view for the affected invention shows a budget notification: "Atlas has completed extensive research for your invention. Automated background research has paused temporarily. You can continue working, and Atlas will resume research on a new billing cycle. [Upgrade plan] to increase your research budget."
+- The stage view for the affected invention shows a budget notification: "InventSmith has completed extensive research for your invention. Automated background research has paused temporarily. You can continue working, and InventSmith will resume research on a new billing cycle. [Upgrade plan] to increase your research budget."
 - Manual refresh (Priority Level 1) still works — but the cost is logged against the inventor's budget. If a founder manually refreshes and exhausts the last of their budget in Priority Level 1 jobs, subsequent manual refreshes are queued until the budget resets.
 
 **Circuit Breaker 3 — Anomalous Spending Spike:**
@@ -1806,7 +1806,7 @@ DataTransmissionRecord {
 - Security incident review requirements (12 months)
 - General engineering analysis and retrospectives (ongoing)
 
-**Cost reconciliation:** At the end of each billing month, Atlas's finance team can export the research execution log for the month, sum `actualCostCents` by provider, and reconcile against each provider's invoice. Any variance greater than 5% triggers an investigation.
+**Cost reconciliation:** At the end of each billing month, InventSmith's finance team can export the research execution log for the month, sum `actualCostCents` by provider, and reconcile against each provider's invoice. Any variance greater than 5% triggers an investigation.
 
 **Who can access audit logs:**
 
@@ -1876,7 +1876,7 @@ The monitoring system is designed for maximum signal, minimum noise:
 
 ## Summary
 
-This document has defined four critical architecture layers of the Atlas Research Engine:
+This document has defined four critical architecture layers of the InventSmith Research Engine:
 
 | Section | What It Defines |
 |---|---|

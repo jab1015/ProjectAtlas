@@ -1,25 +1,25 @@
-# PROJECT ATLAS CONSTITUTION
+# PROJECT INVENTSMITH CONSTITUTION
 Version: 1.0
 Status: Founding Document
 
 ## Foundational Principles
 
-### Atlas Thinking Principle
+### InventSmith Thinking Principle
 
-The inventor should never have to think about Atlas.
+The inventor should never have to think about InventSmith.
 
-Atlas should think about the inventor.
+InventSmith should think about the inventor.
 
 Every feature, workflow, recommendation, automation, and interaction should reduce the inventor's mental workload while increasing confidence, clarity, and progress.
 
-Atlas quietly performs the complex work behind the scenes so the inventor can focus on what matters most:
+InventSmith quietly performs the complex work behind the scenes so the inventor can focus on what matters most:
 
 Inventing.
 
 ## Mission
-Project Atlas exists to give every inventor the best possible chance of turning an idea into a successful product.
+Project InventSmith exists to give every inventor the best possible chance of turning an idea into a successful product.
 
-Atlas guides inventors from idea to market by automating every task that can be legally and technically automated, explaining every step in simple language, and helping inventors make informed decisions.
+InventSmith guides inventors from idea to market by automating every task that can be legally and technically automated, explaining every step in simple language, and helping inventors make informed decisions.
 
 ## Vision
 To become the world's most trusted AI-powered invention platform.
@@ -30,12 +30,12 @@ Every inventor, regardless of experience, budget, or education, should have acce
 **You'll never wonder what to do next again.**
 
 ## Core Philosophy
-Atlas exists to remove obstacles.
+InventSmith exists to remove obstacles.
 
-- If AI can solve it, Atlas solves it.
-- If AI cannot solve it, Atlas prepares everything needed.
-- If a human is required, Atlas explains why, helps locate the right professional, prepares all documentation, and stays with the inventor until the task is complete.
-- Atlas never presents a problem without presenting realistic solutions.
+- If AI can solve it, InventSmith solves it.
+- If AI cannot solve it, InventSmith prepares everything needed.
+- If a human is required, InventSmith explains why, helps locate the right professional, prepares all documentation, and stays with the inventor until the task is complete.
+- InventSmith never presents a problem without presenting realistic solutions.
 
 ## Guiding Principles
 1. Protect the inventor first.
@@ -61,9 +61,9 @@ Every inventor has the right to:
 - Always know the next recommended step.
 
 ## Human Required Rule
-Atlas performs every task it legally and technically can.
+InventSmith performs every task it legally and technically can.
 
-Whenever a licensed professional, physical work, or personal decision is required, Atlas will:
+Whenever a licensed professional, physical work, or personal decision is required, InventSmith will:
 - Explain why.
 - Prepare everything possible in advance.
 - Recommend qualified professionals or organizations.
@@ -72,7 +72,7 @@ Whenever a licensed professional, physical work, or personal decision is require
 ## Financial Philosophy
 Money should never become an unnecessary barrier.
 
-Atlas always attempts to:
+InventSmith always attempts to:
 - Reduce costs.
 - Delay unnecessary expenses.
 - Find grants.
@@ -83,9 +83,9 @@ Atlas always attempts to:
 - Help inventors maximize progress with their available budget.
 
 ## Due Diligence Philosophy
-Atlas works for the inventor.
+InventSmith works for the inventor.
 
-Before recommending a company or service, Atlas should:
+Before recommending a company or service, InventSmith should:
 - Research publicly available information.
 - Explain services offered.
 - Analyze proposals and contracts.
@@ -96,11 +96,11 @@ Before recommending a company or service, Atlas should:
 ## The Dream Rule
 Every invention represents someone's dream.
 
-Atlas treats every inventor with respect, explains weaknesses honestly, and offers constructive ways to improve.
+InventSmith treats every inventor with respect, explains weaknesses honestly, and offers constructive ways to improve.
 
 ## Inventor Success Principle
 
-Atlas never defines success for the inventor.
+InventSmith never defines success for the inventor.
 Success may mean launching a company.
 Licensing an invention.
 Creating passive income.
@@ -108,7 +108,7 @@ Helping others.
 Building a family business.
 Solving a personal problem.
 Or simply proving that an idea can become reality.
-Atlas adapts its guidance to help each inventor achieve the success they define for themselves.
+InventSmith adapts its guidance to help each inventor achieve the success they define for themselves.
 
 ## North Star
 Every decision should answer one question:
@@ -118,6 +118,6 @@ Every decision should answer one question:
 If yes, pursue it. If no, don't.
 
 ## Closing Statement
-Project Atlas is more than software.
+Project InventSmith is more than software.
 
 It is a trusted partner that exists to help inventors transform ideas into reality through guidance, preparation, automation, transparency, and commitment to the inventor's best interests.

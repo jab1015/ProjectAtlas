@@ -1,4 +1,4 @@
-# ATLAS RESEARCH ENGINE ARCHITECTURE
+# INVENTSMITH RESEARCH ENGINE ARCHITECTURE
 ## Section 11, Module 1: Competitor Research
 
 **Version 1.0 — July 2026**
@@ -15,7 +15,7 @@
 
 ## Document Purpose
 
-This document specifies the complete architecture for **Research Module 1: Competitor Research** (`competitive_landscape`). It is Section 11, Module 1 of the Atlas Research Engine Architecture series.
+This document specifies the complete architecture for **Research Module 1: Competitor Research** (`competitive_landscape`). It is Section 11, Module 1 of the InventSmith Research Engine Architecture series.
 
 This specification covers every aspect of how this module operates: when it fires, what inputs it requires, what research it executes, which providers it uses, what outputs it produces, how confidence is scored, how results are cached and refreshed, how errors are handled, how cost is managed, and what the founder review requirements are.
 
@@ -54,7 +54,7 @@ The module does not conduct a one-time search. It is a continuous intelligence f
 
 ### 1.2 Why It Matters to an Inventor
 
-Every inventor begins their journey with some awareness of competing solutions — but that awareness is almost always incomplete, informal, and biased toward the products they happen to know. Atlas has a constitutional obligation (Principle 4 of the Automation Constitution) to conduct this research before asking the inventor to supply it.
+Every inventor begins their journey with some awareness of competing solutions — but that awareness is almost always incomplete, informal, and biased toward the products they happen to know. InventSmith has a constitutional obligation (Principle 4 of the Automation Constitution) to conduct this research before asking the inventor to supply it.
 
 For an inventor, competitive landscape research matters for seven specific downstream reasons:
 
@@ -85,16 +85,16 @@ The Competitor Research module serves the following stages by stage ID:
 | 11 | Marketing | Supplies competitor channel presence and marketing positioning data that inform channel selection and messaging differentiation |
 | 15 | Growth (post-launch) | Powers the ongoing competitive intelligence feed that alerts the founder to new entrants, price changes, and product pivots |
 
-### 1.4 Atlas Decisions Informed
+### 1.4 InventSmith Decisions Informed
 
-The Competitor Research module directly informs the following Atlas-generated outputs and recommendations:
+The Competitor Research module directly informs the following InventSmith-generated outputs and recommendations:
 
-- **Idea Brief differentiation statement** — Atlas identifies the closest competing products and uses them to draft a factual differentiation statement for founder review
-- **Stage 2 Validation guidance** — When researching community sentiment for the problem, Atlas cross-references the competitor list to evaluate whether existing products are adequately solving the problem (informing the validated problem signal)
+- **Idea Brief differentiation statement** — InventSmith identifies the closest competing products and uses them to draft a factual differentiation statement for founder review
+- **Stage 2 Validation guidance** — When researching community sentiment for the problem, InventSmith cross-references the competitor list to evaluate whether existing products are adequately solving the problem (informing the validated problem signal)
 - **Market Research Summary competitive section** — The competitor list, estimated share proxies, and positioning analysis become the Competitive Market Structure section of the Market Research Summary
 - **Competitive Pricing Context table** — The pricing data collected by this module populates the pricing reference table used in Stage 10 pricing strategy decisions
 - **Pitch Deck competitive slide** — The competitive landscape output maps directly to the competitive landscape slide in the investor pitch deck (Stage 13)
-- **Go-to-market positioning recommendations** — The gap analysis within the competitive landscape (where no competitor competes at all) informs Atlas's positioning recommendations in Stage 11
+- **Go-to-market positioning recommendations** — The gap analysis within the competitive landscape (where no competitor competes at all) informs InventSmith's positioning recommendations in Stage 11
 - **Risk Tracker entry for major new competitors** — When the monthly refresh detects a net-new competitor with significant market presence (estimated revenue > $1M or venture-backed), the risk tracker is updated with a "New competitive threat" entry
 
 ---
@@ -173,7 +173,7 @@ These inputs must be present before the module's full detailed research logic ca
 | `inventionId` | `Id<"inventions">` | System | The Convex document ID of the invention record |
 | `stageId` | `number` | System | The stage ID triggering this research job (used for result routing and cost accounting) |
 | `productDescription` | `string` | Stage 1 `stageProgress` | The inventor's narrative description of the product, as captured and confirmed in the Idea Brief. Minimum 20 characters. Used as the primary seed for all search queries. |
-| `productCategory` | `string` | Atlas-inferred from Stage 1 | The SIC/NAICS-aligned category label inferred by Atlas from the product description. Examples: `"consumer_packaged_goods"`, `"kitchen_appliances"`, `"personal_care"`, `"pet_products"`. Required for targeting market-specific search queries. |
+| `productCategory` | `string` | InventSmith-inferred from Stage 1 | The SIC/NAICS-aligned category label inferred by InventSmith from the product description. Examples: `"consumer_packaged_goods"`, `"kitchen_appliances"`, `"personal_care"`, `"pet_products"`. Required for targeting market-specific search queries. |
 
 ### 3.2 Optional Inputs
 
@@ -184,9 +184,9 @@ These inputs are used when available to improve result quality and precision. Th
 | `targetMarket` | `string` | Stage 1 `stageProgress` | Geographic target market (e.g., `"US"`, `"North America"`, `"global"`). Defaults to `"US"` if not supplied. |
 | `targetAudience` | `string` | Stage 1 or Stage 2 `stageProgress` | Plain-language description of the intended buyer (e.g., `"home cooks aged 28–45 who care about kitchen aesthetics"`). Used to refine search queries toward products sold to this audience. |
 | `noveltyStatement` | `string` | Stage 1 `stageProgress` | The inventor's stated differentiator — what they believe is unique. Used to construct queries that specifically look for competitors with similar claimed differentiation, testing whether the differentiator is genuinely novel. |
-| `knownCompetitors` | `string[]` | Stage 1 `stageProgress`, inventor-supplied | List of competitor names or product names the inventor is already aware of. These are added to the competitor list directly as seeds, and Atlas confirms/enriches them rather than discovering them from scratch. |
+| `knownCompetitors` | `string[]` | Stage 1 `stageProgress`, inventor-supplied | List of competitor names or product names the inventor is already aware of. These are added to the competitor list directly as seeds, and InventSmith confirms/enriches them rather than discovering them from scratch. |
 | `channelPreference` | `string[]` | Stage 1 or Stage 3 `stageProgress` | Channels the inventor is targeting (e.g., `["DTC", "Amazon", "specialty_retail"]`). Used to filter competitor research toward the channels where head-to-head competition will occur. |
-| `pricePointIntent` | `string` | Atlas-inferred or founder-supplied | Pricing tier the inventor intends to occupy: `"value"`, `"mid_market"`, `"premium"`, `"ultra_premium"`. Used to weight competitor price searches toward the relevant tier. |
+| `pricePointIntent` | `string` | InventSmith-inferred or founder-supplied | Pricing tier the inventor intends to occupy: `"value"`, `"mid_market"`, `"premium"`, `"ultra_premium"`. Used to weight competitor price searches toward the relevant tier. |
 | `geographicMarket` | `string` | Stage 1 `stageProgress` | If different from `targetMarket`, the geographic scope of the competitive landscape search. Defaults to `targetMarket`. Supports `"US"`, `"North America"`, `"Europe"`, `"global"`. |
 | `runDepth` | `string` | Queue entry (dispatcher-set) | `"light"` (Stage 1 onOpen early run), `"full"` (standard), or `"incremental"` (scheduled refresh). Defaults to `"full"`. Controls which steps in Section 4 are executed. |
 | `lastRunCursor` | `string | null` | Prior `researchResults` record | ISO 8601 date string indicating the end date of the previous run. Used by incremental refresh to scope delta queries. Null for first run. |
@@ -208,9 +208,9 @@ Before the research job executes, the worker validates the input payload:
 | Missing Input | Behavior |
 |---|---|
 | `productDescription` missing AND `productCategory` missing | Job status set to `"awaiting_input"`. The queue entry persists. When either field is populated in `stageProgress`, the dispatcher re-evaluates and dispatches. No error is surfaced to the founder. |
-| `productDescription` missing but `productCategory` present | `runDepth` forced to `"light"`. Only category-level queries are executed (Steps 1 and 2 of Section 4). Result confidence will be low (REQUIRES_REVIEW). UI surfaces: "Atlas searched for competitors in your product category. Add a product description for a more targeted search." |
-| `productCategory` missing but `productDescription` present | Atlas infers category from product description using an LLM classification step (one Haiku call, ~200 tokens) before proceeding with full research. Category inference is recorded as an assumption in the result's `AssumptionRecord[]`. |
-| `targetMarket` missing | Defaults to `"US"`. Recorded as an assumption: "Atlas assumed your primary market is the United States." |
+| `productDescription` missing but `productCategory` present | `runDepth` forced to `"light"`. Only category-level queries are executed (Steps 1 and 2 of Section 4). Result confidence will be low (REQUIRES_REVIEW). UI surfaces: "InventSmith searched for competitors in your product category. Add a product description for a more targeted search." |
+| `productCategory` missing but `productDescription` present | InventSmith infers category from product description using an LLM classification step (one Haiku call, ~200 tokens) before proceeding with full research. Category inference is recorded as an assumption in the result's `AssumptionRecord[]`. |
+| `targetMarket` missing | Defaults to `"US"`. Recorded as an assumption: "InventSmith assumed your primary market is the United States." |
 | `inventionId` invalid | Job fails immediately, no retry. Error logged. No founder notification — this indicates a dispatcher bug, not a founder-facing condition. |
 
 ---
@@ -353,7 +353,7 @@ CompetitorCandidate {
 
 **What happens:** For each `CompetitorCandidate`, the worker fetches the competitor's brand website (or primary product page) to extract pricing, product features, and positioning information. This step supplements the snippet-level data from Step 2 with deeper product-level detail.
 
-**Provider used (primary):** `serpapi_shopping_prices` for marketplace listings; `brave_search` for brand website fetches via search (NOT direct HTTP fetches — Atlas does not directly crawl competitor websites; it uses search results that include the relevant page content).
+**Provider used (primary):** `serpapi_shopping_prices` for marketplace listings; `brave_search` for brand website fetches via search (NOT direct HTTP fetches — InventSmith does not directly crawl competitor websites; it uses search results that include the relevant page content).
 
 **What is extracted per competitor:**
 
@@ -401,7 +401,7 @@ PriceRecord {
 The worker constructs a synthesis prompt structured as follows:
 
 ```
-System: You are a competitive intelligence analyst for Atlas, an AI platform for inventors. 
+System: You are a competitive intelligence analyst for InventSmith, an AI platform for inventors. 
 Your task is to synthesize raw web search results into structured competitor profiles.
 Be precise. Be conservative — only claim what the evidence supports.
 If evidence is insufficient to fill a field, mark it null.
@@ -1012,7 +1012,7 @@ This module supports incremental updates as defined in Part 1 Section 6.7.
 2. If both LLMs fail, Steps 5 and 6 are skipped entirely
 3. The result is written with `enriched: false` for all competitors and `positioningStatement: null`
 4. Confidence is automatically reduced: `coverageCompleteness` capped at 0.50 when Step 5 is skipped
-5. The result label is REQUIRES_REVIEW due to reduced confidence — the founder sees: "Atlas found competitors but could not generate detailed profiles. The basic competitor list is available for your review."
+5. The result label is REQUIRES_REVIEW due to reduced confidence — the founder sees: "InventSmith found competitors but could not generate detailed profiles. The basic competitor list is available for your review."
 
 **Google Trends failure (Step 7):**
 1. Step 7 is skipped — it is already optional
@@ -1038,7 +1038,7 @@ Partial results are never served to the Document Pipeline for document assembly 
 
 The stage view shows a persistent notice in the place where the competitive landscape would be displayed:
 
-> "Atlas wasn't able to complete competitor research for your product. This sometimes happens due to temporary issues with our data sources. You can [Try again] or [Enter competitors manually]."
+> "InventSmith wasn't able to complete competitor research for your product. This sometimes happens due to temporary issues with our data sources. You can [Try again] or [Enter competitors manually]."
 
 The "Try again" button triggers a `manualRefresh` at Priority Level 1. The "Enter competitors manually" button opens the manual override form (per Part 2 Section 9.8).
 
@@ -1046,13 +1046,13 @@ The "Try again" button triggers a `manualRefresh` at Priority Level 1. The "Ente
 
 The stage view shows the partial result with a notice:
 
-> "Atlas found [N] competitors but wasn't able to gather complete pricing and positioning details. Review what Atlas found, or [Refresh for more complete data]."
+> "InventSmith found [N] competitors but wasn't able to gather complete pricing and positioning details. Review what InventSmith found, or [Refresh for more complete data]."
 
 **Research in progress:**
 
 The stage view shows a skeleton/loading state with:
 
-> "Atlas is researching competitors... This usually takes 30–60 seconds."
+> "InventSmith is researching competitors... This usually takes 30–60 seconds."
 
 If research is still in progress when the founder opens the stage (Priority Level 2 job), the live status updates are reflected in the UI through Convex's reactive query system.
 
@@ -1203,10 +1203,10 @@ The specific prompts shown to the founder vary by sub-condition:
 
 | Sub-Condition | Prompt Shown to Founder |
 |---|---|
-| Only 1–2 sources per competitor | "Atlas found these competitors with moderate confidence. The research is based on limited sources — please verify these are the right competitors for your product." |
-| Pricing data is sparse | "Atlas found these competitors but pricing data is incomplete for some. Confirm or fill in any missing prices before using this data for your pricing strategy." |
-| Result is 15–25 days old (approaching degradation) | "This competitor research was conducted [N] days ago. Markets change — confirm these findings are still current, or ask Atlas to refresh." |
-| Trend data shows unusual divergence | "Atlas noticed that search interest for this category is [declining/volatile]. This may affect competitive dynamics — confirm your competitive assessment accounts for this trend." |
+| Only 1–2 sources per competitor | "InventSmith found these competitors with moderate confidence. The research is based on limited sources — please verify these are the right competitors for your product." |
+| Pricing data is sparse | "InventSmith found these competitors but pricing data is incomplete for some. Confirm or fill in any missing prices before using this data for your pricing strategy." |
+| Result is 15–25 days old (approaching degradation) | "This competitor research was conducted [N] days ago. Markets change — confirm these findings are still current, or ask InventSmith to refresh." |
+| Trend data shows unusual divergence | "InventSmith noticed that search interest for this category is [declining/volatile]. This may affect competitive dynamics — confirm your competitive assessment accounts for this trend." |
 
 ### 11.4 What Blocks Stage Advancement If Not Reviewed
 

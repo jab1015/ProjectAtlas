@@ -1,18 +1,18 @@
-# ATLAS-007_TECHNICAL_ARCHITECTURE_BIBLE_v1.0
+# INVENTSMITH-007_TECHNICAL_ARCHITECTURE_BIBLE_v1.0
 
 **Version:** 1.0\
 **Status:** Foundational Draft
 
 ## Purpose
 
-This document defines how Project Atlas is engineered. It is the
+This document defines how Project InventSmith is engineered. It is the
 technical blueprint that transforms the Constitution, Product Bible, and
 AI Specialist Team Bible into an implementable platform.
 
 ## Core Architecture Principles
 
 -   Inventor First
--   Complexity belongs inside Atlas
+-   Complexity belongs inside InventSmith
 -   Replaceable Intelligence
 -   Modular by Design
 -   Security by Default
@@ -30,7 +30,7 @@ AI Specialist Team Bible into an implementable platform.
 
 ## Core Services
 
--   Atlas Orchestration Engine
+-   InventSmith Orchestration Engine
 -   Decision Engine
 -   Memory Engine
 -   Inventor Twin
@@ -42,12 +42,12 @@ AI Specialist Team Bible into an implementable platform.
 ## AI Architecture
 
 Specialist Teams never operate independently. All requests pass through
-the Atlas Orchestration Engine, which coordinates routing, context
+the InventSmith Orchestration Engine, which coordinates routing, context
 sharing, and collaboration.
 
 ## Memory Architecture
 
-Atlas maintains: - Project Memory - Inventor Memory - Organizational
+InventSmith maintains: - Project Memory - Inventor Memory - Organizational
 Memory - Decision History - Document History - Conversation History
 
 ## Data Architecture
@@ -73,7 +73,7 @@ Manufacturing - Payments - Storage
 
 ## Scalability
 
-Atlas must support: - Multi-project inventors - Multiple AI providers -
+InventSmith must support: - Multi-project inventors - Multiple AI providers -
 Horizontal scaling - Background workers - Event queues - Future
 Specialist Teams
 

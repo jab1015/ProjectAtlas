@@ -1,8 +1,8 @@
-ATLAS-010 --- API & INTEGRATION BIBLE v1.0 Version: 1.0 Status: Merged
+INVENTSMITH-010 --- API & INTEGRATION BIBLE v1.0 Version: 1.0 Status: Merged
 Draft \# Revision History Version 1.0 - Merged Parts 01-18 \# Table of
 Contents Part 01 Part 02 Part 03 Part 04 Part 05 Part 06 Part 07 Part 08
 Part 09 Part 10 Part 11 Part 12 Part 13 Part 14 Part 15 Part 16 Part 17
-Part 18 ATLAS-010 --- API & INTEGRATION BIBLE v1.0 \# PART 01
+Part 18 INVENTSMITH-010 --- API & INTEGRATION BIBLE v1.0 \# PART 01
 
 NOTE: This is the beginning of Part 01. Due to the response/output
 limits of this chat session, the complete production content will be
@@ -16,7 +16,7 @@ Handling - Rate Limiting - Security - Observability - Developer
 Experience - Reference Appendices
 
 Reply 'continue' to generate the next sequential portion following the
-established workflow. ATLAS-010 --- API & INTEGRATION BIBLE v1.0 \# PART
+established workflow. INVENTSMITH-010 --- API & INTEGRATION BIBLE v1.0 \# PART
 02
 
 Continuation placeholder.
@@ -36,7 +36,7 @@ of Part 01 and cover additional sections such as:
 -   Implementation guidance
 -   Engineering examples
 
-Reply 'continue' for the next sequential file. ATLAS-010 --- API &
+Reply 'continue' for the next sequential file. INVENTSMITH-010 --- API &
 INTEGRATION BIBLE v1.0 \# PART 03
 
 Continuation placeholder.
@@ -54,7 +54,7 @@ Planned coverage for this section includes:
 -   Logging and tracing
 -   Reference implementation notes
 
-Reply 'continue' to generate the next numbered TXT file. ATLAS-010 ---
+Reply 'continue' to generate the next numbered TXT file. INVENTSMITH-010 ---
 API & INTEGRATION BIBLE v1.0 \# PART 04
 
 Continuation placeholder.
@@ -72,7 +72,7 @@ Planned coverage for this section includes:
 -   Operational runbooks
 -   Enterprise integration examples
 
-Reply 'continue' to generate the next numbered TXT file. ATLAS-010 ---
+Reply 'continue' to generate the next numbered TXT file. INVENTSMITH-010 ---
 API & INTEGRATION BIBLE v1.0 \# PART 05
 
 Continuation placeholder.
@@ -90,7 +90,7 @@ Planned coverage for this section includes:
 -   Change management
 -   Future extensibility roadmap
 
-Reply 'continue' to generate the next numbered TXT file. ATLAS-010 ---
+Reply 'continue' to generate the next numbered TXT file. INVENTSMITH-010 ---
 API & INTEGRATION BIBLE v1.0 \# PART 06
 
 Continuation placeholder.
@@ -108,7 +108,7 @@ Planned coverage for this section includes:
 -   Reference architectures
 -   Appendix planning
 
-Reply 'continue' to generate the next numbered TXT file. ATLAS-010 ---
+Reply 'continue' to generate the next numbered TXT file. INVENTSMITH-010 ---
 API & INTEGRATION BIBLE v1.0 \# PART 07
 
 Continuation placeholder.
@@ -126,7 +126,7 @@ Planned coverage for this section includes:
 -   Deprecation communications
 -   Enterprise implementation checklist
 
-Reply 'continue' to generate the next numbered TXT file. ATLAS-010 ---
+Reply 'continue' to generate the next numbered TXT file. INVENTSMITH-010 ---
 API & INTEGRATION BIBLE v1.0 \# PART 08
 
 Continuation placeholder.
@@ -144,7 +144,7 @@ Planned coverage for this section includes:
 -   Reference integration templates
 -   Final appendix planning
 
-Reply 'continue' to generate the next numbered TXT file. ATLAS-010 ---
+Reply 'continue' to generate the next numbered TXT file. INVENTSMITH-010 ---
 API & INTEGRATION BIBLE v1.0 \# PART 09
 
 Continuation placeholder.
@@ -162,7 +162,7 @@ Planned coverage for this section includes:
 -   Operational KPIs
 -   Final implementation guidance
 
-Reply 'continue' to generate the next numbered TXT file. ATLAS-010 ---
+Reply 'continue' to generate the next numbered TXT file. INVENTSMITH-010 ---
 API & INTEGRATION BIBLE v1.0 \# PART 10
 
 Continuation placeholder.
@@ -180,7 +180,7 @@ Planned coverage for this section includes:
 -   Reference implementation catalog
 -   Closing appendices and glossary
 
-Reply 'continue' to generate the next numbered TXT file. ATLAS-010 ---
+Reply 'continue' to generate the next numbered TXT file. INVENTSMITH-010 ---
 API & INTEGRATION BIBLE v1.0 \# PART 11
 
 Continuation placeholder.
@@ -198,7 +198,7 @@ Planned coverage for this section includes:
 -   Reference deployment topologies
 -   Final reference appendices
 
-Reply 'continue' to generate the next numbered TXT file. ATLAS-010 ---
+Reply 'continue' to generate the next numbered TXT file. INVENTSMITH-010 ---
 API & INTEGRATION BIBLE v1.0 \# PART 12
 
 Continuation placeholder.
@@ -216,7 +216,7 @@ Planned coverage for this section includes:
 -   Comprehensive implementation checklist
 -   Preparation for concluding sections
 
-Reply 'continue' to generate the next numbered TXT file. ATLAS-010 ---
+Reply 'continue' to generate the next numbered TXT file. INVENTSMITH-010 ---
 API & INTEGRATION BIBLE v1.0 \# PART 13
 
 Continuation placeholder.
@@ -234,7 +234,7 @@ Planned coverage for this section includes:
 -   Reference architecture examples
 -   Final appendix preparation
 
-Reply 'continue' to generate the next numbered TXT file. ATLAS-010 ---
+Reply 'continue' to generate the next numbered TXT file. INVENTSMITH-010 ---
 API & INTEGRATION BIBLE v1.0 \# PART 14
 
 Continuation placeholder.
@@ -252,7 +252,7 @@ Planned coverage for this section includes:
 -   Final glossary preparation
 -   Document completion planning
 
-Reply 'continue' to generate the next numbered TXT file. ATLAS-010 ---
+Reply 'continue' to generate the next numbered TXT file. INVENTSMITH-010 ---
 API & INTEGRATION BIBLE v1.0 \# PART 15
 
 Continuation placeholder.
@@ -270,7 +270,7 @@ Planned coverage for this section includes:
 -   Final appendices
 -   Document closeout planning
 
-Reply 'continue' to generate the next numbered TXT file. ATLAS-010 ---
+Reply 'continue' to generate the next numbered TXT file. INVENTSMITH-010 ---
 API & INTEGRATION BIBLE v1.0 \# PART 16
 
 Continuation placeholder.
@@ -288,7 +288,7 @@ Planned coverage for this section includes:
 -   Final engineering appendices
 -   Pre-merge completion checklist
 
-Reply 'continue' to generate the next numbered TXT file. ATLAS-010 ---
+Reply 'continue' to generate the next numbered TXT file. INVENTSMITH-010 ---
 API & INTEGRATION BIBLE v1.0 \# PART 17
 
 Continuation placeholder.
@@ -306,7 +306,7 @@ Planned coverage for this section includes:
 -   Final reference appendices
 -   Merge readiness verification
 
-Reply 'continue' to generate the next numbered TXT file. ATLAS-010 ---
+Reply 'continue' to generate the next numbered TXT file. INVENTSMITH-010 ---
 API & INTEGRATION BIBLE v1.0 \# PART 18
 
 Continuation placeholder.
@@ -323,7 +323,7 @@ Planned coverage for this concluding section includes:
 -   Reference appendix completion
 -   Final validation checklist
 
-END OF ATLAS-010_API\_&\_INTEGRATION_BIBLE_v1.0
+END OF INVENTSMITH-010_API\_&\_INTEGRATION_BIBLE_v1.0
 
 This placeholder series is complete and ready for merge once all
 numbered parts are collected.
@@ -332,11 +332,11 @@ numbered parts are collected.
 
 ## Expansion File 01
 
-ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-01.txt
+INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-01.txt
 
 CHAPTER 1 --- Enterprise API Philosophy
 
-Purpose The API layer is the connective tissue of Project Atlas. Every
+Purpose The API layer is the connective tissue of Project InventSmith. Every
 internal service, AI department, workflow engine, and third-party
 integration communicates through governed interfaces designed for
 reliability, security, scalability, and long-term evolution.
@@ -358,7 +358,7 @@ Discoverable • Testable • Resilient • Extensible
 
 Enterprise Integration Principles
 
-Canonical Data Model Atlas establishes canonical business objects for
+Canonical Data Model InventSmith establishes canonical business objects for
 Projects, Inventors, Products, Documents, AI Departments, Tasks,
 Workflows, Funding, Manufacturing, Marketing, Intellectual Property, and
 Analytics. Systems translate to the canonical model rather than
@@ -389,12 +389,12 @@ departments • New workflow engines • External marketplace partners •
 Enterprise customer deployments • Multi-region infrastructure • Hybrid
 cloud deployment • Event-driven automation • Emerging protocol support
 without redesign. \## Expansion File 02
-ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-02.txt
+INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-02.txt
 
 CHAPTER 2 --- Enterprise API Architecture
 
 Purpose This chapter defines the architectural standards governing every
-API exposed by Project Atlas. The architecture is designed to support
+API exposed by Project InventSmith. The architecture is designed to support
 modular growth, enterprise scalability, security, and interoperability
 across internal services, AI departments, and external partners.
 
@@ -404,7 +404,7 @@ communication. • Simplify integration and governance.
 
 API Classification
 
-1.  Internal APIs Used exclusively between Atlas platform services and
+1.  Internal APIs Used exclusively between InventSmith platform services and
     AI departments.
 
 2.  Partner APIs Exposed to trusted third-party organizations under
@@ -460,12 +460,12 @@ Future Extensibility
 The architecture supports: • Additional AI departments • Regional
 deployments • Multi-cloud operation • Customer-specific extensions •
 Plug-in integrations • Future protocol adoption without redesign \##
-Expansion File 03 ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-03.txt
+Expansion File 03 INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-03.txt
 
 CHAPTER 3 --- Authentication & Authorization Architecture
 
 Purpose Authentication and authorization establish the trust foundation
-for every interaction within the Atlas platform. Every request must be
+for every interaction within the InventSmith platform. Every request must be
 authenticated, authorized, traceable, and auditable before business
 logic is executed.
 
@@ -475,7 +475,7 @@ Secure by default.
 
 Identity Architecture
 
-Identity Providers Atlas supports: • Native identity • Enterprise SSO •
+Identity Providers InventSmith supports: • Native identity • Enterprise SSO •
 OAuth 2.1 providers • OpenID Connect • SAML 2.0 federation
 
 Authentication Methods • Username/password with MFA • Passkeys
@@ -519,12 +519,12 @@ Future Extensibility The security architecture supports: • Adaptive
 authentication • Risk-based authorization • Hardware-backed credentials
 • Delegated administration • Fine-grained policy engines • Emerging
 identity standards \## Expansion File 04
-ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-04.txt
+INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-04.txt
 
 CHAPTER 4 --- API Versioning & Design Standards
 
 Purpose This chapter establishes uniform standards for designing,
-evolving, and maintaining APIs across the Atlas ecosystem. Consistency
+evolving, and maintaining APIs across the InventSmith ecosystem. Consistency
 reduces integration complexity, improves developer productivity, and
 enables long-term platform stability.
 
@@ -582,13 +582,13 @@ consume
 Future Extensibility The design standards are intended to support future
 protocols, evolving business domains, and enterprise-scale integrations
 without requiring fundamental redesign. \## Expansion File 05
-ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-05.txt
+INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-05.txt
 
 CHAPTER 5 --- Event-Driven Architecture & GraphQL Strategy
 
 Purpose This chapter defines the standards for asynchronous
 communication, event-driven processing, GraphQL adoption, and enterprise
-messaging across Project Atlas. These capabilities enable scalable,
+messaging across Project InventSmith. These capabilities enable scalable,
 loosely coupled services while maintaining governance, reliability, and
 observability.
 
@@ -652,12 +652,12 @@ The messaging architecture is designed to support: • AI workflow
 orchestration • Multi-region event distribution • Cross-cloud
 integration • Streaming analytics • Digital twin synchronization •
 Future messaging protocols without architectural redesign. \## Expansion
-File 06 ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-06.txt
+File 06 INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-06.txt
 
 CHAPTER 6 --- API Lifecycle Management & Governance
 
 Purpose This chapter establishes the governance model that manages every
-Atlas API from initial proposal through retirement. Lifecycle governance
+InventSmith API from initial proposal through retirement. Lifecycle governance
 ensures consistency, security, maintainability, and predictable
 evolution across the platform.
 
@@ -721,13 +721,13 @@ Governance processes shall evolve to support: • Additional business
 domains • AI-generated APIs • Partner ecosystems • Industry compliance
 requirements • Emerging API standards without compromising consistency
 or reliability. \## Expansion File 07
-ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-07.txt
+INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-07.txt
 
 CHAPTER 7 --- Integration Security Architecture
 
 Purpose This chapter defines the enterprise security controls protecting
 every API, integration, event stream, and connected service throughout
-the Atlas ecosystem. Security is implemented as a foundational
+the InventSmith ecosystem. Security is implemented as a foundational
 architectural capability rather than an optional feature.
 
 Security Objectives • Protect confidentiality, integrity, and
@@ -802,11 +802,11 @@ The architecture shall support: • Confidential computing • Post-quantum
 cryptography readiness • Hardware security modules (HSMs) • Adaptive
 access controls • AI-assisted threat detection • Emerging enterprise
 security standards \## Expansion File 08
-ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-08.txt
+INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-08.txt
 
 CHAPTER 8 --- Enterprise Observability & Operational Monitoring
 
-Purpose Observability enables Atlas engineering teams to understand the
+Purpose Observability enables InventSmith engineering teams to understand the
 health, performance, reliability, and behavior of every API and
 integration in real time. Every production service must emit actionable
 telemetry that supports rapid diagnosis and continuous improvement.
@@ -873,14 +873,14 @@ Future Extensibility
 The observability platform shall support: • AI-assisted anomaly
 detection • Predictive operations • Autonomous remediation • Cross-cloud
 telemetry • Enterprise reporting \## Expansion File 09
-ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-09.txt
+INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-09.txt
 
 CHAPTER 9 --- API Performance, Resiliency & High Availability
 
 Purpose Enterprise APIs must remain responsive, resilient, and
 continuously available under varying workloads. This chapter defines the
 performance engineering, fault tolerance, and availability standards
-that govern the Atlas integration platform.
+that govern the InventSmith integration platform.
 
 Performance Objectives • Deliver predictable response times. • Scale
 horizontally under load. • Prevent cascading failures. • Optimize
@@ -950,18 +950,18 @@ Future Extensibility
 The resiliency architecture shall evolve to support: • Autonomous
 scaling • Predictive capacity management • AI-assisted optimization •
 Cross-cloud failover • Self-healing infrastructure \## Expansion File 10
-ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-10.txt
+INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-10.txt
 
 CHAPTER 10 --- External Integration Framework
 
-Purpose Project Atlas must integrate securely and consistently with
+Purpose Project InventSmith must integrate securely and consistently with
 third-party platforms, cloud services, enterprise software, and AI
 providers. This chapter defines the architectural framework governing
 external connectivity while preserving security, reliability, and
 operational consistency.
 
 Integration Objectives • Standardize external connectivity. • Reduce
-custom integration effort. • Enable reusable connectors. • Protect Atlas
+custom integration effort. • Enable reusable connectors. • Protect InventSmith
 data and services. • Support future provider expansion.
 
 Connector Architecture
@@ -1027,14 +1027,14 @@ Future Extensibility
 The integration framework shall support: • New enterprise applications •
 Emerging AI providers • Industry-specific platforms • Additional
 communication protocols • Marketplace connector ecosystems \## Expansion
-File 11 ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-11.txt
+File 11 INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-11.txt
 
 CHAPTER 11 --- Enterprise SDK Strategy & Developer Experience
 
 Purpose Enterprise adoption depends on making APIs easy to discover,
 understand, implement, and maintain. This chapter establishes standards
 for SDKs, client libraries, testing assets, automation, and developer
-experience across the Atlas platform.
+experience across the InventSmith platform.
 
 Developer Experience Objectives • Minimize onboarding time. • Reduce
 implementation errors. • Encourage consistent integration patterns. •
@@ -1043,7 +1043,7 @@ examples.
 
 SDK Strategy
 
-Official SDKs Atlas shall maintain supported SDKs for: • Python •
+Official SDKs InventSmith shall maintain supported SDKs for: • Python •
 JavaScript / TypeScript • C# • Java • Go
 
 Additional SDKs may be generated for community-supported ecosystems.
@@ -1066,7 +1066,7 @@ Provide asynchronous support where appropriate
 
 Testing Framework
 
-Testing Assets Atlas provides: • Mock servers • Sample datasets •
+Testing Assets InventSmith provides: • Mock servers • Sample datasets •
 Sandbox credentials • Integration test suites • Performance test
 templates
 
@@ -1097,7 +1097,7 @@ Future Extensibility
 The developer platform shall support: • AI-assisted code generation •
 Interactive code playgrounds • Plugin ecosystems • Community SDK
 contributions • Automated migration tooling \## Expansion File 12
-ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-12.txt
+INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-12.txt
 
 CHAPTER 12 --- Enterprise Integration Testing & Operational Readiness
 
@@ -1171,14 +1171,14 @@ Future Extensibility
 The validation framework shall support: • AI-assisted test generation •
 Autonomous regression detection • Predictive quality analytics •
 Continuous certification • Self-validating deployments \## Expansion
-File 13 ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-13.txt
+File 13 INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-13.txt
 
 CHAPTER 13 --- Enterprise Integration Operations & Continuous
 Improvement
 
 Purpose This chapter defines the operational governance required to
 sustain a secure, high-performing, and continuously improving API and
-integration ecosystem throughout the lifecycle of Project Atlas.
+integration ecosystem throughout the lifecycle of Project InventSmith.
 
 Operational Objectives • Maintain platform reliability. • Standardize
 operational processes. • Improve service quality continuously. •
@@ -1246,12 +1246,12 @@ Future Extensibility
 Operations shall evolve to support: • Autonomous operations •
 AI-assisted incident response • Predictive maintenance • Self-healing
 integrations • Enterprise-scale governance automation \## Expansion File
-14 ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-14.txt
+14 INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-14.txt
 
 CHAPTER 14 --- API Maturity, Federation & Platform Evolution
 
 Purpose This chapter establishes the long-term strategic governance
-model for the Atlas API ecosystem, ensuring that integrations remain
+model for the InventSmith API ecosystem, ensuring that integrations remain
 scalable, interoperable, and adaptable as the platform grows.
 
 Enterprise API Maturity Model
@@ -1321,13 +1321,13 @@ The API platform shall evolve to support: • Autonomous integration
 orchestration • AI-generated integration flows • Industry-specific
 accelerators • Global partner ecosystems • Emerging interoperability
 standards \## Expansion File 15
-ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-15.txt
+INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-15.txt
 
 CHAPTER 15 --- Enterprise Reference Architectures & Integration
 Blueprints
 
 Purpose This chapter provides reference architectures and engineering
-blueprints that standardize implementation across Atlas services while
+blueprints that standardize implementation across InventSmith services while
 allowing controlled flexibility for future growth.
 
 Reference Architecture Principles • Modular services • API-first
@@ -1390,7 +1390,7 @@ Reference architectures are living standards and shall evolve to
 incorporate new cloud capabilities, AI orchestration patterns,
 interoperability standards, and enterprise integration technologies
 while preserving compatibility. \## Expansion File 16
-ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-16.txt
+INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-16.txt
 
 CHAPTER 16 --- Enterprise Compliance, Operational Readiness & Pre-Merge
 Validation
@@ -1461,16 +1461,16 @@ normalized • Cross-references are validated • Terminology is consistent
 
 Future Extensibility
 
-The governance framework shall continue evolving to support future Atlas
+The governance framework shall continue evolving to support future InventSmith
 platform capabilities while preserving enterprise consistency and
 operational excellence. \## Expansion File 17
-ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-17.txt
+INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-17.txt
 
 CHAPTER 17 --- Enterprise Adoption, Governance Sign-Off & Long-Term
 Sustainability
 
 Purpose This chapter defines the organizational processes required to
-successfully adopt, govern, and sustain the Atlas API platform over its
+successfully adopt, govern, and sustain the InventSmith API platform over its
 operational life.
 
 Enterprise Adoption Strategy
@@ -1529,16 +1529,16 @@ implemented and continuously maintained.
 
 Future Extensibility
 
-Future governance shall support additional Atlas products, AI
+Future governance shall support additional InventSmith products, AI
 capabilities, industry frameworks, and evolving enterprise integration
 standards while maintaining architectural consistency. \## Expansion
-File 18 ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0-18.txt
+File 18 INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0-18.txt
 
 CHAPTER 18 --- Enterprise Implementation Roadmap & Merge Readiness
 
 Purpose This concluding expansion chapter defines the roadmap for
 enterprise adoption, ongoing governance, operational excellence, and
-long-term stewardship of the Atlas API and Integration Platform.
+long-term stewardship of the InventSmith API and Integration Platform.
 
 Enterprise Implementation Roadmap
 
@@ -1598,6 +1598,6 @@ alignment • Editorial review completion
 Merge Readiness Confirmation
 
 The expansion series (01--18) is complete and ready to be merged into
-the original ATLAS-012_API\_&\_INTEGRATION_BIBLE_v1.0 document when
+the original INVENTSMITH-012_API\_&\_INTEGRATION_BIBLE_v1.0 document when
 instructed. No merge shall occur until the user explicitly issues the
 MERGE command.

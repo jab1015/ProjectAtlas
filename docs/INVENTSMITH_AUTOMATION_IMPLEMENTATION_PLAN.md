@@ -1,4 +1,4 @@
-# ATLAS AUTOMATION IMPLEMENTATION PLAN
+# INVENTSMITH AUTOMATION IMPLEMENTATION PLAN
 
 > **Current-state notice (August 14, 2026):** This document remains the long-range automation reference, but its July 2026 current-state assessment is historical. Active implementation scope is governed by `ATLAS_PRODUCT_RESET_V1.md`, and verified progress is tracked in `ATLAS_BUILD_PROGRESS.md`.
 
@@ -10,19 +10,19 @@
 
 ## Purpose
 
-This document converts the Atlas Automation Constitution into a concrete engineering implementation plan. It answers a single engineering question: **what must be built, in what order, to move Atlas from a guided workflow to an autonomous AI operating system?**
+This document converts the InventSmith Automation Constitution into a concrete engineering implementation plan. It answers a single engineering question: **what must be built, in what order, to move InventSmith from a guided workflow to an autonomous AI operating system?**
 
-The Automation Constitution defines the principle: Atlas owns execution. This document defines the implementation.
+The Automation Constitution defines the principle: InventSmith owns execution. This document defines the implementation.
 
-**The goal:** Atlas performs every task it reasonably can before asking the founder to do anything.
+**The goal:** InventSmith performs every task it reasonably can before asking the founder to do anything.
 
 ---
 
 ## SECTION 1 — CURRENT STATE ASSESSMENT
 
-### 1.1 How Atlas Currently Operates
+### 1.1 How InventSmith Currently Operates
 
-As of July 2026, Atlas operates between Level 1 (Guided) and Level 2 (Assisted) on the Automation Maturity Model defined in the Constitution. The following describes the actual system behavior.
+As of July 2026, InventSmith operates between Level 1 (Guided) and Level 2 (Assisted) on the Automation Maturity Model defined in the Constitution. The following describes the actual system behavior.
 
 **Architecture Reference:** ADR-001 (Engine Owns Progress), ADR-002 (Three-State Readiness), ADR-003 (Configuration-Driven Journey), ADR-006 (UI Contains No Business Logic), ADR-010 (stageProgress as Separate Table).
 
@@ -33,14 +33,14 @@ As of July 2026, Atlas operates between Level 1 (Guided) and Level 2 (Assisted) 
 Each live stage operates on the following interaction pattern:
 
 1. Founder opens a stage
-2. Atlas presents a structured set of fields and questions via the IntelliQ system
+2. InventSmith presents a structured set of fields and questions via the IntelliQ system
 3. Founder manually fills fields or responds to AI-prompted questions in conversation
 4. `journeyEngine.ts` evaluates completeness against `stageConfig` field definitions
-5. Atlas generates a readiness score (0–100 internal, three-state external per ADR-002)
-6. When sufficient fields are complete, Atlas generates the stage deliverable from founder-supplied input
+5. InventSmith generates a readiness score (0–100 internal, three-state external per ADR-002)
+6. When sufficient fields are complete, InventSmith generates the stage deliverable from founder-supplied input
 7. Founder reviews and advances
 
-**What Atlas does today:**
+**What InventSmith does today:**
 - Structures the questions the founder should answer
 - Explains what each field means and why it matters
 - Scores completeness against defined field thresholds (`stageConfig`)
@@ -49,10 +49,10 @@ Each live stage operates on the following interaction pattern:
 - Tracks `stageProgress` per stage in Convex (`inventionId × stageId` index — ADR-010)
 
 **What the founder must do today:**
-- Research competitors manually (Atlas does not pre-populate competitive data)
+- Research competitors manually (InventSmith does not pre-populate competitive data)
 - Conduct prior art searches in USPTO/Google Patents manually (Stage 4)
 - Supply market size data from external sources (Stage 3)
-- Write or describe everything from scratch before Atlas can generate output
+- Write or describe everything from scratch before InventSmith can generate output
 - Manually answer all stage questions — no pre-population from external research
 - Re-enter information that overlaps with prior stages if not explicitly threaded through
 
@@ -87,20 +87,20 @@ None of stages 5–15 have:
 
 ---
 
-#### The Founder-to-Atlas Work Ratio Today
+#### The Founder-to-InventSmith Work Ratio Today
 
-| Task Category | Founder Does | Atlas Does |
+| Task Category | Founder Does | InventSmith Does |
 |---|---|---|
 | Research (competitive, market, patent, pricing) | 100% | 0% |
 | Data entry and field population | 100% | 0% |
-| Document drafting | 0–20% (Atlas generates from completed fields) | 80–100% (post-input) |
-| Progress evaluation | 0% (Atlas scores) | 100% |
-| Recommendations and assessments | 0% (Atlas generates) | 100% |
-| Stage sequencing and unlocking | 0% (Atlas gates) | 100% |
+| Document drafting | 0–20% (InventSmith generates from completed fields) | 80–100% (post-input) |
+| Progress evaluation | 0% (InventSmith scores) | 100% |
+| Recommendations and assessments | 0% (InventSmith generates) | 100% |
+| Stage sequencing and unlocking | 0% (InventSmith gates) | 100% |
 | Background research before stage opens | 0% | 0% (not implemented) |
 | Cross-stage data population | ~50% (manual re-entry common) | ~50% (some fields auto-threaded) |
 
-**Summary:** Today Atlas guides and generates from what the founder provides. It does not research, pre-populate, or act autonomously before the founder interacts. The Constitution defines where the system must go. This plan defines how to get there.
+**Summary:** Today InventSmith guides and generates from what the founder provides. It does not research, pre-populate, or act autonomously before the founder interacts. The Constitution defines where the system must go. This plan defines how to get there.
 
 ---
 
@@ -133,10 +133,10 @@ The Automation Constitution defines four maturity levels:
 
 | Level | Name | What It Means | Current Status |
 |---|---|---|---|
-| Level 1 | Guided | Atlas structures the process; founder does the work | ✓ Achieved (Stages 1–4) |
-| Level 2 | Assisted | Atlas generates drafts from founder input | ~Partial (Stages 1–4 only) |
-| Level 3 | Autonomous | Atlas researches and generates before founder arrives | ✗ Not yet |
-| Level 4 | Operating System | Atlas manages the journey end-to-end; founder approves | ✗ Long-term vision |
+| Level 1 | Guided | InventSmith structures the process; founder does the work | ✓ Achieved (Stages 1–4) |
+| Level 2 | Assisted | InventSmith generates drafts from founder input | ~Partial (Stages 1–4 only) |
+| Level 3 | Autonomous | InventSmith researches and generates before founder arrives | ✗ Not yet |
+| Level 4 | Operating System | InventSmith manages the journey end-to-end; founder approves | ✗ Long-term vision |
 
 **12-month target:** Level 3 across all live stages.
 
@@ -144,7 +144,7 @@ The Automation Constitution defines four maturity levels:
 
 ## SECTION 2 — TARGET STATE
 
-### 2.1 The Future Atlas Experience
+### 2.1 The Future InventSmith Experience
 
 The target experience: **the founder feels like they hired an experienced startup team.**
 
@@ -153,22 +153,22 @@ When a founder opens a stage in the target state:
 - Documents are already drafted (not blank templates — populated drafts)
 - Data from prior stages has already flowed into the current stage automatically
 - Risks have already been surfaced with specific action items
-- Atlas has already provided a recommendation — the founder confirms, adjusts, or redirects
+- InventSmith has already provided a recommendation — the founder confirms, adjusts, or redirects
 
 The founder's job becomes: **review, approve, and decide** — not research, write, and calculate.
 
 ---
 
-### 2.2 Atlas Owns These Responsibilities in the Target State
+### 2.2 InventSmith Owns These Responsibilities in the Target State
 
-| Atlas Owns | Implementation Mechanism |
+| InventSmith Owns | Implementation Mechanism |
 |---|---|
 | **Research** before every stage opens | Stage `onOpen` lifecycle hook → web search API + structured extraction |
 | **Document drafts** ready at stage open | Document auto-assembly pipeline from prior stage `stageProgress` data |
 | **Calculations** (unit economics, break-even, TAM/SAM/SOM, margins) | Automated from prior stage field data — no founder spreadsheet work |
 | **Competitive analysis** | Background research job → competitive landscape populated before founder sees the stage |
 | **Prior art search** | USPTO + Google Patents API → results surfaced at Stage 4 open |
-| **Recommendations** | Every stage surfaces Atlas's specific recommendation with reasoning and trade-offs |
+| **Recommendations** | Every stage surfaces InventSmith's specific recommendation with reasoning and trade-offs |
 | **Risk monitoring** | Patent deadlines, public disclosure bars, inventory levels, KPI variances |
 | **Cross-stage data propagation** | All fields flow downstream automatically; nothing asked twice |
 | **Document assembly** | Pitch deck, IP brief, sales toolkit, unit economics, landing page — all assembled from prior stage data |
@@ -187,9 +187,9 @@ The Automation Constitution (Principle 9) defines the founder's irreducible role
 | **Physical world tasks** | Prototype testing, factory visits, investor meetings, trade shows |
 | **Relationship formation** | Investors, retail buyers, manufacturers, influencers, media |
 | **Negotiation** | Price, terms, equity, exclusivity |
-| **Final approval** | Review and approve every Atlas output before it is committed |
+| **Final approval** | Review and approve every InventSmith output before it is committed |
 
-**Everything else is Atlas's job.**
+**Everything else is InventSmith's job.**
 
 ---
 
@@ -213,7 +213,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 
 ## SECTION 3 — STAGE-BY-STAGE AUTOMATION PLAN
 
-*For each stage: what the founder does today, what Atlas should own in the target state, implementation details, and impact estimates.*
+*For each stage: what the founder does today, what InventSmith should own in the target state, implementation details, and impact estimates.*
 
 ---
 
@@ -223,27 +223,27 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Describes idea in conversation (relatively low friction — this stage is mostly conversational)
 - Names the invention
 - Answers completeness-scoring questions
-- Resolves contradictions Atlas surfaces
+- Resolves contradictions InventSmith surfaces
 
-**Tasks Atlas Should Automate:**
+**Tasks InventSmith Should Automate:**
 - Run competitive product search the moment the product description is submitted
 - Pre-populate industry category and problem domain from description analysis
 - Surface top 3–5 existing solutions before the founder completes the Idea Brief
 - Identify whether the problem statement is broadly shared (community signal check)
 
-**Tasks Atlas Should Research (on-trigger, before Stage 1 completes):**
+**Tasks InventSmith Should Research (on-trigger, before Stage 1 completes):**
 - Similar products on Amazon, Google Shopping, and D2C brands
 - Community discussion volume for the problem (Reddit, forums, app stores)
 - Patent filings in the technology area (preview — full search at Stage 4)
 - Relevant industry category and SIC/NAICS code for downstream market sizing
 
-**Tasks Atlas Should Generate:**
+**Tasks InventSmith Should Generate:**
 - Idea Brief (already generated — maintain and improve)
 - Completeness Assessment (already generated)
 - Initial competitive context summary (new — from research)
 - Recommended Stage 2 validation priorities from research findings
 
-**Tasks Atlas Should Monitor:**
+**Tasks InventSmith Should Monitor:**
 - Competitive product launches in the category (after stage completion, weekly)
 
 **Tasks Requiring Founder Approval:**
@@ -273,27 +273,27 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Writes up findings
 - Makes Go/No-Go decision
 
-**Tasks Atlas Should Automate:**
+**Tasks InventSmith Should Automate:**
 - Auto-generate interview question set from Idea Brief (already partially done; improve specificity)
 - Rank top 5 assumptions by risk without requiring founder input
 - Surface publicly available problem evidence (Reddit threads, Amazon reviews, app store complaints) before founder conducts interviews
 - Analyze interview findings the founder provides and extract patterns
 - Van Westendorp 4-question price sensitivity module (triggered when price point > $40)
 
-**Tasks Atlas Should Research (on-trigger):**
+**Tasks InventSmith Should Research (on-trigger):**
 - Existing validation evidence for the problem in public forums, reviews, and Q&A platforms
 - Similar product review sentiment on Amazon and Trustpilot
 - Funding history of known competitors as proxy for market activity
 - Channel validation data: which distribution model works for comparable products
 
-**Tasks Atlas Should Generate:**
+**Tasks InventSmith Should Generate:**
 - Assumption Risk Map (5 assumptions ranked by risk + validation method)
 - Customer Interview Guide (tailored to audience and problem)
 - Competitive Landscape (preliminary — 3–5 competitors with notes)
 - Go/No-Go Recommendation with explicit reasoning
 - Validation Report
 
-**Tasks Atlas Should Monitor:**
+**Tasks InventSmith Should Monitor:**
 - Community sentiment for the problem space (monthly, after stage completion)
 
 **Tasks Requiring Founder Approval:**
@@ -322,27 +322,27 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Identifies competitors
 - Profiles customer segments
 
-**Tasks Atlas Should Automate:**
+**Tasks InventSmith Should Automate:**
 - Pull comparable category sizes from public datasets before stage opens
 - Auto-calculate preliminary TAM from demographic data and search volume
 - Build first-draft competitive landscape from Stage 1+2 research
 - Pre-populate Customer Segment Profile templates from Stage 2 interview data
 
-**Tasks Atlas Should Research (on-trigger at stage open):**
+**Tasks InventSmith Should Research (on-trigger at stage open):**
 - Comparable category market sizes (premium cookware, premium drinkware, adjacent categories)
 - Industry growth rate and CAGR from published reports
 - Demographic data for target segment (age, income, geography from public sources)
 - Competitive market share distribution (revenue proxies: Alexa rank, Shopify spy tools, social following as indicators)
 - Search trend volume for the product category and related keywords
 
-**Tasks Atlas Should Generate:**
+**Tasks InventSmith Should Generate:**
 - Draft Market Research Summary (populated with research data)
 - TAM/SAM/SOM Model (calculator pre-seeded with researched figures)
 - Competitive Market Share Analysis
 - Customer Segment Profiles (2–3 segments, pre-populated from demographic research)
 - Market Opportunity Assessment
 
-**Tasks Atlas Should Monitor:**
+**Tasks InventSmith Should Monitor:**
 - Monthly search trend updates for category keywords
 - New competitor launches (using competitive research trigger)
 
@@ -372,20 +372,20 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Documents prior art findings
 - Makes IP strategy decision
 
-**Tasks Atlas Should Automate:**
+**Tasks InventSmith Should Automate:**
 - Execute automated prior art search using USPTO API + Google Patents API at stage open
 - Generate search query set from invention description (mechanism-based, domain-based, and claim-based queries)
 - Rank prior art results by relevance to the inventor's novel element claims
 - Draft novel element statements from invention description
 - Auto-generate NDA document for manufacturer sharing
 
-**Tasks Atlas Should Research (on-trigger):**
+**Tasks InventSmith Should Research (on-trigger):**
 - Top 50 most relevant patents by search query
 - Recent patent activity in the technology area (last 24 months)
 - Competitor patent filings as IP landscape context
 - IP attorney networks appropriate for the invention category
 
-**Tasks Atlas Should Generate:**
+**Tasks InventSmith Should Generate:**
 - Prior Art Search Query Set (already done; automate the actual search execution)
 - Prior Art Summary (from automated search results)
 - Novel Element Statements (3 claim-like articulations)
@@ -394,7 +394,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - IP Brief (attorney-ready)
 - NDA Template (unilateral for manufacturing sharing)
 
-**Tasks Atlas Should Monitor:**
+**Tasks InventSmith Should Monitor:**
 - Ongoing patent filings in the technology area (monthly alert)
 - Provisional patent deadline countdown (from filing date — alert at 9, 11, 11.5 months)
 - Public disclosure log with statutory bar date calculation
@@ -427,20 +427,20 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - No tooling cost guidance — must research independently
 - No compliance pathway — must research independently
 
-**Tasks Atlas Should Automate:**
+**Tasks InventSmith Should Automate:**
 - Activate physical product vertical configuration from Stage 1 product type field
 - Surface material-specific design implications in real time (glass CPG: food contact, thermal shock, weight, breakage, lid compatibility)
 - Calculate tooling cost range from mold count × manufacturing geography
 - Surface applicable regulatory requirements (FDA 21 CFR, CE, Prop 65) by product category
 - Pre-populate design spec template from Stage 1 product description
 
-**Tasks Atlas Should Research (on-trigger):**
+**Tasks InventSmith Should Research (on-trigger):**
 - Regulatory requirements by product category and target market
 - Material specifications standard for the product type
 - Manufacturing implications of material choices (MOQ, tooling, lead times)
 - Industrial design firms and freelancers specializing in the product category
 
-**Tasks Atlas Should Generate:**
+**Tasks InventSmith Should Generate:**
 - Product Design Specification (populated draft)
 - Design Decision Log
 - Tooling Cost Estimate (mold count × geography → $ range)
@@ -448,7 +448,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Designer/Engineer Brief for professional handoff
 - Open Design Questions (prioritized list)
 
-**Tasks Atlas Should Monitor:**
+**Tasks InventSmith Should Monitor:**
 - None at stage-level (point-in-time document)
 
 **Tasks Requiring Founder Approval:**
@@ -458,7 +458,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 
 **Tasks Requiring Physical Founder Involvement:**
 - Creative vision and aesthetic direction
-- Physical material samples review (tactile judgment Atlas cannot replicate)
+- Physical material samples review (tactile judgment InventSmith cannot replicate)
 
 | Metric | Estimate |
 |---|---|
@@ -476,21 +476,21 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Selects prototype approach independently
 - Finds prototype vendors independently
 - Designs test protocols independently
-- Manages IP risk independently (no Atlas checkpoint)
+- Manages IP risk independently (no InventSmith checkpoint)
 
-**Tasks Atlas Should Automate:**
+**Tasks InventSmith Should Automate:**
 - **IP pre-engagement checkpoint**: gating question before stage advances — "Have you filed a provisional patent or signed a mutual NDA before sharing detailed designs?" Cannot bypass without explicit confirmation.
 - Present material-specific prototype path (Glass: 3D form mock → proxy mechanism → glass manufacturer sample)
 - Generate prototype cost and timeline estimate by product type and phase
 - Build prototype plan with specific questions to answer and pass/fail criteria
 
-**Tasks Atlas Should Research (on-trigger):**
+**Tasks InventSmith Should Research (on-trigger):**
 - Prototype services and fabricators relevant to the product type and geography
 - Cost and lead time benchmarks for each prototype phase
 - User testing recruitment criteria for the product category
 - Common failure modes in the product design's mechanism type
 
-**Tasks Atlas Should Generate:**
+**Tasks InventSmith Should Generate:**
 - Prototype Plan (phase breakdown, questions, pass/fail criteria)
 - Prototype Sourcing Guide (specific vendors with cost/timeline range)
 - IP Pre-Engagement Checklist
@@ -498,7 +498,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Prototype Test Report template (for founder to complete after testing)
 - Prototype Readiness Assessment
 
-**Tasks Atlas Should Monitor:**
+**Tasks InventSmith Should Monitor:**
 - None (point-in-time stage)
 
 **Tasks Requiring Founder Approval:**
@@ -529,7 +529,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Calculates unit economics manually
 - Discovers total inventory commitment only after committing to MOQ
 
-**Tasks Atlas Should Automate:**
+**Tasks InventSmith Should Automate:**
 - Generate RFQ document directly from Product Design Specification (no founder rewrite needed)
 - Research manufacturer shortlist by product type and geography
 - Calculate unit economics cascade from entered manufacturer quotes
@@ -537,14 +537,14 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Generate retail compliance pre-qualification checklist by product category and target channel
 - Build manufacturer evaluation scorecard (quality, certifications, IP risk, communication score)
 
-**Tasks Atlas Should Research (on-trigger):**
+**Tasks InventSmith Should Research (on-trigger):**
 - Manufacturers in the product category (domestic and overseas)
 - Typical MOQ and tooling cost benchmarks for the product type
 - Freight cost estimates for international manufacturing scenarios
 - Factory certification requirements (ISO, FDA registration, food contact certifications)
 - Common IP risks in manufacturing agreements for this product type
 
-**Tasks Atlas Should Generate:**
+**Tasks InventSmith Should Generate:**
 - RFQ Document (manufacturer-ready, from design spec)
 - Manufacturer Shortlist with evaluation notes
 - Manufacturer Evaluation Scorecard
@@ -555,7 +555,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Contract Review Checklist (terms that must appear in any manufacturing agreement)
 - Retail Compliance Pre-Qualification Checklist (FDA, Prop 65, GS1, EDI)
 
-**Tasks Atlas Should Monitor:**
+**Tasks InventSmith Should Monitor:**
 - None (point-in-time stage; monitoring resumes at Stage 15 with analytics)
 
 **Tasks Requiring Founder Approval:**
@@ -565,7 +565,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Contract terms and signing
 
 **Tasks Requiring Physical Founder Involvement:**
-- Factory negotiations (Atlas can script them but cannot conduct them)
+- Factory negotiations (InventSmith can script them but cannot conduct them)
 - Factory visits (where warranted)
 - Contract execution and signature
 
@@ -587,7 +587,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Describes brand vision without structured framework
 - Produces brand brief manually
 
-**Tasks Atlas Should Automate:**
+**Tasks InventSmith Should Automate:**
 - Generate 20+ brand name candidates using constraints-based algorithm (phonetics, trademark risk, category conventions, .com availability)
 - Run trademark availability check (USPTO TESS API) for all candidates simultaneously
 - Run domain and social handle availability check (Instagram, TikTok, Pinterest) for all candidates
@@ -595,13 +595,13 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Build brand positioning framework from Customer Segment Profiles (Stage 3) and competitive landscape
 - Generate Brand Identity System draft from completed positioning conversation
 
-**Tasks Atlas Should Research (on-trigger):**
+**Tasks InventSmith Should Research (on-trigger):**
 - Competitive brand landscape (what existing brands look/sound like and the whitespace)
 - Brand name connotations and linguistic analysis for target market
 - Visual aesthetic references for the product category
 - Trademark filing history in relevant classes for shortlisted names
 
-**Tasks Atlas Should Generate:**
+**Tasks InventSmith Should Generate:**
 - Brand Name Candidates (20+ with constraint scoring)
 - Name Evaluation Report (trademark risk, availability, recommendation)
 - Brand Identity System (positioning statement, voice guide, visual direction brief)
@@ -609,7 +609,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Visual Direction Brief (ready for a designer or AI visual tool)
 - Brand Voice Guide ("sounds like / doesn't sound like" examples)
 
-**Tasks Atlas Should Monitor:**
+**Tasks InventSmith Should Monitor:**
 - Trademark application status (after filing)
 - Competitor brand landscape changes (quarterly)
 
@@ -641,7 +641,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - No systematic tracking of public disclosure risk
 - Finds IP attorney independently
 
-**Tasks Atlas Should Automate:**
+**Tasks InventSmith Should Automate:**
 - **Auto-assemble IP Brief** from Stages 4 (patent claims) + 5 (product spec) + 8 (brand identity) — 80%+ complete without founder work
 - **Provisional patent deadline tracker**: when filing date is entered, auto-calculate 12-month conversion window; alert at 9, 11, and 11.5 months (never-miss-this rule)
 - **Public disclosure tracker**: log each public disclosure event with date and audience type; auto-calculate US statutory bar date; alert prominently when within 90 days
@@ -649,13 +649,13 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Generate IP Filing Checklist (all pre-filing tasks with deadlines)
 - Build IP attorney shortlist filtered by specialty (consumer goods, relevant material type)
 
-**Tasks Atlas Should Research (on-trigger):**
+**Tasks InventSmith Should Research (on-trigger):**
 - IP attorneys with consumer goods / relevant product category specialty
 - Recent patent filings in the technology area
 - Applicable International Classes for trademark registration
 - Competitive patent monitoring (ongoing)
 
-**Tasks Atlas Should Generate:**
+**Tasks InventSmith Should Generate:**
 - IP Brief (80%+ auto-assembled from prior stages)
 - IP Filing Checklist
 - NDA Templates (unilateral + mutual, from invention record)
@@ -663,7 +663,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - IP Status Tracker (living document updated as filings progress)
 - IP Attorney Shortlist with approach email template
 
-**Tasks Atlas Should Monitor:**
+**Tasks InventSmith Should Monitor:**
 - **Provisional patent deadline** (persistent across all stages — not just Stage 9)
 - **Public disclosure statutory bar countdown** (persistent)
 - New patent filings in technology area (monthly)
@@ -696,19 +696,19 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Calculates break-even manually
 - Applies pricing frameworks without automated support
 
-**Tasks Atlas Should Automate:**
+**Tasks InventSmith Should Automate:**
 - **Unit economics auto-builder**: ingest Stage 7 manufacturer quote fields → auto-populate complete landed cost model → calculate DTC, wholesale, and Amazon FBA margins automatically
 - Apply three pricing frameworks (cost-plus, competitive, value-based) using research data
 - Generate break-even timeline at three volume scenarios automatically ("At conservative/base/optimistic monthly volume, break even in month X")
 - Calculate value delivered vs. reference product for value-based pricing
 
-**Tasks Atlas Should Research (on-trigger):**
+**Tasks InventSmith Should Research (on-trigger):**
 - Current competitor pricing for the product category (web search)
 - Retail margin requirements for applicable channels (keystone, Amazon FBA, distributor)
 - Consumer willingness-to-pay signals from Stage 2 validation interview notes
 - Pricing benchmarks for comparable products at similar quality and positioning
 
-**Tasks Atlas Should Generate:**
+**Tasks InventSmith Should Generate:**
 - Unit Economics Model (auto-populated from Stage 7 COGS data)
 - Pricing Strategy Document
 - Break-Even Analysis (three scenarios)
@@ -716,7 +716,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Channel Margin Analysis (DTC vs. wholesale vs. Amazon vs. distributor)
 - Pricing Recommendation (specific price with reasoning)
 
-**Tasks Atlas Should Monitor:**
+**Tasks InventSmith Should Monitor:**
 - Competitor pricing changes (monthly refresh)
 - Price compression risk signals (new entrants, Asian DTC launches in category)
 
@@ -747,14 +747,14 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Researches influencers independently
 - Creates all marketing assets from blank
 
-**Tasks Atlas Should Automate:**
+**Tasks InventSmith Should Automate:**
 - Score all 8 channels against product profile (price point, margin, founder resources, audience) before any budget commitment
 - Generate landing page copy + HTML structure from Voice Guide + Messaging Architecture + brand inputs
 - Build 90-day content calendar (30+ posts with topic, format, CTA, channel, publish date)
 - Pre-populate Messaging Architecture first draft from prior stage brand and customer data
 - Research and profile 15+ relevant influencer accounts (follower count, engagement rate, audience match, estimated cost)
 
-**Tasks Atlas Should Research (on-trigger):**
+**Tasks InventSmith Should Research (on-trigger):**
 - Channel performance benchmarks for the product category
 - Keyword and SEO opportunity for content strategy topics
 - Competitor marketing positioning and channel presence
@@ -762,7 +762,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Editorial calendar windows for relevant publications (food, lifestyle, home)
 - Audience size estimates and CPC benchmarks for recommended paid channels
 
-**Tasks Atlas Should Generate:**
+**Tasks InventSmith Should Generate:**
 - Go-to-Market Marketing Plan
 - Messaging Architecture (first draft from prior stage data)
 - Channel Strategy (scored + recommended)
@@ -773,7 +773,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Ad Creative Briefs (based on messaging architecture)
 - Influencer Research List (15+ profiled accounts)
 
-**Tasks Atlas Should Monitor:**
+**Tasks InventSmith Should Monitor:**
 - Landing page conversion rate (after analytics integration)
 - Content engagement metrics (after analytics integration)
 - Influencer engagement rate changes
@@ -807,20 +807,20 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Creates Amazon listing manually
 - Makes channel decisions without structured trade-off analysis
 
-**Tasks Atlas Should Automate:**
+**Tasks InventSmith Should Automate:**
 - **Sales toolkit auto-build**: Messaging Architecture → one-pager + buyer FAQ + objection guide + competitor comparison sheet → all four documents generated before Stage 12 opens
 - Generate Amazon listing (title, bullet points, A+ content draft) from product data and messaging architecture
 - Build wholesale buyer contact list from retail buyer database integration (RangeMe/Faire)
 - Generate post-purchase email sequence (order confirmation → tracking → arrival → review request)
 - Produce three-scenario sales projections (conservative, base, optimistic) from channel and pricing data
 
-**Tasks Atlas Should Research (on-trigger):**
+**Tasks InventSmith Should Research (on-trigger):**
 - Margin structure and requirements for each applicable sales channel
 - Comparable product performance on relevant marketplace platforms
 - Retail buyer and distributor contacts for the product category
 - Conversion rate benchmarks for DTC, Amazon, and retail categories
 
-**Tasks Atlas Should Generate:**
+**Tasks InventSmith Should Generate:**
 - Sales Strategy Document
 - Sales Toolkit (one-pager, FAQ, objection guide, competitor comparison)
 - Sales Funnel Model (conversion assumptions with documented basis)
@@ -830,7 +830,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Amazon Listing Draft
 - Sales Readiness Assessment
 
-**Tasks Atlas Should Monitor:**
+**Tasks InventSmith Should Monitor:**
 - Amazon listing performance (after analytics integration)
 - Wholesale pipeline status (CRM-style tracking)
 
@@ -863,36 +863,36 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Researches comparable raises independently
 - Finds grant programs independently
 
-**Tasks Atlas Should Automate:**
+**Tasks InventSmith Should Automate:**
 - **Pitch deck auto-assembly**: market research (S3) + product spec (S5) + brand (S8) + pricing (S10) + unit economics (S10) + team stub → 80%+ complete pitch deck delivered before Stage 13 opens
 - Populate 3-year financial model from unit economics and sales projection data
-- Generate Investor FAQ with 20 questions + Atlas-drafted answers from invention record
+- Generate Investor FAQ with 20 questions + InventSmith-drafted answers from invention record
 - Research comparable raises (what similar companies at this stage raised at what valuation)
 - Surface applicable grant programs (SBIR, STTR, state programs) by product category
 
-**Tasks Atlas Should Research (on-trigger):**
+**Tasks InventSmith Should Research (on-trigger):**
 - Angel investors and seed funds active in the product category
 - Applicable government grant programs (SBIR, STTR, sector-specific)
 - Comparable raises — stage, sector, and geography matched
 - Strategic corporate investors in the category
 - Crowdfunding platform performance benchmarks for the product type
 
-**Tasks Atlas Should Generate:**
+**Tasks InventSmith Should Generate:**
 - Pitch Deck (80%+ pre-populated, complete 10–12 slides)
 - Financial Model (3-year projection)
 - Funding Strategy Document
-- Investor FAQ (20 questions with Atlas-drafted answers)
+- Investor FAQ (20 questions with InventSmith-drafted answers)
 - Use of Proceeds Summary
 - Funding Readiness Assessment
 - Pitch Feedback Report (from simulated investor Q&A)
 - Grant Program Shortlist with application summaries
 
-**Tasks Atlas Should Monitor:**
+**Tasks InventSmith Should Monitor:**
 - Pitch deck view analytics (via DocSend/Pitch.com integration)
 - Investor pipeline status (after CRM integration)
 
 **Tasks Requiring Founder Approval:**
-- Team narrative and founder story (Atlas cannot write this)
+- Team narrative and founder story (InventSmith cannot write this)
 - Valuation and equity terms
 - Investor selection
 
@@ -905,7 +905,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 |---|---|
 | Implementation Difficulty | Medium-Hard (pitch deck pipeline is the complexity) |
 | Founder Hours Saved | 40–75 hrs (pitch deck alone) + 6–10 hrs investor prep |
-| Business Impact | Critical — pitch deck is the single highest hours-saved feature in Atlas |
+| Business Impact | Critical — pitch deck is the single highest hours-saved feature in InventSmith |
 
 **Gaps Closed:** GAP-C08 (SBIR/STTR grant database), GAP-C09 (investor pipeline), GAP-C10 (deck analytics)
 
@@ -917,9 +917,9 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Assembles launch checklist manually across all domains
 - Sequences launch activities independently
 - Monitors launch day without real-time data
-- Synthesizes first-week feedback without structured Atlas support
+- Synthesizes first-week feedback without structured InventSmith support
 
-**Tasks Atlas Should Automate:**
+**Tasks InventSmith Should Automate:**
 - **Cross-domain launch readiness checklist** auto-built from all prior stage completion records (what was done, what wasn't)
 - Sequence launch activities with specific dates (30 days out → 14 → 7 → launch day → week 1)
 - Monitor pre-launch task completion and flag critical path items at risk
@@ -927,19 +927,19 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Display real-time sales and conversion data during launch week (requires analytics integration)
 - Synthesize first-week customer feedback with pattern extraction
 
-**Tasks Atlas Should Research (on-trigger):**
+**Tasks InventSmith Should Research (on-trigger):**
 - Launch timing benchmarks for the product category
 - PR coverage opportunities (journalists, outlets, communities)
 - Customer review platform setup requirements for applicable channels
 
-**Tasks Atlas Should Generate:**
+**Tasks InventSmith Should Generate:**
 - Launch Readiness Checklist (all pre-launch tasks with owners, deadlines, status)
 - Launch Day Playbook (hour-by-hour)
 - Week 1 Customer Feedback Summary (after feedback is submitted)
 - Launch Performance Report (actual vs. plan)
 - Post-Launch Priority List (top 5 actions from launch data)
 
-**Tasks Atlas Should Monitor:**
+**Tasks InventSmith Should Monitor:**
 - Real-time order volume during launch week (requires Shopify integration)
 - Real-time conversion rate vs. benchmark
 - Traffic source breakdown (requires GA4 integration)
@@ -972,7 +972,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Identifies growth opportunities without data support
 - Builds monthly reports manually
 
-**Tasks Atlas Should Automate:**
+**Tasks InventSmith Should Automate:**
 - **Full KPI monitoring** from connected platforms (Shopify, GA4, email, ads)
 - **90-Day Growth Audit** auto-populated with real performance data vs. plan
 - Identify top 3 growth levers with expected return on effort from actual data
@@ -981,13 +981,13 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Surface new SKU candidates from repeat purchase patterns and customer feedback themes
 - Monitor competitive activity (pricing changes, new product launches)
 
-**Tasks Atlas Should Research (on-trigger / monthly):**
+**Tasks InventSmith Should Research (on-trigger / monthly):**
 - Competitor product evolution and pricing changes
 - Channel expansion benchmarks for comparable businesses
 - International expansion readiness criteria for the product type
 - New SKU opportunity based on growth data
 
-**Tasks Atlas Should Generate:**
+**Tasks InventSmith Should Generate:**
 - 90-Day Growth Audit (with real data)
 - Growth Roadmap (90-day plan with initiatives, metrics, review dates)
 - Growth Levers Analysis (top 3 with expected impact)
@@ -996,7 +996,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 - Retention Playbook (post-purchase sequences, referral programs)
 - New SKU Opportunity Analysis (from repeat purchase patterns)
 
-**Tasks Atlas Should Monitor (continuous, all ongoing):**
+**Tasks InventSmith Should Monitor (continuous, all ongoing):**
 - Revenue and revenue growth rate
 - Customer acquisition cost (CAC) vs. LTV
 - Conversion rate by channel
@@ -1018,7 +1018,7 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 |---|---|
 | Implementation Difficulty | Very Hard (full analytics integration required) |
 | Founder Hours Saved | 80–120 hrs/year (continuous monitoring automation + monthly reports) |
-| Business Impact | Critical — without this, Atlas cannot close the loop between plan and reality |
+| Business Impact | Critical — without this, InventSmith cannot close the loop between plan and reality |
 
 **Gaps Closed:** GAP-C13 (analytics integration), GAP-C14 (competitive intelligence monitoring), GAP-C15 (new SKU planning)
 
@@ -1028,9 +1028,9 @@ Reaching Level 3 (Autonomous) requires these infrastructure components that do n
 
 ### 4.1 Audit Methodology
 
-Each question category in Atlas is evaluated on three criteria:
-1. **Can Atlas determine this automatically?** → Replace with research (AUTO)
-2. **Can Atlas partially determine it?** → Pre-fill and allow founder edits (PREFILL)
+Each question category in InventSmith is evaluated on three criteria:
+1. **Can InventSmith determine this automatically?** → Replace with research (AUTO)
+2. **Can InventSmith partially determine it?** → Pre-fill and allow founder edits (PREFILL)
 3. **Is founder input truly required?** → Document why (REQUIRED)
 
 **Target: 80% reduction in manual data entry questions.**
@@ -1041,46 +1041,46 @@ Each question category in Atlas is evaluated on three criteria:
 
 | # | Question Category | Stage(s) | Type | Determination | Action |
 |---|---|---|---|---|---|
-| 1 | Who are your competitors? | 1, 2, 3 | Research | AUTO | Atlas searches before the founder is asked; presents findings for confirmation |
-| 2 | What market category does this product fall into? | 1 | Inference | AUTO | Atlas infers from product description using classification model |
+| 1 | Who are your competitors? | 1, 2, 3 | Research | AUTO | InventSmith searches before the founder is asked; presents findings for confirmation |
+| 2 | What market category does this product fall into? | 1 | Inference | AUTO | InventSmith infers from product description using classification model |
 | 3 | What problem does your product solve? | 1 | Founder Knowledge | REQUIRED | Only the founder knows this from personal experience; cannot be researched |
-| 4 | What makes your product different? | 1, 2 | Founder Knowledge | REQUIRED | Differentiation is founder's vision; Atlas can challenge it but not determine it |
-| 5 | What is your target price range? | 1, 10 | Research+Judgment | PREFILL | Atlas pre-fills from competitive pricing research; founder confirms or adjusts |
-| 6 | What is the typical price range for products like mine? | 3, 10 | Research | AUTO | Atlas researches and presents; founder should never be asked this directly |
-| 7 | What is the market size for your category? | 3 | Research | AUTO | Atlas builds TAM model from public data; founder confirms methodology |
-| 8 | Who are your target customers? | 2, 3 | Founder Knowledge + Research | PREFILL | Atlas pre-populates demographic research; founder refines with personal knowledge |
+| 4 | What makes your product different? | 1, 2 | Founder Knowledge | REQUIRED | Differentiation is founder's vision; InventSmith can challenge it but not determine it |
+| 5 | What is your target price range? | 1, 10 | Research+Judgment | PREFILL | InventSmith pre-fills from competitive pricing research; founder confirms or adjusts |
+| 6 | What is the typical price range for products like mine? | 3, 10 | Research | AUTO | InventSmith researches and presents; founder should never be asked this directly |
+| 7 | What is the market size for your category? | 3 | Research | AUTO | InventSmith builds TAM model from public data; founder confirms methodology |
+| 8 | Who are your target customers? | 2, 3 | Founder Knowledge + Research | PREFILL | InventSmith pre-populates demographic research; founder refines with personal knowledge |
 | 9 | What is your customer willing to pay? | 2, 10 | Research | AUTO | Van Westendorp protocol (2–4 interview questions) + competitive pricing research |
-| 10 | What prior art exists in your category? | 4 | Research | AUTO | Atlas runs USPTO/Google Patents search; presents results for founder review |
-| 11 | What is novel about your invention? | 4 | Founder Knowledge | REQUIRED | Only the inventor knows their unique insight; Atlas extracts from description |
-| 12 | What patents did you find? | 4 | Research | AUTO | Atlas conducts the search; founder should not be asked to supply results |
-| 13 | What materials will your product use? | 5 | Founder Vision | REQUIRED | Material decisions involve vision and feel; Atlas surfaces implications not choices |
-| 14 | What are the dimensions of your product? | 5 | Founder Decision | REQUIRED | Dimensional decisions are design choices; Atlas provides category benchmarks |
-| 15 | What tooling costs should I expect? | 5, 7 | Research | AUTO | Atlas calculates from mold count × geography; never asks the founder |
-| 16 | What compliance requirements apply? | 5, 7 | Research | AUTO | Atlas surfaces applicable regulations by product category and target market |
-| 17 | Who should I use to prototype? | 6 | Research | AUTO | Atlas researches and recommends fabricators; founder should not be asked to find them |
-| 18 | How much will prototyping cost? | 6 | Research | AUTO | Atlas presents benchmarks; founder confirms whether within budget |
-| 19 | Who manufactures products like mine? | 7 | Research | AUTO | Atlas researches shortlist by product type and geography |
-| 20 | What should I include in my RFQ? | 7 | Research + Assembly | AUTO | Atlas generates RFQ from product spec; founder should not write this |
-| 21 | What is the typical MOQ for my product type? | 7 | Research | AUTO | Atlas presents benchmarks from category research |
-| 22 | What is my COGS? | 7, 10 | Calculation | PREFILL | Atlas calculates from entered quote data; founder enters quotes, Atlas calculates everything else |
-| 23 | What is my brand name? | 8 | Founder Decision | REQUIRED | Final name decision belongs to the founder; Atlas generates candidates |
-| 24 | What names are available? | 8 | Research | AUTO | Atlas runs trademark, domain, and handle checks on all candidates |
-| 25 | What is my brand positioning? | 8 | Founder Vision + Framework | PREFILL | Atlas drafts from customer segment data; founder refines to authentic vision |
-| 26 | What should be in my IP brief? | 9 | Assembly | AUTO | Atlas assembles from prior stages; founder should not build this from scratch |
-| 27 | When is my patent deadline? | 9 | Calculation | AUTO | Atlas calculates from entered filing date; no question needed |
-| 28 | What are my margins? | 10 | Calculation | AUTO | Atlas calculates from COGS and competitive pricing data |
-| 29 | When do I break even? | 10 | Calculation | AUTO | Atlas calculates from unit economics model; no input needed |
-| 30 | What are the right marketing channels for my product? | 11 | Research + Analysis | AUTO | Atlas scores all 8 channels against product profile; presents recommendation |
-| 31 | What should my landing page say? | 11 | Generation | AUTO | Atlas generates from Voice Guide and Messaging Architecture |
-| 32 | Who are the right influencers? | 11 | Research | AUTO | Atlas researches and profiles 15+ accounts |
-| 33 | What should my sales one-pager say? | 12 | Generation | AUTO | Atlas generates from product data and messaging architecture |
-| 34 | Who are the relevant retail buyers? | 12 | Research | AUTO | Atlas integrates with buyer database or researches by category |
-| 35 | What should my pitch deck say? | 13 | Assembly | AUTO | Atlas assembles 80%+ from prior stages; founder provides Team and Ask |
-| 36 | What are my 3-year projections? | 13 | Calculation | AUTO | Atlas calculates from unit economics and sales model |
-| 37 | What grants apply to my product? | 13 | Research | AUTO | Atlas searches SBIR, STTR, state programs by product category |
-| 38 | What does my launch checklist need? | 14 | Assembly | AUTO | Atlas assembles from all prior stage completion records |
-| 39 | How is my business performing? | 15 | Analytics | AUTO | Atlas connects to platforms; no founder data collection needed |
-| 40 | What should I focus on next? | 15 | Analysis | AUTO | Atlas analyzes KPIs and surfaces top 3 growth levers |
+| 10 | What prior art exists in your category? | 4 | Research | AUTO | InventSmith runs USPTO/Google Patents search; presents results for founder review |
+| 11 | What is novel about your invention? | 4 | Founder Knowledge | REQUIRED | Only the inventor knows their unique insight; InventSmith extracts from description |
+| 12 | What patents did you find? | 4 | Research | AUTO | InventSmith conducts the search; founder should not be asked to supply results |
+| 13 | What materials will your product use? | 5 | Founder Vision | REQUIRED | Material decisions involve vision and feel; InventSmith surfaces implications not choices |
+| 14 | What are the dimensions of your product? | 5 | Founder Decision | REQUIRED | Dimensional decisions are design choices; InventSmith provides category benchmarks |
+| 15 | What tooling costs should I expect? | 5, 7 | Research | AUTO | InventSmith calculates from mold count × geography; never asks the founder |
+| 16 | What compliance requirements apply? | 5, 7 | Research | AUTO | InventSmith surfaces applicable regulations by product category and target market |
+| 17 | Who should I use to prototype? | 6 | Research | AUTO | InventSmith researches and recommends fabricators; founder should not be asked to find them |
+| 18 | How much will prototyping cost? | 6 | Research | AUTO | InventSmith presents benchmarks; founder confirms whether within budget |
+| 19 | Who manufactures products like mine? | 7 | Research | AUTO | InventSmith researches shortlist by product type and geography |
+| 20 | What should I include in my RFQ? | 7 | Research + Assembly | AUTO | InventSmith generates RFQ from product spec; founder should not write this |
+| 21 | What is the typical MOQ for my product type? | 7 | Research | AUTO | InventSmith presents benchmarks from category research |
+| 22 | What is my COGS? | 7, 10 | Calculation | PREFILL | InventSmith calculates from entered quote data; founder enters quotes, InventSmith calculates everything else |
+| 23 | What is my brand name? | 8 | Founder Decision | REQUIRED | Final name decision belongs to the founder; InventSmith generates candidates |
+| 24 | What names are available? | 8 | Research | AUTO | InventSmith runs trademark, domain, and handle checks on all candidates |
+| 25 | What is my brand positioning? | 8 | Founder Vision + Framework | PREFILL | InventSmith drafts from customer segment data; founder refines to authentic vision |
+| 26 | What should be in my IP brief? | 9 | Assembly | AUTO | InventSmith assembles from prior stages; founder should not build this from scratch |
+| 27 | When is my patent deadline? | 9 | Calculation | AUTO | InventSmith calculates from entered filing date; no question needed |
+| 28 | What are my margins? | 10 | Calculation | AUTO | InventSmith calculates from COGS and competitive pricing data |
+| 29 | When do I break even? | 10 | Calculation | AUTO | InventSmith calculates from unit economics model; no input needed |
+| 30 | What are the right marketing channels for my product? | 11 | Research + Analysis | AUTO | InventSmith scores all 8 channels against product profile; presents recommendation |
+| 31 | What should my landing page say? | 11 | Generation | AUTO | InventSmith generates from Voice Guide and Messaging Architecture |
+| 32 | Who are the right influencers? | 11 | Research | AUTO | InventSmith researches and profiles 15+ accounts |
+| 33 | What should my sales one-pager say? | 12 | Generation | AUTO | InventSmith generates from product data and messaging architecture |
+| 34 | Who are the relevant retail buyers? | 12 | Research | AUTO | InventSmith integrates with buyer database or researches by category |
+| 35 | What should my pitch deck say? | 13 | Assembly | AUTO | InventSmith assembles 80%+ from prior stages; founder provides Team and Ask |
+| 36 | What are my 3-year projections? | 13 | Calculation | AUTO | InventSmith calculates from unit economics and sales model |
+| 37 | What grants apply to my product? | 13 | Research | AUTO | InventSmith searches SBIR, STTR, state programs by product category |
+| 38 | What does my launch checklist need? | 14 | Assembly | AUTO | InventSmith assembles from all prior stage completion records |
+| 39 | How is my business performing? | 15 | Analytics | AUTO | InventSmith connects to platforms; no founder data collection needed |
+| 40 | What should I focus on next? | 15 | Analysis | AUTO | InventSmith analyzes KPIs and surfaces top 3 growth levers |
 
 ---
 
@@ -1088,8 +1088,8 @@ Each question category in Atlas is evaluated on three criteria:
 
 | Category | Count | Percentage |
 |---|---|---|
-| **AUTO** — Atlas replaces with research, calculation, or assembly | 27 | 67.5% |
-| **PREFILL** — Atlas pre-fills; founder confirms or adjusts | 6 | 15.0% |
+| **AUTO** — InventSmith replaces with research, calculation, or assembly | 27 | 67.5% |
+| **PREFILL** — InventSmith pre-fills; founder confirms or adjusts | 6 | 15.0% |
 | **REQUIRED** — Irreducible founder input | 7 | 17.5% |
 | **Total question categories audited** | **40** | 100% |
 
@@ -1097,7 +1097,7 @@ Each question category in Atlas is evaluated on three criteria:
 
 **The 7 irreducible founder questions:**
 1. What problem does your product solve? (personal experience, cannot be researched)
-2. What makes your product different? (founder vision, Atlas challenges but cannot determine)
+2. What makes your product different? (founder vision, InventSmith challenges but cannot determine)
 3. What is novel about your invention? (inventor's insight, cannot be researched)
 4. What materials will your product use? (vision + tactile judgment)
 5. What are the dimensions of your product? (design decision)
@@ -1110,7 +1110,7 @@ Each question category in Atlas is evaluated on three criteria:
 
 ## SECTION 5 — DELIVERABLE AUTOMATION
 
-*Every document Atlas should generate automatically across all 15 stages.*
+*Every document InventSmith should generate automatically across all 15 stages.*
 
 | Deliverable | Stage | Inputs Required | Automation Level | Human Review |
 |---|---|---|---|---|
@@ -1198,8 +1198,8 @@ Each question category in Atlas is evaluated on three criteria:
 | **New SKU Opportunity Analysis** | 15 | Repeat purchase + feedback + margin data | Full | Required |
 
 **Total deliverables: 76 documents across 15 stages**
-**Full Automation: 42 (55%) — Atlas generates entirely from prior data or research**
-**High Automation: 34 (45%) — Atlas generates draft from prior data; founder reviews and refines**
+**Full Automation: 42 (55%) — InventSmith generates entirely from prior data or research**
+**High Automation: 34 (45%) — InventSmith generates draft from prior data; founder reviews and refines**
 **Human Review Required: 42 (55%) — founder must review before committing**
 **Human Review Optional: 34 (45%) — founder can review or approve without changes**
 **Human Review Not Required: 0 — every document benefits from at least optional founder review**
@@ -1208,7 +1208,7 @@ Each question category in Atlas is evaluated on three criteria:
 
 ## SECTION 6 — RESEARCH ENGINE
 
-*All research Atlas should perform automatically across the journey.*
+*All research InventSmith should perform automatically across the journey.*
 
 | Research Item | Description | Frequency | Trigger Event | Output Format | Stages |
 |---|---|---|---|---|---|
@@ -1283,7 +1283,7 @@ stageConfig[n].onOpen = async (ctx, inventionId) => {
 
 ### MUST HAVE — Ship Q3 2026 (Months 1–3)
 
-*Core automations that directly remove founder pain. Without these, Atlas is still a guided form tool.*
+*Core automations that directly remove founder pain. Without these, InventSmith is still a guided form tool.*
 
 | Feature | What It Does | Effort | Founder Value | Dependencies |
 |---|---|---|---|---|
@@ -1304,20 +1304,20 @@ stageConfig[n].onOpen = async (ctx, inventionId) => {
 
 ### SHOULD HAVE — Ship Q4 2026 (Months 4–6)
 
-*High-value automations that elevate Atlas toward autonomous assistant status.*
+*High-value automations that elevate InventSmith toward autonomous assistant status.*
 
 | Feature | What It Does | Effort | Founder Value | Dependencies |
 |---|---|---|---|---|
 | **Document Auto-Assembly Pipeline — Phase 1** | IP Brief (S4+S5+S8) and Pitch Deck (S3+S5+S8+S10+S13) auto-populated at stage open | L | Critical | Stages 3,4,5,8,10 must be enabled |
 | **Landing Page Auto-Generation** | Voice Guide + Messaging Architecture → HTML-ready landing page copy | M | High | Stage 11 + brand fields |
 | **Sales Toolkit Auto-Build** | Messaging Architecture → one-pager + FAQ + objection guide + competitor comparison | M | High | Stages 8, 11, 12 data |
-| **Prior Art Search Automation — Phase 1** | Atlas generates USPTO search queries and surfaces results; founder still confirms | L | Critical | USPTO API key |
+| **Prior Art Search Automation — Phase 1** | InventSmith generates USPTO search queries and surfaces results; founder still confirms | L | Critical | USPTO API key |
 | **Brand Name Generator** | Constraints-based name generation → 20 candidates with scoring | M | High | Stage 8 enablement |
 | **Trademark + Social Handle Checker** | USPTO TESS + domain + IG/TikTok/Pinterest in one workflow | M | High | API keys; Brand Name Generator |
 | **Competitive Research at Stage 1 Open** | Web search → top 5 competitors presented before founder describes theirs | M | High | Web Search API |
 | **CPG Market Sizing Module** | Build-from-components methodology for niche categories; resolves Stage 3 block | M | High | Stage 3 enablement |
 | **Channel Evaluation Matrix Auto-Scoring** | All 8 marketing channels auto-scored against product profile | S | High | Stage 11 + product profile data |
-| **Investor FAQ with Pre-Populated Answers** | 20 investor questions with Atlas-drafted answers from invention record | M | High | Stages 4+5+8+10+12 data |
+| **Investor FAQ with Pre-Populated Answers** | 20 investor questions with InventSmith-drafted answers from invention record | M | High | Stages 4+5+8+10+12 data |
 | **90-Day Content Calendar Auto-Generation** | 30+ posts with topic/format/CTA/channel/date | M | High | Stage 11 channel strategy |
 
 **Q4 Rationale:** These features implement the Constitution's "Generate Before Requesting" and "Research Before Asking" principles at scale. They require some API integrations but no new infrastructure.
@@ -1330,7 +1330,7 @@ stageConfig[n].onOpen = async (ctx, inventionId) => {
 
 | Feature | What It Does | Effort | Founder Value | Dependencies |
 |---|---|---|---|---|
-| **Prior Art Search — Full Automation** | Atlas executes full search, ranks results, produces prior art summary entirely automatically | XL | Critical | USPTO + Google Patents APIs; Phase 1 |
+| **Prior Art Search — Full Automation** | InventSmith executes full search, ranks results, produces prior art summary entirely automatically | XL | Critical | USPTO + Google Patents APIs; Phase 1 |
 | **Competitive Pricing Monitor** | Live competitor pricing refresh at Stage 10 open + monthly monitoring | M | Medium | Web search API |
 | **Influencer Research + Profiling** | 15+ accounts profiled with follower count, engagement rate, estimated cost | L | High | Stage 11; scraping/API |
 | **Retail Buyer Database Integration** | RangeMe/Faire integration → curated buyer contact list in Stage 12 | L | High | RangeMe/Faire partnership |
@@ -1354,7 +1354,7 @@ stageConfig[n].onOpen = async (ctx, inventionId) => {
 | **Glass/CPG Manufacturing Guidance Module** | Full glass/ceramics manufacturing guidance, database, and prototyping path | XL | High | Physical Product Module (Must Have) |
 | **Launch Day Real-Time Dashboard** | Live Shopify orders, conversion rate, traffic sources during launch | L | High | Analytics Integration |
 | **Founder-to-Professional Matching Engine** | IP attorneys, industrial designers, manufacturing brokers directory with approach emails | L | High | IP Directory research + categorization |
-| **Investor Pipeline CRM** | Contact tracking, deck analytics, follow-up scheduling within Atlas | L | Medium | Deck Analytics integration |
+| **Investor Pipeline CRM** | Contact tracking, deck analytics, follow-up scheduling within InventSmith | L | Medium | Deck Analytics integration |
 | **Deck Analytics Integration** | DocSend/Pitch.com integration → page-level deck view data | M | Medium | Pitch deck auto-assembly |
 | **Multi-Component Supply Chain Model** | Full multi-supplier tracker with lead times, MOQs, and relationship tracking | L | High | Manufacturing module |
 | **Competitive Intelligence Monitoring Feed** | Continuous competitor price, product, and press monitoring | L | Medium | Analytics integration |
@@ -1365,21 +1365,21 @@ stageConfig[n].onOpen = async (ctx, inventionId) => {
 
 ## SECTION 8 — SUCCESS METRICS
 
-*Measurable KPIs for the Atlas automation system. Baselines reflect current state (July 2026). Targets reflect the Q3 2026 (6-month) and Q1 2027 (12-month) roadmap completion states.*
+*Measurable KPIs for the InventSmith automation system. Baselines reflect current state (July 2026). Targets reflect the Q3 2026 (6-month) and Q1 2027 (12-month) roadmap completion states.*
 
 | Metric | Definition | Baseline (July 2026) | 6-Month Target (Q1 2027) | 12-Month Target (Q3 2027) | Measurement |
 |---|---|---|---|---|---|
-| **Average Founder Time Saved Per Stage** | Estimated hours saved vs. without Atlas, per stage completion | ~2–4 hrs (Stages 1–4 only) | ~6–10 hrs across all live stages | ~12–20 hrs across all 15 stages | User session data + stage completion surveys |
+| **Average Founder Time Saved Per Stage** | Estimated hours saved vs. without InventSmith, per stage completion | ~2–4 hrs (Stages 1–4 only) | ~6–10 hrs across all live stages | ~12–20 hrs across all 15 stages | User session data + stage completion surveys |
 | **Question Elimination Rate** | % of question categories that are AUTO or PREFILL vs. REQUIRED | ~0% (all manual today) | 60% eliminated | 82%+ eliminated | Questions presented vs. questions auto-answered ratio in `stageProgress` |
 | **Documents Generated Automatically** | Count of documents auto-generated per completed journey | ~4–6 (Stages 1–4 reports) | ~20–30 per journey | ~50–60 per journey | `documents` table count per `inventionId` |
-| **Research Tasks Completed Without Founder Input** | % of research tasks completed by Atlas vs. manually supplied by founder | ~0% (all manual) | ~30% | ~70% | `stageResearch` records auto-generated vs. founder-submitted |
+| **Research Tasks Completed Without Founder Input** | % of research tasks completed by InventSmith vs. manually supplied by founder | ~0% (all manual) | ~30% | ~70% | `stageResearch` records auto-generated vs. founder-submitted |
 | **Stage Completion Rate** | % of users who complete each stage once started | Baseline TBD from analytics | Improve by 15% vs. baseline | Improve by 30% vs. baseline | `stageProgress.completedAt` vs. `stageProgress.startedAt` in Convex |
 | **Journey Completion Rate** | % of users who reach Stage 15 completion from Stage 1 start | TBD (Stages 5–15 not yet live) | 10% baseline (first cohort through all stages) | 20% | `stageProgress` completion events across all 15 stages |
-| **Commercial Readiness Score at Journey Completion** | Atlas's internal readiness score average across all 15 stages at journey completion | N/A (stages 5–15 not live) | 70+ average score | 80+ average score | `stageProgress.readinessScore` average across all stages at completion |
-| **Time to First Deliverable** | Minutes from stage entry to first auto-generated document appearing | ~15–30 min (after founder inputs) | <5 min (Atlas pre-generates at stage open) | <2 min (pre-generated before stage opens) | `stageProgress.openedAt` → `documents.createdAt` for first document |
-| **Founder-Initiated vs. Atlas-Initiated Actions** | Ratio of actions Atlas takes automatically vs. actions triggered by founder clicking | ~1:10 (founder does almost everything) | ~1:3 | ~1:1 | `stageProgress` event log: `source: "atlas_auto"` vs. `source: "founder"` |
-| **Founder Satisfaction Score** | Post-stage survey: "How much did Atlas reduce your workload this stage?" (1–5) | Baseline TBD | 4.0+ average | 4.5+ average | In-product NPS-style micro-survey triggered at stage completion |
-| **Data Re-Entry Incidents** | Count of times founder is asked for data Atlas already collected in a prior stage | Not measured today | <2 per journey | 0 per journey | Field-level tracking: source = "prior_stage_carry" vs. source = "new_founder_input" |
+| **Commercial Readiness Score at Journey Completion** | InventSmith's internal readiness score average across all 15 stages at journey completion | N/A (stages 5–15 not live) | 70+ average score | 80+ average score | `stageProgress.readinessScore` average across all stages at completion |
+| **Time to First Deliverable** | Minutes from stage entry to first auto-generated document appearing | ~15–30 min (after founder inputs) | <5 min (InventSmith pre-generates at stage open) | <2 min (pre-generated before stage opens) | `stageProgress.openedAt` → `documents.createdAt` for first document |
+| **Founder-Initiated vs. InventSmith-Initiated Actions** | Ratio of actions InventSmith takes automatically vs. actions triggered by founder clicking | ~1:10 (founder does almost everything) | ~1:3 | ~1:1 | `stageProgress` event log: `source: "atlas_auto"` vs. `source: "founder"` |
+| **Founder Satisfaction Score** | Post-stage survey: "How much did InventSmith reduce your workload this stage?" (1–5) | Baseline TBD | 4.0+ average | 4.5+ average | In-product NPS-style micro-survey triggered at stage completion |
+| **Data Re-Entry Incidents** | Count of times founder is asked for data InventSmith already collected in a prior stage | Not measured today | <2 per journey | 0 per journey | Field-level tracking: source = "prior_stage_carry" vs. source = "new_founder_input" |
 | **IP Deadline Miss Rate** | % of founders who miss the provisional→utility conversion window | Not tracked (tracker doesn't exist) | 0% (tracker ships in Q3 2026) | 0% | IP deadline tracker alert log + conversion event |
 | **Document Review Rate** | % of auto-generated documents that founders review and approve vs. skip | Baseline TBD | 80%+ review rate | 85%+ review rate | `documents.reviewedAt` present vs. null |
 
@@ -1413,32 +1413,32 @@ timestamp: v.number(),
 
 ## SECTION 9 — IMPLEMENTATION PRINCIPLES
 
-*Permanent engineering rules for every future Atlas feature. These are not aspirational values — they are concrete filters applied in code review, sprint planning, and feature design.*
+*Permanent engineering rules for every future InventSmith feature. These are not aspirational values — they are concrete filters applied in code review, sprint planning, and feature design.*
 
 ---
 
-### Principle 1: Atlas Performs More Work
+### Principle 1: InventSmith Performs More Work
 
 **The Rule:** If a proposed feature increases the work the founder must do — adds a form, adds questions, adds a step, adds a decision without first doing the research — it is not ready to ship.
 
 **How to Apply in Code Review:**
 - Review the founder interaction flow for the feature. Count the number of distinct inputs required from the founder.
-- Ask: "Could Atlas have pre-computed or pre-filled any of these inputs from prior stage data or web research?"
+- Ask: "Could InventSmith have pre-computed or pre-filled any of these inputs from prior stage data or web research?"
 - If yes, the PR is incomplete. Return for revision with a note: "Pre-populate [field] from [source] before presenting to founder."
 
 **When Exceptions Are Acceptable:**
-- The feature is a one-time founder input that is genuinely unknowable by Atlas (see the 7 irreducible questions in Section 4)
-- The feature is a confirmation step for data Atlas researched — confirmation is acceptable; blank-form entry is not
+- The feature is a one-time founder input that is genuinely unknowable by InventSmith (see the 7 irreducible questions in Section 4)
+- The feature is a confirmation step for data InventSmith researched — confirmation is acceptable; blank-form entry is not
 
 **Passes This Test:**
-- Unit Economics Auto-Builder: Atlas ingests Stage 7 quotes and calculates all margins automatically. Founder reviews a pre-populated model, not a blank spreadsheet.
+- Unit Economics Auto-Builder: InventSmith ingests Stage 7 quotes and calculates all margins automatically. Founder reviews a pre-populated model, not a blank spreadsheet.
 
 **Fails This Test:**
-- A "Market Research" feature that opens Stage 3 with a blank form asking "What is the market size for your product category?" — Atlas should be researching this, not asking.
+- A "Market Research" feature that opens Stage 3 with a blank form asking "What is the market size for your product category?" — InventSmith should be researching this, not asking.
 
 ---
 
-### Principle 2: Atlas Reduces Founder Effort
+### Principle 2: InventSmith Reduces Founder Effort
 
 **The Rule:** Every shipped feature must measurably reduce the time or decisions required from the founder relative to the pre-feature state.
 
@@ -1451,19 +1451,19 @@ timestamp: v.number(),
 - One-time setup steps that eliminate all future repetition
 
 **Passes This Test:**
-- IP Deadline Tracker: founder enters one date (provisional filing date). Atlas automatically calculates all deadlines and sends all alerts. All future monitoring effort: zero.
+- IP Deadline Tracker: founder enters one date (provisional filing date). InventSmith automatically calculates all deadlines and sends all alerts. All future monitoring effort: zero.
 
 **Fails This Test:**
-- A "Launch Calendar" feature that gives the founder a blank calendar template to fill in. Atlas should generate the calendar from the launch date and prior stage data — not hand the founder a template.
+- A "Launch Calendar" feature that gives the founder a blank calendar template to fill in. InventSmith should generate the calendar from the launch date and prior stage data — not hand the founder a template.
 
 ---
 
-### Principle 3: Atlas Generates More Finished Work
+### Principle 3: InventSmith Generates More Finished Work
 
-**The Rule:** Every document, report, analysis, or plan Atlas is aware needs to exist must arrive as a populated draft — not a template, not a guide, not an outline. The Draft-First Policy applies without exception.
+**The Rule:** Every document, report, analysis, or plan InventSmith is aware needs to exist must arrive as a populated draft — not a template, not a guide, not an outline. The Draft-First Policy applies without exception.
 
 **The Draft-First Policy:**
-> Before any stage presents a blank field or empty document to the founder, Atlas must attempt to generate a populated draft. Even if the draft is 40% complete, a 40%-complete draft is better than a blank page.
+> Before any stage presents a blank field or empty document to the founder, InventSmith must attempt to generate a populated draft. Even if the draft is 40% complete, a 40%-complete draft is better than a blank page.
 
 **How to Apply in Code Review:**
 - Review every document the feature produces. Is it populated with data from prior stages?
@@ -1475,41 +1475,41 @@ timestamp: v.number(),
 - Fields that require the current stage's output as input (cannot be pre-populated until this stage runs)
 
 **Passes This Test:**
-- Pitch Deck Auto-Assembly: Atlas pulls market research (Stage 3), product spec (Stage 5), brand identity (Stage 8), pricing (Stage 10), and financial projections (Stage 13) into the deck automatically. 80%+ populated before the founder sees it.
+- Pitch Deck Auto-Assembly: InventSmith pulls market research (Stage 3), product spec (Stage 5), brand identity (Stage 8), pricing (Stage 10), and financial projections (Stage 13) into the deck automatically. 80%+ populated before the founder sees it.
 
 **Fails This Test:**
 - An "Investor Deck" feature that gives the founder a 12-slide PowerPoint template with blank slides and instructions for each slide.
 
 ---
 
-### Principle 4: Atlas Reduces Manual Typing
+### Principle 4: InventSmith Reduces Manual Typing
 
-**The Rule:** The Research-First Policy requires Atlas to research before asking the founder to supply information. The Approval-Gate Policy requires Atlas to interrupt the founder only for irreducible decisions. Every other touchpoint should be pre-populated.
+**The Rule:** The Research-First Policy requires InventSmith to research before asking the founder to supply information. The Approval-Gate Policy requires InventSmith to interrupt the founder only for irreducible decisions. Every other touchpoint should be pre-populated.
 
 **The Research-First Policy:**
-> Before generating any question that asks the founder to supply information Atlas could research, Atlas must first conduct the research and present findings for confirmation.
+> Before generating any question that asks the founder to supply information InventSmith could research, InventSmith must first conduct the research and present findings for confirmation.
 
 **The Approval-Gate Policy:**
 > The founder should be interrupted only when a decision genuinely requires their judgment, vision, or physical presence. All other gates should be automatic.
 
 **How to Apply in Code Review:**
 - Review every input field and question in the feature.
-- For each, ask: "Is this information that Atlas could find via web search, API, or prior stage data?"
-- If yes, Atlas finds it first. The field becomes a "confirm or adjust" interaction, not a blank entry.
+- For each, ask: "Is this information that InventSmith could find via web search, API, or prior stage data?"
+- If yes, InventSmith finds it first. The field becomes a "confirm or adjust" interaction, not a blank entry.
 
 **When Exceptions Are Acceptable:**
 - Information that is personal and private (founder financial situation, team equity)
 - Information that is subjective and vision-dependent (aesthetic preferences, strategic priorities)
 
 **Passes This Test:**
-- Competitive Pricing Research in Stage 10: Atlas runs a web search for competitor pricing before Stage 10 opens. Founder sees a pre-populated "Competitive Pricing Context" table. No manual research needed.
+- Competitive Pricing Research in Stage 10: InventSmith runs a web search for competitor pricing before Stage 10 opens. Founder sees a pre-populated "Competitive Pricing Context" table. No manual research needed.
 
 **Fails This Test:**
-- Any question that asks: "Who are your competitors?" — Atlas must answer this before asking. If the founder needs to confirm or add to the list Atlas found, that is acceptable. Asking from a blank slate is not.
+- Any question that asks: "Who are your competitors?" — InventSmith must answer this before asking. If the founder needs to confirm or add to the list InventSmith found, that is acceptable. Asking from a blank slate is not.
 
 ---
 
-### Principle 5: Atlas Increases the Probability of Inventor Success
+### Principle 5: InventSmith Increases the Probability of Inventor Success
 
 **The Rule:** Every feature must connect to a commercial outcome. Features that improve internal metrics (faster load time, prettier UI, additional settings) are only valuable if they correlate to improved inventor success rates.
 
@@ -1525,38 +1525,38 @@ timestamp: v.number(),
 
 **When Exceptions Are Acceptable:**
 - Infrastructure features (analytics instrumentation, schema migrations) that enable future success-correlating features
-- Trust and transparency features (honest disclaimers, ToS updates) that improve founder confidence in Atlas
+- Trust and transparency features (honest disclaimers, ToS updates) that improve founder confidence in InventSmith
 
 **Passes This Test:**
 - IP Pre-Engagement Checkpoint: prevents the loss of patent rights (irreversible commercial failure) before prototype sharing. Directly increases probability of commercial success by eliminating the most catastrophic early mistake.
 
 **Fails This Test (needs reconsideration):**
 - A "visual redesign" of the Stage 3 market research view that changes layout without improving completion rate or data quality.
-- An "admin dashboard" for the Atlas team that has no founder-facing impact.
+- An "admin dashboard" for the InventSmith team that has no founder-facing impact.
 
 ---
 
 ### 9.1 The Transparency Policy
 
-**Rule:** Atlas must always show what it researched, what it assumed, and what it does not know.
+**Rule:** InventSmith must always show what it researched, what it assumed, and what it does not know.
 
 **Implementation Pattern:**
-Every Atlas-generated document, analysis, or recommendation must include one of three metadata annotations:
+Every InventSmith-generated document, analysis, or recommendation must include one of three metadata annotations:
 
 | Annotation | Meaning | When Used |
 |---|---|---|
-| `Atlas researched` | Data sourced from web search or API with source reference | Competitive pricing, prior art, market size data |
-| `Atlas inferred` | Data derived from prior stage inputs or logical calculation | Unit economics calculated from Stage 7 quotes, break-even from projections |
-| `Atlas assumed` | Data Atlas used without research or input — should be confirmed | Default market geography, assumed retail margin if not researched |
+| `InventSmith researched` | Data sourced from web search or API with source reference | Competitive pricing, prior art, market size data |
+| `InventSmith inferred` | Data derived from prior stage inputs or logical calculation | Unit economics calculated from Stage 7 quotes, break-even from projections |
+| `InventSmith assumed` | Data InventSmith used without research or input — should be confirmed | Default market geography, assumed retail margin if not researched |
 
-Every `Atlas assumed` annotation triggers a confirmation prompt. Every `Atlas researched` annotation includes the source. Every `Atlas inferred` annotation shows the calculation.
+Every `InventSmith assumed` annotation triggers a confirmation prompt. Every `InventSmith researched` annotation includes the source. Every `InventSmith inferred` annotation shows the calculation.
 
 **Founder sees:**
-- What Atlas knows and how it knows it
-- What Atlas is guessing and why
+- What InventSmith knows and how it knows it
+- What InventSmith is guessing and why
 - Where founder judgment is needed to override
 
-This policy is required to maintain founder trust as Atlas becomes more autonomous.
+This policy is required to maintain founder trust as InventSmith becomes more autonomous.
 
 ---
 
@@ -1582,16 +1582,16 @@ If any box is unchecked: explain why in the PR description, or revise the featur
 ### 9.3 When a Feature Fails One or More Principles
 
 **If a feature fails Principle 1 (increases founder work):**
-Reject the PR. Return for revision. The feature is incomplete. Atlas must do the work before the founder sees the interface.
+Reject the PR. Return for revision. The feature is incomplete. InventSmith must do the work before the founder sees the interface.
 
 **If a feature fails Principle 2 (does not reduce effort):**
 Deprioritize. Document the decision. Revisit in the next release cycle when the feature can be redesigned to reduce founder effort.
 
 **If a feature fails Principle 3 (produces a template, not a draft):**
-Reject the PR. Templates are not finished deliverables. Atlas must generate the draft. Return for revision with populated content.
+Reject the PR. Templates are not finished deliverables. InventSmith must generate the draft. Return for revision with populated content.
 
-**If a feature fails Principle 4 (asks for information Atlas could research):**
-Reject the PR for any question that Atlas could answer. Return for revision. Connect to the Research Engine for the missing data type.
+**If a feature fails Principle 4 (asks for information InventSmith could research):**
+Reject the PR for any question that InventSmith could answer. Return for revision. Connect to the Research Engine for the missing data type.
 
 **If a feature fails Principle 5 (cannot connect to a success metric):**
 Formally defer to the backlog with a note: "Revisit when commercial impact can be demonstrated." Do not build features whose value cannot be articulated.

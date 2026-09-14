@@ -1,4 +1,4 @@
-# ATLAS RESEARCH ENGINE ARCHITECTURE
+# INVENTSMITH RESEARCH ENGINE ARCHITECTURE
 ## Section 11, Module 2: Market Research
 
 **Version 1.0 — July 2026**
@@ -16,7 +16,7 @@
 
 ## Document Purpose
 
-This document specifies the complete architecture for **Research Module 2: Market Research** (`market_research`). It is Section 11, Module 2 of the Atlas Research Engine Architecture series.
+This document specifies the complete architecture for **Research Module 2: Market Research** (`market_research`). It is Section 11, Module 2 of the InventSmith Research Engine Architecture series.
 
 This specification covers every aspect of how this module operates: when it fires, what inputs it requires, what research it executes, which providers it uses, what outputs it produces, how confidence is scored, how results are cached and refreshed, how errors are handled, how cost is managed, and what the founder review requirements are.
 
@@ -57,9 +57,9 @@ The module does not conduct a one-time estimate. It is a living intelligence fun
 
 Market sizing is one of the most time-consuming and intimidating tasks for first-time inventors. Most founders either skip it (leading to under-informed decisions), perform it superficially (relying on a single Google search), or pay for expensive market research reports (often $1,500–$5,000 per report) that are generic to the category rather than specific to their product.
 
-Atlas has a constitutional obligation (Principle 4 of the Automation Constitution) to conduct this research before asking the inventor to supply it. For an inventor, market research matters for eight specific downstream reasons:
+InventSmith has a constitutional obligation (Principle 4 of the Automation Constitution) to conduct this research before asking the inventor to supply it. For an inventor, market research matters for eight specific downstream reasons:
 
-1. **Opportunity validation:** Stage 3's core question is "is there a real market for this?" The answer requires an objective estimate of market size. An inventor's intuition is not evidence. Atlas provides evidence.
+1. **Opportunity validation:** Stage 3's core question is "is there a real market for this?" The answer requires an objective estimate of market size. An inventor's intuition is not evidence. InventSmith provides evidence.
 
 2. **TAM/SAM/SOM for the Idea Brief:** The Idea Brief completed at Stage 1 includes a market opportunity section. The Market Research module provides the TAM/SAM/SOM estimates that ground this section in data rather than guesswork.
 
@@ -71,9 +71,9 @@ Atlas has a constitutional obligation (Principle 4 of the Automation Constitutio
 
 6. **Seasonality planning:** Many product categories have pronounced seasonal demand patterns (e.g., outdoor products peak in Q2, holiday gift products peak in Q4). Understanding seasonality before Stage 7 (Manufacturing) allows the founder to plan production runs correctly and avoid costly inventory mismatches.
 
-7. **Geographic market selection:** Not all markets have equal demand for all products. Atlas's market research identifies which geographic markets represent the highest potential for the specific product category — informing whether a US-first launch, international-first launch, or simultaneous multi-market launch is the right strategy.
+7. **Geographic market selection:** Not all markets have equal demand for all products. InventSmith's market research identifies which geographic markets represent the highest potential for the specific product category — informing whether a US-first launch, international-first launch, or simultaneous multi-market launch is the right strategy.
 
-8. **Funding readiness signal:** Atlas's Readiness Engine weighs market size as one of its primary signals. An invention with a well-sourced $5B TAM and 14% CAGR is assessed as more fundable than one with an unconfirmed $100M TAM and flat growth. The Market Research module's output directly feeds the Readiness Engine's market opportunity score.
+8. **Funding readiness signal:** InventSmith's Readiness Engine weighs market size as one of its primary signals. An invention with a well-sourced $5B TAM and 14% CAGR is assessed as more fundable than one with an unconfirmed $100M TAM and flat growth. The Market Research module's output directly feeds the Readiness Engine's market opportunity score.
 
 ### 1.3 Stages Served
 
@@ -89,16 +89,16 @@ The Market Research module serves the following stages by stage ID:
 | 14 | Launch | Supplies seasonality and geographic demand data used in launch timing and initial channel selection |
 | 15 | Growth (post-launch) | Powers quarterly market intelligence updates that track whether the market is expanding or contracting versus the baseline established at Stage 3 |
 
-### 1.4 Atlas Decisions Informed
+### 1.4 InventSmith Decisions Informed
 
-The Market Research module directly informs the following Atlas-generated outputs and recommendations:
+The Market Research module directly informs the following InventSmith-generated outputs and recommendations:
 
-- **Idea Brief market opportunity section** — Atlas drafts a preliminary market opportunity narrative using TAM and growth rate from the initial market research, providing context before Stage 3 begins
+- **Idea Brief market opportunity section** — InventSmith drafts a preliminary market opportunity narrative using TAM and growth rate from the initial market research, providing context before Stage 3 begins
 - **Market Research Summary document** — The primary document produced by Stage 3 draws its market size, CAGR, segmentation, geographic breakdown, and key drivers sections directly from this module's output
 - **Business Model opportunity sizing** — Stage 5's TAM-to-revenue opportunity mapping uses the market sizing estimates as its denominator
 - **Investor Pitch Deck market slide** — Stage 13 assembles the market opportunity slide using TAM/SAM/SOM figures, CAGR, and key market drivers from this module
 - **Funding Readiness Score (market dimension)** — The Readiness Engine uses `tam_usd`, `cagr_percent`, and `confidence` as inputs to the market opportunity dimension of the readiness score
-- **Launch timing recommendations** — Atlas uses the `seasonalityProfile` from this module to recommend launch quarter timing (e.g., "Consider launching in Q3 to capture the back-to-school demand peak for your category")
+- **Launch timing recommendations** — InventSmith uses the `seasonalityProfile` from this module to recommend launch quarter timing (e.g., "Consider launching in Q3 to capture the back-to-school demand peak for your category")
 - **Geographic market prioritization** — Stage 11 channel planning uses the `geographicBreakdown` from this module to identify which markets represent the best initial distribution targets
 - **Quarterly market drift alerts** — The quarterly scheduled refresh detects when CAGR estimates have changed materially versus the baseline, triggering a market conditions update in the founder's monitoring feed
 
@@ -178,7 +178,7 @@ These inputs must be present before the module's full detailed research logic ca
 | `inventionId` | `Id<"inventions">` | System | The Convex document ID of the invention record |
 | `stageId` | `number` | System | The stage ID triggering this research job. Used for result routing and cost accounting. |
 | `productDescription` | `string` | Stage 1 or Stage 3 `stageProgress` | The inventor's narrative description of the product. Minimum 20 characters. Used as the primary input for market category identification and search query construction. |
-| `productCategory` | `string` | Atlas-inferred from Stage 1 | SIC/NAICS-aligned category label inferred by Atlas. Required for targeting category-level market data sources and market research reports. Examples: `"kitchen_appliances"`, `"personal_care"`, `"outdoor_recreation"`, `"health_supplements"`. |
+| `productCategory` | `string` | InventSmith-inferred from Stage 1 | SIC/NAICS-aligned category label inferred by InventSmith. Required for targeting category-level market data sources and market research reports. Examples: `"kitchen_appliances"`, `"personal_care"`, `"outdoor_recreation"`, `"health_supplements"`. |
 
 ### 3.2 Optional Inputs
 
@@ -188,14 +188,14 @@ These inputs improve result quality and precision. Their absence does not preven
 |---|---|---|---|
 | `targetMarket` | `string` | Stage 1 or Stage 3 `stageProgress` | Primary geographic target market. Examples: `"US"`, `"North America"`, `"Europe"`, `"global"`. Defaults to `"US"` if not supplied. |
 | `targetAudience` | `string` | Stage 1, 2, or 3 `stageProgress` | Plain-language description of the intended buyer. Used to narrow segmentation queries (e.g., "millennial parents with children under 5" refines the SAM calculation versus the full category TAM). |
-| `pricePointIntent` | `string` | Atlas-inferred or founder-supplied | Pricing tier the inventor intends to occupy: `"value"`, `"mid_market"`, `"premium"`, `"ultra_premium"`. Used to weight the SAM calculation toward the target price segment of the market. |
+| `pricePointIntent` | `string` | InventSmith-inferred or founder-supplied | Pricing tier the inventor intends to occupy: `"value"`, `"mid_market"`, `"premium"`, `"ultra_premium"`. Used to weight the SAM calculation toward the target price segment of the market. |
 | `channelPreference` | `string[]` | Stage 1 or Stage 3 `stageProgress` | Channels the inventor is targeting. Examples: `["DTC", "Amazon", "specialty_retail"]`. Used to constrain the SOM calculation to the channels the inventor can realistically reach. |
 | `geographicMarket` | `string` | Stage 3 `stageProgress` | Specific geographic market if more granular than `targetMarket`. Supports multi-value: `["US", "Canada", "UK"]`. Defaults to `targetMarket`. |
 | `runDepth` | `string` | Queue entry (dispatcher-set) | `"light"` (Stage 1 onOpen preliminary), `"full"` (standard), or `"incremental"` (quarterly scheduled refresh). Defaults to `"full"`. |
 | `lastRunCursor` | `string \| null` | Prior `researchResults` record | ISO 8601 date string indicating the end date of the previous run. Used by incremental refresh to scope delta queries. Null for first run. |
 | `existingMarketData` | `MarketResearchResult \| null` | Prior `researchResults` record | The result from the most recent completed run. Used by incremental refresh for baseline comparison and update. Null for first run. |
 | `founderRejectionContext` | `string \| null` | `ResearchAuditEvent` | If the founder previously rejected a result and provided context (e.g., "the market size seems too large — you're including industrial use cases, I'm only targeting consumer retail"), this string is injected into Step 1 query construction to scope subsequent queries appropriately. |
-| `inventorProvidedMarketSize` | `string \| null` | Stage 3 `stageProgress` (manual entry) | If the inventor has manually provided a market size figure ("I read that this market is $8B"), this figure is treated as a reference data point to cross-validate against Atlas's own research. It is NOT used as a primary source — it informs confidence scoring. |
+| `inventorProvidedMarketSize` | `string \| null` | Stage 3 `stageProgress` (manual entry) | If the inventor has manually provided a market size figure ("I read that this market is $8B"), this figure is treated as a reference data point to cross-validate against InventSmith's own research. It is NOT used as a primary source — it informs confidence scoring. |
 
 ### 3.3 Input Validation Rules
 
@@ -203,7 +203,7 @@ Before the research job executes, the worker validates the input payload:
 
 1. `inventionId` must be a valid Convex document ID. If invalid, the job fails immediately with `"invalid_input"` — no retry.
 2. `productDescription` must be present and at least 20 characters for the full or incremental path. If missing, the worker falls back to `runDepth: "light"` using only `productCategory`. If `productCategory` is also absent, the job is held in queue with status `"awaiting_input"`.
-3. `productCategory` must be one of the recognized Atlas category values. If absent, the worker runs an LLM category inference step (one Claude Haiku call, ~200 tokens) before proceeding. Inferred categories are recorded as assumptions.
+3. `productCategory` must be one of the recognized InventSmith category values. If absent, the worker runs an LLM category inference step (one Claude Haiku call, ~200 tokens) before proceeding. Inferred categories are recorded as assumptions.
 4. `targetMarket` must be a valid geographic market string when supplied. Unrecognized values (e.g., `"new york city"`) are normalized to their parent market (`"US"`) and the normalization is recorded as an assumption.
 5. `lastRunCursor` must be a valid ISO 8601 date string when `runDepth` is `"incremental"`. If malformed, the worker falls back to `runDepth: "full"` and logs the reason.
 6. `inventorProvidedMarketSize` is accepted as a free-text string (no validation) — it is treated as reference context, not structured input.
@@ -213,9 +213,9 @@ Before the research job executes, the worker validates the input payload:
 | Missing Input | Behavior |
 |---|---|
 | `productDescription` missing AND `productCategory` missing | Job status set to `"awaiting_input"`. The queue entry persists. When either field is populated in `stageProgress`, the dispatcher re-evaluates and dispatches. No error is surfaced to the founder. |
-| `productDescription` missing but `productCategory` present | `runDepth` forced to `"light"`. Only category-level market size queries are executed (Steps 1 and 2). Result will be low confidence (REQUIRES_REVIEW). UI surfaces: "Atlas estimated market size for your product category. Add a product description for a more targeted market analysis." |
-| `productCategory` missing but `productDescription` present | Atlas infers category from product description using one Claude Haiku LLM classification call (~200 tokens) before proceeding with full research. Category inference is recorded as an assumption in `AssumptionRecord[]`. |
-| `targetMarket` missing | Defaults to `"US"`. Recorded as assumption: "Atlas assumed your primary market is the United States." |
+| `productDescription` missing but `productCategory` present | `runDepth` forced to `"light"`. Only category-level market size queries are executed (Steps 1 and 2). Result will be low confidence (REQUIRES_REVIEW). UI surfaces: "InventSmith estimated market size for your product category. Add a product description for a more targeted market analysis." |
+| `productCategory` missing but `productDescription` present | InventSmith infers category from product description using one Claude Haiku LLM classification call (~200 tokens) before proceeding with full research. Category inference is recorded as an assumption in `AssumptionRecord[]`. |
+| `targetMarket` missing | Defaults to `"US"`. Recorded as assumption: "InventSmith assumed your primary market is the United States." |
 | `pricePointIntent` missing | TAM is estimated for the full category. SAM is estimated for the mid-market tier by default (the largest segment by unit volume for most consumer product categories). The assumption is recorded. |
 | `inventionId` invalid | Job fails immediately, no retry. Error logged. No founder notification — this indicates a dispatcher bug. |
 
@@ -246,7 +246,7 @@ All paths are executed by a Convex Action with `"use node"` directive in `convex
 The worker calls Claude Haiku with the following structured prompt:
 
 ```
-System: You are a market research query generator for Atlas, an AI platform for inventors.
+System: You are a market research query generator for InventSmith, an AI platform for inventors.
 Your task is to generate targeted web search queries that will surface credible market size data,
 industry growth rates, and market structure information for a specific product category.
 
@@ -275,10 +275,10 @@ Founder rejection context (adjust queries accordingly): {founderRejectionContext
 **If `productCategory` is absent (category inference sub-step):** Before constructing the query battery, the worker executes a separate Claude Haiku call to classify the product:
 
 ```
-System: Classify the following product description into exactly one of Atlas's recognized product categories.
+System: Classify the following product description into exactly one of InventSmith's recognized product categories.
 Output ONLY the category identifier as a plain string. No explanation.
 
-Recognized categories: [list of all valid Atlas product categories]
+Recognized categories: [list of all valid InventSmith product categories]
 
 Product description: {productDescription}
 ```
@@ -506,7 +506,7 @@ Haiku reliably handles classification and extraction. This multi-step analytical
 **LLM prompt strategy:**
 
 ```
-System: You are a market sizing analyst for Atlas, an AI platform for inventors.
+System: You are a market sizing analyst for InventSmith, an AI platform for inventors.
 Your task is to synthesize market research data into a structured TAM/SAM/SOM estimate.
 
 Methodology requirements:
@@ -933,7 +933,7 @@ The `transparencyLabel` for market research results is `"atlas_researched"` when
 
 ### 6.4 Downstream Documents Updated
 
-The following Atlas documents draw from `market_research` module output:
+The following InventSmith documents draw from `market_research` module output:
 
 | Document | When Updated | Fields Consumed |
 |---|---|---|
@@ -1026,7 +1026,7 @@ Market research uses a wider mix of source types than competitive landscape rese
 | `web_search_result` (unclassified content) | Common | 0.25 |
 | `llm_synthesis` (fields generated by Claude with no external source) | Used for SOM assumptions | 0.10 |
 
-**Important caveat for analyst reports:** Many market research reports (Grand View Research, Mordor Intelligence, etc.) are pay-gated. Atlas's web search will typically surface only the report summary page or a press release announcing the report, not the full report. The `ExtractedFigure` from a market research report summary is treated as an analyst-reported figure with authority weight 0.75 — even though Atlas is reading the free summary, not the paid full report. The assumption is that the headline TAM figure in the summary accurately reflects the paid report's findings. This is recorded as an assumption in `AssumptionRecord[]`.
+**Important caveat for analyst reports:** Many market research reports (Grand View Research, Mordor Intelligence, etc.) are pay-gated. InventSmith's web search will typically surface only the report summary page or a press release announcing the report, not the full report. The `ExtractedFigure` from a market research report summary is treated as an analyst-reported figure with authority weight 0.75 — even though InventSmith is reading the free summary, not the paid full report. The assumption is that the headline TAM figure in the summary accurately reflects the paid report's findings. This is recorded as an assumption in `AssumptionRecord[]`.
 
 ### 7.3 Confidence Degradation Schedule
 
@@ -1059,7 +1059,7 @@ This module's result triggers `REQUIRES_REVIEW` when any of the following condit
 5. **High-risk assumption present** — if the module assumed `productCategory` and the inferred category significantly constrains the market estimate (e.g., a "smart home" product categorized as "consumer electronics" instead of "IoT devices" produces a very different TAM), the assumption is `riskIfWrong: "high"` and REQUIRES_REVIEW is triggered
 6. **TAM divergence > 60%** — when multiple TAM sources conflict by more than 60% and reconciliation was not possible, the result requires the founder to choose which market definition is correct
 7. **Effective confidence degraded below 0.60** due to time elapsed (see Section 7.3)
-8. **`inventorProvidedMarketSize` diverges from Atlas estimate by > 50%** — when the founder's manually entered market size differs substantially from Atlas's research-derived estimate, the discrepancy requires the founder to reconcile the difference before the figure is used downstream
+8. **`inventorProvidedMarketSize` diverges from InventSmith estimate by > 50%** — when the founder's manually entered market size differs substantially from InventSmith's research-derived estimate, the discrepancy requires the founder to reconcile the difference before the figure is used downstream
 
 ### 7.5 What Triggers AUTO_ACCEPT
 
@@ -1071,7 +1071,7 @@ This module's result auto-accepts when ALL of the following conditions are true:
 4. No high-risk assumptions are present
 5. No prior rejection of this module for this `inventionId`
 6. `runDepth` is `"full"` or `"incremental"` (not `"light"`)
-7. If `inventorProvidedMarketSize` is set, the Atlas estimate is within 50% of the founder's figure (no unresolved divergence)
+7. If `inventorProvidedMarketSize` is set, the InventSmith estimate is within 50% of the founder's figure (no unresolved divergence)
 
 This module IS eligible for auto-acceptance. At AUTO_ACCEPT threshold, the market sizing estimates, CAGR, and segmentation data flow directly into the stage view and document pipeline without requiring explicit founder confirmation. The founder can still edit auto-accepted results at any time.
 
@@ -1186,7 +1186,7 @@ This module supports incremental updates for quarterly scheduled refreshes.
 **Claude Sonnet failure (Step 8):**
 1. Retry once after 30 seconds with the same prompt
 2. On second failure, fall back to `openai_gpt4o_mini`
-3. If both fail: Steps 8, 9, and 10 are skipped. The result is written with raw `ExtractedFigure[]` data only — no synthesized TAM/SAM/SOM. Confidence is automatically reduced: `coverageCompleteness` capped at 0.30 (raw figures without synthesis are not a complete result). Result is REQUIRES_REVIEW with founder message: "Atlas found market size data but could not synthesize it into a complete analysis. The raw figures are below for your review."
+3. If both fail: Steps 8, 9, and 10 are skipped. The result is written with raw `ExtractedFigure[]` data only — no synthesized TAM/SAM/SOM. Confidence is automatically reduced: `coverageCompleteness` capped at 0.30 (raw figures without synthesis are not a complete result). Result is REQUIRES_REVIEW with founder message: "InventSmith found market size data but could not synthesize it into a complete analysis. The raw figures are below for your review."
 4. The `ExtractedFigure[]` array is surfaced directly to the founder — who can use the raw data and manually enter the synthesized values
 
 **Claude Haiku failure (Steps 1 and 10):**
@@ -1212,27 +1212,27 @@ Partial results are never served to the Document Pipeline for document assembly 
 
 **Research job failed (all retries exhausted):**
 
-> "Atlas wasn't able to complete market research for your product category. This sometimes happens for newer or more niche markets where public data is limited. You can [Try again] or [Enter market data manually]."
+> "InventSmith wasn't able to complete market research for your product category. This sometimes happens for newer or more niche markets where public data is limited. You can [Try again] or [Enter market data manually]."
 
 **Only a light-path or partial result is available:**
 
-> "Atlas found preliminary market data for your category but couldn't complete a full analysis. [N] market size figures were found but need your review. You can [Review what Atlas found] or [Refresh for a complete analysis]."
+> "InventSmith found preliminary market data for your category but couldn't complete a full analysis. [N] market size figures were found but need your review. You can [Review what InventSmith found] or [Refresh for a complete analysis]."
 
 **No market size data found at all:**
 
-> "Atlas couldn't find market size data for this specific product category. This may be a new or niche market. You can [Enter market size manually] or [Try a broader category]."
+> "InventSmith couldn't find market size data for this specific product category. This may be a new or niche market. You can [Enter market size manually] or [Try a broader category]."
 
 **CAGR not available:**
 
-> "Atlas found market size estimates but couldn't find a reliable growth rate for this category. You can [Enter a growth rate] based on your own research, or [Ask Atlas to try again]."
+> "InventSmith found market size estimates but couldn't find a reliable growth rate for this category. You can [Enter a growth rate] based on your own research, or [Ask InventSmith to try again]."
 
 **Wide CAGR range:**
 
-> "Atlas found conflicting growth rate estimates for this market (ranging from [X%] to [Y%]). Different sources define this market differently. Please [Review the estimates] and confirm which growth rate best applies to your specific product."
+> "InventSmith found conflicting growth rate estimates for this market (ranging from [X%] to [Y%]). Different sources define this market differently. Please [Review the estimates] and confirm which growth rate best applies to your specific product."
 
 **Research in progress:**
 
-> "Atlas is building your market analysis... This takes about 60–90 seconds."
+> "InventSmith is building your market analysis... This takes about 60–90 seconds."
 
 ### 9.5 Retry Behavior
 
@@ -1353,7 +1353,7 @@ Per Part 2 Section 9.2, this module generates a review request under the followi
 | CAGR unavailable (for Stages 12 and 13) | Required review prompt at Stages 12/13 | Yes at Stage 12 and 13 — growth rate is required for funding readiness scoring |
 | High-risk assumption present (assumed productCategory, assumed targetMarket) | Required review prompt | Yes — high-risk assumptions always require confirmation |
 | TAM divergence > 60% between sources (unresolved) | Required review prompt | Yes — conflicting market definitions must be resolved before the figure is used |
-| `inventorProvidedMarketSize` diverges from Atlas estimate by > 50% | Required review prompt | Yes — the discrepancy must be resolved before either figure is used downstream |
+| `inventorProvidedMarketSize` diverges from InventSmith estimate by > 50% | Required review prompt | Yes — the discrepancy must be resolved before either figure is used downstream |
 | `effectiveConfidence` 0.60–0.84 (REVIEW_RECOMMENDED) | Gentle review prompt | No — stage can advance but market size fields are not fully credited until confirmed |
 | Quarterly refresh produces `growthRateRevised: true` | Market update notification | No — notification only; founder prompted to review the growth rate change |
 | `marketMaturityStage` changed from prior result (e.g., `"growth"` → `"maturing"`) | Material change notification | No — surfaced as a monitoring feed update |
@@ -1368,7 +1368,7 @@ A market research result is auto-accepted when ALL of the following are true:
 4. No high-risk assumptions present
 5. No prior rejection of this module for this `inventionId`
 6. `runDepth` is `"full"` or `"incremental"` (not `"light"`)
-7. If `inventorProvidedMarketSize` is set, Atlas estimate is within 50% of the founder's figure
+7. If `inventorProvidedMarketSize` is set, InventSmith estimate is within 50% of the founder's figure
 
 Auto-accepted results are marked `"auto_accepted"` in the audit trail and flow directly to the stage view and document pipeline. The founder can always edit an auto-accepted result.
 
@@ -1378,12 +1378,12 @@ REVIEW_RECOMMENDED (amber indicator, gentle prompt, non-blocking) is triggered w
 
 | Sub-Condition | Prompt Shown to Founder |
 |---|---|
-| Single-source CAGR only | "Atlas found a market growth rate from one source. This is [X]% annually, but confirm with your own research — a single source may not capture the full picture for your specific product segment." |
-| Sparse consumer segmentation data | "Atlas found limited consumer segmentation data for this category. The segments shown are based on general category research. You may want to verify these apply to your specific product." |
-| Result is 25–60 days old (approaching degradation) | "This market research was conducted [N] days ago. Markets evolve — confirm these figures are still current, or ask Atlas to refresh." |
-| Trend data shows `"volatile"` direction | "Atlas noticed significant fluctuation in consumer interest for this category. Market momentum may be unpredictable — factor this into your business model planning." |
-| Only secondary sources available (no government or analyst reports) | "Atlas researched this market using publicly available web sources. No established analyst reports were found. The estimates below are synthesized from general web data and may be less precise than industry reports." |
-| Bottom-up and top-down estimates diverge by 30–60% | "Atlas's market size estimate shows a moderate discrepancy between two calculation methods ([top-down estimate] vs. [bottom-up estimate]). Review both figures and choose the one that best matches your market definition." |
+| Single-source CAGR only | "InventSmith found a market growth rate from one source. This is [X]% annually, but confirm with your own research — a single source may not capture the full picture for your specific product segment." |
+| Sparse consumer segmentation data | "InventSmith found limited consumer segmentation data for this category. The segments shown are based on general category research. You may want to verify these apply to your specific product." |
+| Result is 25–60 days old (approaching degradation) | "This market research was conducted [N] days ago. Markets evolve — confirm these figures are still current, or ask InventSmith to refresh." |
+| Trend data shows `"volatile"` direction | "InventSmith noticed significant fluctuation in consumer interest for this category. Market momentum may be unpredictable — factor this into your business model planning." |
+| Only secondary sources available (no government or analyst reports) | "InventSmith researched this market using publicly available web sources. No established analyst reports were found. The estimates below are synthesized from general web data and may be less precise than industry reports." |
+| Bottom-up and top-down estimates diverge by 30–60% | "InventSmith's market size estimate shows a moderate discrepancy between two calculation methods ([top-down estimate] vs. [bottom-up estimate]). Review both figures and choose the one that best matches your market definition." |
 
 ### 11.4 What Blocks Stage Advancement If Not Reviewed
 
@@ -1422,13 +1422,13 @@ The current module is optimized for US market data. Phase 2 should add region-sp
 For established consumer product categories, some data providers offer near-real-time market data feeds (e.g., Nielsen/NielsenIQ market intelligence, NPD Group data, SPINS for natural/organic products). These feeds provide monthly or quarterly category-level sales volume and revenue figures sourced directly from retailer point-of-sale data — far more accurate than analyst projections. Integration would require negotiating data licensing (these are commercial enterprise data products), but would make the TAM/SAM estimates genuinely primary-sourced with 0.90+ authority weight. This is a Phase 3 capability due to the cost and integration complexity of these data feeds.
 
 **Custom TAM model from bottom-up with census data:**
-Phase 3 should build a structured bottom-up market sizing calculator that can combine US Census population data (consumer counts by demographic segment) with average category spend per consumer from BLS Consumer Expenditure Survey data to produce a bottom-up TAM estimate that does not rely on any analyst report. For categories where Census and BLS provide enough data, this would give Atlas a primary-sourced TAM estimate for US markets regardless of whether any analyst has published a report on the category. This is a Phase 3 capability due to the data pipeline complexity.
+Phase 3 should build a structured bottom-up market sizing calculator that can combine US Census population data (consumer counts by demographic segment) with average category spend per consumer from BLS Consumer Expenditure Survey data to produce a bottom-up TAM estimate that does not rely on any analyst report. For categories where Census and BLS provide enough data, this would give InventSmith a primary-sourced TAM estimate for US markets regardless of whether any analyst has published a report on the category. This is a Phase 3 capability due to the data pipeline complexity.
 
 **Longitudinal market tracking:**
-Over the life of a multi-year Atlas invention journey, the quarterly incremental refreshes produce a time series of market size and CAGR estimates. Phase 3 should persist this time series as a `marketTimeSeries` table and surface it as a chart in the founder's monitoring dashboard — showing whether the market has grown, contracted, or accelerated since the founder began their journey. This turns the market research module from a point-in-time estimate into a genuine market intelligence tracking function.
+Over the life of a multi-year InventSmith invention journey, the quarterly incremental refreshes produce a time series of market size and CAGR estimates. Phase 3 should persist this time series as a `marketTimeSeries` table and surface it as a chart in the founder's monitoring dashboard — showing whether the market has grown, contracted, or accelerated since the founder began their journey. This turns the market research module from a point-in-time estimate into a genuine market intelligence tracking function.
 
 **TAM/SAM model customization:**
-Phase 3 should allow founders who have specific market definition preferences to configure the TAM and SAM calculation methodology. For example, an inventor who defines their SAM as "households with incomes above $100K in major urban markets" should be able to specify this constraint and have Atlas compute the SAM accordingly from demographic data. The current module uses Atlas's inferred audience as the SAM constraint — Phase 3 should allow founder override of the SAM definition with Atlas still performing the calculation.
+Phase 3 should allow founders who have specific market definition preferences to configure the TAM and SAM calculation methodology. For example, an inventor who defines their SAM as "households with incomes above $100K in major urban markets" should be able to specify this constraint and have InventSmith compute the SAM accordingly from demographic data. The current module uses InventSmith's inferred audience as the SAM constraint — Phase 3 should allow founder override of the SAM definition with InventSmith still performing the calculation.
 
 **Competitive-market integration (cross-module synthesis):**
 Phase 3 should build a cross-module synthesis step that runs after both `market_research` and `competitive_landscape` modules have completed, and produces an integrated market share analysis: given the total market size (from `market_research`) and the known competitor landscape (from `competitive_landscape`), what is the estimated current market share distribution and what share is theoretically available to a new entrant? This would produce a `MarketShareModel` that appears in the Market Research Summary as a new section and directly feeds the competitive market share analysis in Stage 3.

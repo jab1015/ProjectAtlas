@@ -8,14 +8,14 @@ This file defines documentation authority, naming, and historical-reference rule
 
 The customer-facing and current product name is **InventSmith — The Inventor OS** by **Modern Methods**.
 
-The former **Atlas / ProjectAtlas** name is historical only. It may remain only where changing it would make a factual record inaccurate, including:
+The former **InventSmith / ProjectAtlas** name is historical only. It may remain only where changing it would make a factual record inaccurate, including:
 
 - the current historical GitHub repository slug `jab1015/ProjectAtlas` until a separately reviewed repository rename is performed;
 - exact historical commit messages, branch names, workflow names, environment-variable/code identifiers, email subjects, quotations, screenshots, exhibits, or third-party records;
 - historical chronology explaining that the same product was previously developed under the former working name;
 - compatibility identifiers that must remain until a tested code-level migration is performed.
 
-Current product prose, active plans, current-state descriptions, handoff instructions, headings, and canonical documentation must use **InventSmith**, not Atlas.
+Current product prose, active plans, current-state descriptions, handoff instructions, headings, and canonical documentation must use **InventSmith**, not InventSmith.
 
 ## Current authoritative documents
 

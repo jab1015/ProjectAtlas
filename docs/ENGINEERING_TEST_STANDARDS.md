@@ -120,7 +120,7 @@ When automation isn't feasible, add an entry following the MRT-001 pattern. Incl
 
 ## Naming note
 
-Historical test names, workflow filenames, environment identifiers, or commit references may retain the former Atlas / ProjectAtlas working name where changing them would break compatibility or falsify history. Current product prose uses **InventSmith**.
+Historical test names, workflow filenames, environment identifiers, or commit references may retain the former InventSmith / ProjectAtlas working name where changing them would break compatibility or falsify history. Current product prose uses **InventSmith**.
 
 ## Note on DEFINITION_OF_DONE.md
 

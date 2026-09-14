@@ -1,17 +1,17 @@
-# ATLAS CONFIDENCE FRAMEWORK
+# INVENTSMITH CONFIDENCE FRAMEWORK
 
 **Version 1.0 — July 2026**
 **Classification: Internal Engineering Reference**
-**Status: Active — Applies to All Atlas Subsystems**
-**Scope: Universal — Patent Intelligence, Market Research, Competitor Research, and all future Atlas research domains**
+**Status: Active — Applies to All InventSmith Subsystems**
+**Scope: Universal — Patent Intelligence, Market Research, Competitor Research, and all future InventSmith research domains**
 
 ---
 
 ## Document Purpose
 
-This document defines the universal Atlas Confidence Framework.
+This document defines the universal InventSmith Confidence Framework.
 
-Every recommendation Atlas produces must include a transparent confidence assessment. This framework governs how that assessment is computed, expressed, and presented to founders across every Atlas research domain — not only Patent Intelligence.
+Every recommendation InventSmith produces must include a transparent confidence assessment. This framework governs how that assessment is computed, expressed, and presented to founders across every InventSmith research domain — not only Patent Intelligence.
 
 This document does not specify UI, frontend implementation, caching, cost controls, API management, or approval workflow. It defines the framework that all subsystems implement.
 
@@ -42,28 +42,28 @@ This document does not specify UI, frontend implementation, caching, cost contro
 
 ### 1.1 Why Confidence Transparency Matters for Inventors
 
-Inventors making decisions about their products, IP strategy, manufacturing, and market approach are taking real financial and personal risk. Atlas must never let a founder make a high-stakes decision under the false impression that the evidence behind that decision is stronger than it actually is.
+Inventors making decisions about their products, IP strategy, manufacturing, and market approach are taking real financial and personal risk. InventSmith must never let a founder make a high-stakes decision under the false impression that the evidence behind that decision is stronger than it actually is.
 
 - **Misplaced confidence causes real harm** — an inventor who files a patent believing prior art was fully clear, only to discover a key reference was missed, loses time, money, and possibly market position
-- **Transparency builds trust** — founders who understand *why* Atlas is uncertain are equipped to decide whether to act on a recommendation or gather more evidence first
-- **Every Atlas recommendation carries evidence quality risk** — there is no perfect research; confidence scoring makes that risk visible and explicit rather than hidden
-- **Founders are the decision-makers** — Atlas provides research and recommendations; founders approve, redirect, or override; confidence scores are how Atlas communicates the strength of its basis for each recommendation
+- **Transparency builds trust** — founders who understand *why* InventSmith is uncertain are equipped to decide whether to act on a recommendation or gather more evidence first
+- **Every InventSmith recommendation carries evidence quality risk** — there is no perfect research; confidence scoring makes that risk visible and explicit rather than hidden
+- **Founders are the decision-makers** — InventSmith provides research and recommendations; founders approve, redirect, or override; confidence scores are how InventSmith communicates the strength of its basis for each recommendation
 
-### 1.2 How Atlas Uses Confidence to Guide (Not Replace) Founder Judgment
+### 1.2 How InventSmith Uses Confidence to Guide (Not Replace) Founder Judgment
 
-- Atlas presents confidence scores **with every recommendation**, not as a final verdict but as a transparent signal about evidence quality
-- Atlas **explains the reason** behind each confidence level — what evidence is present, what is missing, and what assumptions were made
-- Atlas **never withholds a recommendation** solely because confidence is low — it surfaces the finding with an accurate confidence level and flags the gaps, so the founder can choose how to proceed
-- At low confidence levels, Atlas **recommends specific follow-on research** to improve the evidence base before the founder acts
-- The founder retains full authority to act at any confidence level — confidence is informational, not a gate that Atlas controls unilaterally (except where Founder Review Thresholds apply — see Section 11)
+- InventSmith presents confidence scores **with every recommendation**, not as a final verdict but as a transparent signal about evidence quality
+- InventSmith **explains the reason** behind each confidence level — what evidence is present, what is missing, and what assumptions were made
+- InventSmith **never withholds a recommendation** solely because confidence is low — it surfaces the finding with an accurate confidence level and flags the gaps, so the founder can choose how to proceed
+- At low confidence levels, InventSmith **recommends specific follow-on research** to improve the evidence base before the founder acts
+- The founder retains full authority to act at any confidence level — confidence is informational, not a gate that InventSmith controls unilaterally (except where Founder Review Thresholds apply — see Section 11)
 
-### 1.3 Atlas Never Overstates Certainty
+### 1.3 InventSmith Never Overstates Certainty
 
-This principle is non-negotiable across all Atlas subsystems:
+This principle is non-negotiable across all InventSmith subsystems:
 
-- **Every ConfidenceAssessment must reflect the actual evidence** — Atlas never inflates confidence to appear more authoritative
-- **Missing evidence is always declared**, not silently ignored — if Atlas could not find a data point it needed, the ConfidenceAssessment must say so
-- **Assumptions must be disclosed** — when Atlas fills a gap with an inference, that inference is labeled as an assumption and weighted accordingly
+- **Every ConfidenceAssessment must reflect the actual evidence** — InventSmith never inflates confidence to appear more authoritative
+- **Missing evidence is always declared**, not silently ignored — if InventSmith could not find a data point it needed, the ConfidenceAssessment must say so
+- **Assumptions must be disclosed** — when InventSmith fills a gap with an inference, that inference is labeled as an assumption and weighted accordingly
 - **Confidence scores are bounded by the quality of available evidence** — a well-executed search across unreliable sources does not produce high confidence; source reliability is factored in
 - **Positive findings do not override risk signals** — when conflicting evidence exists, confidence reflects the conflict rather than suppressing the weaker signal
 
@@ -72,18 +72,18 @@ This principle is non-negotiable across all Atlas subsystems:
 **Confidence is not probability:**
 - Probability is a statistical statement about the likelihood of an outcome
 - Confidence is an assessment of how well the available evidence supports a finding or recommendation
-- A confidence score of 0.90 does not mean Atlas is 90% certain a claim will hold — it means the evidence Atlas found is strong, broad, and internally consistent
+- A confidence score of 0.90 does not mean InventSmith is 90% certain a claim will hold — it means the evidence InventSmith found is strong, broad, and internally consistent
 
 **Confidence is not legal opinion:**
-- Atlas is not a law firm; Atlas confidence assessments are not legal opinions
-- Patent Research confidence scores describe the quality of the prior art and FTO evidence Atlas gathered — they do not constitute legal advice
-- Where Atlas research touches legal matters (patent landscape, regulatory status, trademark), every ConfidenceAssessment must include a `legalDisclaimer` field
+- InventSmith is not a law firm; InventSmith confidence assessments are not legal opinions
+- Patent Research confidence scores describe the quality of the prior art and FTO evidence InventSmith gathered — they do not constitute legal advice
+- Where InventSmith research touches legal matters (patent landscape, regulatory status, trademark), every ConfidenceAssessment must include a `legalDisclaimer` field
 - Founders must consult qualified legal counsel for decisions that carry legal consequences
 
 **Confidence is an evidence quality signal:**
-- It tells founders how thoroughly Atlas researched a question
-- It tells founders how reliable the sources Atlas consulted are
-- It tells founders what assumptions Atlas made when evidence was absent
+- It tells founders how thoroughly InventSmith researched a question
+- It tells founders how reliable the sources InventSmith consulted are
+- It tells founders what assumptions InventSmith made when evidence was absent
 - It tells founders what gaps remain and how significant those gaps are
 
 ---
@@ -116,9 +116,9 @@ penaltyTotal = sum(KA_penalties) + sum(KU_penalties)
 confidenceScore = max(0.0, min(1.0, rawScore − penaltyTotal))
 ```
 
-The raw sub-score weights sum to 0.90 rather than 1.00. The remaining 0.10 budget is implicitly consumed by penalties. When penalties are zero, the maximum achievable score is 0.90, indicating that some residual uncertainty always exists — Atlas never claims perfect certainty.
+The raw sub-score weights sum to 0.90 rather than 1.00. The remaining 0.10 budget is implicitly consumed by penalties. When penalties are zero, the maximum achievable score is 0.90, indicating that some residual uncertainty always exists — InventSmith never claims perfect certainty.
 
-> **Design principle:** The formula ensures that even the strongest evidence base with zero assumptions and no gaps cannot produce a score above 0.90. This enforces the "Atlas never overstates certainty" principle at the mathematical level.
+> **Design principle:** The formula ensures that even the strongest evidence base with zero assumptions and no gaps cannot produce a score above 0.90. This enforces the "InventSmith never overstates certainty" principle at the mathematical level.
 
 ---
 
@@ -158,7 +158,7 @@ Each evidence item has a base weight determined by:
 
 ### 3.3 Direct Evidence vs. Inferred Evidence
 
-**Direct evidence** — explicitly states the finding Atlas is using:
+**Direct evidence** — explicitly states the finding InventSmith is using:
 - A patent claim that explicitly covers a specific mechanism
 - A competitor's published price list
 - A regulatory clearance letter
@@ -176,9 +176,9 @@ Each evidence item has a base weight determined by:
 
 ## Section 4 — Source Reliability
 
-### 4.1 How Atlas Rates Source Reliability
+### 4.1 How InventSmith Rates Source Reliability
 
-Source reliability is determined by the type of source, not the content of any individual record from that source. Atlas assigns a reliability tier to each source before evaluating the evidence it contains. The tier determines the maximum evidence quality contribution that source can make.
+Source reliability is determined by the type of source, not the content of any individual record from that source. InventSmith assigns a reliability tier to each source before evaluating the evidence it contains. The tier determines the maximum evidence quality contribution that source can make.
 
 ### 4.2 Reliability Tiers
 
@@ -227,16 +227,16 @@ User-generated content, unverified claims, and low-methodology sources. Useful a
 | Manufacturer | Unverified supplier profiles |
 
 **Tier 5 — Unknown (weight: 0.20)**
-Sources whose provenance, methodology, or authority Atlas cannot determine. Evidence from unknown sources is tracked but penalized.
+Sources whose provenance, methodology, or authority InventSmith cannot determine. Evidence from unknown sources is tracked but penalized.
 
 - Unattributed statistics cited in secondary sources
 - Data scraped from sites without verifiable authorship
 - AI-generated summaries without source attribution
-- Any source where Atlas cannot trace the original data
+- Any source where InventSmith cannot trace the original data
 
 ### 4.3 Provider Independence
 
-Source reliability tiers must be defined by source type, not by which data provider Atlas happens to use. A USPTO patent record is Tier 1 regardless of whether it was retrieved via USPTO's own API, Google Patents, or a licensed database. The tier follows the origin of the data, not the pipe that delivered it.
+Source reliability tiers must be defined by source type, not by which data provider InventSmith happens to use. A USPTO patent record is Tier 1 regardless of whether it was retrieved via USPTO's own API, Google Patents, or a licensed database. The tier follows the origin of the data, not the pipe that delivered it.
 
 ---
 
@@ -244,7 +244,7 @@ Source reliability tiers must be defined by source type, not by which data provi
 
 ### 5.1 How Age Affects Confidence
 
-Evidence ages at different rates depending on the domain. A patent granted three years ago is still highly relevant; a competitor pricing data point from three years ago may be completely outdated. Atlas applies a freshness multiplier to each evidence item based on its data type and age.
+Evidence ages at different rates depending on the domain. A patent granted three years ago is still highly relevant; a competitor pricing data point from three years ago may be completely outdated. InventSmith applies a freshness multiplier to each evidence item based on its data type and age.
 
 ### 5.2 Freshness Decay by Data Type
 
@@ -320,9 +320,9 @@ The freshness score is a weighted average across all evidence items contributing
 
 ## Section 6 — Completeness Scoring
 
-### 6.1 How Atlas Measures Evidence Completeness
+### 6.1 How InventSmith Measures Evidence Completeness
 
-Each research type defines a set of **required evidence items** and **optional evidence items**. Completeness measures the fraction of required items that Atlas was able to gather for a given research run.
+Each research type defines a set of **required evidence items** and **optional evidence items**. Completeness measures the fraction of required items that InventSmith was able to gather for a given research run.
 
 ### 6.2 Completeness Formula
 
@@ -355,21 +355,21 @@ When `completenessScore` is below the minimum threshold:
 - The `reviewReason` field includes: "Completeness below minimum threshold for this research type"
 - The `missingInformation` array enumerates exactly which required items were not found
 - The `confidenceScore` is automatically capped at 0.49 (Moderate or below) regardless of sub-scores, because insufficient coverage of required evidence is structurally incompatible with High or Very High confidence
-- Atlas presents the finding with a `suggestedNextResearch` list to help the founder close the gap
+- InventSmith presents the finding with a `suggestedNextResearch` list to help the founder close the gap
 
 ---
 
 ## Section 7 — Conflict Detection
 
-### 7.1 How Atlas Identifies Conflicting Sources
+### 7.1 How InventSmith Identifies Conflicting Sources
 
-Conflicts occur when two or more evidence items make materially different claims about the same fact. Atlas detects conflicts by:
+Conflicts occur when two or more evidence items make materially different claims about the same fact. InventSmith detects conflicts by:
 
 - Comparing quantitative values from different sources for the same metric (e.g., two sources citing different market sizes for the same year)
 - Identifying contradictory status claims (e.g., one source shows a patent as active, another shows it as abandoned)
 - Detecting logical incompatibility between evidence items (e.g., a competitor described as both a startup and a $50M revenue company by different sources)
 
-**Conflict detection is automatic** — Atlas compares evidence items against each other during the evidence assembly step and flags pairs or groups that contradict.
+**Conflict detection is automatic** — InventSmith compares evidence items against each other during the evidence assembly step and flags pairs or groups that contradict.
 
 ### 7.2 How Conflicts Affect Confidence Score
 
@@ -390,13 +390,13 @@ Conflicts are quantified through the **Agreement Score** (see Section 13.4). Con
 ### 7.3 How Conflicts Are Surfaced to Founders
 
 - Every detected conflict appears in the `conflictsDetected` array of the ConfidenceAssessment
-- Each conflict entry includes: source A, source B, the conflicting claim, severity level, and Atlas's resolution approach
-- Atlas never silently resolves a critical or significant conflict — it must always surface the conflict and explain how it was handled
+- Each conflict entry includes: source A, source B, the conflicting claim, severity level, and InventSmith's resolution approach
+- InventSmith never silently resolves a critical or significant conflict — it must always surface the conflict and explain how it was handled
 - **Resolution approaches:**
   - `HIGHER_TIER_WINS` — when two sources conflict and one has a higher reliability tier, the higher-tier source is weighted more heavily
   - `MOST_RECENT_WINS` — when sources from different time periods conflict, the more recent source is weighted more heavily
-  - `PRESENTED_AS_RANGE` — when the conflict cannot be cleanly resolved, Atlas presents the range and flags it for founder resolution
-  - `FOUNDER_RESOLUTION_REQUIRED` — for critical conflicts where Atlas cannot determine which source is correct
+  - `PRESENTED_AS_RANGE` — when the conflict cannot be cleanly resolved, InventSmith presents the range and flags it for founder resolution
+  - `FOUNDER_RESOLUTION_REQUIRED` — for critical conflicts where InventSmith cannot determine which source is correct
 
 ---
 
@@ -404,7 +404,7 @@ Conflicts are quantified through the **Agreement Score** (see Section 13.4). Con
 
 ### 8.1 The Requirement to Document All Assumptions
 
-Every inference Atlas makes that is not directly supported by a retrieved evidence item must be documented as an assumption. No assumption is too small to record. The complete set of assumptions in a ConfidenceAssessment defines exactly where Atlas filled gaps with inference rather than fact.
+Every inference InventSmith makes that is not directly supported by a retrieved evidence item must be documented as an assumption. No assumption is too small to record. The complete set of assumptions in a ConfidenceAssessment defines exactly where InventSmith filled gaps with inference rather than fact.
 
 ### 8.2 Types of Assumptions
 
@@ -412,7 +412,7 @@ Every inference Atlas makes that is not directly supported by a retrieved eviden
 - "Competitor likely prices above $50 based on product category and positioning signals"
 - "Market growth rate assumed to continue at historical pace since no forward projections were found"
 
-**DEFAULT** — a standard value Atlas applies when no specific data is available, drawn from domain knowledge:
+**DEFAULT** — a standard value InventSmith applies when no specific data is available, drawn from domain knowledge:
 - "Standard retail margin of 40% applied because no channel-specific data was found"
 - "USPTO processing time of 18–24 months assumed based on category averages"
 
@@ -443,7 +443,7 @@ Penalties are cumulative but capped at −0.25 total from assumptions (across al
 
 ### 9.1 How Missing Inputs Reduce Confidence
 
-Missing information is distinct from assumptions. An assumption is Atlas filling a gap; missing information is a gap Atlas could not fill at all. Missing information reduces confidence through the Known Unknowns Penalty.
+Missing information is distinct from assumptions. An assumption is InventSmith filling a gap; missing information is a gap InventSmith could not fill at all. Missing information reduces confidence through the Known Unknowns Penalty.
 
 ### 9.2 Penalty Table by Input Type
 
@@ -464,12 +464,12 @@ Missing information is distinct from assumptions. An assumption is Atlas filling
 | Historical pricing trends | Minor | −0.03 |
 | Influencer / channel data | Minor | −0.02 |
 
-### 9.3 How Atlas Signals Missing Information to Founders
+### 9.3 How InventSmith Signals Missing Information to Founders
 
 - All identified gaps appear in the `missingInformation` array of the ConfidenceAssessment with severity labeled
 - The `suggestedNextResearch` array includes at least one specific research action for every critical or significant gap
-- Atlas does not block progress for significant or minor gaps — it flags and recommends
-- Atlas does block progress past Founder Review for any ConfidenceAssessment where a **critical gap** is present AND the `confidenceScore` falls below 0.30
+- InventSmith does not block progress for significant or minor gaps — it flags and recommends
+- InventSmith does block progress past Founder Review for any ConfidenceAssessment where a **critical gap** is present AND the `confidenceScore` falls below 0.30
 
 ---
 
@@ -477,26 +477,26 @@ Missing information is distinct from assumptions. An assumption is Atlas filling
 
 ### 10.1 When and How a Founder Can Override
 
-A founder may override Atlas's confidence assessment when:
+A founder may override InventSmith's confidence assessment when:
 
-- The founder has personal knowledge or access to information that Atlas could not obtain
-- The founder disagrees with how Atlas weighted a specific source or assumption
-- The founder wants to proceed at a lower confidence level than Atlas recommends
+- The founder has personal knowledge or access to information that InventSmith could not obtain
+- The founder disagrees with how InventSmith weighted a specific source or assumption
+- The founder wants to proceed at a lower confidence level than InventSmith recommends
 - The founder believes a detected conflict has been resolved based on their own research
 
 **Override mechanism:**
 - The founder sets `manualOverride: true` on the ConfidenceAssessment
 - The founder provides an `overrideRationale` string explaining the basis for the override
 - The founder sets `founderConfidenceOverride` (0.0–1.0) — their stated confidence level
-- The founder's override is recorded in the audit trail alongside the Atlas-generated score
+- The founder's override is recorded in the audit trail alongside the InventSmith-generated score
 
 ### 10.2 What Happens When an Override Is Applied
 
 - The `confidenceScore` displayed to the founder changes to `founderConfidenceOverride`
 - The `confidenceLevel` is recalculated from the overridden score
-- The `requiresFounderReview` flag may be cleared if the overridden score is above the threshold — but Atlas logs that review was waived by override
+- The `requiresFounderReview` flag may be cleared if the overridden score is above the threshold — but InventSmith logs that review was waived by override
 - All downstream recommendations continue to use the overridden confidence level for display
-- The original Atlas-computed score is preserved in `atlasOriginalConfidenceScore` and is never deleted
+- The original InventSmith-computed score is preserved in `atlasOriginalConfidenceScore` and is never deleted
 - A `ManualOverrideRecord` is appended to the audit log
 
 ### 10.3 Audit Trail Requirements
@@ -523,7 +523,7 @@ Overrides are append-only. They cannot be deleted or retroactively modified.
 
 ## Section 11 — Founder Review Thresholds
 
-### 11.1 When Atlas Requires Founder Review
+### 11.1 When InventSmith Requires Founder Review
 
 Founder review is triggered automatically when any of the following conditions are met:
 
@@ -539,10 +539,10 @@ Founder review is triggered automatically when any of the following conditions a
 
 When `requiresFounderReview: true`:
 
-- Atlas surfaces the ConfidenceAssessment to the founder with a clear explanation of why review is required
-- Atlas provides the `reviewReason` — a plain-language explanation the founder can read and act on
-- Atlas provides `suggestedNextResearch` — specific steps the founder can take to improve the evidence base
-- Atlas does NOT prevent the founder from proceeding — the founder can override (see Section 10) or accept the finding at its current confidence level
+- InventSmith surfaces the ConfidenceAssessment to the founder with a clear explanation of why review is required
+- InventSmith provides the `reviewReason` — a plain-language explanation the founder can read and act on
+- InventSmith provides `suggestedNextResearch` — specific steps the founder can take to improve the evidence base
+- InventSmith does NOT prevent the founder from proceeding — the founder can override (see Section 10) or accept the finding at its current confidence level
 
 ### 11.3 Confidence Thresholds by Research Domain and Risk Level
 
@@ -554,7 +554,7 @@ When `requiresFounderReview: true`:
 | High | 0.70–0.84 | No — proceed |
 | Moderate | 0.50–0.69 | Recommended — flagged but not required |
 | Low | 0.30–0.49 | Yes — required |
-| Very Low | 0.00–0.29 | Yes — required; Atlas blocks automatic progression |
+| Very Low | 0.00–0.29 | Yes — required; InventSmith blocks automatic progression |
 
 **High-stakes domains (patent, regulatory, manufacturer selection, funding):**
 
@@ -563,8 +563,8 @@ When `requiresFounderReview: true`:
 | Very High | 0.85–1.00 | No — proceed |
 | High | 0.70–0.84 | Recommended — flagged but not required |
 | Moderate | 0.50–0.69 | Yes — required |
-| Low | 0.30–0.49 | Yes — required; Atlas blocks automatic progression |
-| Very Low | 0.00–0.29 | Yes — required; Atlas blocks automatic progression |
+| Low | 0.30–0.49 | Yes — required; InventSmith blocks automatic progression |
+| Very Low | 0.00–0.29 | Yes — required; InventSmith blocks automatic progression |
 
 **Legal-touching outputs (FTO indicators, regulatory compliance, trademark clearance):**
 
@@ -586,7 +586,7 @@ When `requiresFounderReview: true`:
 - Assumptions are few and of INFERRED or DEFAULT type only
 - No critical or significant gaps
 
-**Atlas behavior:**
+**InventSmith behavior:**
 - Proceeds automatically in standard domains
 - Flags for recommended review in high-stakes domains
 - Surfaces findings with confidence level but no block
@@ -608,7 +608,7 @@ When `requiresFounderReview: true`:
 - Most required evidence items found; minor gaps only
 - Moderate assumption count; assumptions are well-documented
 
-**Atlas behavior:**
+**InventSmith behavior:**
 - Proceeds in standard domains
 - Flags for recommended (not required) review in high-stakes domains
 - Surfaces confidence level with summary reasoning
@@ -629,7 +629,7 @@ When `requiresFounderReview: true`:
 - Several required evidence items missing; completeness approaching or below threshold
 - Multiple assumptions including EXTRAPOLATED or ESTIMATED types
 
-**Atlas behavior:**
+**InventSmith behavior:**
 - Flags for recommended review in standard domains
 - Requires review before proceeding in high-stakes domains
 - Presents findings with explicit gap and assumption disclosures
@@ -653,7 +653,7 @@ When `requiresFounderReview: true`:
 - High assumption count including multiple ESTIMATED types
 - One or more significant gaps in evidence
 
-**Atlas behavior:**
+**InventSmith behavior:**
 - Requires founder review in all domains
 - Automatically blocks downstream progression in high-stakes domains
 - Presents findings as preliminary and explicitly incomplete
@@ -677,14 +677,14 @@ When `requiresFounderReview: true`:
 - Primarily assumption-based with multiple critical gaps
 - Finding is speculative
 
-**Atlas behavior:**
+**InventSmith behavior:**
 - Requires founder review in all domains without exception
 - Blocks automatic progression in all domains
 - Presents result as insufficient for decision-making
 - Recommends full evidence-gathering effort before proceeding
 
 **Example scenarios:**
-- *Patent:* Atlas could not execute searches due to provider unavailability; no prior art assessment possible
+- *Patent:* InventSmith could not execute searches due to provider unavailability; no prior art assessment possible
 - *Market:* No market size data found; competitive landscape completely unknown; TAM entirely estimated
 - *Any domain:* Research just started; fewer than 20% of required evidence items found
 
@@ -866,7 +866,7 @@ penaltyTotal = min(0.50, KA_total + KU_total)
 confidenceScore = max(0.0, min(1.0, rawScore − penaltyTotal))
 ```
 
-The combined penalty cap is 0.50 — Atlas never forces a score below 0.00 from penalties alone, and the minimum score is always 0.00.
+The combined penalty cap is 0.50 — InventSmith never forces a score below 0.00 from penalties alone, and the minimum score is always 0.00.
 
 The maximum achievable raw score before penalties is 0.90. A perfect score requires:
 - All evidence items from Tier 1 sources, direct, highly specific, and verifiable (EQ = 1.00)
@@ -883,7 +883,7 @@ Even under these conditions, `rawScore = 0.90`, and any assumptions or gaps redu
 
 ### 14.1 ConfidenceAssessment Schema
 
-Every Atlas recommendation must include a `ConfidenceAssessment` object.
+Every InventSmith recommendation must include a `ConfidenceAssessment` object.
 
 ```typescript
 type ConfidenceAssessment = {
@@ -1007,7 +1007,7 @@ type ConflictRecord = {
   claimB: string;             // Source B's claim
   severity: "critical" | "significant" | "minor";
   resolutionApproach: "HIGHER_TIER_WINS" | "MOST_RECENT_WINS" | "PRESENTED_AS_RANGE" | "FOUNDER_RESOLUTION_REQUIRED";
-  resolution: string | null;  // How Atlas resolved it (null if founder resolution required)
+  resolution: string | null;  // How InventSmith resolved it (null if founder resolution required)
 };
 
 type ResearchAction = {
@@ -1023,7 +1023,7 @@ type ResearchAction = {
 
 ## Section 15 — Cross-System Applicability
 
-The Confidence Framework applies uniformly across all Atlas research domains. Each domain has distinct evidence types, freshness concerns, and typical confidence trajectories.
+The Confidence Framework applies uniformly across all InventSmith research domains. Each domain has distinct evidence types, freshness concerns, and typical confidence trajectories.
 
 ---
 
@@ -1235,7 +1235,7 @@ The Confidence Framework applies uniformly across all Atlas research domains. Ea
 
 **How this is enforced:**
 
-- The scoring model has a mathematical ceiling of 0.90 for the raw score before penalties — Atlas physically cannot compute a score of 1.00 under any conditions
+- The scoring model has a mathematical ceiling of 0.90 for the raw score before penalties — InventSmith physically cannot compute a score of 1.00 under any conditions
 - Every assumption and gap reduces the score — there is no way to report a high confidence score while hiding assumptions or gaps
 - The `confidenceScore` field in `ConfidenceAssessment` is computed on the backend, never on the frontend
 - Any deviation between the displayed confidence and the backend-computed confidence is a system error, not a valid state
@@ -1299,11 +1299,11 @@ The Confidence Framework applies uniformly across all Atlas research domains. Ea
 
 ---
 
-### 16.7 Follow Atlas Owns Execution
+### 16.7 Follow InventSmith Owns Execution
 
 **How this is enforced:**
 
-- Confidence scoring runs entirely on the Atlas backend
+- Confidence scoring runs entirely on the InventSmith backend
 - No confidence logic — scoring formulas, tier assignments, penalty calculations — may be implemented in frontend code
 - The frontend receives a complete, pre-computed `ConfidenceAssessment` object from the backend and renders it
 - If the frontend needs to filter or display assessments by confidence level, it does so by reading the `confidenceLevel` string from the object — not by computing a score client-side
@@ -1322,7 +1322,7 @@ The Confidence Framework applies uniformly across all Atlas research domains. Ea
 
 ---
 
-*End of ATLAS CONFIDENCE FRAMEWORK — Version 1.0*
+*End of INVENTSMITH CONFIDENCE FRAMEWORK — Version 1.0*
 *Issued: July 2026*
-*Scope: Universal — applies to all Atlas research subsystems*
+*Scope: Universal — applies to all InventSmith research subsystems*
 *Status: Active*

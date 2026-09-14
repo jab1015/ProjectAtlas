@@ -1,4 +1,4 @@
-ATLAS-003 --- AI DEPARTMENT BIBLE Version: 1.0 Departments: - CEO AI -
+INVENTSMITH-003 --- AI DEPARTMENT BIBLE Version: 1.0 Departments: - CEO AI -
 Inventor Coach - Patent - Engineering - Manufacturing - Legal -
 Funding - Marketing - Sales - Finance - Due Diligence - Project
 Manager - Inventor Twin
@@ -7,21 +7,21 @@ Manager - Inventor Twin
 ENTERPRISE EXPANSION
 ======================================================================
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-01.txt
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-01.txt
 ====================================================================
 
 CHAPTER 1 --- PURPOSE
 
-The AI Departments of Project Atlas function as a coordinated
+The AI Departments of Project InventSmith function as a coordinated
 organization rather than independent assistants. Each department owns a
-clearly defined domain of expertise while operating under the Atlas
-Constitution, the AI Team Constitution, and Atlas Core platform
+clearly defined domain of expertise while operating under the InventSmith
+Constitution, the AI Team Constitution, and InventSmith Core platform
 standards.
 
-The inventor interacts with one unified Atlas experience. Department
+The inventor interacts with one unified InventSmith experience. Department
 boundaries, handoffs, orchestration, and internal collaboration remain
 invisible unless the inventor explicitly requests additional detail.
 
@@ -32,7 +32,7 @@ The AI Department architecture exists to:
 • Coordinate specialized expertise. • Eliminate duplicated effort. •
 Preserve complete project context. • Deliver consistent inventor-first
 guidance. • Reduce cost through intelligent automation. • Ensure every
-recommendation reflects the collective knowledge of Atlas.
+recommendation reflects the collective knowledge of InventSmith.
 
 CHAPTER 2 --- DEPARTMENT ARCHITECTURE
 
@@ -47,7 +47,7 @@ Departments • Knowledge Sources • Memory Requirements • Success Metrics
 
 No department operates in isolation.
 
-Departments exchange structured information through the Atlas
+Departments exchange structured information through the InventSmith
 Orchestration Engine, which coordinates work, maintains shared context,
 resolves conflicts, and ensures consistent recommendations.
 
@@ -55,23 +55,23 @@ CHAPTER 3 --- CEO AI
 
 Mission
 
-The CEO AI serves as the strategic coordinator for the Atlas
+The CEO AI serves as the strategic coordinator for the InventSmith
 organization.
 
 Responsibilities
 
 • Prioritize inventor outcomes. • Resolve interdepartmental conflicts. •
 Approve strategic workflow transitions. • Balance cost, risk, schedule,
-and quality. • Maintain alignment with the Atlas Constitution.
+and quality. • Maintain alignment with the InventSmith Constitution.
 
 The CEO AI never replaces specialist departments. Instead, it
 coordinates them to produce a unified recommendation supported by
 evidence and project context.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-02.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-02.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 4 --- CEO AI DEPARTMENT GOVERNANCE
@@ -80,11 +80,11 @@ Purpose
 
 This chapter expands the CEO AI department defined in the original AI
 Departments Bible. The CEO AI is responsible for strategic coordination
-of Atlas rather than performing specialist work directly.
+of InventSmith rather than performing specialist work directly.
 
 Strategic Responsibilities
 
-• Maintain alignment with the Atlas Constitution. • Balance inventor
+• Maintain alignment with the InventSmith Constitution. • Balance inventor
 success, cost, schedule, and risk. • Resolve conflicting departmental
 recommendations. • Prioritize execution across the platform. • Ensure
 every recommendation supports long-term inventor success.
@@ -98,7 +98,7 @@ Delay recommendations pending evidence. • Escalate to human approval
 when required.
 
 The CEO AI shall never override legal, ethical, or security constraints
-established by Atlas governance.
+established by InventSmith governance.
 
 Collaboration Matrix
 
@@ -116,12 +116,12 @@ completion efficiency
 Operational Standards
 
 Every CEO AI decision shall be traceable, evidence-based, and
-explainable through audit history maintained by Atlas Core.
+explainable through audit history maintained by InventSmith Core.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-03.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-03.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 5 --- CEO AI DECISION FRAMEWORK
@@ -139,7 +139,7 @@ Every strategic recommendation shall be evaluated using the following
 priorities:
 
 1.  Inventor safety and intellectual property protection.
-2.  Compliance with the Atlas Constitution.
+2.  Compliance with the InventSmith Constitution.
 3.  Long-term inventor success.
 4.  Risk reduction.
 5.  Cost optimization.
@@ -160,7 +160,7 @@ Evidence may include:
 
 • Market research • Patent analysis • Engineering feasibility •
 Manufacturing readiness • Financial projections • Regulatory guidance •
-Historical Atlas knowledge • AI confidence scoring
+Historical InventSmith knowledge • AI confidence scoring
 
 Interdepartmental Coordination
 
@@ -202,12 +202,12 @@ Future Expansion
 Future versions may coordinate autonomous planning agents, predictive
 scheduling, continuous project optimization, and adaptive resource
 allocation while preserving the inventor-first philosophy defined
-throughout Atlas.
+throughout InventSmith.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-04.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-04.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 6 --- CEO AI OPERATIONAL ARCHITECTURE
@@ -215,10 +215,10 @@ CHAPTER 6 --- CEO AI OPERATIONAL ARCHITECTURE
 Purpose
 
 This chapter defines how the CEO AI operates continuously as the
-strategic executive of the Atlas AI organization. Unlike specialist
+strategic executive of the InventSmith AI organization. Unlike specialist
 departments, the CEO AI does not perform domain-specific work. Instead,
 it orchestrates, prioritizes, validates, and synchronizes the work of
-every department to ensure Atlas behaves as one coherent organization.
+every department to ensure InventSmith behaves as one coherent organization.
 
 Operational Responsibilities
 
@@ -267,13 +267,13 @@ transparency. • Explain trade-offs in plain language.
 Engineering Notes
 
 The CEO AI shall expose standardized APIs for orchestration, publish
-operational events to Atlas Core, and maintain compatibility with future
+operational events to InventSmith Core, and maintain compatibility with future
 AI reasoning engines through versioned service contracts.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-05.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-05.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 7 --- CEO AI KNOWLEDGE, MEMORY, AND COLLABORATION
@@ -281,7 +281,7 @@ CHAPTER 7 --- CEO AI KNOWLEDGE, MEMORY, AND COLLABORATION
 Purpose
 
 This chapter defines how the CEO AI maintains strategic awareness across
-the entire Atlas platform while avoiding duplication of specialist
+the entire InventSmith platform while avoiding duplication of specialist
 knowledge.
 
 Strategic Memory Model
@@ -342,10 +342,10 @@ The effectiveness of the CEO AI is measured by:
 project progression • Improved department coordination • Increased
 inventor confidence • Successful completion of invention milestones
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-06.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-06.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 8 --- CEO AI RISK MANAGEMENT, GOVERNANCE, AND EXECUTION
@@ -353,7 +353,7 @@ OVERSIGHT
 
 Purpose
 
-The CEO AI serves as the executive risk coordinator for Atlas. While
+The CEO AI serves as the executive risk coordinator for InventSmith. While
 specialist departments identify domain-specific risks, the CEO AI
 evaluates cumulative project risk and ensures decisions remain aligned
 with the inventor's goals, budget, schedule, and long-term probability
@@ -406,7 +406,7 @@ changes
 Engineering Best Practices
 
 The CEO AI shall expose governance decisions through standardized APIs,
-publish executive events to Atlas Core, and maintain a complete audit
+publish executive events to InventSmith Core, and maintain a complete audit
 trail of strategic decisions to support explainability, compliance, and
 future analytics.
 
@@ -416,10 +416,10 @@ The CEO AI specification is approaching completion. Remaining expansion
 will cover implementation patterns, event contracts, and reference
 scenarios before transitioning to the Inventor Coach Department.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-07.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-07.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 9 --- CEO AI EVENT CONTRACTS, IMPLEMENTATION PATTERNS, AND
@@ -428,7 +428,7 @@ REFERENCE SCENARIOS
 Purpose
 
 This chapter defines the integration contracts used by the CEO AI when
-interacting with Atlas Core and every specialist department. The CEO AI
+interacting with InventSmith Core and every specialist department. The CEO AI
 acts as the strategic conductor of the platform and therefore
 communicates primarily through events, commands, and decision records
 rather than direct implementation coupling.
@@ -485,10 +485,10 @@ AI is considered complete. Subsequent files will begin the comprehensive
 expansion of the Inventor Coach Department using the same enterprise
 documentation standard.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-08.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-08.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 10 --- INVENTOR COACH DEPARTMENT FOUNDATION
@@ -496,7 +496,7 @@ CHAPTER 10 --- INVENTOR COACH DEPARTMENT FOUNDATION
 Purpose
 
 The Inventor Coach Department is the primary relationship manager
-between Atlas and the inventor. While other departments provide
+between InventSmith and the inventor. While other departments provide
 specialized expertise, the Inventor Coach translates complex
 recommendations into clear guidance, maintains momentum, and ensures the
 inventor always understands the recommended next step.
@@ -505,7 +505,7 @@ Mission
 
 Empower inventors to progress confidently from idea to market by
 providing continuous guidance, education, encouragement, and
-coordination while preserving complete alignment with the Atlas
+coordination while preserving complete alignment with the InventSmith
 Constitution.
 
 Primary Responsibilities
@@ -532,7 +532,7 @@ department.
 Inputs
 
 • Inventor profile • Inventor Twin context • Active project data • CEO
-AI priorities • Department recommendations • Workflow status • Atlas
+AI priorities • Department recommendations • Workflow status • InventSmith
 memory
 
 Outputs
@@ -552,17 +552,17 @@ Success Metrics
 • Inventor engagement • Project progression • Recommendation acceptance
 • Completion of milestones • Reduction in abandoned projects
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-09.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-09.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 11 --- INVENTOR COACH BEHAVIORAL ARCHITECTURE
 
 Purpose
 
-The Inventor Coach serves as Atlas's primary human-centered intelligence
+The Inventor Coach serves as InventSmith's primary human-centered intelligence
 layer. Its responsibility extends beyond answering questions; it
 actively guides, educates, motivates, and maintains momentum throughout
 the inventor's journey.
@@ -603,7 +603,7 @@ Knowledge Responsibilities
 
 The Inventor Coach maintains knowledge of:
 
-• Atlas capabilities • Active workflows • Project milestones • Inventor
+• InventSmith capabilities • Active workflows • Project milestones • Inventor
 preferences • Learning progress • Department responsibilities
 
 Specialist technical knowledge remains owned by the appropriate
@@ -633,10 +633,10 @@ Key performance indicators include:
 Satisfaction scores • Reduction in abandoned projects • Clarity of
 recommendations
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-10.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-10.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 12 --- INVENTOR COACH MEMORY, COLLABORATION, AND WORKFLOW
@@ -646,7 +646,7 @@ Purpose
 
 The Inventor Coach maintains the long-term relationship with the
 inventor while ensuring every interaction benefits from the collective
-intelligence of the Atlas organization. The Coach owns relationship
+intelligence of the InventSmith organization. The Coach owns relationship
 continuity, not specialist expertise.
 
 Relationship Memory
@@ -660,7 +660,7 @@ trends
 
 Memory shall be continuously synchronized with the Inventor Twin while
 respecting privacy, retention, and authorization policies defined by
-Atlas Core.
+InventSmith Core.
 
 Collaboration Matrix
 
@@ -674,7 +674,7 @@ artifacts
 
 Workflow Responsibilities
 
-Within Atlas workflows, the Inventor Coach shall:
+Within InventSmith workflows, the Inventor Coach shall:
 
 1.  Explain the purpose of each phase.
 2.  Prepare the inventor for upcoming decisions.
@@ -707,10 +707,10 @@ education paths, proactive milestone forecasting, and predictive
 engagement models while remaining aligned with the inventor-first
 philosophy.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-11.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-11.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 13 --- INVENTOR COACH EVENT CONTRACTS, DECISION MODEL, AND
@@ -764,7 +764,7 @@ where appropriate.
 Engineering Integration
 
 The Inventor Coach exposes versioned APIs and publishes standardized
-events to Atlas Core. All interactions are auditable, correlated, and
+events to InventSmith Core. All interactions are auditable, correlated, and
 compatible with the shared workflow engine.
 
 Anti-Patterns
@@ -782,10 +782,10 @@ The Inventor Coach enterprise specification is complete. Subsequent
 expansion files begin the Patent Department using the same enterprise
 documentation model.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-12.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-12.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 14 --- PATENT DEPARTMENT FOUNDATION
@@ -797,7 +797,7 @@ evaluate, prepare, and protect intellectual property throughout the
 invention lifecycle. Its objective is to maximize the inventor's
 opportunity to obtain meaningful IP protection while ensuring
 recommendations remain evidence-based, transparent, and aligned with the
-Atlas Constitution.
+InventSmith Constitution.
 
 Mission
 
@@ -849,10 +849,10 @@ Recommendations shall prioritize:
 explanation • Timely execution • Preservation of future filing
 opportunities
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-13.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-13.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 15 --- PATENT DEPARTMENT PATENTABILITY ANALYSIS & COLLABORATION
@@ -861,7 +861,7 @@ Purpose
 
 This chapter expands the Patent Department by defining the standardized
 framework used to evaluate invention protection opportunities while
-coordinating with other Atlas departments.
+coordinating with other InventSmith departments.
 
 Patentability Evaluation Framework
 
@@ -871,7 +871,7 @@ including:
 • Novelty • Non-obviousness • Utility • Enablement • Subject matter
 eligibility • Commercial value • Defensive publication considerations
 
-Atlas shall clearly distinguish between preliminary AI assessments and
+InventSmith shall clearly distinguish between preliminary AI assessments and
 legal opinions provided by qualified professionals.
 
 Prior-Art Workflow
@@ -908,7 +908,7 @@ Operational Knowledge
 The department maintains structured knowledge of:
 
 • Patent terminology • Filing pathways • USPTO processes • International
-filing concepts • Atlas document templates • Project IP history
+filing concepts • InventSmith document templates • Project IP history
 
 Best Practices
 
@@ -925,10 +925,10 @@ The Patent Department shall never:
 Ignore conflicting evidence. • Recommend unnecessary filings. • Delay
 escalation when attorney review is appropriate.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-14.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-14.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 16 --- PATENT DEPARTMENT EVENT CONTRACTS, DECISION AUTHORITY,
@@ -936,7 +936,7 @@ AND IMPLEMENTATION
 
 Purpose
 
-This chapter defines how the Patent Department integrates with Atlas
+This chapter defines how the Patent Department integrates with InventSmith
 Core, participates in workflows, and coordinates with legal
 professionals while maintaining complete traceability and inventor-first
 guidance.
@@ -1005,10 +1005,10 @@ The foundational enterprise specification for the Patent Department is
 complete. Subsequent expansion files will begin the Engineering
 Department.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-15.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-15.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 17 --- ENGINEERING DEPARTMENT FOUNDATION
@@ -1083,10 +1083,10 @@ Engineering decisions shall emphasize:
 • Safety • Simplicity • Manufacturability • Reliability • Cost awareness
 • Sustainability • Maintainability • Evidence-based validation
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-16.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-16.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 18 --- ENGINEERING DEPARTMENT DESIGN GOVERNANCE
@@ -1094,7 +1094,7 @@ CHAPTER 18 --- ENGINEERING DEPARTMENT DESIGN GOVERNANCE
 Purpose
 
 This chapter establishes the engineering governance model that ensures
-every Atlas design progresses from concept to production using
+every InventSmith design progresses from concept to production using
 repeatable, measurable, and auditable engineering practices.
 
 Design Review Framework
@@ -1150,10 +1150,10 @@ The Engineering Department shall never:
 undocumented changes. • Sacrifice safety for schedule. • Release
 incomplete specifications.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-17.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-17.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 19 --- ENGINEERING DEPARTMENT TECHNICAL ARCHITECTURE &
@@ -1221,14 +1221,14 @@ When a prototype fails validation, Engineering shall:
 Implementation Guidance
 
 Engineering services shall expose versioned interfaces, maintain
-complete design traceability, and integrate with Atlas Core through
+complete design traceability, and integrate with InventSmith Core through
 standardized APIs, event contracts, telemetry, and workflow
 orchestration.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-18.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-18.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 20 --- ENGINEERING DEPARTMENT EXECUTION, QUALITY, AND GOVERNANCE
@@ -1297,10 +1297,10 @@ The foundational enterprise specification for the Engineering Department
 is complete. Subsequent expansion files begin the Manufacturing
 Department using the same enterprise documentation standard.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-19.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-19.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 21 --- MANUFACTURING DEPARTMENT FOUNDATION
@@ -1370,10 +1370,10 @@ Manufacturing decisions shall prioritize:
 efficiency • Scalability • Supply resilience • Waste reduction •
 Continuous improvement
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-20.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-20.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 22 --- MANUFACTURING DEPARTMENT PRODUCTION GOVERNANCE
@@ -1435,12 +1435,12 @@ Engineering Best Practices
 Manufacturing recommendations shall emphasize repeatability,
 traceability, automation where practical, and long-term operational
 sustainability while maintaining complete alignment with inventor
-objectives and Atlas governance.
+objectives and InventSmith governance.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-21.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-21.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 23 --- MANUFACTURING DEPARTMENT EXECUTION, EVENT CONTRACTS, AND
@@ -1499,7 +1499,7 @@ production risks. • Publish manufacturing readiness status.
 
 Implementation Guidance
 
-Manufacturing services shall integrate with Atlas Core through
+Manufacturing services shall integrate with InventSmith Core through
 standardized APIs, workflow orchestration, telemetry, and event
 contracts. Every production decision shall be auditable, versioned, and
 traceable to supporting engineering evidence.
@@ -1510,10 +1510,10 @@ The foundational enterprise specification for the Manufacturing
 Department is complete. Subsequent expansion files begin the Legal
 Department.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-22.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-22.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 24 --- LEGAL DEPARTMENT FOUNDATION
@@ -1529,7 +1529,7 @@ agreements, liability, and jurisdictional considerations.
 
 Mission
 
-Protect inventors and the Atlas platform by identifying legal risks
+Protect inventors and the InventSmith platform by identifying legal risks
 early, supporting compliant business operations, coordinating with
 qualified legal professionals, and ensuring legal considerations are
 incorporated into every major project milestone.
@@ -1578,10 +1578,10 @@ Legal recommendations shall emphasize:
 • Transparency • Compliance • Risk reduction • Evidence-based reasoning
 • Clear documentation • Timely escalation
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-23.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-23.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 25 --- LEGAL DEPARTMENT COMPLIANCE, CONTRACTS, AND GOVERNANCE
@@ -1590,7 +1590,7 @@ Purpose
 
 This chapter expands the Legal Department by defining standardized legal
 governance, compliance management, contract oversight, and collaboration
-with other Atlas departments.
+with other InventSmith departments.
 
 Compliance Framework
 
@@ -1648,10 +1648,10 @@ The Legal Department shall never:
 requirements. • Approve contracts without review history. • Conceal
 identified legal risks.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-24.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-24.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 26 --- LEGAL DEPARTMENT EVENT CONTRACTS, IMPLEMENTATION, AND
@@ -1660,7 +1660,7 @@ OPERATIONAL OVERSIGHT
 Purpose
 
 This chapter completes the enterprise specification for the Legal
-Department by defining its integration model with Atlas Core,
+Department by defining its integration model with InventSmith Core,
 event-driven collaboration, operational governance, and attorney handoff
 standards.
 
@@ -1701,7 +1701,7 @@ Cross-department response time
 
 Implementation Guidance
 
-Legal services integrate with Atlas Core through versioned APIs,
+Legal services integrate with InventSmith Core through versioned APIs,
 workflow activities, audit records, and standardized event contracts.
 Every legal recommendation shall preserve traceability, evidence, and
 appropriate disclaimers distinguishing informational guidance from
@@ -1713,10 +1713,10 @@ The foundational enterprise specification for the Legal Department is
 complete. Subsequent expansion files begin the Funding Department using
 the same enterprise documentation model.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-25.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-25.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 27 --- FUNDING DEPARTMENT FOUNDATION
@@ -1785,10 +1785,10 @@ Funding recommendations shall prioritize sustainability, transparency,
 realistic financial assumptions, evidence-based planning, and
 preservation of inventor ownership whenever practical.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-26.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-26.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 28 --- FUNDING DEPARTMENT STRATEGY, INVESTOR READINESS, AND
@@ -1818,7 +1818,7 @@ dilution • Repayment obligations • Regulatory requirements
 
 Investor Readiness
 
-Prior to investor engagement Atlas shall verify:
+Prior to investor engagement InventSmith shall verify:
 
 • Executive summary completed • Pitch deck available • Financial
 assumptions documented • Prototype status confirmed • Market analysis
@@ -1846,10 +1846,10 @@ to project maturity. • Preserve inventor ownership whenever practical. •
 Document financial assumptions. • Reassess strategy after major project
 milestones.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-27.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-27.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 29 --- FUNDING DEPARTMENT EVENT CONTRACTS, IMPLEMENTATION, AND
@@ -1912,7 +1912,7 @@ When an inventor requests funding guidance, the department shall:
 
 Implementation Guidance
 
-Funding services integrate with Atlas Core through standardized APIs,
+Funding services integrate with InventSmith Core through standardized APIs,
 workflow activities, telemetry, audit records, and versioned event
 contracts. All recommendations shall preserve traceability, evidence,
 and documented financial assumptions.
@@ -1923,10 +1923,10 @@ The foundational enterprise specification for the Funding Department is
 complete. Subsequent expansion files begin the Marketing Department
 using the same enterprise documentation standard.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-28.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-28.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 30 --- MARKETING DEPARTMENT FOUNDATION
@@ -1990,10 +1990,10 @@ Marketing recommendations shall be evidence-based, customer-centric,
 measurable, and continuously refined using market feedback and
 commercial performance.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-29.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-29.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 31 --- MARKETING DEPARTMENT BRAND GOVERNANCE, GO-TO-MARKET, AND
@@ -2059,10 +2059,10 @@ The Marketing Department shall never:
 before operational readiness. • Create inconsistent messaging across
 channels.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-30.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-30.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 32 --- MARKETING DEPARTMENT EVENT CONTRACTS, IMPLEMENTATION, AND
@@ -2124,7 +2124,7 @@ success rate
 
 Implementation Guidance
 
-Marketing services shall integrate with Atlas Core using standardized
+Marketing services shall integrate with InventSmith Core using standardized
 APIs, workflow orchestration, telemetry, audit logging, and versioned
 event contracts. All commercialization recommendations shall remain
 traceable to supporting research and approved business objectives.
@@ -2135,10 +2135,10 @@ The foundational enterprise specification for the Marketing Department
 is complete. Subsequent expansion files begin the Sales Department using
 the same enterprise documentation standard.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-31.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-31.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 33 --- SALES DEPARTMENT FOUNDATION
@@ -2155,7 +2155,7 @@ Mission
 
 Develop predictable and ethical revenue generation processes that
 maximize customer success while preserving the inventor's vision and
-Atlas quality standards.
+InventSmith quality standards.
 
 Primary Responsibilities
 
@@ -2208,10 +2208,10 @@ Sales recommendations shall emphasize customer value, ethical selling,
 transparent communication, accurate forecasting, and long-term customer
 relationships over short-term revenue.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-32.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-32.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 34 --- SALES DEPARTMENT PIPELINE GOVERNANCE, CUSTOMER SUCCESS,
@@ -2280,10 +2280,10 @@ The Sales Department shall never:
 Promise unsupported features. • Conceal commercial risks. • Sacrifice
 long-term relationships for short-term revenue.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-33.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-33.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 35 --- SALES DEPARTMENT EVENT CONTRACTS, IMPLEMENTATION, AND
@@ -2347,7 +2347,7 @@ satisfaction
 
 Implementation Guidance
 
-Sales services integrate with Atlas Core using standardized APIs,
+Sales services integrate with InventSmith Core using standardized APIs,
 workflow activities, telemetry, audit logging, and versioned event
 contracts. Customer interactions shall remain traceable throughout the
 complete commercial lifecycle.
@@ -2360,10 +2360,10 @@ complete.
 Subsequent expansion files begin the Finance Department using the same
 enterprise documentation model.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-34.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-34.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 36 --- FINANCE DEPARTMENT FOUNDATION
@@ -2371,7 +2371,7 @@ CHAPTER 36 --- FINANCE DEPARTMENT FOUNDATION
 Purpose
 
 The Finance Department establishes the financial governance framework
-for Atlas, ensuring every inventor project is evaluated for economic
+for InventSmith, ensuring every inventor project is evaluated for economic
 viability, budget discipline, profitability, and long-term
 sustainability. It provides objective financial analysis that supports
 informed decision-making across the platform.
@@ -2431,10 +2431,10 @@ Financial recommendations shall emphasize accuracy, transparency,
 traceability, evidence-based assumptions, prudent resource allocation,
 and long-term inventor success over short-term optimization.
 
-ATLAS-008 --- AI DEPARTMENTS BIBLE Version 1.0
+INVENTSMITH-008 --- AI DEPARTMENTS BIBLE Version 1.0
 
 ====================================================================
-ATLAS-008_AI_DEPARTMENTS_BIBLE_v1.0-35.txt ENTERPRISE EXPANSION
+INVENTSMITH-008_AI_DEPARTMENTS_BIBLE_v1.0-35.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 37 --- FINANCE DEPARTMENT GOVERNANCE, EVENT CONTRACTS, AND
@@ -2444,7 +2444,7 @@ Purpose
 
 This chapter expands the Finance Department by defining financial
 governance, cross-department integration, operational controls, and
-event-driven execution standards used throughout Atlas.
+event-driven execution standards used throughout InventSmith.
 
 Budget Governance
 
@@ -2486,7 +2486,7 @@ estimate accuracy • Cash runway • Financial review completion
 
 Implementation Guidance
 
-Finance integrates with Atlas Core using standardized APIs, workflow
+Finance integrates with InventSmith Core using standardized APIs, workflow
 activities, audit logging, telemetry, and versioned event contracts.
 Every financial recommendation shall include assumptions, supporting
 evidence, confidence level, and traceability to source data.

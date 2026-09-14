@@ -65,7 +65,7 @@ Export formats match the artifact: PDF/DOCX, PPTX/presentation-compatible, XLSX/
 
 The UI exposes the applicable journey and outputs; backend-only implementation is not acceptance. Inventors can reach journey/stage state, active/completed work, research/evidence, validation, prior art/IP readiness, Product Design, applicable CAD/engineering or software product-development artifacts, prototype/manufacturing or software release work, legal/professional work, documents/downloads, decisions/approvals, recommendations/next actions and Ask InventSmith grounded in the complete invention record.
 
-All current customer-facing surfaces use **InventSmith**, **The Inventor OS** and **Modern Methods**. Legacy Atlas identifiers may remain internally only where compatibility requires them.
+All current customer-facing surfaces use **InventSmith**, **The Inventor OS** and **Modern Methods**. Legacy InventSmith identifiers may remain internally only where compatibility requires them.
 
 ## 10. Autonomy and approvals
 

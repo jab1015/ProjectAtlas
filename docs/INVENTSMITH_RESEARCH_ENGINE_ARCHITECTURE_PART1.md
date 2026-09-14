@@ -1,4 +1,4 @@
-# ATLAS RESEARCH ENGINE ARCHITECTURE
+# INVENTSMITH RESEARCH ENGINE ARCHITECTURE
 ## Part 1 — Sections 1–6: Core Architecture
 
 **Version 1.0 — July 2026**
@@ -13,7 +13,7 @@
 
 ## Document Purpose
 
-This document is Part 1 of the Atlas Research Engine Architecture specification. It covers the foundational architecture of the Research Engine: what it is, how it is structured, how the research lifecycle flows, how stage lifecycle hooks trigger research, how the research queue operates, and how caching is managed.
+This document is Part 1 of the InventSmith Research Engine Architecture specification. It covers the foundational architecture of the Research Engine: what it is, how it is structured, how the research lifecycle flows, how stage lifecycle hooks trigger research, how the research queue operates, and how caching is managed.
 
 Part 2 (Sections 7–10) will cover Provider Abstraction, Confidence Framework, Human Review Flow, and Security/Cost Controls.
 
@@ -40,45 +40,45 @@ No existing files are modified by this document.
 
 ### 1.1 Purpose
 
-The Atlas Research Engine is the subsystem responsible for gathering, processing, storing, and delivering external research on behalf of inventors — automatically, proactively, and before the founder is asked a single question.
+The InventSmith Research Engine is the subsystem responsible for gathering, processing, storing, and delivering external research on behalf of inventors — automatically, proactively, and before the founder is asked a single question.
 
-The Research Engine is the primary mechanism by which Atlas fulfills the constitutional obligation encoded in Principle 4 of the Atlas Automation Constitution:
+The Research Engine is the primary mechanism by which InventSmith fulfills the constitutional obligation encoded in Principle 4 of the InventSmith Automation Constitution:
 
-> "Atlas should proactively research before asking the founder to supply information."
+> "InventSmith should proactively research before asking the founder to supply information."
 
-Without the Research Engine, Atlas is a guided workflow that asks founders to do work Atlas could do instead. With the Research Engine, Atlas arrives at each stage having already completed the foundational research, so that the founder's first interaction with a stage is review, confirmation, and judgment — not blank-form data entry.
+Without the Research Engine, InventSmith is a guided workflow that asks founders to do work InventSmith could do instead. With the Research Engine, InventSmith arrives at each stage having already completed the foundational research, so that the founder's first interaction with a stage is review, confirmation, and judgment — not blank-form data entry.
 
 ### 1.2 The Problem It Solves
 
-As of July 2026, Atlas operates between Level 1 (Guided) and Level 2 (Assisted) on the Automation Maturity Model. The primary gap preventing Atlas from reaching Level 3 (Autonomous) is that Atlas still asks founders for information it could find itself.
+As of July 2026, InventSmith operates between Level 1 (Guided) and Level 2 (Assisted) on the Automation Maturity Model. The primary gap preventing InventSmith from reaching Level 3 (Autonomous) is that InventSmith still asks founders for information it could find itself.
 
 Specific examples of the problem:
-- Stage 1 asks: "Who are your competitors?" — Atlas should research this before asking.
-- Stage 3 asks founders to supply market size data from external sources — Atlas should build a draft TAM/SAM/SOM model from public data before the founder opens Stage 3.
-- Stage 4 requires the founder to manually search USPTO, Google Patents, and Espacenet — 4 to 10 hours per inventor — when Atlas could execute these searches automatically.
-- Stage 7 requires the founder to independently identify manufacturers — Atlas should provide a shortlist before Stage 7 opens.
-- Stage 10 requires the founder to research competitor pricing manually — Atlas should populate this data proactively.
+- Stage 1 asks: "Who are your competitors?" — InventSmith should research this before asking.
+- Stage 3 asks founders to supply market size data from external sources — InventSmith should build a draft TAM/SAM/SOM model from public data before the founder opens Stage 3.
+- Stage 4 requires the founder to manually search USPTO, Google Patents, and Espacenet — 4 to 10 hours per inventor — when InventSmith could execute these searches automatically.
+- Stage 7 requires the founder to independently identify manufacturers — InventSmith should provide a shortlist before Stage 7 opens.
+- Stage 10 requires the founder to research competitor pricing manually — InventSmith should populate this data proactively.
 
 The Research Engine eliminates these gaps by treating research as a first-class infrastructure service that runs automatically at defined trigger points throughout the inventor journey.
 
 ### 1.3 Mission Alignment
 
-The Research Engine directly enables Atlas's mission: moving inventors from Idea to Market while minimizing founder effort.
+The Research Engine directly enables InventSmith's mission: moving inventors from Idea to Market while minimizing founder effort.
 
 Every research task the Research Engine completes is a task the founder does not have to do. The compounding effect across a 15-stage journey is substantial:
 
-- The Automation Implementation Plan identifies 27 of 40 audited question categories as AUTO — meaning Atlas should answer them without founder input.
+- The Automation Implementation Plan identifies 27 of 40 audited question categories as AUTO — meaning InventSmith should answer them without founder input.
 - Across those 27 categories, the projected founder effort savings range from 2–4 hours (Stage 1 competitive research) to 40–75 hours (Stage 13 pitch deck assembly, which draws heavily on prior research).
 - The total estimated founder hours saved from full Research Engine implementation is 120–200+ hours per inventor journey.
 
-The Research Engine is not a convenience feature. It is the infrastructure that bridges the gap between Atlas's current Level 2 state and the Level 3 Autonomous target within 12 months.
+The Research Engine is not a convenience feature. It is the infrastructure that bridges the gap between InventSmith's current Level 2 state and the Level 3 Autonomous target within 12 months.
 
 ### 1.4 Scope
 
 The Research Engine covers:
 
 **In scope:**
-- All external research Atlas conducts autonomously on behalf of an inventor
+- All external research InventSmith conducts autonomously on behalf of an inventor
 - Background research jobs triggered by stage lifecycle events
 - Scheduled ongoing monitoring research (post-launch competitive intelligence, KPI tracking)
 - Research result storage, versioning, and freshness management
@@ -92,9 +92,9 @@ The Research Engine covers:
 - Founder-facing UI for reviewing research results (UI layer — consumes Research Engine outputs but is architecturally separate)
 - Stage gating and readiness scoring (Journey Engine — research completion feeds into readiness, but the readiness computation lives in journeyEngine.ts)
 
-### 1.5 Relationship to Other Atlas Systems
+### 1.5 Relationship to Other InventSmith Systems
 
-The Research Engine is one of four major subsystems required to move Atlas to Level 3 Autonomous, as identified in the Automation Implementation Plan (Section 2.4):
+The Research Engine is one of four major subsystems required to move InventSmith to Level 3 Autonomous, as identified in the Automation Implementation Plan (Section 2.4):
 
 | Subsystem | Role | Dependency Relationship |
 |---|---|---|
@@ -107,17 +107,17 @@ The Research Engine is the foundational layer. The Document Pipeline depends on 
 
 ### 1.6 Design Philosophy
 
-The Research Engine must be built on these non-negotiable principles drawn directly from the Atlas Automation Constitution:
+The Research Engine must be built on these non-negotiable principles drawn directly from the InventSmith Automation Constitution:
 
-**Never ask what Atlas can find.** Every question that can be pre-answered by research must be pre-answered. The Research Engine exists to eliminate questions, not to generate material for them.
+**Never ask what InventSmith can find.** Every question that can be pre-answered by research must be pre-answered. The Research Engine exists to eliminate questions, not to generate material for them.
 
 **Research before the founder arrives.** Research must complete before the founder opens a stage, not after. If research runs while the founder is waiting at a loading screen, the design has failed. Research is a background process triggered by stage events, not a foreground process blocking the founder's session.
 
-**Transparency about what was researched.** The founder must always be able to see what Atlas found, where it came from, when it was found, and how confident Atlas is in the result. Research is not a black box — it is a transparent, auditable service.
+**Transparency about what was researched.** The founder must always be able to see what InventSmith found, where it came from, when it was found, and how confident InventSmith is in the result. Research is not a black box — it is a transparent, auditable service.
 
-**Provider independence.** The Research Engine must not be coupled to any specific external API or data provider. Providers change, APIs deprecate, costs shift. The architecture must support swapping or adding providers without changing Atlas business logic.
+**Provider independence.** The Research Engine must not be coupled to any specific external API or data provider. Providers change, APIs deprecate, costs shift. The architecture must support swapping or adding providers without changing InventSmith business logic.
 
-**Graceful degradation.** Research failure must never block the founder's journey. If a research job fails, Atlas proceeds with what it knows and flags the gap transparently. A failed prior art search does not prevent the founder from accessing Stage 4. It surfaces a notice that automated search was unavailable and prompts manual review.
+**Graceful degradation.** Research failure must never block the founder's journey. If a research job fails, InventSmith proceeds with what it knows and flags the gap transparently. A failed prior art search does not prevent the founder from accessing Stage 4. It surfaces a notice that automated search was unavailable and prompts manual review.
 
 ---
 
@@ -261,7 +261,7 @@ Research results are persisted in Convex in the `researchResults` table. This is
 | `confidenceScore` | `number` | 0–100 score indicating confidence in the result's accuracy and freshness |
 | `evidenceCount` | `number` | Number of distinct sources or data points used to generate the result |
 | `sources` | `string[]` | Array of source references (URLs, patent IDs, database identifiers) |
-| `assumptions` | `string[]` | Any assumptions Atlas made that should be confirmed by the founder |
+| `assumptions` | `string[]` | Any assumptions InventSmith made that should be confirmed by the founder |
 | `researchedAt` | `number` | Unix timestamp when research was executed |
 | `expiresAt` | `number` | Unix timestamp when this result should be considered stale and refreshed |
 | `providerUsed` | `string` | Which provider was used (for audit, cost tracking, and debugging) |
@@ -301,7 +301,7 @@ Results are not compressed or summarized during storage. The full result is stor
 
 ### 2.11 Provider Abstraction Layer
 
-The Provider Abstraction Layer insulates Atlas business logic from the specifics of any external API or data provider. The Research Engine calls provider-agnostic interfaces; the abstraction layer routes those calls to the configured provider.
+The Provider Abstraction Layer insulates InventSmith business logic from the specifics of any external API or data provider. The Research Engine calls provider-agnostic interfaces; the abstraction layer routes those calls to the configured provider.
 
 Full design in Part 2, Section 7.
 
@@ -407,7 +407,7 @@ Stage Updated
 
 **Ordering:** Jobs in the queue are processed in priority order. Within the same priority tier, FIFO ordering applies (earlier-enqueued jobs run first).
 
-**Visibility:** The queue state is readable by the stage view to display research-in-progress indicators to the founder. Founders can see that "Atlas is researching competitors..." rather than encountering a silent wait.
+**Visibility:** The queue state is readable by the stage view to display research-in-progress indicators to the founder. Founders can see that "InventSmith is researching competitors..." rather than encountering a silent wait.
 
 ### 3.4 Step 3 — Executed
 
@@ -425,7 +425,7 @@ Stage Updated
 
 5. **Raw result capture** — The worker captures the full API response(s) as the raw result.
 
-6. **Normalization** — The worker passes the raw result through the module's normalization function, which transforms the provider-specific response format into Atlas's standard structured format for that module.
+6. **Normalization** — The worker passes the raw result through the module's normalization function, which transforms the provider-specific response format into InventSmith's standard structured format for that module.
 
 7. **Confidence scoring** — The worker calls the module's confidence scoring function (see Section 3.5 for confidence scoring detail).
 
@@ -460,17 +460,17 @@ Stage Updated
 
 | Score | Label | Founder Review Required | UI Treatment |
 |---|---|---|---|
-| 80–100 | High confidence | Optional | Presented as Atlas's finding with source citation |
+| 80–100 | High confidence | Optional | Presented as InventSmith's finding with source citation |
 | 60–79 | Moderate confidence | Recommended | Presented with a note that the founder should verify key figures |
 | 40–59 | Low confidence | Required | Presented with explicit warning and confirmation prompt |
-| 0–39 | Very low confidence | Required + notify | Presented with strong caveat; Atlas recommends manual research as supplement |
+| 0–39 | Very low confidence | Required + notify | Presented with strong caveat; InventSmith recommends manual research as supplement |
 
 **Transparency annotation:** Every research result is annotated with one of three labels (per the Implementation Plan's Transparency Policy):
-- `Atlas researched` — data sourced from external API or web search, with source reference
-- `Atlas inferred` — data derived from prior stage inputs or calculation
-- `Atlas assumed` — data used without research or direct input; must be confirmed
+- `InventSmith researched` — data sourced from external API or web search, with source reference
+- `InventSmith inferred` — data derived from prior stage inputs or calculation
+- `InventSmith assumed` — data used without research or direct input; must be confirmed
 
-Any `Atlas assumed` annotation triggers an automatic confirmation prompt in the founder's review flow.
+Any `InventSmith assumed` annotation triggers an automatic confirmation prompt in the founder's review flow.
 
 ### 3.6 Step 5 — Documents Updated
 
@@ -502,20 +502,20 @@ Any `Atlas assumed` annotation triggers an automatic confirmation prompt in the 
 - The research findings in structured, readable format
 - The confidence score and its label (High / Moderate / Low / Very Low)
 - The sources consulted
-- Any assumptions Atlas made that should be confirmed
+- Any assumptions InventSmith made that should be confirmed
 - The research timestamp (when was this researched)
 - Any prior version available for comparison (if this is a refresh)
 
 **Review modes by confidence level:**
 - **High confidence:** The founder sees the result with a simple "Looks right / Edit this" interaction. No explicit approval required. Proceeding past the section without interaction counts as implicit acceptance.
-- **Moderate confidence:** The founder is prompted to review key figures and confirm them. The prompt is contextual: "Atlas found these competitors based on your product description. Do these look right? You can add, remove, or edit."
+- **Moderate confidence:** The founder is prompted to review key figures and confirm them. The prompt is contextual: "InventSmith found these competitors based on your product description. Do these look right? You can add, remove, or edit."
 - **Low / Very low confidence:** The founder must explicitly confirm or override. They cannot advance the stage without interacting with the research result. The stage readiness score does not reach the "Ready to Move Forward" threshold until the founder has reviewed low-confidence research.
 
 **What the founder can do with a research result:**
 1. **Accept** — The result is marked `founderReviewedAt` with the current timestamp. No further action needed.
-2. **Edit** — The founder modifies one or more fields in the research output. The modified values are stored in `founderOverride` alongside the original Atlas result. Both are preserved.
-3. **Reject and Request Re-run** — The founder can request Atlas to run the research again (triggers a `manualRefresh` lifecycle hook for that specific module).
-4. **Reject and Enter Manually** — The founder enters the data manually. The manual entry is stored in `founderOverride`. The Atlas result is marked as overridden but preserved for audit.
+2. **Edit** — The founder modifies one or more fields in the research output. The modified values are stored in `founderOverride` alongside the original InventSmith result. Both are preserved.
+3. **Reject and Request Re-run** — The founder can request InventSmith to run the research again (triggers a `manualRefresh` lifecycle hook for that specific module).
+4. **Reject and Enter Manually** — The founder enters the data manually. The manual entry is stored in `founderOverride`. The InventSmith result is marked as overridden but preserved for audit.
 
 **Persistent founder overrides:** If the founder overrides a research result, and the Research Engine later refreshes the result (via scheduled research or manual refresh), the refreshed result is presented as a new draft alongside the founder's override, not replacing it. The founder decides whether to adopt the new research or maintain their override.
 
@@ -541,7 +541,7 @@ Any `Atlas assumed` annotation triggers an automatic confirmation prompt in the 
 - Fields that were previously empty (pending research) are now populated with the approved research data
 - The stage's readiness score increases as research-dependent fields are filled
 - The `stageProgress` record reflects the new field values with `source: "atlas_research"` notation
-- If the stage was waiting on research before becoming accessible to the founder, it transitions from the "Atlas is preparing this stage" state to the fully interactive state
+- If the stage was waiting on research before becoming accessible to the founder, it transitions from the "InventSmith is preparing this stage" state to the fully interactive state
 
 **Cross-stage propagation:** Approved research results that contain data relevant to future stages trigger a cross-stage propagation step. For example, when competitive landscape research is approved in Stage 1, the competitive data is written as a pre-populated input to the Stage 3 market research view. When prior art is approved in Stage 4, it is referenced in the Stage 9 IP Brief auto-assembly. This propagation is defined per-module in the module specification (Part 3) and executed by the stageProgress cross-population mechanism in `journeyEngine.ts`.
 
@@ -567,7 +567,7 @@ These six hooks cover the full surface of research trigger opportunities across 
 
 **When it fires:** Immediately when a new `inventions` record is created for a founder. This fires before the founder has completed Stage 1 for the first time.
 
-**Purpose:** To begin the most basic initial research that can be conducted with minimal context — specifically, research that helps Atlas prepare for the Stage 1 conversation before the founder has said much beyond their initial product description (if any is captured at account creation).
+**Purpose:** To begin the most basic initial research that can be conducted with minimal context — specifically, research that helps InventSmith prepare for the Stage 1 conversation before the founder has said much beyond their initial product description (if any is captured at account creation).
 
 **What research occurs at onCreate:**
 - None from external sources at this moment, because there is no product description yet to seed research queries
@@ -698,7 +698,7 @@ These six hooks cover the full surface of research trigger opportunities across 
 
 **When it fires:** On a time-based recurring schedule, independent of founder actions. Scheduled research is enrolled when a stage completes and a recurring research need is identified.
 
-**Purpose:** To keep research fresh after the founder has moved past the stage that first generated it. Markets change, competitors change prices, new patents get filed, and platforms launch new products. Research conducted once at stage open becomes stale over time. Scheduled research ensures Atlas's knowledge stays current through the ongoing journey.
+**Purpose:** To keep research fresh after the founder has moved past the stage that first generated it. Markets change, competitors change prices, new patents get filed, and platforms launch new products. Research conducted once at stage open becomes stale over time. Scheduled research ensures InventSmith's knowledge stays current through the ongoing journey.
 
 **Scheduling mechanism:** When a stage completes and scheduled research is indicated, the Research Engine registers a Convex scheduled function with:
 - `inventionId` — which invention to run research for
@@ -734,7 +734,7 @@ The scheduled function writes a new queue entry at each firing time, which the n
 
 **Purpose:** To give founders the ability to force a fresh research run when:
 - They believe the current research result is outdated
-- They rejected the current result and want Atlas to try again
+- They rejected the current result and want InventSmith to try again
 - They added context (e.g., updated their product description) and want research re-run with the new context
 - Time has passed since the last research run and they want current data before making a decision
 
@@ -757,7 +757,7 @@ The scheduled function writes a new queue entry at each firing time, which the n
 
 ### 5.1 Overview
 
-The Research Queue is the persistence and scheduling layer for all research work in the Atlas Research Engine. It ensures that research jobs are executed reliably, in the right order, without overloading external providers, and with appropriate handling for failures.
+The Research Queue is the persistence and scheduling layer for all research work in the InventSmith Research Engine. It ensures that research jobs are executed reliably, in the right order, without overloading external providers, and with appropriate handling for failures.
 
 The queue is implemented as a Convex table (`researchQueue`) combined with Convex Actions that serve as workers. Convex's reactive query system provides built-in observability into queue state.
 
@@ -888,7 +888,7 @@ The Research Engine prevents duplicate work through multiple mechanisms:
 
 ### 5.9 Queue Monitoring
 
-The Research Queue exposes monitoring data through Convex queries accessible by Atlas's operational tooling:
+The Research Queue exposes monitoring data through Convex queries accessible by InventSmith's operational tooling:
 
 **Queue depth by priority:** Count of pending jobs at each priority level. Used to detect queue growth (indicates workers are not keeping up with job creation rate).
 
@@ -981,7 +981,7 @@ When a new job is enqueued with a different `contextHash` from the current activ
 The `scheduledResearch` hook fires on the defined cadence for each monitoring module and enqueues a refresh job at Priority Level 4. This runs regardless of the current result's expiration status — scheduled refreshes run on their cadence whether the result is technically expired or not.
 
 **Rule 4 — Manual refresh (founder-initiated):**
-The `manualRefresh` hook always triggers a refresh, regardless of expiration or context. When the founder explicitly requests a refresh, Atlas runs it.
+The `manualRefresh` hook always triggers a refresh, regardless of expiration or context. When the founder explicitly requests a refresh, InventSmith runs it.
 
 **Rule 5 — Failed result refresh:**
 If the current active result has a `"failed"` status (all retries exhausted), the next `onStageEnter` event for that stage triggers a retry at Priority Level 2 — treating the failed result as an expired cache miss.
@@ -1003,7 +1003,7 @@ When a result is fresh, the Research Engine serves it from the cache without enq
 
 When a result fails any of these five conditions, the Research Engine treats it as a cache miss and enqueues a new job (subject to deduplication against existing queued jobs).
 
-**Freshness for downstream systems:** The Document Pipeline and stage view query the freshness of research results before incorporating them into documents or displaying them. If a result is stale (but the refresh job hasn't completed yet), the stale result is served with a visible indicator: "This research was last updated [N days] ago. Atlas is refreshing it in the background."
+**Freshness for downstream systems:** The Document Pipeline and stage view query the freshness of research results before incorporating them into documents or displaying them. If a result is stale (but the refresh job hasn't completed yet), the stale result is served with a visible indicator: "This research was last updated [N days] ago. InventSmith is refreshing it in the background."
 
 ### 6.6 Manual Refresh
 
@@ -1024,7 +1024,7 @@ From a caching perspective, manualRefresh is a cache invalidation followed by a 
 
 ### 6.7 Incremental Updates
 
-Some research modules produce results that can be updated incrementally rather than re-run completely. Incremental updates allow Atlas to refresh only the portion of a result that has changed, rather than re-executing the full research task.
+Some research modules produce results that can be updated incrementally rather than re-run completely. Incremental updates allow InventSmith to refresh only the portion of a result that has changed, rather than re-executing the full research task.
 
 **When incremental updates apply:**
 
@@ -1054,7 +1054,7 @@ Incremental updates produce a new version in `researchResults` (same versioning 
 
 ## Summary
 
-This document has defined the foundational architecture of the Atlas Research Engine across six sections:
+This document has defined the foundational architecture of the InventSmith Research Engine across six sections:
 
 | Section | What It Defines |
 |---|---|

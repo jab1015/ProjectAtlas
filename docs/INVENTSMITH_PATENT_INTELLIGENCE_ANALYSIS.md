@@ -1,4 +1,4 @@
-# ATLAS PATENT INTELLIGENCE — ANALYSIS
+# INVENTSMITH PATENT INTELLIGENCE — ANALYSIS
 
 **Version 1.0 — July 2026**
 **Classification: Internal Engineering Reference**
@@ -12,13 +12,13 @@
 
 ## Document Purpose
 
-This document defines how Atlas **analyzes** patent search results after the Search Engine completes execution.
+This document defines how InventSmith **analyzes** patent search results after the Search Engine completes execution.
 
 Discovery determines **what** to search.
 Search Engine **retrieves** the results.
 Analysis determines **what the results mean**.
 
-Atlas transforms raw `PatentRecord`, `PatentFamily`, and `ClaimSummary` objects from the Search Engine into structured, actionable inventor intelligence.
+InventSmith transforms raw `PatentRecord`, `PatentFamily`, and `ClaimSummary` objects from the Search Engine into structured, actionable inventor intelligence.
 
 It does not specify caching, cost controls, API management, founder approval workflow, or human review UI implementation. Those belong in subsequent Patent Intelligence documents.
 
@@ -43,7 +43,7 @@ It does not specify caching, cost controls, API management, founder approval wor
 
 ### 1.1 Purpose of the Analysis Subsystem
 
-The Analysis subsystem is the intelligence layer of Atlas Patent Intelligence. It receives raw, ranked patent data from the Search Engine and converts it into findings that an inventor can act on.
+The Analysis subsystem is the intelligence layer of InventSmith Patent Intelligence. It receives raw, ranked patent data from the Search Engine and converts it into findings that an inventor can act on.
 
 Raw patent data is not actionable. A list of 200 patent numbers sorted by relevance score is not what a founder needs. What the founder needs:
 
@@ -51,7 +51,7 @@ Raw patent data is not actionable. A list of 200 patent numbers sorted by releva
 - How close the invention is to what has already been claimed
 - What risks the patent landscape presents and at what level
 - Where the white space is and how to take advantage of it
-- What specific actions Atlas recommends as next steps
+- What specific actions InventSmith recommends as next steps
 
 The Analysis subsystem produces all of this — automatically, without requiring the founder to interpret raw patent records.
 
@@ -87,7 +87,7 @@ Invention Context
 - `TechnologyCluster[]` — aggregated technology landscape data
 - `CitationGraph` — citation relationships between patents
 - `CoverageReport` — what was searched and at what quality
-- Invention context — the inventor's description, novel elements, product description from the Atlas invention record
+- Invention context — the inventor's description, novel elements, product description from the InventSmith invention record
 
 **Outputs (for Founder Review and Document Assembly):**
 - `PatentAnalysisReport` — top-level analysis container
@@ -97,14 +97,14 @@ Invention Context
 - `RiskAssessment` — structured risk categorization with contributing factors
 - `OpportunityReport` — white space, design-around paths, licensing indicators
 - `RecommendationSet` — ordered, prioritized action recommendations
-- `FounderReviewPackage` — curated subset formatted for Atlas UI presentation
+- `FounderReviewPackage` — curated subset formatted for InventSmith UI presentation
 
 ### 1.4 Permanent Design Constraints
 
 The Analysis subsystem operates under three non-negotiable constraints:
 
-- **Never claims legal certainty.** All outputs use probabilistic, advisory language. Atlas does not determine whether a patent is infringed. Atlas identifies indicators, signals, and risk levels for human review.
-- **Always distinguishes evidence from conclusions.** Every conclusion field in every output schema has a corresponding evidence field. Atlas never asserts a finding without documenting what data produced it.
+- **Never claims legal certainty.** All outputs use probabilistic, advisory language. InventSmith does not determine whether a patent is infringed. InventSmith identifies indicators, signals, and risk levels for human review.
+- **Always distinguishes evidence from conclusions.** Every conclusion field in every output schema has a corresponding evidence field. InventSmith never asserts a finding without documenting what data produced it.
 - **Always supports human review.** Every analysis output is reviewable and overridable by a qualified human. Analysis never produces a locked conclusion — it produces a structured finding that a patent attorney or founder can examine, challenge, and override.
 
 ---
@@ -267,8 +267,8 @@ Patent Results (from Search Engine)
 
 **Processing:**
 - Extract the curated subset most relevant to founder decision-making.
-- Apply Atlas UI formatting (plain language summaries, priority ordering, disclaimer insertion).
-- Produce `FounderReviewPackage` optimized for Atlas dashboard presentation.
+- Apply InventSmith UI formatting (plain language summaries, priority ordering, disclaimer insertion).
+- Produce `FounderReviewPackage` optimized for InventSmith dashboard presentation.
 
 **Output:** `FounderReviewPackage`. See Section 9.
 
@@ -278,9 +278,9 @@ Patent Results (from Search Engine)
 
 ### 3.1 Claim Parsing
 
-Atlas parses raw claim text from `PatentRecord.claims` using the following logic:
+InventSmith parses raw claim text from `PatentRecord.claims` using the following logic:
 
-- **Claim number detection:** Each claim begins with a claim number (e.g., `1.`, `Claim 1`, `1)`). Atlas strips the number and stores it as `claimNumber`.
+- **Claim number detection:** Each claim begins with a claim number (e.g., `1.`, `Claim 1`, `1)`). InventSmith strips the number and stores it as `claimNumber`.
 - **Preamble extraction:** The preamble (the portion before the transitional phrase) introduces the category of subject matter being claimed (e.g., "A device for...", "A method of...").
 - **Transitional phrase detection:** Identifies `comprising`, `consisting of`, `consisting essentially of`, `including`, `having` — which determines whether the claim is open-ended or closed.
 - **Claim body parsing:** The body following the transitional phrase lists claim elements, typically as a series of limitations separated by semicolons or line breaks.
@@ -299,7 +299,7 @@ Atlas parses raw claim text from `PatentRecord.claims` using the following logic
 
 ### 3.3 Claim Hierarchy
 
-Atlas builds a claim tree for each analyzed patent:
+InventSmith builds a claim tree for each analyzed patent:
 
 ```
 Claim 1 (independent)
@@ -318,7 +318,7 @@ Claim 6 (independent)
 
 ### 3.4 Key Inventive Concepts
 
-Atlas extracts the core protected features from each independent claim by:
+InventSmith extracts the core protected features from each independent claim by:
 
 - Identifying the **novel combination** — the set of elements claimed together (not individually, since individual elements may not be novel).
 - Surfacing the **functional limitation** — what the combination must accomplish, not merely what it is.
@@ -328,7 +328,7 @@ Atlas extracts the core protected features from each independent claim by:
 
 ### 3.5 Protected Features
 
-For each independent claim, Atlas surfaces:
+For each independent claim, InventSmith surfaces:
 
 | Feature Type | Description | Example |
 |---|---|---|
@@ -340,7 +340,7 @@ For each independent claim, Atlas surfaces:
 
 ### 3.6 Potential Design-Around Opportunities
 
-Atlas identifies claim boundaries available for design-around by:
+InventSmith identifies claim boundaries available for design-around by:
 
 - **Limiting element avoidance:** Identifying specific claim limitations (structural, functional, compositional) that the inventor's design could omit or replace with a non-infringing equivalent.
 - **Range boundary analysis:** For numerical limitations, noting the claim's boundary values — designs operating outside those ranges fall outside the claim's scope.
@@ -393,7 +393,7 @@ ParsedClaim {
 
 ### 4.1 Novelty Scoring
 
-Atlas scores the apparent novelty of the inventor's concept on a **0.0–1.0 scale**:
+InventSmith scores the apparent novelty of the inventor's concept on a **0.0–1.0 scale**:
 
 | Score Range | Interpretation |
 |---|---|
@@ -416,7 +416,7 @@ Atlas scores the apparent novelty of the inventor's concept on a **0.0–1.0 sca
 - High filing activity in the exact technology sub-domain
 
 **Partial anticipation:**
-When prior art discloses some but not all elements of the inventor's combination, Atlas:
+When prior art discloses some but not all elements of the inventor's combination, InventSmith:
 - Documents which elements are anticipated and which are not
 - Flags the unanticipated elements as the potential basis for a narrowed claim
 - Applies a partial score reduction proportional to the number of anticipated elements
@@ -433,7 +433,7 @@ When prior art discloses some but not all elements of the inventor's combination
 
 ### 4.3 Technology Overlap
 
-Atlas measures overlap between the inventor's concept and each prior art patent's claims and description using:
+InventSmith measures overlap between the inventor's concept and each prior art patent's claims and description using:
 
 - **Claim element matching:** How many claim limitations in the prior art patent correspond to elements in the inventor's described mechanism. Scored as a ratio: `matched_elements / total_claim_elements`.
 - **Description overlap:** Semantic similarity between the patent's detailed description and the inventor's `productDescription` + `solutionSummary`. Measured via embedding cosine similarity.
@@ -458,7 +458,7 @@ High technology overlap (> 0.70) triggers escalation to FTO analysis in Step 5.
 
 ### 4.5 Evidence Collection
 
-For each prior art reference, Atlas collects:
+For each prior art reference, InventSmith collects:
 
 | Field | Description |
 |---|---|
@@ -477,7 +477,7 @@ For each prior art reference, Atlas collects:
 
 ### 4.6 Reference Mapping
 
-Atlas produces an element-by-element matching table for each prior art reference, mapping inventor concept elements to prior art claim elements:
+InventSmith produces an element-by-element matching table for each prior art reference, mapping inventor concept elements to prior art claim elements:
 
 ```
 Inventor Element                      | Prior Art Claim Element         | Match Type
@@ -540,11 +540,11 @@ PriorArtReference {
 
 ## Section 5 — Freedom-to-Operate Indicators
 
-> **⚠ ATLAS DISCLAIMER — READ BEFORE USING FTO INDICATORS**
+> **⚠ INVENTSMITH DISCLAIMER — READ BEFORE USING FTO INDICATORS**
 >
-> Atlas provides decision support, not legal advice. The FTO indicators below are research signals derived from automated patent analysis. They are NOT legal conclusions about whether the inventor's product infringes any patent claim.
+> InventSmith provides decision support, not legal advice. The FTO indicators below are research signals derived from automated patent analysis. They are NOT legal conclusions about whether the inventor's product infringes any patent claim.
 >
-> Freedom-to-operate analysis is a legal determination that requires qualified patent counsel reviewing the specific claims of specific patents against the specific design and intended use of the inventor's product. Atlas's FTO indicators reduce the research burden for that analysis — they do not replace it.
+> Freedom-to-operate analysis is a legal determination that requires qualified patent counsel reviewing the specific claims of specific patents against the specific design and intended use of the inventor's product. InventSmith's FTO indicators reduce the research burden for that analysis — they do not replace it.
 >
 > Founders should consult a qualified patent attorney before making any product development, commercialization, or IP-related decisions based on these indicators.
 
@@ -592,7 +592,7 @@ PriorArtReference {
 **Why expired ≠ automatically safe:**
 - **Continuation risk:** An expired patent may have spawned pending continuation applications with updated claims that are currently active. The continuation's claims may be as broad as or broader than the expired parent.
 - **Related family members:** Patent families often include continuation-in-parts, divisionals, and foreign counterparts — some of which may still be active in relevant jurisdictions.
-- **Atlas flag:** Every expired patent with active family members is flagged `continuationRisk: true` and linked to the active family members for review.
+- **InventSmith flag:** Every expired patent with active family members is flagged `continuationRisk: true` and linked to the active family members for review.
 
 ### 5.5 Abandoned Applications
 
@@ -603,12 +603,12 @@ PriorArtReference {
 **Why abandoned ≠ automatically safe:**
 - **Refiling risk:** An abandoned application may have been refiled as a continuation — the refiled application may be active under a different publication number.
 - **Prosecution history estoppel:** Claims abandoned during prosecution may limit future claim scope, which can work in the inventor's favor — but requires attorney analysis.
-- **Atlas flag:** Abandoned applications are retained in the analysis as prior art (they affect patentability) but are down-weighted as FTO concerns.
+- **InventSmith flag:** Abandoned applications are retained in the analysis as prior art (they affect patentability) but are down-weighted as FTO concerns.
 
 ### 5.6 Patent Families
 
 **Family tracing:**
-- Atlas retrieves INPADOC family data for all patents with claim proximity score ≥ 0.50.
+- InventSmith retrieves INPADOC family data for all patents with claim proximity score ≥ 0.50.
 - The full family is examined, not just the representative patent.
 
 **Why a family hit requires evaluating all members:**
@@ -616,12 +616,12 @@ PriorArtReference {
 - Legal status differs across family members — the US patent may be expired while the EP counterpart is still active.
 - Continuation applications are family members — they may have broader or differently-scoped claims than the original grant.
 
-**Atlas behavior:** Any family with at least one active member in a relevant jurisdiction is flagged `activeFamilyRisk: true` regardless of the representative patent's status.
+**InventSmith behavior:** Any family with at least one active member in a relevant jurisdiction is flagged `activeFamilyRisk: true` regardless of the representative patent's status.
 
 ### 5.7 Design Patent Interactions
 
 **Flagging logic:**
-- Atlas identifies when a design patent covers the ornamental appearance of a product category matching the inventor's product category.
+- InventSmith identifies when a design patent covers the ornamental appearance of a product category matching the inventor's product category.
 - Design patent proximity is evaluated on product appearance characteristics, not mechanical function — separate from utility patent proximity scoring.
 - Flags products where the inventor's product appearance could be confused with the protected ornamental design.
 
@@ -632,7 +632,7 @@ PriorArtReference {
 ### 5.8 Utility Patent Interactions
 
 **Independent claim mapping:**
-- For each utility patent with claim proximity ≥ 0.40, Atlas maps the inventor's product features against each independent claim element-by-element.
+- For each utility patent with claim proximity ≥ 0.40, InventSmith maps the inventor's product features against each independent claim element-by-element.
 - Claims where all elements are present in the inventor's described product are flagged `potentialReadOn: true`.
 
 **Dependent claim proximity:**
@@ -654,7 +654,7 @@ FTOIndicators {
   activeFamilyRiskFlags:    string[]            // Required — family IDs with at least one active member
   designPatentFlags:        string[]            // Required — design patent numbers flagged for review
   jurisdictionCoverage:     JurisdictionStatus[] // Required — [{jurisdiction, activePatentCount, highProximityCount}]
-  disclaimer:               string              // Required — must include full Atlas FTO disclaimer text
+  disclaimer:               string              // Required — must include full InventSmith FTO disclaimer text
   reasoning:                string              // Required
 }
 ```
@@ -677,15 +677,15 @@ FTOPatentIndicator {
 }
 ```
 
-**Disclaimer text Atlas must include when surfacing FTO indicators:**
+**Disclaimer text InventSmith must include when surfacing FTO indicators:**
 
-> "These are research signals, not legal conclusions. Atlas has identified patent indicators that may be relevant to your freedom to develop and commercialize this product. This analysis does not constitute a freedom-to-operate opinion. Only a qualified patent attorney can provide a legal FTO opinion. Do not make commercialization decisions based solely on these indicators."
+> "These are research signals, not legal conclusions. InventSmith has identified patent indicators that may be relevant to your freedom to develop and commercialize this product. This analysis does not constitute a freedom-to-operate opinion. Only a qualified patent attorney can provide a legal FTO opinion. Do not make commercialization decisions based solely on these indicators."
 
 ---
 
 ## Section 6 — Risk Assessment
 
-> **ATLAS DISCLAIMER:** Atlas provides decision support, not legal advice. Risk indicators are not legal conclusions. Founders should consult qualified patent counsel before making any IP-related business or development decisions.
+> **INVENTSMITH DISCLAIMER:** InventSmith provides decision support, not legal advice. Risk indicators are not legal conclusions. Founders should consult qualified patent counsel before making any IP-related business or development decisions.
 
 ### 6.1 Risk Categories
 
@@ -812,7 +812,7 @@ RiskAssessment {
   continuationRiskPresent:  boolean             // Required
   designPatentRiskPresent:  boolean             // Required
   coverageConfidence:       string              // Required — high | medium | low (from CoverageReport)
-  disclaimer:               string              // Required — full Atlas disclaimer text
+  disclaimer:               string              // Required — full InventSmith disclaimer text
   reasoning:                string              // Required
 }
 ```
@@ -904,7 +904,7 @@ RiskFactor {
 **Logic:**
 - Elements that are not anticipated by prior art represent genuinely novel capabilities
 - Genuinely novel capabilities are legitimate product differentiators — "first to..." claims that are supportable by the patent landscape
-- Atlas maps unanticipated elements to potential marketing messages
+- InventSmith maps unanticipated elements to potential marketing messages
 
 **Output:** List of unanticipated elements with suggested plain-language differentiation statements.
 
@@ -990,7 +990,7 @@ OpportunityItem {
 - Patent family with active members across multiple jurisdictions
 - NPE assignee with enforcement history flagged
 
-**Example text:** "High-risk indicators have been identified in the patent landscape. One or more active patents have claim language that may extend to your described product. Atlas recommends engaging a qualified patent attorney before proceeding with manufacturing, investment, or public disclosure."
+**Example text:** "High-risk indicators have been identified in the patent landscape. One or more active patents have claim language that may extend to your described product. InventSmith recommends engaging a qualified patent attorney before proceeding with manufacturing, investment, or public disclosure."
 
 ---
 
@@ -1012,7 +1012,7 @@ OpportunityItem {
 - Recent filing activity (within 12 months) by known competitors
 - Competitor assignees with patents in the 0.40–0.60 proximity range
 
-**Example text:** "[Competitor name] has filed [N] patents in your technology area in the past 12 months. Their recent filings should be monitored as they may define the IP boundaries of the competitive landscape. Atlas will flag new relevant filings from this assignee."
+**Example text:** "[Competitor name] has filed [N] patents in your technology area in the past 12 months. Their recent filings should be monitored as they may define the IP boundaries of the competitive landscape. InventSmith will flag new relevant filings from this assignee."
 
 ---
 
@@ -1118,7 +1118,7 @@ PatentAnalysisReport {
   patentsAnalyzed:        number              // Required — total patents included in the analysis
   patentsWithClaimText:   number              // Required — patents where full claims were available
   analysisConfidence:     string              // Required — high | medium | low
-  disclaimer:             string              // Required — full Atlas legal disclaimer
+  disclaimer:             string              // Required — full InventSmith legal disclaimer
 }
 ```
 
@@ -1257,7 +1257,7 @@ RecommendationSet {
 
 ### 9.8 FounderReviewPackage
 
-Curated subset of the full analysis, formatted for Atlas UI presentation and human review.
+Curated subset of the full analysis, formatted for InventSmith UI presentation and human review.
 
 ```typescript
 FounderReviewPackage {
@@ -1286,7 +1286,7 @@ FounderReviewPackage {
   topOpportunities:           OpportunityItem[]   // Required — top 3 opportunities
 
   // Disclaimer — must be displayed in UI
-  disclaimer:                 string              // Required — full Atlas legal disclaimer text
+  disclaimer:                 string              // Required — full InventSmith legal disclaimer text
   disclaimerAcknowledged:     boolean             // Required — whether founder has acknowledged disclaimer
                                                   //   (set false on generation; set true on UI acknowledgment)
 
@@ -1315,12 +1315,12 @@ KeyFinding {
 **Never claim legal certainty.**
 - Every output field that expresses a finding uses probabilistic language: "indicates", "suggests", "may", "potential", "appears to".
 - All output schemas include a `disclaimer` field. Required fields are never omitted; they receive explicit uncertainty annotations when confidence is low.
-- No Atlas output ever states that a patent is infringed, that a product is cleared for commercialization, or that a claim is valid or invalid.
+- No InventSmith output ever states that a patent is infringed, that a product is cleared for commercialization, or that a claim is valid or invalid.
 
 **Never replace patent counsel.**
-- Atlas reduces the research burden for the attorney-client engagement. It pre-identifies the patents an attorney should examine. It does not replace the attorney's legal analysis.
+- InventSmith reduces the research burden for the attorney-client engagement. It pre-identifies the patents an attorney should examine. It does not replace the attorney's legal analysis.
 - Every high-risk or complex finding is paired with a `CONSULT_PATENT_COUNSEL` recommendation.
-- The `FounderReviewPackage` explicitly frames Atlas analysis as preparation for — not a substitute for — qualified IP legal advice.
+- The `FounderReviewPackage` explicitly frames InventSmith analysis as preparation for — not a substitute for — qualified IP legal advice.
 
 **Clearly distinguish evidence from conclusions.**
 - Every output schema that contains a conclusion field (score, label, finding) also contains a corresponding `reasoning` field and an `evidence` field documenting the specific data that produced the conclusion.
@@ -1329,7 +1329,7 @@ KeyFinding {
 **Provide transparent reasoning.**
 - All `ClaimIntelligence`, `NoveltyAssessment`, `FTOIndicators`, `RiskAssessment`, and `RecommendationSet` objects contain a `reasoning` field.
 - The `reasoning` field is plain-language text — human-readable without technical patent knowledge.
-- Atlas never produces a score without explaining what drove it.
+- InventSmith never produces a score without explaining what drove it.
 
 **Support human review.**
 - Every analysis output is structured for human review: ordered by priority, labeled with confidence levels, linked to source patent records.
@@ -1341,17 +1341,17 @@ KeyFinding {
 - Pre-filtering: only top-ranked, most relevant patents receive full claim analysis. Founders are not presented with 200 raw records.
 - Pre-ranking: `FounderReviewPackage.keyFindings` surfaces the 5 most important findings. Founders begin with what matters most.
 - Pre-summarization: `overallGuidance` provides a synthesized plain-language reading of the full analysis in one paragraph.
-- Atlas handles the research; the founder reviews the findings and applies judgment to the decisions those findings inform.
+- InventSmith handles the research; the founder reviews the findings and applies judgment to the decisions those findings inform.
 
 **Remain provider independent.**
 - No analysis logic references a specific patent data provider.
 - All inputs to the Analysis subsystem are normalized `PatentRecord` and `ClaimSummary` objects — provider identity is irrelevant to the analysis.
 - Switching providers does not require changes to the Analysis pipeline.
 
-**Follow Atlas Owns Execution.**
+**Follow InventSmith Owns Execution.**
 - The Analysis engine runs automatically when triggered by the Patent Intelligence stack (after Search Engine completes).
 - Founders do not initiate analysis manually. They review results.
-- Per the Automation Constitution: Atlas executes, founders review, founders approve. Analysis is Atlas's responsibility. Judgment on the findings is the founder's.
+- Per the Automation Constitution: InventSmith executes, founders review, founders approve. Analysis is InventSmith's responsibility. Judgment on the findings is the founder's.
 
 ---
 
@@ -1368,7 +1368,7 @@ KeyFinding {
 | Section 7 | Seven opportunity types (white space, design-around, licensing, expired patents, technology gaps, market differentiation, innovation directions) and OpportunityReport schema |
 | Section 8 | Eight recommendation types with trigger conditions and example text, five priority levels, and RecommendationSet schema |
 | Section 9 | Complete field-level schemas for all eight output objects: PatentAnalysisReport, NoveltyAssessment, PriorArtSummary, RiskSummary, OpportunityReport, DesignAroundReport, RecommendationSet, FounderReviewPackage |
-| Section 10 | Eight engineering principles: legal certainty prohibition, no replacement of counsel, evidence/conclusion separation, transparent reasoning, human review support, founder effort reduction, provider independence, Atlas Owns Execution |
+| Section 10 | Eight engineering principles: legal certainty prohibition, no replacement of counsel, evidence/conclusion separation, transparent reasoning, human review support, founder effort reduction, provider independence, InventSmith Owns Execution |
 
 **Subsequent documents will define:**
 - Confidence framework for patent research

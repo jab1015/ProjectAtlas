@@ -4,7 +4,7 @@
 **Current customer-facing name:** InventSmith  
 **Descriptor:** The Inventor OS  
 **Publisher:** Modern Methods  
-**Former working name:** Atlas / ProjectAtlas — historical references only
+**Former working name:** InventSmith / ProjectAtlas — historical references only
 
 ## Canonical naming rule
 

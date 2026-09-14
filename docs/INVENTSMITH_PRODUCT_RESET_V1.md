@@ -241,7 +241,7 @@ Current customer-facing identity is:
 **The Inventor OS**  
 **Modern Methods**
 
-The official InventSmith logo must appear on current customer-facing surfaces. Legacy Atlas branding may remain only in internal compatibility identifiers where technically required.
+The official InventSmith logo must appear on current customer-facing surfaces. Legacy InventSmith branding may remain only in internal compatibility identifiers where technically required.
 
 ## 16. Delivery direction
 

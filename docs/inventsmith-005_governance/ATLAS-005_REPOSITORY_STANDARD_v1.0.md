@@ -1,11 +1,11 @@
-# ATLAS-011_REPOSITORY_STANDARD_v1.0
+# INVENTSMITH-011_REPOSITORY_STANDARD_v1.0
 
 Version: 1.0 Status: Foundational Standard
 
 ## Purpose
 
 This document defines the official repository structure, naming
-conventions, and documentation standards for Project Atlas. It ensures
+conventions, and documentation standards for Project InventSmith. It ensures
 consistency, scalability, and long-term maintainability.
 
 ## Repository Structure
@@ -33,13 +33,13 @@ MEMORY_ENGINE_v1.0 - ANTICIPATORY_ENGINE_v1.0
 
 ### Documentation
 
-Use numbered filenames: ATLAS-001_CONSTITUTION_v1.0
-ATLAS-002_PRODUCT_BIBLE_v1.0 ATLAS-003_AI_SPECIALIST_TEAM_BIBLE_v1.0
-ATLAS-004_INVENTOR_JOURNEY_BIBLE_v1.0 ATLAS-005_SCREEN_BIBLE_v1.0
-ATLAS-006_BUSINESS_BIBLE_v1.0
-ATLAS-007_TECHNICAL_ARCHITECTURE_BIBLE_v1.0 ATLAS-008_ATLAS_CANON_v1.0
-ATLAS-009_WHY_ATLAS_EXISTS_v1.0 ATLAS-010_ATLAS_MANIFESTO_v1.0
-ATLAS-011_REPOSITORY_STANDARD_v1.0
+Use numbered filenames: INVENTSMITH-001_CONSTITUTION_v1.0
+INVENTSMITH-002_PRODUCT_BIBLE_v1.0 INVENTSMITH-003_AI_SPECIALIST_TEAM_BIBLE_v1.0
+INVENTSMITH-004_INVENTOR_JOURNEY_BIBLE_v1.0 INVENTSMITH-005_SCREEN_BIBLE_v1.0
+INVENTSMITH-006_BUSINESS_BIBLE_v1.0
+INVENTSMITH-007_TECHNICAL_ARCHITECTURE_BIBLE_v1.0 INVENTSMITH-008_ATLAS_CANON_v1.0
+INVENTSMITH-009_WHY_ATLAS_EXISTS_v1.0 INVENTSMITH-010_ATLAS_MANIFESTO_v1.0
+INVENTSMITH-011_REPOSITORY_STANDARD_v1.0
 
 ### Runtime Prompts
 
@@ -62,5 +62,5 @@ ADR-004_Three_Layer_Architecture.md
 
 ## Guiding Principle
 
-Documentation defines what Atlas is. Runtime prompts define how Atlas
+Documentation defines what InventSmith is. Runtime prompts define how InventSmith
 behaves.

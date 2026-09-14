@@ -1,6 +1,6 @@
-ATLAS-007 --- WORKFLOW BIBLE
+INVENTSMITH-007 --- WORKFLOW BIBLE
 
-Project: Project Atlas
+Project: Project InventSmith
 
 Version: 1.0
 
@@ -14,16 +14,16 @@ Chapter 1 --- Purpose & Philosophy
 
 Purpose
 
-The Workflow Bible defines how every major Atlas process operates from
+The Workflow Bible defines how every major InventSmith process operates from
 beginning to end.
 
-It establishes the standard workflows followed by Atlas departments, AI
+It establishes the standard workflows followed by InventSmith departments, AI
 specialists, automations, and user interactions to ensure consistency,
 efficiency, and reliability across the platform.
 
 Mission
 
-Atlas should always know the next best action for every inventor.
+InventSmith should always know the next best action for every inventor.
 
 Objectives
 
@@ -38,7 +38,7 @@ Every workflow should answer one question:
 "What action most increases the inventor's chance of success?"
 
 If an action does not improve the inventor's likelihood of success,
-Atlas should not recommend it.
+InventSmith should not recommend it.
 
 Guiding Principles
 
@@ -48,31 +48,31 @@ Recommend the Next Step
 
 Core Principle
 
-Every Atlas workflow exists to reduce uncertainty, coordinate
+Every InventSmith workflow exists to reduce uncertainty, coordinate
 intelligent automation, and help inventors move confidently from idea to
 market.
 
-Chapter 2 --- Atlas Master Workflow
+Chapter 2 --- InventSmith Master Workflow
 
 Purpose
 
-The Atlas Master Workflow defines the standard lifecycle that every
+The InventSmith Master Workflow defines the standard lifecycle that every
 invention follows from the moment an idea is captured until long after
 the product reaches the market.
 
-Every specialized workflow within Atlas builds upon this master
+Every specialized workflow within InventSmith builds upon this master
 workflow.
 
 Workflow Philosophy
 
-Atlas should never ask the inventor:
+InventSmith should never ask the inventor:
 
 "What would you like to do next?"
 
-Instead, Atlas should already know the highest-value next action based
+Instead, InventSmith should already know the highest-value next action based
 on the project's current state.
 
-The inventor may always choose a different path, but Atlas continuously
+The inventor may always choose a different path, but InventSmith continuously
 recommends the path most likely to increase the inventor's probability
 of success.
 
@@ -81,7 +81,7 @@ Stage 1 --- Idea Capture
 Objectives
 
 • Capture the inventor's idea. • Preserve every detail. • Create a new
-Atlas project. • Assign an Inventor Twin.
+InventSmith project. • Assign an Inventor Twin.
 
 Outputs
 
@@ -183,7 +183,7 @@ Future Roadmap
 
 Continuous Background Processes
 
-Throughout every stage Atlas continuously:
+Throughout every stage InventSmith continuously:
 
 • Updates the Inventor Twin. • Synchronizes project data. • Generates
 documents. • Tracks milestones. • Monitors deadlines. • Identifies
@@ -195,7 +195,7 @@ intervention.
 
 Core Principle
 
-Every Atlas workflow ultimately supports one continuous journey---from
+Every InventSmith workflow ultimately supports one continuous journey---from
 inspiration to successful commercialization---while ensuring the
 inventor always knows where they are, what has been completed, and what
 should happen next.
@@ -204,22 +204,22 @@ Chapter 3 --- Workflow State Machine
 
 Purpose
 
-The Workflow State Machine defines how every Atlas project progresses
+The Workflow State Machine defines how every InventSmith project progresses
 from one stage to another. Every project exists in a known state at all
-times, allowing Atlas to intelligently recommend actions, trigger
+times, allowing InventSmith to intelligently recommend actions, trigger
 automations, and coordinate AI departments without losing context.
 
 Workflow Principles
 
 A project may only occupy one primary workflow state at a time.
 
-Within each state, Atlas may execute multiple background processes
+Within each state, InventSmith may execute multiple background processes
 simultaneously.
 
 Projects may move forward, pause, return to previous stages, or skip
 optional stages when appropriate.
 
-No project is ever considered "stuck." Atlas always recommends a path
+No project is ever considered "stuck." InventSmith always recommends a path
 forward.
 
 Primary Workflow States
@@ -239,7 +239,7 @@ Exit Requirements
 
 2.  Validation
 
-Atlas evaluates commercial viability.
+InventSmith evaluates commercial viability.
 
 Objectives
 
@@ -251,7 +251,7 @@ Exit Requirements
 
 3.  Research
 
-Atlas gathers information required for informed decisions.
+InventSmith gathers information required for informed decisions.
 
 Objectives
 
@@ -288,7 +288,7 @@ Exit Requirements
 
 6.  Intellectual Property
 
-Atlas prepares and tracks intellectual property activities.
+InventSmith prepares and tracks intellectual property activities.
 
 Objectives
 
@@ -301,7 +301,7 @@ Exit Requirements
 
 7.  Manufacturing
 
-Atlas prepares production.
+InventSmith prepares production.
 
 Objectives
 
@@ -326,7 +326,7 @@ Exit Requirements
 
 9.  Commercialization
 
-Atlas prepares the product for market.
+InventSmith prepares the product for market.
 
 Objectives
 
@@ -338,7 +338,7 @@ Exit Requirements
 
 10. Growth
 
-Atlas continues supporting the inventor after launch.
+InventSmith continues supporting the inventor after launch.
 
 Objectives
 
@@ -349,7 +349,7 @@ Exit Requirements
 
 This state has no final completion.
 
-Atlas continues supporting the inventor throughout the product's
+InventSmith continues supporting the inventor throughout the product's
 lifetime.
 
 Workflow Transitions
@@ -372,7 +372,7 @@ Reasons may include:
 response • Awaiting legal review • Waiting for prototype • Waiting for
 funding
 
-While paused, Atlas continues monitoring deadlines, opportunities,
+While paused, InventSmith continues monitoring deadlines, opportunities,
 grants, market changes, and relevant project activity.
 
 Completed State
@@ -389,8 +389,8 @@ Completed projects remain fully accessible and searchable forever.
 
 Core Principle
 
-Every Atlas project always exists in a clearly defined state. Knowing
-the current state allows Atlas to coordinate every department, automate
+Every InventSmith project always exists in a clearly defined state. Knowing
+the current state allows InventSmith to coordinate every department, automate
 routine work, anticipate future needs, and continuously recommend the
 highest-value next action.
 
@@ -398,14 +398,14 @@ Chapter 4 --- Department Workflow Coordination
 
 Purpose
 
-Atlas functions as a unified invention company composed of specialized
+InventSmith functions as a unified invention company composed of specialized
 AI departments. This chapter defines how those departments coordinate,
 exchange information, assign responsibilities, and transfer work
 throughout the invention lifecycle.
 
 The inventor should never need to manually coordinate departments.
 
-Atlas performs that coordination automatically.
+InventSmith performs that coordination automatically.
 
 Coordination Philosophy
 
@@ -420,7 +420,7 @@ the work completed by every other department.
 
 Department Responsibilities
 
-Each Atlas department owns a defined area of responsibility.
+Each InventSmith department owns a defined area of responsibility.
 
 Examples include:
 
@@ -482,7 +482,7 @@ Product Ready for Launch
 
 → Licensing
 
-Atlas automatically activates the appropriate departments without
+InventSmith automatically activates the appropriate departments without
 requiring inventor intervention.
 
 Information Sharing
@@ -512,7 +512,7 @@ department.
 
 Workflow Handoffs
 
-When one department completes its work, Atlas performs a structured
+When one department completes its work, InventSmith performs a structured
 handoff.
 
 Every handoff includes:
@@ -535,7 +535,7 @@ Departments never restart work already completed by another department.
 
 Conflict Resolution
 
-If two departments recommend different actions, Atlas automatically:
+If two departments recommend different actions, InventSmith automatically:
 
 • Compares both recommendations.
 
@@ -553,7 +553,7 @@ The inventor always makes the final decision.
 
 Parallel Workflows
 
-Whenever possible, Atlas performs independent work simultaneously.
+Whenever possible, InventSmith performs independent work simultaneously.
 
 Examples include:
 
@@ -572,7 +572,7 @@ complexity for the inventor.
 
 Workflow Prioritization
 
-When multiple departments require attention, Atlas prioritizes work
+When multiple departments require attention, InventSmith prioritizes work
 using the following hierarchy:
 
 Protect the inventor.
@@ -616,7 +616,7 @@ action from the inventor.
 
 Core Principle
 
-Atlas succeeds because its departments operate as one coordinated
+InventSmith succeeds because its departments operate as one coordinated
 organization rather than a collection of independent tools. Every
 department shares knowledge, communicates continuously, and works
 together to help the inventor achieve the greatest possible chance of
@@ -626,9 +626,9 @@ Chapter 5 --- Automation & Event Triggers
 
 Purpose
 
-Atlas continuously monitors every project and automatically performs
+InventSmith continuously monitors every project and automatically performs
 work whenever predefined events occur. This event-driven architecture
-allows Atlas to proactively assist inventors instead of waiting for
+allows InventSmith to proactively assist inventors instead of waiting for
 instructions.
 
 Automation should reduce effort, not remove the inventor's control.
@@ -643,12 +643,12 @@ Every automation must satisfy three conditions:
 
 • It does not make irreversible decisions without inventor approval.
 
-Whenever an automation requires approval, Atlas prepares the work first
+Whenever an automation requires approval, InventSmith prepares the work first
 and then requests confirmation.
 
 Event Types
 
-Atlas recognizes four primary event categories:
+InventSmith recognizes four primary event categories:
 
 User Events
 
@@ -670,7 +670,7 @@ Examples:
 
 System Events
 
-Triggered internally by Atlas.
+Triggered internally by InventSmith.
 
 Examples:
 
@@ -746,7 +746,7 @@ This process ensures every department works from the same information.
 
 Automatic Actions
 
-Depending on the event, Atlas may automatically:
+Depending on the event, InventSmith may automatically:
 
 • Update project health scores.
 
@@ -788,12 +788,12 @@ The following actions always require inventor approval before execution:
 
 • Publishing content
 
-Atlas prepares these actions completely but never executes them without
+InventSmith prepares these actions completely but never executes them without
 authorization.
 
 Background Automations
 
-While the inventor is away, Atlas may continue to:
+While the inventor is away, InventSmith may continue to:
 
 • Monitor grant opportunities.
 
@@ -818,7 +818,7 @@ returns.
 
 Notification Rules
 
-Atlas only interrupts the inventor when an event is meaningful.
+InventSmith only interrupts the inventor when an event is meaningful.
 
 Examples include:
 
@@ -837,7 +837,7 @@ notifications.
 
 Automation Priorities
 
-When multiple automations are triggered simultaneously, Atlas processes
+When multiple automations are triggered simultaneously, InventSmith processes
 them in the following order:
 
 Safety and project protection
@@ -880,7 +880,7 @@ The inventor may review this history at any time.
 
 Core Principle
 
-Automation should feel invisible. Atlas quietly performs the work that
+Automation should feel invisible. InventSmith quietly performs the work that
 can be automated, prepares the work that requires approval, and allows
 the inventor to focus on creating, improving, and commercializing their
 invention.
@@ -889,17 +889,17 @@ Chapter 6 --- Decision Engine Workflow
 
 Purpose
 
-The Atlas Decision Engine continuously evaluates every project to
+The InventSmith Decision Engine continuously evaluates every project to
 determine the highest-value action that should occur next. Rather than
-simply responding to inventor requests, Atlas proactively analyzes
+simply responding to inventor requests, InventSmith proactively analyzes
 project conditions, weighs available options, and recommends the path
 most likely to increase the inventor's probability of success.
 
 Decision Philosophy
 
-Every recommendation generated by Atlas must be intentional.
+Every recommendation generated by InventSmith must be intentional.
 
-Atlas never recommends an action simply because it is the next step in a
+InventSmith never recommends an action simply because it is the next step in a
 checklist.
 
 Recommendations are based upon the inventor's:
@@ -947,7 +947,7 @@ This cycle operates continuously throughout the life of every project.
 
 Decision Inputs
 
-The Decision Engine evaluates information from every Atlas department,
+The Decision Engine evaluates information from every InventSmith department,
 including:
 
 • Inventor Goals
@@ -980,7 +980,7 @@ including:
 
 Opportunity Analysis
 
-Before recommending any action, Atlas searches for opportunities such
+Before recommending any action, InventSmith searches for opportunities such
 as:
 
 • Available Grants
@@ -1038,7 +1038,7 @@ Every identified risk receives:
 
 Recommendation Ranking
 
-When multiple actions are available, Atlas ranks them using the
+When multiple actions are available, InventSmith ranks them using the
 following priorities:
 
 Protect the inventor.
@@ -1062,9 +1062,9 @@ suggested action.
 
 Alternative Recommendations
 
-Atlas never assumes there is only one path forward.
+InventSmith never assumes there is only one path forward.
 
-Whenever practical, Atlas presents:
+Whenever practical, InventSmith presents:
 
 • Primary Recommendation
 
@@ -1080,7 +1080,7 @@ Each option includes its expected advantages and trade-offs.
 
 Recommendation Validation
 
-Before displaying a recommendation, Atlas verifies that:
+Before displaying a recommendation, InventSmith verifies that:
 
 • Required information exists.
 
@@ -1098,7 +1098,7 @@ Only validated recommendations are presented.
 
 Learning Loop
 
-After a recommendation is completed, Atlas evaluates:
+After a recommendation is completed, InventSmith evaluates:
 
 • Was the recommendation followed?
 
@@ -1119,7 +1119,7 @@ The inventor always retains full control.
 
 The inventor may:
 
-• Accept Atlas's recommendation.
+• Accept InventSmith's recommendation.
 
 • Modify the recommendation.
 
@@ -1127,7 +1127,7 @@ The inventor may:
 
 • Reject the recommendation.
 
-Whenever a different path is chosen, Atlas immediately recalculates the
+Whenever a different path is chosen, InventSmith immediately recalculates the
 optimal workflow without losing project history.
 
 Core Principle
@@ -1146,7 +1146,7 @@ No invention progresses exactly as planned.
 The purpose of the Exception Handling & Recovery Workflow is to ensure
 that unexpected events never permanently stop an inventor's progress.
 
-When problems occur, Atlas immediately identifies the issue, explains
+When problems occur, InventSmith immediately identifies the issue, explains
 its impact, develops recovery options, and recommends the best path
 forward.
 
@@ -1156,7 +1156,7 @@ Recovery Philosophy
 
 Every obstacle represents a decision point---not a project failure.
 
-Atlas responds to every disruption by answering four questions:
+InventSmith responds to every disruption by answering four questions:
 
 • What happened?
 
@@ -1168,7 +1168,7 @@ Atlas responds to every disruption by answering four questions:
 
 Exception Categories
 
-Atlas classifies exceptions into the following categories:
+InventSmith classifies exceptions into the following categories:
 
 Financial
 
@@ -1246,7 +1246,7 @@ Exception Detection
 
 Exceptions may be identified by:
 
-• Atlas departments
+• InventSmith departments
 
 • Background automations
 
@@ -1262,7 +1262,7 @@ Detection occurs continuously throughout the project lifecycle.
 
 Recovery Workflow
 
-When an exception occurs, Atlas performs the following sequence:
+When an exception occurs, InventSmith performs the following sequence:
 
 Detect the issue.
 
@@ -1284,7 +1284,7 @@ Monitor recovery progress.
 
 Recovery Strategies
 
-Whenever possible, Atlas prepares multiple recovery options.
+Whenever possible, InventSmith prepares multiple recovery options.
 
 Examples include:
 
@@ -1358,7 +1358,7 @@ Severity levels determine notification priority and workflow urgency.
 
 Automatic Recovery Actions
 
-When appropriate, Atlas may automatically:
+When appropriate, InventSmith may automatically:
 
 • Update project timelines.
 
@@ -1382,7 +1382,7 @@ Learning From Exceptions
 Every resolved exception becomes part of the Inventor Twin's permanent
 project history.
 
-Atlas records:
+InventSmith records:
 
 • The issue
 
@@ -1401,7 +1401,7 @@ Core Principle
 
 Problems should never end an invention.
 
-Every exception is treated as an opportunity for Atlas to guide the
+Every exception is treated as an opportunity for InventSmith to guide the
 inventor toward the safest, smartest, and most effective path forward
 while preserving momentum and increasing the likelihood of long-term
 success.
@@ -1410,11 +1410,11 @@ Chapter 8 --- Human Collaboration & Approval Workflows
 
 Purpose
 
-Although Atlas automates every task it responsibly can, certain
+Although InventSmith automates every task it responsibly can, certain
 activities require human expertise, legal authority, physical execution,
 or personal judgment.
 
-This chapter defines how Atlas prepares inventors for those moments
+This chapter defines how InventSmith prepares inventors for those moments
 while remaining an active partner before, during, and after every
 collaboration.
 
@@ -1422,12 +1422,12 @@ The inventor should never face an outside professional unprepared.
 
 Collaboration Philosophy
 
-Atlas does not replace professionals.
+InventSmith does not replace professionals.
 
-Atlas prepares inventors so that professional time is spent solving
+InventSmith prepares inventors so that professional time is spent solving
 problems rather than gathering information.
 
-Whenever human involvement is required, Atlas completes every possible
+Whenever human involvement is required, InventSmith completes every possible
 preparation task first.
 
 Human Required Categories
@@ -1468,7 +1468,7 @@ Each collaboration follows a standardized workflow.
 
 Collaboration Workflow
 
-Whenever Atlas determines that outside assistance is appropriate, it
+Whenever InventSmith determines that outside assistance is appropriate, it
 performs the following sequence:
 
 Identify the required expertise.
@@ -1491,7 +1491,7 @@ Update the project roadmap.
 
 Professional Preparation Package
 
-Before every meeting or engagement, Atlas prepares a complete
+Before every meeting or engagement, InventSmith prepares a complete
 collaboration package containing:
 
 • Project Summary
@@ -1518,7 +1518,7 @@ The package is tailored to the specific professional.
 
 Meeting Preparation
 
-Atlas prepares inventors by providing:
+InventSmith prepares inventors by providing:
 
 • Meeting agenda
 
@@ -1559,12 +1559,12 @@ Examples include:
 
 • Submitting grant applications
 
-Atlas prepares these actions completely but pauses until approval is
+InventSmith prepares these actions completely but pauses until approval is
 received.
 
 Approval Summary
 
-Before requesting approval, Atlas presents:
+Before requesting approval, InventSmith presents:
 
 • Action to be taken
 
@@ -1584,7 +1584,7 @@ The inventor receives all relevant information before making a decision.
 
 Collaboration Tracking
 
-Atlas records every interaction, including:
+InventSmith records every interaction, including:
 
 • Meeting date
 
@@ -1604,7 +1604,7 @@ This information becomes part of the Inventor Twin's permanent memory.
 
 Performance Evaluation
 
-After each collaboration, Atlas evaluates:
+After each collaboration, InventSmith evaluates:
 
 • Deliverables received
 
@@ -1622,7 +1622,7 @@ These evaluations help improve future recommendations.
 
 Post-Collaboration Workflow
 
-After the collaboration concludes, Atlas automatically:
+After the collaboration concludes, InventSmith automatically:
 
 • Updates project records.
 
@@ -1643,7 +1643,7 @@ work has been completed.
 
 Core Principle
 
-Human expertise should strengthen Atlas---not interrupt it. Atlas
+Human expertise should strengthen InventSmith---not interrupt it. InventSmith
 prepares every collaboration, supports every interaction, records every
 outcome, and ensures that outside professionals become an efficient
 extension of the inventor's workflow rather than a source of confusion
@@ -1653,7 +1653,7 @@ Chapter 9 --- Workflow Analytics & Continuous Improvement
 
 Purpose
 
-Atlas continuously measures workflow performance to improve project
+InventSmith continuously measures workflow performance to improve project
 outcomes, identify inefficiencies, reduce unnecessary work, and provide
 inventors with meaningful insights into their progress.
 
@@ -1663,7 +1663,7 @@ Analytics Philosophy
 
 Every workflow should become more effective over time.
 
-Atlas measures performance so it can identify:
+InventSmith measures performance so it can identify:
 
 • What is working well.
 
@@ -1699,7 +1699,7 @@ The dashboard updates automatically as work progresses.
 
 Workflow Metrics
 
-Atlas measures workflow performance using metrics such as:
+InventSmith measures workflow performance using metrics such as:
 
 • Stage Completion Time
 
@@ -1717,12 +1717,12 @@ Atlas measures workflow performance using metrics such as:
 
 • Decision Turnaround Time
 
-These metrics help identify areas where Atlas can improve guidance and
+These metrics help identify areas where InventSmith can improve guidance and
 efficiency.
 
 Productivity Analysis
 
-Atlas evaluates how efficiently a project is progressing by monitoring:
+InventSmith evaluates how efficiently a project is progressing by monitoring:
 
 • Time spent per workflow stage
 
@@ -1736,12 +1736,12 @@ Atlas evaluates how efficiently a project is progressing by monitoring:
 
 • Recovery from delays
 
-If momentum begins to slow, Atlas recommends manageable actions to
+If momentum begins to slow, InventSmith recommends manageable actions to
 restore progress.
 
 Financial Analytics
 
-Atlas continuously analyzes:
+InventSmith continuously analyzes:
 
 • Planned Budget
 
@@ -1759,7 +1759,7 @@ Financial insights are updated whenever project information changes.
 
 Risk Analytics
 
-Atlas tracks:
+InventSmith tracks:
 
 • Number of active risks
 
@@ -1773,11 +1773,11 @@ Atlas tracks:
 
 • Average resolution time
 
-Atlas highlights risks that require immediate attention.
+InventSmith highlights risks that require immediate attention.
 
 Opportunity Analytics
 
-Atlas records:
+InventSmith records:
 
 • Grants identified
 
@@ -1799,7 +1799,7 @@ This history helps improve future recommendations.
 
 Department Performance
 
-Atlas evaluates every department by measuring:
+InventSmith evaluates every department by measuring:
 
 • Assigned tasks
 
@@ -1813,12 +1813,12 @@ Atlas evaluates every department by measuring:
 
 • Workflow efficiency
 
-This information helps Atlas optimize internal operations while
+This information helps InventSmith optimize internal operations while
 remaining invisible to the inventor.
 
 Workflow Reports
 
-Atlas can automatically generate reports including:
+InventSmith can automatically generate reports including:
 
 • Daily Summary
 
@@ -1839,7 +1839,7 @@ current project data.
 
 Continuous Improvement Engine
 
-Atlas continuously reviews completed projects to identify:
+InventSmith continuously reviews completed projects to identify:
 
 • Successful workflows
 
@@ -1858,7 +1858,7 @@ and consistency.
 
 Success Measurement
 
-Atlas measures success according to the inventor's own objectives.
+InventSmith measures success according to the inventor's own objectives.
 
 Examples include:
 
@@ -1874,11 +1874,11 @@ Examples include:
 
 • Personal problem solved
 
-Success is never defined by Atlas alone.
+Success is never defined by InventSmith alone.
 
 Core Principle
 
-Workflow analytics exist to make Atlas smarter, workflows faster, and
+Workflow analytics exist to make InventSmith smarter, workflows faster, and
 inventors more successful. Every insight should lead to better
 recommendations, more efficient execution, and a continually improving
 invention experience.
@@ -1887,9 +1887,9 @@ Chapter 10 --- Workflow Governance & Future Expansion
 
 Purpose
 
-Workflow Governance establishes the rules that ensure every Atlas
+Workflow Governance establishes the rules that ensure every InventSmith
 workflow remains consistent, reliable, maintainable, and aligned with
-the Atlas Constitution as the platform evolves.
+the InventSmith Constitution as the platform evolves.
 
 As new features, AI departments, integrations, and technologies are
 introduced, they must strengthen the existing workflow architecture
@@ -1903,14 +1903,14 @@ complicated.
 New capabilities should integrate seamlessly into existing workflows
 whenever possible.
 
-Atlas should evolve while preserving a familiar experience for
+InventSmith should evolve while preserving a familiar experience for
 inventors.
 
 Workflow Standards
 
-Every workflow created within Atlas must:
+Every workflow created within InventSmith must:
 
-• Support the Atlas Constitution.
+• Support the InventSmith Constitution.
 
 • Protect the inventor's interests.
 
@@ -2008,7 +2008,7 @@ Backward compatibility should be preserved whenever practical.
 
 Future Expansion
 
-Atlas is designed for continuous growth.
+InventSmith is designed for continuous growth.
 
 Future workflow categories may include:
 
@@ -2037,7 +2037,7 @@ replace it.
 
 Workflow Auditing
 
-Atlas periodically audits workflows to identify:
+InventSmith periodically audits workflows to identify:
 
 • Redundant steps
 
@@ -2055,7 +2055,7 @@ Audit findings are used to improve future platform versions.
 
 Long-Term Evolution
 
-As Atlas learns from thousands of inventor projects, workflows should
+As InventSmith learns from thousands of inventor projects, workflows should
 become:
 
 • Simpler
@@ -2070,26 +2070,26 @@ become:
 
 • More predictive
 
-Despite these improvements, Atlas should always remain transparent and
+Despite these improvements, InventSmith should always remain transparent and
 allow inventors to understand why recommendations are made.
 
 Core Principle
 
-Workflow Governance ensures that Atlas continues to grow without
+Workflow Governance ensures that InventSmith continues to grow without
 sacrificing clarity, consistency, or trust. Every enhancement should
 strengthen the inventor's experience, preserve the integrity of the
 platform, and increase the probability of successful innovation.
 
 Closing Statement
 
-The Workflow Bible defines how Atlas operates as a unified invention
+The Workflow Bible defines how InventSmith operates as a unified invention
 company rather than a collection of independent tools.
 
 Every workflow, automation, AI department, document, and recommendation
 exists to help inventors move confidently from idea to market with the
 greatest possible chance of success.
 
-By standardizing workflows across the platform, Atlas delivers a
+By standardizing workflows across the platform, InventSmith delivers a
 consistent, intelligent, and continuously improving experience while
 remaining faithful to its core mission:
 
@@ -2097,10 +2097,10 @@ To become the world's most trusted lifelong advocate for inventors.
 
 # Enterprise Expansion
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-01.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-01.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 11 --- ENTERPRISE WORKFLOW ENGINE ARCHITECTURE
@@ -2108,9 +2108,9 @@ CHAPTER 11 --- ENTERPRISE WORKFLOW ENGINE ARCHITECTURE
 Purpose
 
 This expansion extends the existing Workflow Bible by defining the
-enterprise architecture of the Atlas Workflow Engine. The Workflow
+enterprise architecture of the InventSmith Workflow Engine. The Workflow
 Engine is responsible for executing, monitoring, coordinating, and
-recovering every inventor workflow across all Atlas departments while
+recovering every inventor workflow across all InventSmith departments while
 maintaining complete traceability.
 
 Architectural Principles
@@ -2119,7 +2119,7 @@ The Workflow Engine shall:
 
 • Execute workflows deterministically. • Persist workflow state after
 every transition. • Support long-running processes. • Coordinate AI
-Departments through Atlas Core. • Recover automatically from
+Departments through InventSmith Core. • Recover automatically from
 interruptions. • Produce complete audit history. • Maintain backward
 compatibility between workflow versions.
 
@@ -2157,13 +2157,13 @@ Produces explainable execution history.
 Implementation Standards
 
 Workflow definitions shall be versioned, declarative, testable,
-observable, idempotent where practical, and integrated with Atlas Core
+observable, idempotent where practical, and integrated with InventSmith Core
 through standardized events and service contracts.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-02.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-02.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 12 --- WORKFLOW DEFINITIONS, METADATA, AND STATE GOVERNANCE
@@ -2171,7 +2171,7 @@ CHAPTER 12 --- WORKFLOW DEFINITIONS, METADATA, AND STATE GOVERNANCE
 Purpose
 
 This chapter defines the metadata, identity, and governance model used
-by every Atlas workflow. Every workflow is treated as a versioned
+by every InventSmith workflow. Every workflow is treated as a versioned
 enterprise asset with a well-defined contract, lifecycle, ownership
 model, and execution context.
 
@@ -2192,7 +2192,7 @@ Every execution instance shall receive:
 Parent Workflow ID (if applicable) • Execution Timestamp • Version
 Identifier
 
-These identifiers enable complete traceability across Atlas Core.
+These identifiers enable complete traceability across InventSmith Core.
 
 Execution Context
 
@@ -2219,13 +2219,13 @@ unless an approved migration strategy exists.
 Engineering Guidance
 
 Workflow metadata shall be machine-readable, searchable, and exposed
-through Atlas Core APIs to support orchestration, reporting, analytics,
+through InventSmith Core APIs to support orchestration, reporting, analytics,
 monitoring, and future automation engines.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-03.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-03.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 13 --- WORKFLOW REGISTRATION, TRANSITION ENGINE, AND EXECUTION
@@ -2234,7 +2234,7 @@ POLICIES
 Purpose
 
 This chapter defines how workflows are registered, validated, and
-executed within Atlas Core. Registration establishes a discoverable
+executed within InventSmith Core. Registration establishes a discoverable
 catalog of workflow definitions while the transition engine guarantees
 safe movement between states.
 
@@ -2292,19 +2292,19 @@ Error Boundaries
 
 Failures inside one branch shall be isolated where practical. The
 workflow engine shall invoke retry or compensation policies before
-escalating unrecoverable errors to Atlas governance.
+escalating unrecoverable errors to InventSmith governance.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-04.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-04.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 14 --- EVENT-DRIVEN ORCHESTRATION, SAGA PATTERNS, AND RECOVERY
 
 Purpose
 
-This chapter defines how Atlas coordinates long-running workflows using
+This chapter defines how InventSmith coordinates long-running workflows using
 an event-driven architecture. Workflow execution is resilient,
 asynchronous where appropriate, and capable of recovering from failures
 without losing project history.
@@ -2337,7 +2337,7 @@ The orchestrator shall:
 
 Compensation Transactions
 
-If a completed step must be reversed, Atlas shall execute a documented
+If a completed step must be reversed, InventSmith shall execute a documented
 compensation action rather than attempting to roll back history.
 
 Examples include:
@@ -2363,14 +2363,14 @@ Recommended recovery action
 Operational Guidance
 
 Every workflow execution shall remain observable through telemetry,
-audit logs, workflow metrics, and event history, allowing Atlas to
+audit logs, workflow metrics, and event history, allowing InventSmith to
 explain every decision, transition, retry, and recovery action performed
 during project execution.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-05.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-05.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 15 --- HUMAN APPROVAL ENGINE, AUTHORIZATION, AND WORKFLOW
@@ -2381,12 +2381,12 @@ Purpose
 This chapter defines the governance model for workflow activities that
 require human judgment, legal authority, financial approval, or other
 actions that cannot be safely automated. The Human Approval Engine
-ensures Atlas prepares work completely while preserving inventor control
+ensures InventSmith prepares work completely while preserving inventor control
 over consequential decisions.
 
 Approval Philosophy
 
-Atlas shall automate preparation, analysis, validation, and
+InventSmith shall automate preparation, analysis, validation, and
 documentation. Actions that create legal, financial, contractual, or
 irreversible consequences shall pause until explicit approval has been
 granted by an authorized person.
@@ -2419,7 +2419,7 @@ Permissions determine who may:
 Escalation Policies
 
 If an approval is not received within the defined service level
-objective, Atlas may:
+objective, InventSmith may:
 
 • Send reminders. • Escalate to the appropriate department. • Recommend
 alternative workflows. • Pause dependent activities. • Notify the
@@ -2434,15 +2434,15 @@ Non-repudiable • Recorded within the workflow audit history
 
 Operational Guidance
 
-Approval workflows shall integrate with Atlas Core identity services,
+Approval workflows shall integrate with InventSmith Core identity services,
 audit logging, telemetry, notification services, and workflow
 orchestration while maintaining complete transparency and inventor-first
 governance.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-06.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-06.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 16 --- WORKFLOW OBSERVABILITY, TELEMETRY, AND OPERATIONAL
@@ -2451,7 +2451,7 @@ MONITORING
 Purpose
 
 This chapter defines the observability framework used to monitor
-workflow execution across the Atlas platform. Every workflow shall
+workflow execution across the InventSmith platform. Every workflow shall
 expose operational signals that enable engineers, administrators, and AI
 departments to understand current status, diagnose failures, measure
 performance, and continuously improve workflow reliability.
@@ -2484,7 +2484,7 @@ Human approvals • State transitions • Completion status
 
 Operational Dashboards
 
-Atlas shall provide dashboards for:
+InventSmith shall provide dashboards for:
 
 • Active workflows • Workflow throughput • Average completion time •
 Bottleneck analysis • Approval backlog • Error trends • Department
@@ -2506,21 +2506,21 @@ Failed activities • Department responsiveness • Schedule variance
 
 Engineering Guidance
 
-Observability data shall integrate with Atlas Core logging, metrics,
+Observability data shall integrate with InventSmith Core logging, metrics,
 tracing, alerting, and analytics services while preserving privacy,
 security, and complete execution traceability.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-07.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-07.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 17 --- WORKFLOW TESTING, VALIDATION, AND CONTINUOUS VERIFICATION
 
 Purpose
 
-This chapter defines the engineering standards for validating Atlas
+This chapter defines the engineering standards for validating InventSmith
 workflows before deployment and continuously verifying their correctness
 throughout the platform lifecycle.
 
@@ -2542,7 +2542,7 @@ testing • Regression testing • Performance testing • Resilience testing
 
 Simulation Environment
 
-Atlas shall provide a workflow simulator capable of:
+InventSmith shall provide a workflow simulator capable of:
 
 • Executing complete workflow definitions • Injecting synthetic events •
 Simulating external integrations • Replaying historical executions •
@@ -2557,7 +2557,7 @@ delivery • Approval delays • Database failover • External API failures
 
 Continuous Verification
 
-After deployment, Atlas shall continuously verify:
+After deployment, InventSmith shall continuously verify:
 
 • Workflow integrity • State consistency • Transition success rate •
 Event delivery accuracy • Audit completeness • SLA compliance
@@ -2580,17 +2580,17 @@ validation, continuous monitoring, and evidence-based acceptance
 criteria. No workflow shall be promoted to production without documented
 verification results.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-08.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-08.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 18 --- WORKFLOW VERSIONING, MIGRATION, AND LIFECYCLE GOVERNANCE
 
 Purpose
 
-This chapter defines how Atlas evolves workflow definitions while
+This chapter defines how InventSmith evolves workflow definitions while
 preserving stability for active projects. Workflow versioning ensures
 improvements can be introduced without disrupting in-flight executions
 or compromising historical traceability.
@@ -2625,7 +2625,7 @@ approval
 
 State Migration
 
-When migrating active workflows Atlas shall:
+When migrating active workflows InventSmith shall:
 
 • Validate current state. • Map legacy state to target state. • Preserve
 execution history. • Verify dependencies. • Record migration results.
@@ -2646,14 +2646,14 @@ verification • Compatibility confirmation • Operational approval
 
 Engineering Guidance
 
-Workflow version management shall integrate with Atlas Core
+Workflow version management shall integrate with InventSmith Core
 repositories, deployment pipelines, governance records, telemetry, and
 audit services to provide safe, repeatable enterprise evolution.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-09.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-09.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 19 --- LONG-RUNNING WORKFLOWS, PERSISTENCE, AND RECOVERY
@@ -2661,7 +2661,7 @@ CHAPTER 19 --- LONG-RUNNING WORKFLOWS, PERSISTENCE, AND RECOVERY
 Purpose
 
 This chapter defines the architecture for long-running workflows that
-may span hours, days, weeks, or months. Atlas must preserve execution
+may span hours, days, weeks, or months. InventSmith must preserve execution
 context, survive platform restarts, and resume processing without losing
 state or requiring the inventor to repeat completed work.
 
@@ -2687,7 +2687,7 @@ Workflows may be suspended because of:
 • Awaiting inventor input • External dependencies • Scheduled execution
 • Human approval • Resource constraints • Planned maintenance
 
-Upon resumption Atlas shall:
+Upon resumption InventSmith shall:
 
 1.  Reload execution context.
 2.  Validate persisted state.
@@ -2721,12 +2721,12 @@ Engineering Guidance
 
 Long-running workflow support shall prioritize durability, idempotent
 recovery, minimal operator intervention, complete auditability, and
-predictable execution across distributed Atlas services.
+predictable execution across distributed InventSmith services.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-10.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-10.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 20 --- WORKFLOW SCHEDULING, TIMERS, AND EXECUTION PRIORITIES
@@ -2735,7 +2735,7 @@ Purpose
 
 This chapter defines the scheduling subsystem responsible for executing
 time-based, recurring, and dependency-driven workflows throughout the
-Atlas platform.
+InventSmith platform.
 
 Scheduling Principles
 
@@ -2748,7 +2748,7 @@ complete audit history.
 
 Supported Schedule Types
 
-Atlas supports:
+InventSmith supports:
 
 • Immediate execution • Delayed execution • Fixed date and time •
 Recurring schedules • Event-triggered schedules • Dependency-triggered
@@ -2783,29 +2783,29 @@ The scheduler shall prioritize work using:
 
 Missed Execution Recovery
 
-Following downtime Atlas shall:
+Following downtime InventSmith shall:
 
 • Identify missed schedules. • Recalculate execution windows. • Execute
 eligible work. • Suppress expired activities. • Record recovery actions.
 
 Engineering Guidance
 
-Scheduling services shall integrate with Atlas Core orchestration,
+Scheduling services shall integrate with InventSmith Core orchestration,
 telemetry, notifications, and persistence services while providing
 deterministic, fault-tolerant execution for enterprise-scale workflow
 automation.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-11.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-11.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 21 --- AI DEPARTMENT ORCHESTRATION AND WORK DISTRIBUTION
 
 Purpose
 
-This chapter defines how the Atlas Workflow Engine coordinates
+This chapter defines how the InventSmith Workflow Engine coordinates
 specialized AI Departments so they operate as a unified organization
 rather than isolated services.
 
@@ -2845,7 +2845,7 @@ materially change.
 
 Resource Allocation
 
-Atlas shall allocate computational and operational resources according
+InventSmith shall allocate computational and operational resources according
 to:
 
 1.  Critical inventor protection
@@ -2864,15 +2864,15 @@ recommendations. • Record audit history.
 
 Engineering Guidance
 
-Department orchestration shall integrate with Atlas Core messaging,
+Department orchestration shall integrate with InventSmith Core messaging,
 event streaming, telemetry, workflow persistence, authorization, and
 monitoring services while maintaining deterministic, explainable
 execution.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-12.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-12.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 22 --- WORKFLOW DEPENDENCY GRAPHS, CRITICAL PATHS, AND EXECUTION
@@ -2880,7 +2880,7 @@ OPTIMIZATION
 
 Purpose
 
-This chapter defines how Atlas models workflow dependencies to ensure
+This chapter defines how InventSmith models workflow dependencies to ensure
 work is executed in the correct order while maximizing safe parallelism
 and minimizing overall project duration.
 
@@ -2902,7 +2902,7 @@ system dependency
 
 Critical Path Analysis
 
-Atlas continuously calculates the critical path to determine:
+InventSmith continuously calculates the critical path to determine:
 
 • Longest execution chain • Blocking activities • Schedule sensitivity •
 Float and slack time • Schedule risk • Completion forecast
@@ -2916,7 +2916,7 @@ Data conflicts are prevented. • Required predecessors are complete.
 
 Synchronization Barriers
 
-Before dependent work proceeds, Atlas shall verify:
+Before dependent work proceeds, InventSmith shall verify:
 
 • Required branches completed • Required events received • Shared state
 synchronized • Outstanding conflicts resolved
@@ -2928,7 +2928,7 @@ The workflow engine shall detect:
 • Circular dependencies • Unreachable states • Waiting cycles • Resource
 starvation • Conflicting approvals
 
-When detected, Atlas shall recommend corrective actions and record the
+When detected, InventSmith shall recommend corrective actions and record the
 incident.
 
 Execution Optimization
@@ -2942,13 +2942,13 @@ departmental workloads
 Engineering Guidance
 
 Dependency graphs shall remain versioned, auditable, and queryable
-through Atlas Core to support scheduling, visualization, analytics,
+through InventSmith Core to support scheduling, visualization, analytics,
 simulation, and continuous workflow optimization.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-13.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-13.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 23 --- WORKFLOW DATA FLOW, CONTEXT PROPAGATION, AND STATE
@@ -2956,9 +2956,9 @@ CONSISTENCY
 
 Purpose
 
-This chapter defines how workflow data moves throughout Atlas while
+This chapter defines how workflow data moves throughout InventSmith while
 preserving consistency, traceability, and synchronization between AI
-Departments, Atlas Core services, and external integrations.
+Departments, InventSmith Core services, and external integrations.
 
 Workflow Context Model
 
@@ -2980,7 +2980,7 @@ identifier • Causation identifier • Execution timestamp
 
 Shared State Management
 
-Atlas shall maintain a single authoritative workflow state while
+InventSmith shall maintain a single authoritative workflow state while
 allowing individual departments to maintain localized execution caches.
 Cached data must be reconciled with the authoritative state before
 critical transitions.
@@ -3001,7 +3001,7 @@ schema • Correlation metadata • Integrity validation
 
 Consistency Validation
 
-Before completing a workflow transition Atlas shall verify:
+Before completing a workflow transition InventSmith shall verify:
 
 • Required documents exist • Context is synchronized • State is
 internally consistent • Dependencies remain satisfied • Security
@@ -3009,14 +3009,14 @@ policies are enforced
 
 Engineering Guidance
 
-Workflow data architecture shall integrate with Atlas Core persistence,
+Workflow data architecture shall integrate with InventSmith Core persistence,
 messaging, telemetry, analytics, and governance services while ensuring
 enterprise-grade reliability, traceability, and scalability.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-14.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-14.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 24 --- WORKFLOW DOCUMENT LIFECYCLE, ARTIFACT GOVERNANCE, AND
@@ -3025,7 +3025,7 @@ RECORDS MANAGEMENT
 Purpose
 
 This chapter defines how workflow-generated documents and artifacts are
-created, versioned, secured, retained, and governed throughout the Atlas
+created, versioned, secured, retained, and governed throughout the InventSmith
 platform.
 
 Artifact Categories
@@ -3063,7 +3063,7 @@ Critical workflow artifacts shall support:
 
 Retention Policies
 
-Atlas shall retain workflow records according to governance policies
+InventSmith shall retain workflow records according to governance policies
 while supporting configurable archival, legal hold, export, and secure
 deletion requirements where permitted.
 
@@ -3076,22 +3076,22 @@ Audit compliant
 
 Engineering Guidance
 
-Workflow document services shall integrate with Atlas Core repositories,
+Workflow document services shall integrate with InventSmith Core repositories,
 authorization, telemetry, search, and audit systems to ensure
 enterprise-grade records management across the complete invention
 lifecycle.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-15.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-15.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 25 --- WORKFLOW COMMUNICATION, NOTIFICATIONS, AND COLLABORATION
 
 Purpose
 
-This chapter defines how Atlas communicates workflow activity to
+This chapter defines how InventSmith communicates workflow activity to
 inventors, AI Departments, administrators, and integrated services while
 ensuring timely, relevant, and non-intrusive collaboration.
 
@@ -3104,7 +3104,7 @@ Preference-driven
 
 Notification Categories
 
-Atlas supports:
+InventSmith supports:
 
 • Informational notifications • Approval requests • Deadline reminders •
 Risk alerts • Opportunity alerts • Workflow completion notices •
@@ -3114,7 +3114,7 @@ Delivery Channels
 
 Notifications may be delivered through:
 
-• Atlas dashboard • Email • Mobile push • In-app messaging • API
+• InventSmith dashboard • Email • Mobile push • In-app messaging • API
 callbacks • Webhooks • Collaboration platforms
 
 Task Routing
@@ -3126,7 +3126,7 @@ completion date • Dependency status • Authorization level
 
 Escalation Framework
 
-If work remains incomplete beyond established service levels Atlas
+If work remains incomplete beyond established service levels InventSmith
 shall:
 
 1.  Issue reminder notifications.
@@ -3144,15 +3144,15 @@ thresholds • Digest schedules • Language preferences
 
 Engineering Guidance
 
-Workflow communication services shall integrate with Atlas Core
+Workflow communication services shall integrate with InventSmith Core
 identity, authorization, telemetry, audit logging, workflow
 orchestration, and messaging infrastructure while preserving privacy,
 reliability, and complete auditability.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-16.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-16.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 26 --- WORKFLOW SECURITY, PRIVACY, AND COMPLIANCE GOVERNANCE
@@ -3161,7 +3161,7 @@ Purpose
 
 This chapter defines the security architecture governing workflow
 execution, workflow data, approvals, documents, and interdepartmental
-communication across the Atlas platform.
+communication across the InventSmith platform.
 
 Security Principles
 
@@ -3173,7 +3173,7 @@ auditability
 
 Identity and Access Management
 
-Workflow execution shall integrate with Atlas identity services to
+Workflow execution shall integrate with InventSmith identity services to
 support:
 
 • User authentication • Service authentication • Role-based access
@@ -3217,22 +3217,22 @@ decision
 
 Engineering Guidance
 
-Workflow security services shall integrate with Atlas Core identity,
+Workflow security services shall integrate with InventSmith Core identity,
 authorization, telemetry, logging, and governance infrastructure to
 provide enterprise-grade confidentiality, integrity, availability, and
 traceability.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-17.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-17.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 27 --- WORKFLOW PERFORMANCE, SCALABILITY, AND RESILIENCE
 
 Purpose
 
-This chapter defines the engineering standards that enable Atlas
+This chapter defines the engineering standards that enable InventSmith
 workflows to execute efficiently at enterprise scale while maintaining
 responsiveness, availability, and predictable behavior under varying
 workloads.
@@ -3254,7 +3254,7 @@ utilization
 
 Scalability Architecture
 
-Atlas shall support scaling through:
+InventSmith shall support scaling through:
 
 • Stateless workflow services • Distributed workers • Horizontal node
 expansion • Event-driven processing • Elastic resource allocation •
@@ -3285,21 +3285,21 @@ Operational verification
 
 Performance Metrics
 
-Atlas shall continuously measure:
+InventSmith shall continuously measure:
 
 • Workflow latency • Transition throughput • Queue wait time • Error
 rate • Resource consumption • Recovery duration
 
 Engineering Guidance
 
-Workflow performance engineering shall integrate with Atlas Core
+Workflow performance engineering shall integrate with InventSmith Core
 monitoring, autoscaling, telemetry, deployment pipelines, and
 operational governance to deliver reliable enterprise-scale execution.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-18.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-18.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 28 --- WORKFLOW GOVERNANCE, CHANGE MANAGEMENT, AND OPERATIONAL
@@ -3307,9 +3307,9 @@ MATURITY
 
 Purpose
 
-This chapter defines the governance model that ensures Atlas workflows
+This chapter defines the governance model that ensures InventSmith workflows
 evolve in a controlled, measurable, and auditable manner while remaining
-aligned with the Atlas Constitution, platform architecture, and
+aligned with the InventSmith Constitution, platform architecture, and
 enterprise engineering standards.
 
 Governance Principles
@@ -3345,7 +3345,7 @@ Every workflow modification shall follow:
 
 Operational Policies
 
-Atlas shall define policies for:
+InventSmith shall define policies for:
 
 • Workflow naming • Version control • Deprecation • Exception handling •
 Incident response • Performance review • Documentation maintenance
@@ -3367,15 +3367,15 @@ Workflow maturity shall be evaluated using:
 
 Engineering Guidance
 
-Governance services shall integrate with Atlas Core policy management,
+Governance services shall integrate with InventSmith Core policy management,
 audit, telemetry, workflow analytics, and release management to ensure
 every workflow remains trustworthy, maintainable, and enterprise-ready
 throughout its lifecycle.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-19.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-19.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 29 --- WORKFLOW TEMPLATES, COMPOSITION, AND REUSABLE PATTERNS
@@ -3383,7 +3383,7 @@ CHAPTER 29 --- WORKFLOW TEMPLATES, COMPOSITION, AND REUSABLE PATTERNS
 Purpose
 
 This chapter defines the reusable workflow template system that allows
-Atlas to build complex business processes from standardized, governed,
+InventSmith to build complex business processes from standardized, governed,
 and versioned workflow components.
 
 Workflow Template Principles
@@ -3395,7 +3395,7 @@ Domain-driven • Backward compatible where practical
 
 Template Categories
 
-Atlas maintains templates for:
+InventSmith maintains templates for:
 
 • Idea evaluation • Market research • Patent preparation • Engineering
 review • Manufacturing readiness • Funding strategy • Product launch •
@@ -3421,7 +3421,7 @@ Overrides shall be explicitly declared and documented.
 
 Pattern Catalog
 
-Atlas maintains standard workflow patterns including:
+InventSmith maintains standard workflow patterns including:
 
 • Approval Pattern • Review Pattern • Research Pattern • Collaboration
 Pattern • Escalation Pattern • Recovery Pattern • Synchronization
@@ -3436,15 +3436,15 @@ matrix • Validation history
 
 Engineering Guidance
 
-Workflow templates shall integrate with Atlas Core repositories,
+Workflow templates shall integrate with InventSmith Core repositories,
 workflow registration services, orchestration engines, testing
 frameworks, and governance controls to maximize reuse while minimizing
 duplication and maintenance effort.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-20.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-20.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 30 --- REFERENCE WORKFLOW IMPLEMENTATIONS, BEST PRACTICES, AND
@@ -3453,7 +3453,7 @@ ANTI-PATTERNS
 Purpose
 
 This chapter provides reference implementations that demonstrate how
-Atlas workflows should be composed to deliver predictable, auditable,
+InventSmith workflows should be composed to deliver predictable, auditable,
 and repeatable business outcomes across the complete invention
 lifecycle.
 
@@ -3500,7 +3500,7 @@ Sequence:
 
 Best Practices
 
-Atlas workflows should:
+InventSmith workflows should:
 
 • Minimize manual intervention. • Favor event-driven execution. •
 Preserve complete traceability. • Execute work in parallel when safe. •
@@ -3509,7 +3509,7 @@ Twin.
 
 Anti-Patterns
 
-Atlas workflows shall avoid:
+InventSmith workflows shall avoid:
 
 • Duplicate work. • Circular dependencies. • Hidden state transitions. •
 Unbounded retries. • Missing audit records. • Direct cross-department
@@ -3519,12 +3519,12 @@ Engineering Guidance
 
 Reference workflows shall serve as implementation blueprints for
 solution architects, developers, and AI engineers while remaining
-extensible through the Atlas template framework and governance model.
+extensible through the InventSmith template framework and governance model.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-21.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-21.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 31 --- ENTERPRISE WORKFLOW BLUEPRINTS AND CROSS-DEPARTMENT
@@ -3533,7 +3533,7 @@ ORCHESTRATION
 Purpose
 
 This chapter defines standardized enterprise workflow blueprints that
-coordinate multiple Atlas departments from idea inception through
+coordinate multiple InventSmith departments from idea inception through
 commercialization while maintaining governance, traceability, and
 continuous decision support.
 
@@ -3547,7 +3547,7 @@ scenarios • Recovery strategies
 
 End-to-End Blueprint
 
-A complete Atlas invention workflow coordinates:
+A complete InventSmith invention workflow coordinates:
 
 1.  Inventor Coach captures the opportunity.
 2.  Project Manager establishes execution.
@@ -3584,14 +3584,14 @@ Improved auditability • Predictable delivery • Better collaboration
 
 Engineering Guidance
 
-Blueprints shall be maintained as reusable workflow assets within Atlas
+Blueprints shall be maintained as reusable workflow assets within InventSmith
 Core and validated through automated testing, governance review, and
 continuous improvement processes.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-22.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-22.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 32 --- WORKFLOW KPIs, SCORECARDS, AND PREDICTIVE OPERATIONAL
@@ -3601,7 +3601,7 @@ Purpose
 
 This chapter establishes the measurement framework used to evaluate
 workflow effectiveness, predict operational outcomes, and drive
-continuous improvement across the Atlas platform.
+continuous improvement across the InventSmith platform.
 
 Measurement Principles
 
@@ -3612,7 +3612,7 @@ Continuously updated
 
 Key Performance Indicators
 
-Atlas shall monitor:
+InventSmith shall monitor:
 
 • Workflow completion rate • Average cycle time • State transition
 latency • Automation utilization • Human approval turnaround • Exception
@@ -3643,7 +3643,7 @@ Resource contention • Dependency congestion • Underutilized automation
 
 Continuous Optimization
 
-Atlas shall recommend improvements by:
+InventSmith shall recommend improvements by:
 
 • Reordering workflow steps • Increasing safe parallelism • Eliminating
 redundant tasks • Improving template reuse • Adjusting resource
@@ -3658,15 +3658,15 @@ forecasts • Strategic risks • Improvement opportunities
 
 Engineering Guidance
 
-Workflow intelligence services shall integrate with Atlas Core
+Workflow intelligence services shall integrate with InventSmith Core
 analytics, telemetry, reporting, governance, and decision services to
 support measurable, data-driven optimization across every inventor
 project.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-23.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-23.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 33 --- PORTFOLIO WORKFLOW GOVERNANCE, MULTI-PROJECT
@@ -3674,7 +3674,7 @@ ORCHESTRATION, AND CAPACITY MANAGEMENT
 
 Purpose
 
-This chapter defines how Atlas governs workflows across an entire
+This chapter defines how InventSmith governs workflows across an entire
 portfolio of inventor projects. While previous chapters focus on
 individual workflow instances, this chapter establishes enterprise
 practices for coordinating, prioritizing, and optimizing multiple
@@ -3710,7 +3710,7 @@ readiness • Overall project health • Risk profile
 
 Capacity Management
 
-Atlas shall continuously monitor:
+InventSmith shall continuously monitor:
 
 • Active workflows • Department utilization • Queue depth • Human
 approval workload • Infrastructure capacity • External dependency load
@@ -3733,15 +3733,15 @@ health • Critical risks • Upcoming milestones • Strategic opportunities
 
 Engineering Guidance
 
-Portfolio workflow services shall integrate with Atlas Core
+Portfolio workflow services shall integrate with InventSmith Core
 orchestration, analytics, governance, scheduling, and reporting systems
 to provide scalable, data-driven management across the complete inventor
 ecosystem.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-24.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-24.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 34 --- ENTERPRISE RESOURCE GOVERNANCE, WORKLOAD BALANCING, AND
@@ -3749,14 +3749,14 @@ EXECUTION OPTIMIZATION
 
 Purpose
 
-This chapter defines how Atlas allocates computational resources, AI
+This chapter defines how InventSmith allocates computational resources, AI
 Department capacity, and human participation to ensure workflows execute
 efficiently while maintaining fairness, responsiveness, and predictable
 service levels.
 
 Resource Governance Principles
 
-Atlas shall:
+InventSmith shall:
 
 • Allocate resources dynamically. • Protect high-priority workflows. •
 Prevent resource starvation. • Balance workloads continuously. •
@@ -3779,7 +3779,7 @@ approvals • Event throughput • Historical execution trends
 
 Balancing Strategies
 
-Atlas may improve execution by:
+InventSmith may improve execution by:
 
 • Redistributing queued work • Scaling workflow workers • Deferring
 low-priority tasks • Increasing safe parallelism • Reordering
@@ -3810,14 +3810,14 @@ Expected outcome • Review status
 
 Engineering Guidance
 
-Resource governance shall integrate with Atlas Core scheduling,
+Resource governance shall integrate with InventSmith Core scheduling,
 telemetry, analytics, autoscaling, and operational governance services
 to provide predictable, resilient, enterprise-scale workflow execution.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-25.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-25.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 35 --- WORKFLOW SERVICE LEVEL AGREEMENTS, INCIDENT RESPONSE, AND
@@ -3825,13 +3825,13 @@ OPERATIONAL RELIABILITY
 
 Purpose
 
-This chapter defines the operational reliability framework for Atlas
+This chapter defines the operational reliability framework for InventSmith
 workflows, including service level objectives, incident management,
 escalation procedures, and continuous operational readiness.
 
 Reliability Principles
 
-Atlas workflow operations shall be:
+InventSmith workflow operations shall be:
 
 • Highly available • Predictable • Measurable • Recoverable • Auditable
 • Continuously improved
@@ -3883,15 +3883,15 @@ Approval bottlenecks • Integration outages • Data consistency validation
 
 Engineering Guidance
 
-Workflow reliability services shall integrate with Atlas Core
+Workflow reliability services shall integrate with InventSmith Core
 monitoring, alerting, telemetry, governance, and deployment systems to
 maintain enterprise- grade operational excellence across all workflow
 executions.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-26.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-26.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 36 --- WORKFLOW AUDIT ARCHITECTURE, COMPLIANCE REPORTING, AND
@@ -3899,7 +3899,7 @@ EVIDENCE MANAGEMENT
 
 Purpose
 
-This chapter defines the audit framework that enables Atlas to
+This chapter defines the audit framework that enables InventSmith to
 demonstrate workflow integrity, regulatory compliance, operational
 accountability, and complete execution traceability throughout the
 invention lifecycle.
@@ -3929,7 +3929,7 @@ Result code
 
 Compliance Reporting
 
-Atlas shall generate reports supporting:
+InventSmith shall generate reports supporting:
 
 • Internal governance reviews • Regulatory compliance • Operational
 audits • Security assessments • Executive oversight • Customer evidence
@@ -3950,15 +3950,15 @@ requirements.
 
 Engineering Guidance
 
-Audit services shall integrate with Atlas Core logging, telemetry,
+Audit services shall integrate with InventSmith Core logging, telemetry,
 document management, workflow orchestration, and governance systems to
 provide reliable, enterprise-grade evidence for every workflow decision
 and execution.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-27.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-27.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 37 --- WORKFLOW POLICY ENGINE, BUSINESS RULES, AND GOVERNANCE
@@ -3968,7 +3968,7 @@ Purpose
 
 This chapter defines the enterprise policy engine responsible for
 evaluating business rules, enforcing governance requirements, and
-ensuring workflow decisions remain consistent across every Atlas
+ensuring workflow decisions remain consistent across every InventSmith
 project.
 
 Policy Engine Principles
@@ -4007,7 +4007,7 @@ Policies progress through:
 
 Exception Handling
 
-When a policy cannot be satisfied Atlas shall:
+When a policy cannot be satisfied InventSmith shall:
 
 • Block prohibited actions. • Recommend corrective actions. • Escalate
 to the responsible department. • Record the exception. • Preserve
@@ -4022,15 +4022,15 @@ considered • Confidence indicators • Required human approvals, if any
 
 Engineering Guidance
 
-The workflow policy engine shall integrate with Atlas Core
+The workflow policy engine shall integrate with InventSmith Core
 authorization, workflow orchestration, audit logging, telemetry, and
 analytics services so that every policy decision is repeatable,
 traceable, and governed throughout the enterprise.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-28.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-28.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 38 --- AI DECISION ORCHESTRATION, CONSENSUS, AND ADAPTIVE
@@ -4038,7 +4038,7 @@ WORKFLOW INTELLIGENCE
 
 Purpose
 
-This chapter defines how Atlas coordinates AI-generated recommendations
+This chapter defines how InventSmith coordinates AI-generated recommendations
 across multiple departments while preserving transparency, human
 oversight, and consistent workflow execution.
 
@@ -4071,7 +4071,7 @@ Each recommendation shall include:
 
 Multi-Department Consensus
 
-When multiple departments participate, Atlas shall:
+When multiple departments participate, InventSmith shall:
 
 • Aggregate recommendations • Detect conflicts • Highlight dependencies
 • Rank alternatives • Recommend a preferred course of action • Escalate
@@ -4087,22 +4087,22 @@ Policy exceptions
 
 Adaptive Optimization
 
-Atlas shall continuously improve decision quality using:
+InventSmith shall continuously improve decision quality using:
 
 • Historical workflow outcomes • Approval patterns • Operational metrics
 • User feedback • Post-project reviews • Governance findings
 
 Engineering Guidance
 
-Decision orchestration services shall integrate with Atlas Core AI
+Decision orchestration services shall integrate with InventSmith Core AI
 orchestration, workflow execution, policy evaluation, telemetry, and
 audit services while ensuring every recommendation remains traceable and
 explainable.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-29.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-29.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 39 --- WORKFLOW EXCEPTION MANAGEMENT, RISK MITIGATION, AND
@@ -4117,7 +4117,7 @@ confidence.
 
 Exception Management Principles
 
-Atlas shall manage workflow exceptions using the following principles:
+InventSmith shall manage workflow exceptions using the following principles:
 
 • Early detection • Consistent classification • Automated remediation
 where appropriate • Human escalation when required • Complete
@@ -4141,7 +4141,7 @@ recurrence • Recovery priority • Responsible owner
 
 Automated Remediation
 
-Where safe, Atlas shall automatically perform:
+Where safe, InventSmith shall automatically perform:
 
 • Workflow retries • Context reconciliation • Event replay • Cache
 refresh • Queue reprocessing • Alternate routing • Dependency
@@ -4172,15 +4172,15 @@ Additional automation candidates • Monitoring enhancements
 
 Engineering Guidance
 
-Exception management services shall integrate with Atlas Core
+Exception management services shall integrate with InventSmith Core
 monitoring, workflow orchestration, telemetry, policy evaluation, and
 audit systems to ensure resilient, explainable, and enterprise-grade
 workflow recovery.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-30.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-30.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 40 --- WORKFLOW OPTIMIZATION ENGINE, PREDICTIVE EXECUTION, AND
@@ -4202,7 +4202,7 @@ Continuously learning
 
 Optimization Objectives
 
-Atlas shall optimize for:
+InventSmith shall optimize for:
 
 • Reduced cycle time • Increased automation • Higher throughput • Lower
 operational cost • Improved inventor experience • Greater workflow
@@ -4232,7 +4232,7 @@ Priorities shall be recalculated using:
 
 Self-Healing Operations
 
-When supported by governance policies Atlas may automatically:
+When supported by governance policies InventSmith may automatically:
 
 • Restart failed activities • Rebuild execution context • Replay missed
 events • Reassign eligible work • Refresh stale caches • Reconcile
@@ -4248,15 +4248,15 @@ improvement
 
 Engineering Guidance
 
-Optimization services shall integrate with Atlas Core orchestration,
+Optimization services shall integrate with InventSmith Core orchestration,
 analytics, policy evaluation, telemetry, and workflow governance to
 provide measurable, enterprise-scale improvements while preserving
 deterministic execution.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-31.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-31.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 41 --- WORKFLOW INTEGRATION ARCHITECTURE, CONNECTOR FRAMEWORK,
@@ -4264,7 +4264,7 @@ AND INTEROPERABILITY
 
 Purpose
 
-This chapter defines how Atlas workflows integrate with external
+This chapter defines how InventSmith workflows integrate with external
 systems, third-party services, enterprise applications, and internal
 platform components while preserving security, reliability, and
 governance.
@@ -4278,7 +4278,7 @@ Observable • Fault tolerant
 
 Connector Framework
 
-Atlas connectors shall support:
+InventSmith connectors shall support:
 
 • REST APIs • GraphQL APIs • Webhooks • Message queues • File exchange •
 Database synchronization • Identity providers
@@ -4313,15 +4313,15 @@ Transaction boundaries • Version compatibility
 
 Engineering Guidance
 
-Integration services shall integrate with Atlas Core messaging, workflow
+Integration services shall integrate with InventSmith Core messaging, workflow
 orchestration, telemetry, audit logging, policy enforcement, and
 security services to provide reliable enterprise interoperability across
-the Atlas ecosystem.
+the InventSmith ecosystem.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-32.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-32.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 42 --- WORKFLOW API GOVERNANCE, SDK STANDARDS, AND DEVELOPER
@@ -4331,7 +4331,7 @@ Purpose
 
 This chapter defines the standards governing workflow APIs, SDK
 integration, developer tooling, and lifecycle management to ensure every
-Atlas workflow can be securely extended and consistently consumed by
+InventSmith workflow can be securely extended and consistently consumed by
 internal and external systems.
 
 API Design Principles
@@ -4343,7 +4343,7 @@ appropriate • Backward compatible whenever practical
 
 API Categories
 
-Atlas exposes:
+InventSmith exposes:
 
 • Workflow Management APIs • Execution APIs • Query APIs • Event
 Subscription APIs • Administrative APIs • Reporting APIs • Integration
@@ -4379,22 +4379,22 @@ Deprecation policy
 
 Developer Experience
 
-Atlas shall provide:
+InventSmith shall provide:
 
 • Interactive API documentation • Sample applications • Code snippets •
 Sandbox environments • SDK reference guides • Migration documentation
 
 Engineering Guidance
 
-Workflow API services shall integrate with Atlas Core security,
+Workflow API services shall integrate with InventSmith Core security,
 telemetry, policy enforcement, documentation, testing, and release
 management services to deliver a predictable enterprise developer
 experience.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-33.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-33.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 43 --- WORKFLOW DEPLOYMENT ARCHITECTURE, RELEASE ORCHESTRATION,
@@ -4403,7 +4403,7 @@ AND ENVIRONMENT GOVERNANCE
 Purpose
 
 This chapter defines how workflow definitions are deployed, validated,
-promoted, and retired across Atlas environments while maintaining
+promoted, and retired across InventSmith environments while maintaining
 stability, traceability, and operational confidence.
 
 Deployment Principles
@@ -4415,7 +4415,7 @@ where practical • Fully observable
 
 Environment Strategy
 
-Atlas maintains separate workflow environments for:
+InventSmith maintains separate workflow environments for:
 
 • Local Development • Integration • Quality Assurance • User Acceptance
 Testing • Staging • Production • Disaster Recovery
@@ -4442,7 +4442,7 @@ Feature-flag activation • Controlled phased rollout
 
 Operational Readiness Review
 
-Before production deployment Atlas shall verify:
+Before production deployment InventSmith shall verify:
 
 • Workflow integrity • Version compatibility • Database readiness •
 Event contract compatibility • Monitoring configuration • Rollback
@@ -4458,14 +4458,14 @@ Post-rollback verification
 
 Engineering Guidance
 
-Deployment services shall integrate with Atlas Core CI/CD pipelines,
+Deployment services shall integrate with InventSmith Core CI/CD pipelines,
 release management, telemetry, audit logging, and governance services to
 deliver safe, predictable enterprise workflow releases.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-34.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-34.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 44 --- REFERENCE ARCHITECTURES, IMPLEMENTATION PATTERNS, AND
@@ -4474,14 +4474,14 @@ DESIGN GUIDELINES
 Purpose
 
 This chapter defines reference architectures and implementation patterns
-for building enterprise-grade Atlas workflows. These patterns provide a
+for building enterprise-grade InventSmith workflows. These patterns provide a
 common engineering foundation that promotes consistency,
 maintainability, scalability, and governance across all workflow
 implementations.
 
 Reference Architecture Layers
 
-Atlas workflow solutions shall be organized into the following logical
+InventSmith workflow solutions shall be organized into the following logical
 layers:
 
 • Presentation layer • Workflow orchestration layer • AI Department
@@ -4531,16 +4531,16 @@ coverage summary
 
 Engineering Guidance
 
-Reference architectures shall evolve alongside Atlas Core standards
+Reference architectures shall evolve alongside InventSmith Core standards
 while remaining backward compatible whenever practical. Every
 implementation shall be validated against enterprise governance,
 security, observability, and workflow quality requirements before
 production deployment.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-35.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-35.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 45 --- ENTERPRISE READINESS ASSESSMENTS, CERTIFICATION, AND
@@ -4549,7 +4549,7 @@ OPERATIONAL ACCEPTANCE
 Purpose
 
 This chapter establishes the final governance standards used to certify
-Atlas workflows before production use. Readiness assessments verify that
+InventSmith workflows before production use. Readiness assessments verify that
 workflow implementations satisfy architectural, operational, security,
 and business requirements and are capable of supporting enterprise-scale
 execution.
@@ -4580,7 +4580,7 @@ documentation • Runbook availability
 
 Certification Levels
 
-Atlas recognizes the following certification states:
+InventSmith recognizes the following certification states:
 
 • Development Ready • Integration Ready • Production Candidate •
 Production Certified • Deprecated • Retired
@@ -4602,15 +4602,15 @@ Security posture • Documentation currency • Improvement opportunities
 
 Engineering Guidance
 
-Readiness assessment services shall integrate with Atlas Core
+Readiness assessment services shall integrate with InventSmith Core
 governance, deployment, telemetry, audit, and reporting capabilities to
 ensure every workflow entering production meets enterprise quality and
 operational standards.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-36.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-36.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 46 --- ENTERPRISE REFERENCE MATRICES, CROSS-BIBLE INTEGRATION,
@@ -4619,15 +4619,15 @@ AND IMPLEMENTATION ROADMAP
 Purpose
 
 This chapter establishes the reference matrices used to align the
-Workflow Bible with every other Atlas Bible. These matrices provide a
+Workflow Bible with every other InventSmith Bible. These matrices provide a
 common architectural language for engineers, solution architects, AI
-engineers, platform engineers, and future Atlas contributors.
+engineers, platform engineers, and future InventSmith contributors.
 
 Cross-Bible Dependency Matrix
 
 The Workflow Bible integrates directly with:
 
-• Atlas Constitution • Core Bible • Business Bible • Data Model Bible •
+• InventSmith Constitution • Core Bible • Business Bible • Data Model Bible •
 API & Integration Bible • AI Departments Bible • DevOps & CI/CD Bible •
 Security Bible • Operations Bible
 
@@ -4662,22 +4662,22 @@ Architecture Alignment Checklist
 
 Every implementation shall verify:
 
-• Atlas Core compatibility • Standard event contracts • Shared data
+• InventSmith Core compatibility • Standard event contracts • Shared data
 model usage • Security compliance • API compatibility • Operational
 readiness • Governance approval
 
 Final Engineering Guidance
 
 The Workflow Bible shall be treated as the authoritative specification
-for workflow execution across Atlas. Future enhancements shall preserve
+for workflow execution across InventSmith. Future enhancements shall preserve
 backward compatibility where practical, remain fully documented, and
-align with Atlas Core architecture, governance policies, and enterprise
+align with InventSmith Core architecture, governance policies, and enterprise
 engineering standards.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-37.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-37.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 47 --- ENTERPRISE WORKFLOW REFERENCE MODELS AND DOMAIN
@@ -4686,13 +4686,13 @@ BLUEPRINTS
 Purpose
 
 This chapter defines reusable reference models that standardize workflow
-design across every Atlas business domain. These models provide
+design across every InventSmith business domain. These models provide
 implementation consistency while allowing departments to extend behavior
 without violating enterprise governance.
 
 Reference Workflow Families
 
-Atlas maintains canonical workflow families for:
+InventSmith maintains canonical workflow families for:
 
 • Idea Discovery • Research and Validation • Intellectual Property •
 Product Engineering • Manufacturing • Commercialization • Portfolio
@@ -4739,14 +4739,14 @@ Recovery procedures are documented. • Automated tests are available.
 
 Engineering Guidance
 
-Reference models shall be maintained within Atlas Core and reviewed
+Reference models shall be maintained within InventSmith Core and reviewed
 alongside the Core, Data Model, API, Security, and AI Departments Bibles
 to ensure platform-wide architectural consistency.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-38.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-38.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 48 --- WORKFLOW GOVERNANCE APPENDICES, NAMING STANDARDS, AND
@@ -4756,7 +4756,7 @@ Purpose
 
 This chapter defines the enterprise reference standards that ensure
 workflow assets remain consistent, searchable, maintainable, and
-understandable across the entire Atlas platform.
+understandable across the entire InventSmith platform.
 
 Workflow Naming Standards
 
@@ -4798,7 +4798,7 @@ Metadata Requirements
 Every workflow definition shall maintain:
 
 • Unique identifier • Display name • Semantic version • Owner • Business
-domain • Classification • Dependencies • Related Atlas Bibles • Approval
+domain • Classification • Dependencies • Related InventSmith Bibles • Approval
 history
 
 Architecture Decision Records
@@ -4817,14 +4817,14 @@ interfaces, governance, or operational expectations materially change.
 
 Engineering Guidance
 
-These standards establish the common language used throughout Atlas and
+These standards establish the common language used throughout InventSmith and
 shall be applied consistently across every workflow definition,
 implementation, integration, and supporting engineering artifact.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-39.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-39.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 49 --- WORKFLOW IMPLEMENTATION CHECKLISTS, PRODUCTION
@@ -4887,13 +4887,13 @@ activation.
 Engineering Guidance
 
 Implementation checklists and acceptance matrices shall be maintained as
-living artifacts within Atlas Core and reviewed as part of every
+living artifacts within InventSmith Core and reviewed as part of every
 workflow release to ensure continuous enterprise quality.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-40.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-40.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 50 --- WORKFLOW MATURITY MODEL, CONTINUOUS GOVERNANCE, AND
@@ -4902,7 +4902,7 @@ EVOLUTION STRATEGY
 Purpose
 
 This chapter defines the enterprise maturity model used to assess,
-improve, and govern Atlas workflows throughout their operational
+improve, and govern InventSmith workflows throughout their operational
 lifecycle. The model provides a structured roadmap for increasing
 automation, reliability, scalability, and business value while
 preserving architectural consistency.
@@ -4950,15 +4950,15 @@ recommendations • Predictable business outcomes
 
 Engineering Guidance
 
-Workflow maturity assessments shall integrate with Atlas Core
+Workflow maturity assessments shall integrate with InventSmith Core
 governance, analytics, architecture review, and release management
 processes to ensure the workflow platform evolves in a controlled,
 measurable, and enterprise-ready manner.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-41.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-41.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 51 --- ENTERPRISE WORKFLOW ROADMAP, FUTURE EXTENSIBILITY, AND
@@ -4967,7 +4967,7 @@ PLATFORM EVOLUTION
 Purpose
 
 This chapter defines the strategic roadmap for the evolution of the
-Atlas Workflow platform. It establishes principles that allow the
+InventSmith Workflow platform. It establishes principles that allow the
 workflow engine to grow while preserving compatibility, governance, and
 architectural integrity.
 
@@ -5011,7 +5011,7 @@ Include migration guidance. • Avoid breaking active workflow instances.
 
 Technology Watch
 
-Atlas engineering shall continuously evaluate:
+InventSmith engineering shall continuously evaluate:
 
 • AI orchestration advances • Workflow standards • Messaging
 technologies • Event streaming platforms • Distributed execution models
@@ -5019,8 +5019,8 @@ technologies • Event streaming platforms • Distributed execution models
 
 Final Recommendations
 
-Workflow evolution shall remain aligned with the Atlas Constitution,
-Atlas Core, Data Model, API, Security, Operations, and AI Departments
+Workflow evolution shall remain aligned with the InventSmith Constitution,
+InventSmith Core, Data Model, API, Security, Operations, and AI Departments
 Bibles. Every change shall improve maintainability, transparency,
 reliability, and inventor value without compromising enterprise
 governance.
@@ -5028,12 +5028,12 @@ governance.
 Engineering Guidance
 
 This roadmap provides the long-term direction for workflow architecture
-and serves as the foundation for future Atlas platform evolution.
+and serves as the foundation for future InventSmith platform evolution.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-42.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-42.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 52 --- CONTINUOUS IMPROVEMENT, KNOWLEDGE MANAGEMENT, AND
@@ -5041,7 +5041,7 @@ ORGANIZATIONAL LEARNING
 
 Purpose
 
-This chapter establishes the mechanisms used by Atlas to continuously
+This chapter establishes the mechanisms used by InventSmith to continuously
 improve workflow quality through operational feedback, knowledge
 capture, and enterprise learning. The objective is to ensure every
 completed workflow strengthens future workflow execution across the
@@ -5065,7 +5065,7 @@ governance guidance
 
 Feedback Sources
 
-Atlas shall collect feedback from:
+InventSmith shall collect feedback from:
 
 • Inventors • AI Departments • Platform engineers • Solution architects
 • Operations teams • Executive governance • Production telemetry
@@ -5099,15 +5099,15 @@ reuse
 
 Engineering Guidance
 
-Continuous improvement services shall integrate with Atlas Core
+Continuous improvement services shall integrate with InventSmith Core
 analytics, telemetry, governance, documentation, and AI orchestration to
 ensure every workflow contributes to an increasingly capable and
 resilient platform.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-43.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-43.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 53 --- WORKFLOW GOVERNANCE METRICS, BENCHMARKING, AND STRATEGIC
@@ -5115,7 +5115,7 @@ OVERSIGHT
 
 Purpose
 
-This chapter defines how Atlas measures the effectiveness of workflow
+This chapter defines how InventSmith measures the effectiveness of workflow
 governance across the enterprise. Governance metrics enable leadership
 to assess maturity, identify systemic improvement opportunities, and
 ensure workflows continue to deliver strategic value.
@@ -5129,7 +5129,7 @@ Risk reduction • Continuous improvement • Sustainable scalability
 
 Governance Metrics
 
-Atlas shall continuously measure:
+InventSmith shall continuously measure:
 
 • Workflow adoption rate • Policy compliance percentage • Architecture
 compliance score • Automation coverage • Exception frequency • Audit
@@ -5160,15 +5160,15 @@ Follow-up review schedules
 
 Engineering Guidance
 
-Governance metrics shall integrate with Atlas Core reporting, analytics,
+Governance metrics shall integrate with InventSmith Core reporting, analytics,
 telemetry, portfolio management, and executive dashboards to provide a
 complete, evidence-based view of enterprise workflow health and
 strategic progress.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-44.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-44.txt ENTERPRISE EXPANSION
 ====================================================================
 
 CHAPTER 54 --- ENTERPRISE WORKFLOW REFERENCE APPENDICES, GLOSSARY, AND
@@ -5178,7 +5178,7 @@ Purpose
 
 This concluding chapter provides standardized reference material
 supporting consistent implementation, governance, onboarding, and
-long-term evolution of the Atlas Workflow platform.
+long-term evolution of the InventSmith Workflow platform.
 
 Enterprise Reference Appendices
 
@@ -5198,7 +5198,7 @@ Orchestration • Workflow Blueprint
 
 Reference Tables
 
-Atlas shall maintain standardized reference tables for:
+InventSmith shall maintain standardized reference tables for:
 
 • Workflow states • Event categories • Notification priorities •
 Severity levels • SLA classifications • Security classifications •
@@ -5206,7 +5206,7 @@ Department responsibilities
 
 Governance Responsibilities
 
-The Atlas Architecture Council shall periodically review:
+The InventSmith Architecture Council shall periodically review:
 
 • Workflow standards • Naming conventions • Reference models •
 Cross-Bible alignment • Technology evolution • Governance effectiveness
@@ -5217,37 +5217,37 @@ Future revisions of this Bible shall:
 
 • Preserve architectural consistency. • Maintain backward compatibility
 where practical. • Introduce changes through documented governance. •
-Align with Atlas Core and all related Bibles. • Preserve complete
+Align with InventSmith Core and all related Bibles. • Preserve complete
 historical traceability.
 
 Closing Guidance
 
 The Workflow Bible serves as the definitive enterprise specification for
-workflow orchestration within Atlas. It establishes a durable
+workflow orchestration within InventSmith. It establishes a durable
 engineering foundation for scalable automation, transparent governance,
 and continuous innovation throughout the complete inventor lifecycle.
 
-ATLAS-009 --- WORKFLOW BIBLE Version 1.0
+INVENTSMITH-009 --- WORKFLOW BIBLE Version 1.0
 
 ====================================================================
-ATLAS-009_WORKFLOW_BIBLE_v1.0-45.txt ENTERPRISE EXPANSION
+INVENTSMITH-009_WORKFLOW_BIBLE_v1.0-45.txt ENTERPRISE EXPANSION
 ====================================================================
 
-CHAPTER 55 --- ATLAS WORKFLOW CONFORMANCE, CERTIFICATION, AND FINAL
+CHAPTER 55 --- INVENTSMITH WORKFLOW CONFORMANCE, CERTIFICATION, AND FINAL
 ENTERPRISE PRINCIPLES
 
 Purpose
 
 This concluding chapter defines the mandatory conformance requirements
-for all workflow implementations across the Atlas platform. It
+for all workflow implementations across the InventSmith platform. It
 establishes the certification criteria used to determine whether a
-workflow is considered fully Atlas-compliant and production ready.
+workflow is considered fully InventSmith-compliant and production ready.
 
 Core Conformance Principles
 
-Every Atlas workflow shall:
+Every InventSmith workflow shall:
 
-• Conform to Atlas Core architecture. • Follow approved workflow
+• Conform to InventSmith Core architecture. • Follow approved workflow
 patterns. • Use standardized state definitions. • Publish governed event
 contracts. • Support observability and auditing. • Enforce security and
 policy controls. • Maintain version compatibility. • Preserve
@@ -5257,7 +5257,7 @@ Cross-Bible Conformance
 
 Workflow implementations shall remain aligned with:
 
-• Atlas Constitution • Core Bible • Business Bible • AI Departments
+• InventSmith Constitution • Core Bible • Business Bible • AI Departments
 Bible • Data Model Bible • API & Integration Bible • Security Bible •
 Operations Bible • DevOps & CI/CD Bible
 
@@ -5288,8 +5288,8 @@ inventor outcomes without reducing transparency.
 
 Closing Statement
 
-The Atlas Workflow Bible is the authoritative enterprise specification
-for workflow orchestration within the Atlas ecosystem. Together with the
+The InventSmith Workflow Bible is the authoritative enterprise specification
+for workflow orchestration within the InventSmith ecosystem. Together with the
 companion Bibles, it establishes a unified architectural framework that
 enables secure, scalable, explainable, and continuously improving
 execution across the complete inventor lifecycle.

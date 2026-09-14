@@ -1,4 +1,4 @@
-ATLAS-012_DEVOPS_CICD_BIBLE_v1.0 Final Merged Edition \# Revision
+INVENTSMITH-012_DEVOPS_CICD_BIBLE_v1.0 Final Merged Edition \# Revision
 History Version 1.0 - Initial merged edition.
 
 # Table of Contents
@@ -9,13 +9,13 @@ Use Word navigation pane for headings.
 
 The DevOps & CI/CD Bible defines the enterprise operational standards
 for building, testing, securing, deploying, monitoring, and operating
-Project Atlas. It establishes a repeatable, automated delivery model
+Project InventSmith. It establishes a repeatable, automated delivery model
 that enables reliable releases while maintaining security, traceability,
 scalability, and operational excellence.
 
 ## DevOps Philosophy
 
-Project Atlas adopts a DevSecOps-first philosophy.
+Project InventSmith adopts a DevSecOps-first philosophy.
 
 Core principles:
 
@@ -82,7 +82,7 @@ pipelines.
 
 ## Source Control Standards
 
-Git is the authoritative source control system for Project Atlas.
+Git is the authoritative source control system for Project InventSmith.
 
 Repository requirements: - Protected default branches - Mandatory pull
 requests - Required code reviews - Status checks before merge - Signed
@@ -148,7 +148,7 @@ management systems.
 
 ## Deployment Strategies
 
-Atlas supports multiple deployment strategies selected according to
+InventSmith supports multiple deployment strategies selected according to
 risk, application criticality, and operational requirements.
 
 Supported strategies: - Rolling deployments - Blue/Green deployments -
@@ -192,7 +192,7 @@ Observability integration
 ## Terraform Standards
 
 Terraform is the primary Infrastructure as Code platform for Project
-Atlas.
+InventSmith.
 
 Requirements: - Modular architecture - Remote state storage - State
 locking - Version-pinned providers - Reusable modules - Automated
@@ -235,7 +235,7 @@ Release artifacts become immutable after publication.
 
 ## Monitoring and Observability
 
-Every Atlas environment shall provide end-to-end observability across
+Every InventSmith environment shall provide end-to-end observability across
 applications, infrastructure, databases, APIs, AI services, and CI/CD
 pipelines.
 
@@ -305,7 +305,7 @@ Operational incidents shall follow standardized response procedures:
 
 ## Backup and Disaster Recovery
 
-Project Atlas shall implement automated backup and disaster recovery
+Project InventSmith shall implement automated backup and disaster recovery
 processes for all critical systems.
 
 Backup policy includes: - Source repositories - Databases - Object
@@ -339,14 +339,14 @@ Engineering leadership shall review: - Deployment frequency - Change
 failure rate - Mean time to recovery - Lead time for changes - Security
 findings - Infrastructure drift - Automation coverage
 
-Governance ensures operational excellence across the Atlas platform.
+Governance ensures operational excellence across the InventSmith platform.
 
 (Continues in Part 07.)
 
 ## GitHub Actions Standards
 
 GitHub Actions is the primary CI/CD orchestration platform for Project
-Atlas unless an approved exception exists.
+InventSmith unless an approved exception exists.
 
 Repository workflow organization:
 
@@ -563,7 +563,7 @@ operational intervention.
 
 ## Deployment Automation Standards
 
-All deployments within Project Atlas shall be executed through approved
+All deployments within Project InventSmith shall be executed through approved
 automation. Manual deployments to production environments are prohibited
 except under formally declared emergency procedures with documented
 post-implementation review.
@@ -586,7 +586,7 @@ rebuilding software during deployment.
 
 ## Progressive Delivery
 
-Project Atlas supports progressive delivery techniques to minimize
+Project InventSmith supports progressive delivery techniques to minimize
 operational risk.
 
 Supported techniques include:
@@ -640,7 +640,7 @@ analysis.
 ## Platform Engineering Standards
 
 Platform engineering provides the standardized internal developer
-platform that enables Atlas teams to build, test, deploy, monitor, and
+platform that enables InventSmith teams to build, test, deploy, monitor, and
 operate software consistently.
 
 Platform responsibilities include:
@@ -660,7 +660,7 @@ services rather than project-specific implementations.
 
 ## Internal Developer Platform
 
-The Atlas Internal Developer Platform (IDP) shall provide:
+The InventSmith Internal Developer Platform (IDP) shall provide:
 
 -   Repository templates
 -   Standard GitHub workflows
@@ -693,7 +693,7 @@ Catalog metadata includes:
 -   Documentation
 -   Operational runbooks
 
-The service catalog becomes the authoritative inventory for the Atlas
+The service catalog becomes the authoritative inventory for the InventSmith
 platform.
 
 ## Developer Experience
@@ -756,7 +756,7 @@ Environment-specific differences shall be documented and minimized.
 Infrastructure drift occurs when deployed resources differ from the
 declared Infrastructure as Code.
 
-Atlas shall continuously detect:
+InventSmith shall continuously detect:
 
 -   Unauthorized configuration changes
 -   Missing resources
@@ -912,7 +912,7 @@ The ORR shall verify:
 
 ## DevOps Maturity Model
 
-Atlas DevOps maturity progresses through five levels:
+InventSmith DevOps maturity progresses through five levels:
 
 Level 1 -- Manual Level 2 -- Automated Builds Level 3 -- Automated
 Delivery Level 4 -- Continuous Deployment Level 5 -- Autonomous
@@ -996,7 +996,7 @@ Key reliability objectives include:
 
 ## Service Reliability Engineering (SRE)
 
-Project Atlas incorporates Site Reliability Engineering (SRE) principles
+Project InventSmith incorporates Site Reliability Engineering (SRE) principles
 to improve platform stability, scalability, and operational efficiency.
 
 Core SRE objectives:
@@ -1138,11 +1138,11 @@ Compliance results become permanent deployment records.
 ## Operational Metrics and Continuous Improvement
 
 Operational excellence shall be measured using objective engineering
-metrics that enable continuous improvement across the Atlas platform.
+metrics that enable continuous improvement across the InventSmith platform.
 
 ### Core DevOps Metrics
 
-Project Atlas adopts industry-recognized delivery metrics including:
+Project InventSmith adopts industry-recognized delivery metrics including:
 
 -   Deployment Frequency
 -   Lead Time for Changes
@@ -1208,7 +1208,7 @@ and future revisions of this Bible.
 
 ## Enterprise DevOps Compliance
 
-Every production delivery pipeline shall comply with Atlas engineering
+Every production delivery pipeline shall comply with InventSmith engineering
 governance before software is eligible for deployment.
 
 ### Compliance Requirements
@@ -1284,7 +1284,7 @@ platform releases.
 
 ## Enterprise DevOps Certification
 
-Before any Project Atlas application, service, or infrastructure
+Before any Project InventSmith application, service, or infrastructure
 component is approved for production deployment, the associated DevOps
 pipeline shall complete an enterprise certification review.
 
@@ -1329,7 +1329,7 @@ deployment audit record.
 ## Continuous Compliance
 
 Continuous compliance ensures that operational, security, and governance
-controls remain effective throughout the lifecycle of every Atlas
+controls remain effective throughout the lifecycle of every InventSmith
 service.
 
 Continuous validation shall monitor:
@@ -1424,7 +1424,7 @@ future engineering planning.
 
 ## DevOps Excellence Principle
 
-Project Atlas considers DevOps to be a strategic engineering capability
+Project InventSmith considers DevOps to be a strategic engineering capability
 rather than a supporting toolset. Every automation, deployment,
 operational procedure, and governance practice shall contribute to
 secure, reliable, scalable, and continuously improving software
@@ -1466,10 +1466,10 @@ records retained \[ \] Ownership confirmed
 
 ## Final Operational Principle
 
-Project Atlas treats DevOps as a continuous engineering discipline.
+Project InventSmith treats DevOps as a continuous engineering discipline.
 Automation, observability, security, governance, and operational
 excellence shall evolve together to ensure reliable, repeatable, and
-scalable software delivery across every Atlas platform component.
+scalable software delivery across every InventSmith platform component.
 
 (Continues in Final Part 24.)
 
@@ -1477,9 +1477,9 @@ scalable software delivery across every Atlas platform component.
 
 The DevOps & CI/CD Bible establishes the operational foundation for
 building, validating, deploying, monitoring, securing, and continuously
-improving every Project Atlas platform.
+improving every Project InventSmith platform.
 
-DevOps within Atlas is not merely a deployment mechanism. It is an
+DevOps within InventSmith is not merely a deployment mechanism. It is an
 enterprise operating model that unifies engineering, security,
 infrastructure, operations, and governance into a single, automated
 software delivery capability.
@@ -1499,7 +1499,7 @@ Every DevOps implementation shall remain:
 
 ## Mandatory Compliance
 
-All Atlas products, services, APIs, AI systems, infrastructure, and
+All InventSmith products, services, APIs, AI systems, infrastructure, and
 supporting platforms shall adopt these standards unless an approved
 Architecture Decision Record explicitly authorizes an exception.
 
@@ -1512,22 +1512,22 @@ Compliance shall be verified through:
 -   Governance audits
 -   Continuous compliance monitoring
 
-These standards shall evolve alongside Project Atlas while preserving
+These standards shall evolve alongside Project InventSmith while preserving
 the core principles of automation, reliability, security, operational
 excellence, and engineering consistency.
 
-END OF ATLAS-012_DEVOPS_CICD_BIBLE_v1.0
+END OF INVENTSMITH-012_DEVOPS_CICD_BIBLE_v1.0
 
-# ATLAS-014 DevOps CI/CD Bible --- Enterprise Expansion (01--18)
+# INVENTSMITH-014 DevOps CI/CD Bible --- Enterprise Expansion (01--18)
 
 ## Expansion 01
 
-ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-01.txt
+INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-01.txt
 
 CHAPTER 25 --- AI-Driven DevOps & Intelligent Delivery
 
 Purpose This enterprise expansion establishes standards for integrating
-artificial intelligence into the Atlas DevOps ecosystem while preserving
+artificial intelligence into the InventSmith DevOps ecosystem while preserving
 governance, security, reliability, traceability, and human
 accountability.
 
@@ -1570,12 +1570,12 @@ Future Extensibility
 The DevOps platform shall evolve toward policy-aware AI orchestration,
 predictive delivery optimization, and autonomous engineering assistance
 while preserving enterprise governance and operational excellence. \##
-Expansion 02 ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-02.txt
+Expansion 02 INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-02.txt
 
 CHAPTER 26 --- GitOps Governance & Declarative Operations
 
 Purpose This chapter establishes enterprise GitOps standards for
-managing Atlas deployments through version-controlled, declarative
+managing InventSmith deployments through version-controlled, declarative
 configuration with continuous reconciliation and governance.
 
 Objectives • Standardize deployments. • Eliminate configuration drift. •
@@ -1618,11 +1618,11 @@ Future Extensibility
 GitOps governance shall evolve to support AI-assisted reconciliation,
 policy-aware deployment optimization, multi-cluster orchestration, and
 enterprise-scale platform automation. \## Expansion 03
-ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-03.txt
+INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-03.txt
 
 CHAPTER 27 --- Internal Developer Platform (IDP) Architecture
 
-Purpose This chapter defines standards for the Atlas Internal Developer
+Purpose This chapter defines standards for the InventSmith Internal Developer
 Platform (IDP), providing secure self-service engineering capabilities
 while enforcing enterprise governance and operational consistency.
 
@@ -1665,7 +1665,7 @@ Future Extensibility
 The IDP shall evolve to support AI-assisted engineering, autonomous
 environment provisioning, intelligent service recommendations, and
 enterprise-scale platform orchestration while maintaining governance.
-\## Expansion 04 ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-04.txt
+\## Expansion 04 INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-04.txt
 
 CHAPTER 28 --- Ephemeral Environment Strategy
 
@@ -1713,15 +1713,15 @@ Deployment validation • Resource consumption • Security findings
 
 Future Extensibility
 
-The Atlas platform shall evolve toward intelligent environment
+The InventSmith platform shall evolve toward intelligent environment
 provisioning, AI-assisted capacity optimization, predictive lifecycle
 management, and fully automated elastic engineering environments. \##
-Expansion 05 ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-05.txt
+Expansion 05 INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-05.txt
 
 CHAPTER 29 --- Progressive Delivery Governance
 
 Purpose This chapter establishes governance standards for progressive
-software delivery, enabling Atlas to reduce deployment risk through
+software delivery, enabling InventSmith to reduce deployment risk through
 controlled rollout, continuous validation, and data-driven release
 decisions.
 
@@ -1768,12 +1768,12 @@ Future Extensibility
 Progressive delivery shall evolve to support AI-assisted release
 orchestration, predictive deployment safety analysis, autonomous rollout
 optimization, and enterprise-scale intelligent software delivery. \##
-Expansion 06 ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-06.txt
+Expansion 06 INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-06.txt
 
 CHAPTER 30 --- DevOps FinOps Integration
 
 Purpose This chapter establishes enterprise standards for integrating
-Financial Operations (FinOps) into the Atlas DevOps platform to optimize
+Financial Operations (FinOps) into the InventSmith DevOps platform to optimize
 cloud spending, pipeline efficiency, infrastructure utilization, and
 engineering value.
 
@@ -1820,12 +1820,12 @@ Future Extensibility
 The DevOps FinOps framework shall evolve to support AI-assisted cost
 forecasting, predictive resource optimization, autonomous budgeting, and
 enterprise engineering financial intelligence. \## Expansion 07
-ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-07.txt
+INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-07.txt
 
 CHAPTER 31 --- Multi-Cloud DevOps Strategy
 
 Purpose This chapter establishes enterprise standards for building,
-deploying, and operating Atlas workloads across multiple cloud providers
+deploying, and operating InventSmith workloads across multiple cloud providers
 while maintaining consistent governance, portability, security, and
 operational excellence.
 
@@ -1867,16 +1867,16 @@ Capacity trends • Cost analytics • Security posture
 
 Future Extensibility
 
-The Atlas DevOps platform shall evolve toward intelligent multi-cloud
+The InventSmith DevOps platform shall evolve toward intelligent multi-cloud
 orchestration, AI-assisted placement decisions, autonomous failover, and
 policy-driven global delivery while maintaining enterprise governance.
-\## Expansion 08 ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-08.txt
+\## Expansion 08 INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-08.txt
 
 CHAPTER 32 --- Software Delivery Intelligence
 
 Purpose This chapter defines the enterprise intelligence framework for
 measuring, analyzing, and continuously improving software delivery
-across Project Atlas using operational data, engineering analytics, and
+across Project InventSmith using operational data, engineering analytics, and
 AI-assisted insights.
 
 Objectives • Improve delivery predictability. • Increase deployment
@@ -1919,7 +1919,7 @@ Future Extensibility
 Software delivery intelligence shall evolve toward predictive
 engineering, autonomous pipeline optimization, enterprise-wide
 operational analytics, and AI-guided delivery governance. \## Expansion
-09 ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-09.txt
+09 INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-09.txt
 
 CHAPTER 33 --- Autonomous Pipeline Optimization
 
@@ -1968,17 +1968,17 @@ feedback
 
 Future Extensibility
 
-Atlas CI/CD shall evolve toward AI-guided orchestration, autonomous
+InventSmith CI/CD shall evolve toward AI-guided orchestration, autonomous
 pipeline tuning, predictive optimization, and enterprise-scale
 intelligent software delivery while preserving governance and
 operational excellence. \## Expansion 10
-ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-10.txt
+INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-10.txt
 
 CHAPTER 34 --- DevOps Governance Scorecards & Platform Maturity
 
 Purpose This chapter defines standardized governance scorecards used to
 evaluate the health, maturity, compliance, and effectiveness of the
-Atlas DevOps ecosystem.
+InventSmith DevOps ecosystem.
 
 Objectives • Standardize DevOps evaluation. • Measure platform maturity.
 • Improve engineering governance. • Enable executive visibility. • Drive
@@ -2041,7 +2041,7 @@ Future Extensibility
 
 The governance model shall evolve toward AI-driven evaluation systems,
 autonomous compliance scoring, and real-time DevOps intelligence
-platforms. \## Expansion 11 ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-11.txt
+platforms. \## Expansion 11 INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-11.txt
 
 CHAPTER 35 --- CI/CD Continuous Audit Automation
 
@@ -2104,13 +2104,13 @@ Future Extensibility
 The audit framework shall evolve toward autonomous compliance engines,
 AI-driven governance enforcement, predictive risk detection, and
 enterprise- scale real-time audit intelligence systems. \## Expansion 12
-ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-12.txt
+INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-12.txt
 
 CHAPTER 36 --- DevSecOps Architecture Deep Dive
 
 Purpose This chapter defines the enterprise security architecture for
 integrating security directly into every stage of the DevOps lifecycle
-within Atlas, ensuring systems are secure by design, continuously
+within InventSmith, ensuring systems are secure by design, continuously
 validated, and resilient against evolving threats.
 
 Objectives • Embed security in CI/CD. • Reduce attack surface. •
@@ -2169,12 +2169,12 @@ Future Extensibility
 The DevSecOps framework shall evolve toward autonomous security
 enforcement, AI-driven threat prediction, self-healing defenses, and
 enterprise-scale continuous security intelligence. \## Expansion 13
-ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-13.txt
+INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-13.txt
 
 CHAPTER 37 --- Supply Chain Security Hardening
 
 Purpose This chapter defines advanced enterprise controls for securing
-the software supply chain across all Atlas DevOps pipelines, ensuring
+the software supply chain across all InventSmith DevOps pipelines, ensuring
 integrity, traceability, and trust from source to production runtime.
 
 Objectives • Eliminate supply chain compromise risk. • Strengthen
@@ -2246,13 +2246,13 @@ Future Extensibility
 The supply chain security framework shall evolve toward autonomous trust
 verification, AI-driven vulnerability prediction, self-healing
 dependency management, and enterprise-scale cryptographic assurance
-systems. \## Expansion 14 ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-14.txt
+systems. \## Expansion 14 INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-14.txt
 
 CHAPTER 38 --- GitOps at Scale: Multi-Cluster Orchestration
 
 Purpose This chapter defines enterprise-grade GitOps operating models
 for managing large-scale, multi-cluster, multi-region deployment systems
-across the Atlas platform with consistent governance, observability, and
+across the InventSmith platform with consistent governance, observability, and
 automated reconciliation.
 
 Objectives • Enable multi-cluster consistency. • Standardize distributed
@@ -2319,12 +2319,12 @@ Future Extensibility
 GitOps at scale shall evolve toward autonomous fleet management,
 AI-driven orchestration, predictive drift correction, and self-healing
 global deployment systems. \## Expansion 15
-ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-15.txt
+INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-15.txt
 
 CHAPTER 39 --- DevOps Observability Platform Deep Dive
 
 Purpose This chapter defines the enterprise observability architecture
-for the Atlas DevOps ecosystem, enabling unified visibility across
+for the InventSmith DevOps ecosystem, enabling unified visibility across
 pipelines, infrastructure, applications, and GitOps systems with
 intelligent analytics and real-time operational insight.
 
@@ -2379,12 +2379,12 @@ Future Extensibility
 The DevOps observability layer shall evolve toward autonomous operations
 intelligence, predictive incident resolution, and AI-driven system-wide
 observability orchestration. \## Expansion 16
-ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-16.txt
+INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-16.txt
 
 CHAPTER 40 --- DevOps Autonomous Operations Framework
 
 Purpose This chapter defines the enterprise framework for autonomous
-DevOps operations within the Atlas platform, enabling systems to
+DevOps operations within the InventSmith platform, enabling systems to
 self-detect issues, self-heal, and self-optimize while maintaining
 strict governance, auditability, and human oversight.
 
@@ -2442,12 +2442,12 @@ Future Extensibility
 The autonomous DevOps framework shall evolve toward fully self-managing
 platforms with AI orchestration, predictive stability assurance, and
 enterprise-grade autonomous engineering systems while preserving
-governance. \## Expansion 17 ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-17.txt
+governance. \## Expansion 17 INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-17.txt
 
 CHAPTER 41 --- DevOps Platform Security & Zero Trust Operations Layer
 
 Purpose This chapter defines the enterprise security and Zero Trust
-operational layer for the Atlas DevOps platform, ensuring that every
+operational layer for the InventSmith DevOps platform, ensuring that every
 pipeline, deployment, runtime system, and automation agent operates
 under strict identity, authorization, and verification controls.
 
@@ -2511,13 +2511,13 @@ Future Extensibility
 
 The DevSecOps runtime security layer shall evolve toward autonomous
 threat prevention, AI-driven identity governance, self-healing security
-systems, and fully automated zero-trust enforcement across all Atlas
-platforms. \## Expansion 18 ATLAS-014_DEVOPS_CICD_BIBLE_v1.0-18.txt
+systems, and fully automated zero-trust enforcement across all InventSmith
+platforms. \## Expansion 18 INVENTSMITH-014_DEVOPS_CICD_BIBLE_v1.0-18.txt
 
 CHAPTER 42 --- DevOps FinOps + Security Convergence Layer
 
 Purpose This chapter defines the unified convergence layer between
-DevOps, FinOps, and Security operations within the Atlas platform,
+DevOps, FinOps, and Security operations within the InventSmith platform,
 enabling a single governed model for cost, risk, and operational
 control.
 
@@ -2575,7 +2575,7 @@ tracking • Automated remediation workflows
 
 Final Platform Synthesis
 
-The Atlas DevOps ecosystem shall operate as a unified, intelligent,
+The InventSmith DevOps ecosystem shall operate as a unified, intelligent,
 policy-driven engineering platform where cost, security, and delivery
 are continuously optimized together.
 

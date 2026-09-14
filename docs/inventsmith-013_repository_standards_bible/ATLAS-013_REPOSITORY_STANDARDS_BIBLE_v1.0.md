@@ -1,4 +1,4 @@
-ATLAS-011_REPOSITORY_STANDARDS_BIBLE_v1.0 Final Merged Edition
+INVENTSMITH-011_REPOSITORY_STANDARDS_BIBLE_v1.0 Final Merged Edition
 
 # Revision History
 
@@ -15,12 +15,12 @@ Generated headings appear below in document navigation.
 The Repository Standards Bible establishes the mandatory repository
 architecture, organizational standards, governance rules, naming
 conventions, documentation requirements, and lifecycle management
-practices for Project Atlas. It defines a single enterprise repository
+practices for Project InventSmith. It defines a single enterprise repository
 standard that supports long-term maintainability, scalability,
 automation, AI collaboration, security, and predictable software
 delivery.
 
-Every repository within Project Atlas shall conform to this standard
+Every repository within Project InventSmith shall conform to this standard
 unless an Architecture Decision Record (ADR) explicitly approves a
 documented exception.
 
@@ -132,7 +132,7 @@ Draft notes belong outside the canonical documentation hierarchy.
 ## Documentation Repository Organization
 
 The documentation repository is the authoritative knowledge base for
-Atlas. Every production document must be version-controlled, reviewed,
+InventSmith. Every production document must be version-controlled, reviewed,
 and traceable to architectural intent.
 
 Canonical documentation structure:
@@ -228,7 +228,7 @@ Repository settings are managed as code whenever supported.
 
 ## Branching Strategy
 
-Project Atlas adopts a protected trunk-based workflow with structured
+Project InventSmith adopts a protected trunk-based workflow with structured
 release branches.
 
 Primary branches:
@@ -265,7 +265,7 @@ Commits shall never combine unrelated work.
 
 ## Versioning
 
-Atlas follows Semantic Versioning.
+InventSmith follows Semantic Versioning.
 
 MAJOR Breaking architectural changes.
 
@@ -307,7 +307,7 @@ All prompt revisions are version controlled and documented.
 
 ## Module Organization Standards
 
-Every Atlas module shall represent a cohesive business capability with
+Every InventSmith module shall represent a cohesive business capability with
 clearly defined boundaries. Modules shall maximize cohesion and minimize
 coupling. Public interfaces must be intentional and stable, while
 internal implementation details remain encapsulated.
@@ -541,7 +541,7 @@ Repository quality is a shared engineering responsibility.
 
 ## Prompt Repository Organization
 
-All AI prompts used by Project Atlas shall be treated as production
+All AI prompts used by Project InventSmith shall be treated as production
 software assets.
 
 Repository layout:
@@ -571,7 +571,7 @@ Decision logic - Failure handling - Escalation rules - Expected outputs
 
 ## Monorepo Standards
 
-Project Atlas uses a logical monorepo structure to encourage shared
+Project InventSmith uses a logical monorepo structure to encourage shared
 tooling while preserving clear ownership boundaries.
 
 Requirements:
@@ -645,7 +645,7 @@ owner.
 
 Ownership responsibilities include: - Reviewing changes - Maintaining
 documentation - Responding to issues - Approving architectural changes -
-Monitoring quality metrics - Ensuring compliance with Atlas standards
+Monitoring quality metrics - Ensuring compliance with InventSmith standards
 
 Ownership shall be recorded through CODEOWNERS and governance
 documentation.
@@ -693,7 +693,7 @@ whenever feasible.
 
 ## Repository Compliance Standards
 
-All Atlas repositories shall comply with enterprise governance
+All InventSmith repositories shall comply with enterprise governance
 requirements before being designated as production-ready.
 
 Mandatory compliance includes:
@@ -752,7 +752,7 @@ prompts/ ├── scripts/ ├── tests/ ├── tools/ ├── CHANGELO
 ├── README.md └── SECURITY.md
 
 This structure represents the canonical enterprise repository layout for
-Atlas and should be used as the baseline for all future repositories
+InventSmith and should be used as the baseline for all future repositories
 unless superseded by an approved Architecture Decision Record.
 
 ## Repository Guiding Principles
@@ -792,7 +792,7 @@ Required metadata includes:
 -   Technology stack
 -   Compliance requirements
 -   Linked Architecture Decision Records
--   Related Atlas Bible references
+-   Related InventSmith Bible references
 
 Repository metadata shall remain synchronized with governance systems
 and deployment automation.
@@ -855,7 +855,7 @@ Manual repository creation is discouraged unless formally approved.
 
 ## Repository Lifecycle Governance
 
-Every Atlas repository shall progress through a controlled lifecycle
+Every InventSmith repository shall progress through a controlled lifecycle
 governed by architecture, engineering management, and product
 leadership.
 
@@ -933,7 +933,7 @@ The following practices are prohibited:
 -   Orphaned modules
 -   Circular dependencies
 -   Manual production changes without reconciliation
--   Repository-specific conventions that conflict with Atlas standards
+-   Repository-specific conventions that conflict with InventSmith standards
 
 Consistency is preferred over individual optimization.
 
@@ -941,7 +941,7 @@ Consistency is preferred over individual optimization.
 
 ## Enterprise Repository Reference Architecture
 
-All Project Atlas repositories shall conform to a common reference
+All Project InventSmith repositories shall conform to a common reference
 architecture to ensure predictability, maintainability, automation
 compatibility, and rapid onboarding.
 
@@ -956,7 +956,7 @@ CODEOWNERS ├── CONTRIBUTING.md ├── LICENSE ├── README.md └�
 
 README.md Defines repository purpose, architecture overview, setup
 instructions, supported platforms, dependencies, ownership, and links to
-authoritative Atlas documentation.
+authoritative InventSmith documentation.
 
 CHANGELOG.md Maintains chronological release history following semantic
 versioning.
@@ -976,7 +976,7 @@ license.
 
 ## Repository Bootstrap Standards
 
-Every new Atlas repository shall be created from an approved repository
+Every new InventSmith repository shall be created from an approved repository
 template.
 
 Bootstrap automation shall provision:
@@ -1019,7 +1019,7 @@ Represent a single responsibility. - Avoid generic names such as "misc",
 
 ## File Naming Standards
 
-Production documents: ATLAS-###\_DOCUMENT_NAME_vMAJOR.MINOR
+Production documents: INVENTSMITH-###\_DOCUMENT_NAME_vMAJOR.MINOR
 
 Architecture Decision Records: ADR-###\_Short_Title.md
 
@@ -1059,14 +1059,14 @@ Engineering teams shall:
 -   Maintain backward compatibility for tooling whenever practical.
 
 Repository consistency is considered an architectural quality attribute
-and shall be protected throughout the lifetime of Project Atlas.
+and shall be protected throughout the lifetime of Project InventSmith.
 
 (Continues in Part 14.)
 
 ## Repository Governance Framework
 
-Repository governance ensures every Atlas repository remains consistent,
-secure, maintainable, and aligned with the Atlas Constitution, Product
+Repository governance ensures every InventSmith repository remains consistent,
+secure, maintainable, and aligned with the InventSmith Constitution, Product
 Bible, Technical Architecture Bible, and all approved Architecture
 Decision Records.
 
@@ -1120,7 +1120,7 @@ Level 1 -- Initial Basic repository with minimal governance.
 
 Level 2 -- Managed Documented workflows and protected branches.
 
-Level 3 -- Standardized Repository fully aligned with Atlas standards.
+Level 3 -- Standardized Repository fully aligned with InventSmith standards.
 
 Level 4 -- Measured Quality metrics continuously monitored.
 
@@ -1133,7 +1133,7 @@ Repositories should continually progress toward Level 5 maturity.
 
 ## Repository Operational Excellence
 
-Repository operational excellence ensures that every Atlas repository
+Repository operational excellence ensures that every InventSmith repository
 remains reliable, maintainable, observable, secure, and efficient
 throughout its operational lifetime.
 
@@ -1224,7 +1224,7 @@ Repository recovery procedures shall be exercised periodically.
 
 ## Long-Term Preservation
 
-Atlas repositories preserve institutional knowledge.
+InventSmith repositories preserve institutional knowledge.
 
 The following artifacts shall never be discarded without formal
 approval:
@@ -1323,7 +1323,7 @@ Multi-agent orchestration assets - Knowledge graph organization -
 Autonomous development workflows - Enterprise governance automation -
 Emerging repository technologies
 
-All future revisions shall remain consistent with the Atlas Constitution
+All future revisions shall remain consistent with the InventSmith Constitution
 and enterprise engineering principles.
 
 (Continues in Part 18.)
@@ -1362,14 +1362,14 @@ This Bible shall be reviewed:
 -   Following significant production incidents.
 -   Following organizational restructuring.
 -   When introducing new engineering platforms.
--   Before major Atlas platform releases.
+-   Before major InventSmith platform releases.
 
 Proposed revisions shall follow the Architecture Decision Record process
 and receive formal approval before adoption.
 
 ## Closing Principles
 
-The repository is the permanent operational memory of Project Atlas.
+The repository is the permanent operational memory of Project InventSmith.
 
 A well-governed repository:
 
@@ -1382,7 +1382,7 @@ A well-governed repository:
 -   Simplifies long-term maintenance.
 
 Every repository shall embody the engineering principles established
-throughout the Atlas documentation suite and remain an asset that future
+throughout the InventSmith documentation suite and remain an asset that future
 engineering teams can confidently understand, maintain, and extend.
 
 (Continues in Part 19.)
@@ -1401,7 +1401,7 @@ technically feasible.
 
 ## Cross-Repository Standards
 
-Repositories participating in the Atlas platform shall follow common
+Repositories participating in the InventSmith platform shall follow common
 conventions for:
 
 -   Semantic versioning
@@ -1449,7 +1449,7 @@ Before a repository is considered production ready it shall verify:
 
 ## Repository Automation Governance
 
-Automation is a foundational principle of Project Atlas. Repository
+Automation is a foundational principle of Project InventSmith. Repository
 operations shall be automated whenever automation improves consistency,
 reliability, security, or developer productivity.
 
@@ -1575,7 +1575,7 @@ Repository compliance shall be continuously re-evaluated through
 automated governance tooling. Engineering leadership shall review trends
 rather than isolated events to identify opportunities for
 standardization, simplification, and quality improvement across the
-Atlas platform.
+InventSmith platform.
 
 (Continues in Part 22.)
 
@@ -1614,13 +1614,13 @@ When a repository is replaced or retired:
 -   Repository status shall change to Archived.
 -   Documentation shall remain accessible.
 
-Archived repositories remain part of the Atlas engineering knowledge
+Archived repositories remain part of the InventSmith engineering knowledge
 base and shall preserve their complete history for audit, reference, and
 future engineering research.
 
 ## Standard of Excellence
 
-A Project Atlas repository is considered complete only when its code,
+A Project InventSmith repository is considered complete only when its code,
 documentation, automation, governance, security, testing, and
 operational readiness evolve together as a single cohesive engineering
 asset.
@@ -1656,19 +1656,19 @@ Governance \[ \] Ownership assigned \[ \] Repository metadata current \[
 
 ## Final Engineering Principle
 
-Every Atlas repository is expected to be understandable, secure,
+Every InventSmith repository is expected to be understandable, secure,
 maintainable, reproducible, well documented, and automation-friendly
 from its first commit through its final archival.
 
 Repository quality directly influences engineering velocity, operational
-stability, and the long-term success of Project Atlas.
+stability, and the long-term success of Project InventSmith.
 
 (Continues in Final Part 24.)
 
 ## Closing Statement
 
 The Repository Standards Bible establishes the enterprise foundation for
-organizing, governing, maintaining, and evolving every Project Atlas
+organizing, governing, maintaining, and evolving every Project InventSmith
 repository.
 
 Repository standards are not intended to restrict innovation. Their
@@ -1691,7 +1691,7 @@ Every repository shall remain:
 
 ## Mandatory Compliance
 
-All current and future Atlas repositories shall adopt these standards
+All current and future InventSmith repositories shall adopt these standards
 unless an approved Architecture Decision Record explicitly authorizes an
 exception.
 
@@ -1710,25 +1710,25 @@ future platform components.
 
 ## Continuous Evolution
 
-This document is intended to evolve alongside Project Atlas.
+This document is intended to evolve alongside Project InventSmith.
 
 Future revisions may expand repository guidance to support new
 technologies, engineering practices, AI capabilities, and organizational
 growth while preserving the core principles of clarity, consistency,
 automation, and long-term maintainability.
 
-END OF ATLAS-011_REPOSITORY_STANDARDS_BIBLE_v1.0
+END OF INVENTSMITH-011_REPOSITORY_STANDARDS_BIBLE_v1.0
 
 # Enterprise Repository Standards Expansion
 
 ## Expansion 01
 
-ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-01.txt
+INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-01.txt
 
 CHAPTER 25 --- Repository Knowledge Architecture
 
 Purpose This enterprise expansion establishes repository knowledge
-management standards that transform every Atlas repository into a
+management standards that transform every InventSmith repository into a
 searchable, governed engineering knowledge asset rather than simply a
 source-code container.
 
@@ -1774,9 +1774,9 @@ Future Extensibility
 
 The knowledge architecture shall evolve to support enterprise knowledge
 graphs, AI copilots, autonomous documentation assistants, and future
-Atlas governance platforms while maintaining compatibility with the
+InventSmith governance platforms while maintaining compatibility with the
 Repository Standards Bible foundation. \## Expansion 02
-ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-02.txt
+INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-02.txt
 
 CHAPTER 26 --- AI-Native Repository Engineering
 
@@ -1827,8 +1827,8 @@ Future Extensibility
 
 The repository architecture shall evolve to support multi-agent
 engineering, autonomous documentation, AI-assisted reviews, and governed
-automation while remaining aligned with Atlas repository standards. \##
-Expansion 03 ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-03.txt
+automation while remaining aligned with InventSmith repository standards. \##
+Expansion 03 INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-03.txt
 
 CHAPTER 27 --- Repository Supply Chain Security
 
@@ -1883,14 +1883,14 @@ Future Extensibility
 The supply chain framework shall evolve to support emerging provenance
 standards, advanced attestation models, AI-generated software
 validation, and future enterprise security requirements. \## Expansion
-04 ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-04.txt
+04 INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-04.txt
 
 CHAPTER 28 --- Repository Telemetry & Engineering Analytics
 
 Purpose This chapter defines the standards for collecting, analyzing,
 and acting upon repository telemetry to improve engineering quality,
 operational efficiency, developer experience, and governance across
-Project Atlas.
+Project InventSmith.
 
 Objectives • Measure repository health. • Improve engineering
 productivity. • Detect quality trends early. • Support evidence-based
@@ -1935,7 +1935,7 @@ Future Extensibility
 Repository analytics shall evolve to support predictive engineering,
 AI-driven insights, automated governance reporting, and enterprise-wide
 knowledge intelligence. \## Expansion 05
-ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-05.txt
+INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-05.txt
 
 CHAPTER 29 --- Cross-Repository Dependency Governance
 
@@ -1995,7 +1995,7 @@ Future Extensibility
 The dependency governance framework shall support automated impact
 analysis, graph-based dependency visualization, AI-assisted upgrade
 planning, and enterprise-scale repository federation. \## Expansion 06
-ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-06.txt
+INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-06.txt
 
 CHAPTER 30 --- Repository Information Architecture & Knowledge
 Stewardship
@@ -2003,7 +2003,7 @@ Stewardship
 Purpose This chapter defines how repository information shall be
 classified, organized, retained, governed, and discovered to ensure that
 engineering knowledge remains accurate, accessible, and useful
-throughout the lifecycle of Project Atlas.
+throughout the lifecycle of Project InventSmith.
 
 Objectives • Standardize information organization. • Improve
 discoverability. • Reduce duplicated knowledge. • Protect sensitive
@@ -2059,11 +2059,11 @@ The information architecture shall evolve to support enterprise
 knowledge graphs, intelligent search, autonomous classification, and
 AI-powered engineering assistants while preserving governance and
 long-term maintainability. \## Expansion 07
-ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-07.txt
+INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-07.txt
 
 CHAPTER 31 --- Repository Digital Twin Architecture
 
-Purpose This chapter defines a digital representation of each Atlas
+Purpose This chapter defines a digital representation of each InventSmith
 repository that captures its structure, health, dependencies, governance
 status, and engineering metrics to support informed decision-making and
 continuous improvement.
@@ -2111,7 +2111,7 @@ Future Extensibility
 Repository digital twins shall evolve to support autonomous governance,
 AI-driven engineering recommendations, enterprise knowledge graphs, and
 cross-platform operational intelligence. \## Expansion 08
-ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-08.txt
+INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-08.txt
 
 CHAPTER 32 --- Repository Cost Governance & Engineering FinOps
 
@@ -2166,7 +2166,7 @@ Future Extensibility
 Repository cost governance shall evolve to support AI-assisted cost
 forecasting, automated optimization recommendations, predictive
 budgeting, and enterprise engineering FinOps analytics. \## Expansion 09
-ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-09.txt
+INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-09.txt
 
 CHAPTER 33 --- Repository Lifecycle Automation & Autonomous Operations
 
@@ -2224,12 +2224,12 @@ Repository automation shall evolve toward autonomous engineering
 assistance, predictive maintenance, policy-aware AI agents, and
 enterprise-scale workflow orchestration while maintaining transparent
 human governance. \## Expansion 10
-ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-10.txt
+INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-10.txt
 
 CHAPTER 34 --- Repository AI Governance Framework
 
 Purpose This chapter establishes governance standards for the
-responsible use of AI within Atlas repositories, ensuring that
+responsible use of AI within InventSmith repositories, ensuring that
 AI-assisted engineering improves productivity while maintaining
 security, accountability, quality, and architectural integrity.
 
@@ -2282,13 +2282,13 @@ The AI governance framework shall evolve to support multi-agent
 engineering, policy-aware orchestration, autonomous compliance
 verification, and emerging enterprise AI governance standards while
 preserving human oversight. \## Expansion 11
-ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-11.txt
+INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-11.txt
 
 CHAPTER 35 --- Repository Governance Scorecards & Maturity Assessment
 
 Purpose This chapter defines enterprise scorecards and maturity models
 used to measure repository quality, governance compliance, operational
-excellence, and continuous improvement across the Atlas platform.
+excellence, and continuous improvement across the InventSmith platform.
 
 Objectives • Measure repository maturity. • Standardize governance
 reporting. • Identify improvement opportunities. • Benchmark engineering
@@ -2306,7 +2306,7 @@ Level 1 --- Foundational Basic repository standards implemented.
 
 Level 2 --- Managed Governance processes established.
 
-Level 3 --- Enterprise Repository fully aligned with Atlas standards.
+Level 3 --- Enterprise Repository fully aligned with InventSmith standards.
 
 Level 4 --- Optimized Advanced automation, observability, and analytics
 implemented.
@@ -2341,13 +2341,13 @@ Future Extensibility
 The governance framework shall evolve to support enterprise-wide
 maturity benchmarking, AI-generated recommendations, autonomous
 compliance analysis, and strategic engineering reporting. \## Expansion
-12 ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-12.txt
+12 INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-12.txt
 
 CHAPTER 36 --- Enterprise Repository Certification & Continuous
 Validation
 
 Purpose This chapter defines the enterprise certification program that
-verifies every Atlas repository satisfies governance, engineering,
+verifies every InventSmith repository satisfies governance, engineering,
 security, operational, and documentation standards before production use
 and throughout its lifecycle.
 
@@ -2400,11 +2400,11 @@ Future Extensibility
 The certification framework shall evolve to support continuous
 accreditation, AI-assisted evidence collection, autonomous compliance
 reporting, and organization-wide repository governance. \## Expansion 13
-ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-13.txt
+INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-13.txt
 
 CHAPTER 37 --- Repository Operational Excellence
 
-Purpose This chapter establishes operational standards that ensure Atlas
+Purpose This chapter establishes operational standards that ensure InventSmith
 repositories remain reliable, observable, maintainable, and continuously
 improving throughout their lifecycle.
 
@@ -2460,11 +2460,11 @@ Future Extensibility
 Operational excellence shall evolve to support AI-assisted operations,
 predictive reliability engineering, autonomous remediation, and
 enterprise repository operations management. \## Expansion 14
-ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-14.txt
+INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-14.txt
 
 CHAPTER 38 --- Repository Disaster Recovery & Business Continuity
 
-Purpose This chapter defines enterprise standards for protecting Atlas
+Purpose This chapter defines enterprise standards for protecting InventSmith
 repositories against accidental loss, corruption, cyber incidents, and
 infrastructure failures while ensuring rapid recovery and uninterrupted
 engineering operations.
@@ -2517,13 +2517,13 @@ Future Extensibility
 Repository resilience shall evolve to support autonomous recovery
 validation, predictive resilience analytics, AI-assisted disaster
 response, and enterprise continuity orchestration. \## Expansion 15
-ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-15.txt
+INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-15.txt
 
 CHAPTER 39 --- Repository Reference Implementations & Engineering
 Blueprints
 
 Purpose This chapter defines the canonical reference implementations
-used to bootstrap, validate, and standardize Atlas repositories across
+used to bootstrap, validate, and standardize InventSmith repositories across
 engineering teams.
 
 Objectives • Accelerate repository creation. • Ensure architectural
@@ -2557,7 +2557,7 @@ Quality gate configuration
 
 Reference Validation
 
-Reference repositories shall be validated against: • Atlas Constitution
+Reference repositories shall be validated against: • InventSmith Constitution
 • Repository Standards • Architecture Decision Records • Security
 policies • CI/CD requirements • Documentation standards
 
@@ -2572,7 +2572,7 @@ Future Extensibility
 Reference blueprints shall evolve to incorporate new technologies,
 AI-native engineering practices, improved automation, and emerging
 enterprise repository standards while preserving compatibility. \##
-Expansion 16 ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-16.txt
+Expansion 16 INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-16.txt
 
 CHAPTER 40 --- Repository Governance Completion & Long-Term Evolution
 
@@ -2586,7 +2586,7 @@ consistency. • Enable future platform growth.
 
 Enterprise Compliance Framework
 
-Repositories shall maintain compliance with: • Atlas Constitution •
+Repositories shall maintain compliance with: • InventSmith Constitution •
 Repository Standards Bible • Architecture Decision Records • Security
 policies • Operational standards • Regulatory requirements where
 applicable
@@ -2630,14 +2630,14 @@ Long-Term Evolution
 
 Repository standards shall evolve through controlled governance,
 incorporating emerging engineering practices, AI-native workflows, and
-future Atlas platform capabilities while preserving backward
+future InventSmith platform capabilities while preserving backward
 compatibility. \## Expansion 17
-ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-17.txt
+INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-17.txt
 
 CHAPTER 41 --- Enterprise Repository Adoption & Excellence
 
 Purpose This chapter defines the roadmap for enterprise-wide adoption of
-Atlas repository standards and establishes the long-term excellence
+InventSmith repository standards and establishes the long-term excellence
 model that guides continual improvement.
 
 Objectives • Accelerate standards adoption. • Ensure consistent
@@ -2691,9 +2691,9 @@ met.
 Future Extensibility
 
 The repository excellence framework shall evolve with emerging
-engineering, AI, and governance capabilities while preserving Atlas
+engineering, AI, and governance capabilities while preserving InventSmith
 architectural principles. \## Expansion 18
-ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0-18.txt
+INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0-18.txt
 
 CHAPTER 42 --- Enterprise Repository Implementation Roadmap & Merge
 Readiness
@@ -2754,6 +2754,6 @@ completeness
 Merge Readiness Confirmation
 
 The expansion series (01--18) is complete and ready to be merged into
-the original ATLAS-013_REPOSITORY_STANDARDS_BIBLE_v1.0 document when
+the original INVENTSMITH-013_REPOSITORY_STANDARDS_BIBLE_v1.0 document when
 instructed. No merge shall occur until the user explicitly issues the
 MERGE command.

@@ -1,12 +1,12 @@
-# ATLAS-009_DATA_MODEL_BIBLE_v1.0
+# INVENTSMITH-009_DATA_MODEL_BIBLE_v1.0
 
 
 ## Part 1
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version: 1.0 (Working Draft)
 Status: In Development
-Purpose: Define the complete enterprise data architecture for Project Atlas, serving as the implementation specification for engineers, database architects, AI engineers, API developers, and platform integrators.
+Purpose: Define the complete enterprise data architecture for Project InventSmith, serving as the implementation specification for engineers, database architects, AI engineers, API developers, and platform integrators.
 
 1. Design Principles
 •	Every data object has a globally unique identifier.
@@ -43,7 +43,7 @@ This draft establishes the foundational architecture. Future chapters will expan
 
 ## Part 2
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 2
 
 CORE ENTITY DEFINITIONS & RELATIONSHIP ARCHITECTURE
@@ -222,7 +222,7 @@ Sentiment
 Timestamp
 Metadata
 
-Atlas extracts:
+InventSmith extracts:
 Questions
 Decisions
 Risks
@@ -282,19 +282,19 @@ Reference
 Dependency
 Generation
 
-Atlas is a relationship-driven knowledge graph. Every entity participates in a connected graph supporting reasoning, automation, search, and historical traceability.
+InventSmith is a relationship-driven knowledge graph. Every entity participates in a connected graph supporting reasoning, automation, search, and historical traceability.
 
 
 ## Part 3
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 3
 
 INVENTOR TWIN MEMORY ARCHITECTURE
 
 Purpose
 
-The Inventor Twin is Atlas's persistent knowledge model for every inventor. Rather than storing isolated conversations, Atlas continuously builds a structured representation of the inventor, projects, products, decisions, preferences, experience, relationships, and history.
+The Inventor Twin is InventSmith's persistent knowledge model for every inventor. Rather than storing isolated conversations, InventSmith continuously builds a structured representation of the inventor, projects, products, decisions, preferences, experience, relationships, and history.
 
 Memory Layers
 
@@ -436,7 +436,7 @@ Department Instructions
 
 CONTEXT ASSEMBLY
 
-Atlas ranks context by:
+InventSmith ranks context by:
 Relevance
 Recency
 Relationship Distance
@@ -456,7 +456,7 @@ Language
 
 SYNCHRONIZATION
 
-When a product changes Atlas evaluates:
+When a product changes InventSmith evaluates:
 Patent Documents
 Manufacturing Documents
 Marketing Assets
@@ -484,19 +484,19 @@ Task Creation
 ↓
 Notification
 
-This event-driven architecture ensures Atlas remains consistent without duplicating data.
+This event-driven architecture ensures InventSmith remains consistent without duplicating data.
 
 END OF PART 3
 
 
 ## Part 4
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 4
 
 DATABASE SCHEMA PRINCIPLES
 
-Atlas uses a normalized, relationship-driven schema. Every entity has a permanent identifier, immutable creation history, version tracking, security metadata, and relationship references.
+InventSmith uses a normalized, relationship-driven schema. Every entity has a permanent identifier, immutable creation history, version tracking, security metadata, and relationship references.
 
 STANDARD TABLE FIELDS
 
@@ -635,7 +635,7 @@ REJECT
 
 DATA VALIDATION
 
-Atlas validates:
+InventSmith validates:
 
 Required fields
 Unique identifiers
@@ -771,12 +771,12 @@ END OF PART 4
 
 ## Part 5
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 5
 
 SEARCH ARCHITECTURE
 
-Atlas provides unified search across structured records, documents, conversations, files, workflows, recommendations, and knowledge graph relationships.
+InventSmith provides unified search across structured records, documents, conversations, files, workflows, recommendations, and knowledge graph relationships.
 
 SEARCH OBJECT
 
@@ -806,7 +806,7 @@ SEARCH MODES
 
 SEMANTIC SEARCH
 
-Atlas generates vector embeddings for:
+InventSmith generates vector embeddings for:
 Projects
 Products
 Documents
@@ -1016,14 +1016,14 @@ END OF PART 5
 
 ## Part 6
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 6
 
 INVENTOR TWIN ARCHITECTURE
 
 PURPOSE
 
-The Inventor Twin is Atlas's continuously evolving digital representation of an inventor. It is not a chatbot memory. It is a structured knowledge system that accumulates everything Atlas learns while maintaining explainability, traceability, and version history.
+The Inventor Twin is InventSmith's continuously evolving digital representation of an inventor. It is not a chatbot memory. It is a structured knowledge system that accumulates everything InventSmith learns while maintaining explainability, traceability, and version history.
 
 INVENTOR TWIN LAYERS
 
@@ -1130,7 +1130,7 @@ Recency
 Direction
 Evidence
 
-Relationship strength changes automatically as Atlas gathers more evidence.
+Relationship strength changes automatically as InventSmith gathers more evidence.
 
 GRAPH TRAVERSAL
 
@@ -1147,7 +1147,7 @@ Project Scoped
 
 AI CONTEXT ASSEMBLY
 
-Before every AI response Atlas assembles context.
+Before every AI response InventSmith assembles context.
 
 Priority Order
 
@@ -1164,7 +1164,7 @@ Duplicate information is removed before context generation.
 
 MULTI-PROJECT INTELLIGENCE
 
-Atlas compares projects to identify:
+InventSmith compares projects to identify:
 
 Reusable research
 Shared manufacturers
@@ -1197,7 +1197,7 @@ Timestamp
 
 HISTORICAL REASONING
 
-Atlas reasons using:
+InventSmith reasons using:
 
 Past decisions
 Past outcomes
@@ -1272,14 +1272,14 @@ END OF PART 6
 
 ## Part 7
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 7
 
 DATA SYNCHRONIZATION ENGINE
 
 PURPOSE
 
-The synchronization engine guarantees that every dependent object remains consistent whenever information changes. Atlas propagates changes through relationships rather than duplicating data.
+The synchronization engine guarantees that every dependent object remains consistent whenever information changes. InventSmith propagates changes through relationships rather than duplicating data.
 
 SYNCHRONIZATION PRINCIPLES
 
@@ -1330,7 +1330,7 @@ Dependency evaluation occurs before every update.
 
 IMPACT ANALYSIS
 
-Before applying a change Atlas determines:
+Before applying a change InventSmith determines:
 
 Objects affected
 Departments affected
@@ -1342,7 +1342,7 @@ Recommended actions
 
 CONFLICT DETECTION
 
-Atlas identifies:
+InventSmith identifies:
 
 Version conflicts
 Duplicate entities
@@ -1374,7 +1374,7 @@ Every Decision references supporting evidence.
 
 ORPHAN DETECTION
 
-Atlas scans for:
+InventSmith scans for:
 
 Documents without Projects
 Tasks without Workflows
@@ -1460,14 +1460,14 @@ END OF PART 7
 
 ## Part 8
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 8
 
 AI DEPARTMENT DATA MODEL
 
 PURPOSE
 
-Every Atlas AI Department operates from the same canonical data model while maintaining department-specific working memory. Departments never duplicate permanent project information.
+Every InventSmith AI Department operates from the same canonical data model while maintaining department-specific working memory. Departments never duplicate permanent project information.
 
 DEPARTMENT OBJECT
 
@@ -1534,7 +1534,7 @@ Importance
 
 MEMORY COMPRESSION
 
-Atlas periodically summarizes mature knowledge.
+InventSmith periodically summarizes mature knowledge.
 
 Compression Rules
 
@@ -1626,7 +1626,7 @@ Highest scores are presented first.
 
 WORKFLOW INTELLIGENCE
 
-Atlas predicts:
+InventSmith predicts:
 
 Likely next tasks
 Missing documents
@@ -1655,14 +1655,14 @@ END OF PART 8
 
 ## Part 9
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 9
 
 CANONICAL OBJECT STANDARDS
 
 PURPOSE
 
-Canonical objects define the official structure for every entity in Atlas. Every service, workflow, AI department, report, and integration must exchange these objects without modification.
+Canonical objects define the official structure for every entity in InventSmith. Every service, workflow, AI department, report, and integration must exchange these objects without modification.
 
 CANONICAL OBJECT RULES
 
@@ -1694,7 +1694,7 @@ MigrationRules
 
 MIGRATION MODEL
 
-When schemas change Atlas:
+When schemas change InventSmith:
 1. Validates existing objects.
 2. Migrates compatible fields.
 3. Flags incompatible data.
@@ -1800,7 +1800,7 @@ RetailRequirements
 
 STATE VALIDATION
 
-Atlas prevents:
+InventSmith prevents:
 Invalid transitions
 Missing approvals
 Circular dependencies
@@ -1841,21 +1841,21 @@ Supports vector embeddings.
 
 ARCHITECTURAL PRINCIPLE
 
-The canonical data model is the contract between every subsystem in Atlas. No feature may introduce a competing representation of business data.
+The canonical data model is the contract between every subsystem in InventSmith. No feature may introduce a competing representation of business data.
 
 END OF PART 9
 
 
 ## Part 10
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 10
 
 ENTITY REFERENCE CATALOG
 
 PURPOSE
 
-The Entity Reference Catalog defines the approved naming conventions, enumerations, identifiers, validation rules, and governance policies for every object in Atlas.
+The Entity Reference Catalog defines the approved naming conventions, enumerations, identifiers, validation rules, and governance policies for every object in InventSmith.
 
 NAMING STANDARDS
 
@@ -2032,21 +2032,21 @@ Decisions modify Projects
 
 CLOSING PRINCIPLE
 
-Atlas is not a collection of tables. It is a living knowledge architecture that preserves every meaningful relationship across the inventor's journey. The data model provides the single source of truth that enables every AI department, workflow, document, and automation to operate consistently, transparently, and intelligently.
+InventSmith is not a collection of tables. It is a living knowledge architecture that preserves every meaningful relationship across the inventor's journey. The data model provides the single source of truth that enables every AI department, workflow, document, and automation to operate consistently, transparently, and intelligently.
 
 END OF PART 10
 
 
 ## Part 11
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 11
 
 CANONICAL JSON OBJECT PATTERNS
 
 PURPOSE
 
-Every Atlas entity shall support a common serialization format to simplify APIs, storage, synchronization, auditing, and AI reasoning.
+Every InventSmith entity shall support a common serialization format to simplify APIs, storage, synchronization, auditing, and AI reasoning.
 
 BASE OBJECT
 
@@ -2223,21 +2223,21 @@ Audit logging
 
 IMPLEMENTATION PRINCIPLE
 
-The schema is the contract. Every subsystem must obey the canonical object definitions to preserve a single source of truth across Atlas.
+The schema is the contract. Every subsystem must obey the canonical object definitions to preserve a single source of truth across InventSmith.
 
 END OF PART 11
 
 
 ## Part 12
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 12
 
 API DATA CONTRACTS
 
 PURPOSE
 
-Every Atlas service exchanges canonical objects through stable, versioned API contracts.
+Every InventSmith service exchanges canonical objects through stable, versioned API contracts.
 
 API DESIGN PRINCIPLES
 
@@ -2419,14 +2419,14 @@ END OF PART 12
 
 ## Part 13
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 13
 
 DATABASE INDEXING STRATEGY
 
 PURPOSE
 
-Atlas is designed to manage millions of entities and billions of relationships while maintaining low-latency retrieval. Every index exists to improve discoverability, AI reasoning, workflow execution, and reporting.
+InventSmith is designed to manage millions of entities and billions of relationships while maintaining low-latency retrieval. Every index exists to improve discoverability, AI reasoning, workflow execution, and reporting.
 
 INDEX TYPES
 
@@ -2494,7 +2494,7 @@ Version changes
 
 SEARCH OPTIMIZATION
 
-Atlas prefers:
+InventSmith prefers:
 
 Exact match
 Relationship match
@@ -2616,14 +2616,14 @@ END OF PART 13
 
 ## Part 14
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 14
 
 ADVANCED ENTITY DICTIONARIES
 
 PURPOSE
 
-Entity dictionaries define every business object consistently across the Atlas platform. They provide semantic meaning beyond simple database schemas and ensure AI departments interpret data uniformly.
+Entity dictionaries define every business object consistently across the InventSmith platform. They provide semantic meaning beyond simple database schemas and ensure AI departments interpret data uniformly.
 
 ENTITY METADATA
 
@@ -2666,7 +2666,7 @@ Milestones 5%
 
 DOCUMENT COMPLETENESS
 
-Atlas evaluates:
+InventSmith evaluates:
 
 Required Sections
 Required Metadata
@@ -2683,7 +2683,7 @@ Confidence Score
 
 WORKFLOW READINESS
 
-Before a workflow begins Atlas verifies:
+Before a workflow begins InventSmith verifies:
 
 Required inputs exist
 Dependencies satisfied
@@ -2777,7 +2777,7 @@ Alternative Options
 Potential Risks
 Expected Benefits
 
-Atlas always explains why a recommendation exists.
+InventSmith always explains why a recommendation exists.
 
 DATA GOVERNANCE BOARD
 
@@ -2794,7 +2794,7 @@ END OF PART 14
 
 ## Part 15
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 15
 
 FIELD-LEVEL IMPLEMENTATION STANDARDS
@@ -2965,7 +2965,7 @@ Approval Reference
 
 ENTITY LOCKING
 
-Atlas supports optimistic locking.
+InventSmith supports optimistic locking.
 
 Objects include VersionNumber.
 Updates fail when stale versions are submitted.
@@ -2982,21 +2982,21 @@ Cold objects are retrieved on demand.
 
 IMPLEMENTATION PRINCIPLE
 
-Every field is intentionally defined so Atlas behaves consistently across web, mobile, desktop, APIs, AI departments, reporting engines, and future integrations.
+Every field is intentionally defined so InventSmith behaves consistently across web, mobile, desktop, APIs, AI departments, reporting engines, and future integrations.
 
 END OF PART 15
 
 
 ## Part 16
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 16
 
 SERVICE INTERACTION MODEL
 
 PURPOSE
 
-Atlas consists of loosely coupled services communicating through canonical objects and published events. Services own behavior but never duplicate authoritative business data.
+InventSmith consists of loosely coupled services communicating through canonical objects and published events. Services own behavior but never duplicate authoritative business data.
 
 CORE SERVICES
 
@@ -3142,14 +3142,14 @@ END OF PART 16
 
 ## Part 17
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 17
 
 DATA GOVERNANCE IMPLEMENTATION
 
 PURPOSE
 
-This section defines the operational governance of Atlas data after entities have been created. Governance ensures that information remains accurate, trustworthy, secure, and explainable throughout its lifetime.
+This section defines the operational governance of InventSmith data after entities have been created. Governance ensures that information remains accurate, trustworthy, secure, and explainable throughout its lifetime.
 
 DATA STEWARDSHIP
 
@@ -3184,7 +3184,7 @@ These entities may only have one authoritative active record.
 
 DUPLICATE DETECTION
 
-Atlas evaluates:
+InventSmith evaluates:
 
 Name similarity
 Identifier similarity
@@ -3308,7 +3308,7 @@ Validation Success > 99%
 
 CONTINUOUS IMPROVEMENT
 
-Atlas periodically reviews:
+InventSmith periodically reviews:
 
 Unused fields
 Unused entities
@@ -3328,7 +3328,7 @@ END OF PART 17
 
 ## Part 18
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 18
 
 AI MEMORY STORAGE ENGINE
@@ -3349,7 +3349,7 @@ Tier 3 – Long-Term Memory
 Persistent inventor knowledge.
 
 Tier 4 – Institutional Knowledge
-Reusable knowledge shared across Atlas where permitted.
+Reusable knowledge shared across InventSmith where permitted.
 
 MEMORY INGESTION PIPELINE
 
@@ -3371,7 +3371,7 @@ Persistent Storage
 
 ENTITY EXTRACTION
 
-Atlas identifies:
+InventSmith identifies:
 
 People
 Companies
@@ -3444,7 +3444,7 @@ Metadata
 
 RAG RETRIEVAL STRATEGY
 
-Atlas retrieves knowledge using:
+InventSmith retrieves knowledge using:
 
 1. Permission Filter
 2. Project Scope
@@ -3490,7 +3490,7 @@ PromptVersion
 Department
 Timestamp
 
-Atlas can explain every recommendation using stored evidence.
+InventSmith can explain every recommendation using stored evidence.
 
 END-TO-END DATA FLOW
 
@@ -3518,21 +3518,21 @@ User Response
 
 IMPLEMENTATION PRINCIPLE
 
-Atlas does not merely remember conversations. It builds an explainable, evolving knowledge system that continuously improves its understanding of inventors, inventions, and the complete innovation journey while preserving transparency, auditability, and trust.
+InventSmith does not merely remember conversations. It builds an explainable, evolving knowledge system that continuously improves its understanding of inventors, inventions, and the complete innovation journey while preserving transparency, auditability, and trust.
 
 END OF PART 18
 
 
 ## Part 19
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 19
 
 GRAPH REASONING ENGINE
 
 PURPOSE
 
-The Graph Reasoning Engine allows Atlas to reason across connected knowledge rather than isolated records. Every recommendation, prediction, and workflow decision is supported by traversing the Knowledge Graph.
+The Graph Reasoning Engine allows InventSmith to reason across connected knowledge rather than isolated records. Every recommendation, prediction, and workflow decision is supported by traversing the Knowledge Graph.
 
 GRAPH NODE MODEL
 
@@ -3618,7 +3618,7 @@ Explanation Assembly
 
 CONFLICT DETECTION
 
-Atlas detects:
+InventSmith detects:
 
 Contradictory Decisions
 Duplicate Manufacturers
@@ -3646,7 +3646,7 @@ Recommended for verification
 
 LEARNING MODEL
 
-Atlas improves by:
+InventSmith improves by:
 
 Accepted Recommendations
 Rejected Recommendations
@@ -3690,14 +3690,14 @@ END OF PART 19
 
 ## Part 20
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 20
 
 MULTI-TENANT DATA ARCHITECTURE
 
 PURPOSE
 
-Atlas supports individual inventors, startup teams, companies, accelerators, universities, enterprise customers, and future government deployments from one canonical data model.
+InventSmith supports individual inventors, startup teams, companies, accelerators, universities, enterprise customers, and future government deployments from one canonical data model.
 
 TENANT MODEL
 
@@ -3839,7 +3839,7 @@ Recovery Time Objective (RTO)
 
 DATA RESIDENCY
 
-Atlas stores:
+InventSmith stores:
 
 Country
 Region
@@ -3879,21 +3879,21 @@ Unlimited Historical Events (partitioned)
 
 FINAL ARCHITECTURAL PRINCIPLE
 
-Every layer of the Atlas Data Model is designed to preserve one authoritative source of truth while allowing unlimited growth in users, projects, organizations, AI capabilities, and future platform features without requiring fundamental redesign.
+Every layer of the InventSmith Data Model is designed to preserve one authoritative source of truth while allowing unlimited growth in users, projects, organizations, AI capabilities, and future platform features without requiring fundamental redesign.
 
 END OF PART 20
 
 
 ## Part 21
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 21
 
 IMPLEMENTATION REFERENCE ARCHITECTURE
 
 PURPOSE
 
-This section defines the recommended implementation architecture used to transform the Atlas Data Model into production software while preserving consistency, scalability, and maintainability.
+This section defines the recommended implementation architecture used to transform the InventSmith Data Model into production software while preserving consistency, scalability, and maintainability.
 
 CANONICAL LAYERS
 
@@ -4066,21 +4066,21 @@ IMPLEMENTATION CHECKLIST
 
 FINAL IMPLEMENTATION PRINCIPLE
 
-The Atlas Data Model is the permanent contract that connects every AI department, service, workflow, document, and user interaction. All future development should extend this model rather than bypass it.
+The InventSmith Data Model is the permanent contract that connects every AI department, service, workflow, document, and user interaction. All future development should extend this model rather than bypass it.
 
 END OF PART 21
 
 
 ## Part 22
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 22
 
 REFERENCE JSON CONTRACTS
 
 PURPOSE
 
-This section defines representative JSON structures for the most important Atlas entities. These examples establish serialization conventions for APIs, integrations, backups, AI processing, and future services.
+This section defines representative JSON structures for the most important InventSmith entities. These examples establish serialization conventions for APIs, integrations, backups, AI processing, and future services.
 
 PROJECT JSON
 
@@ -4230,14 +4230,14 @@ END OF PART 22
 
 ## Part 23
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 23
 
 VALIDATION RULE CATALOG
 
 PURPOSE
 
-Validation guarantees that Atlas accepts only complete, consistent, secure, and explainable information.
+Validation guarantees that InventSmith accepts only complete, consistent, secure, and explainable information.
 
 VALIDATION TIERS
 
@@ -4386,7 +4386,7 @@ END OF PART 23
 
 ## Part 24
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 24
 
 ENTITY LIFECYCLE REFERENCE
@@ -4560,21 +4560,21 @@ History | Immutable
 
 FINAL REFERENCE PRINCIPLE
 
-The Atlas Data Model is intended to remain stable for years. New capabilities should extend canonical objects through versioned evolution rather than replacing established structures.
+The InventSmith Data Model is intended to remain stable for years. New capabilities should extend canonical objects through versioned evolution rather than replacing established structures.
 
 END OF PART 24
 
 
 ## Part 25
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 25
 
 CANONICAL RELATIONSHIP DICTIONARY
 
 PURPOSE
 
-Relationships are first-class objects within Atlas. They provide the semantic connections that allow AI departments, workflows, analytics, and search to reason across the platform.
+Relationships are first-class objects within InventSmith. They provide the semantic connections that allow AI departments, workflows, analytics, and search to reason across the platform.
 
 RELATIONSHIP OBJECT
 
@@ -4745,21 +4745,21 @@ Documentation Complete
 
 FINAL PRINCIPLE
 
-Relationships are the intelligence layer of Atlas. By preserving explicit, versioned, and explainable connections between every object, Atlas becomes more than a database—it becomes an evolving knowledge system capable of guiding inventors throughout the entire innovation lifecycle.
+Relationships are the intelligence layer of InventSmith. By preserving explicit, versioned, and explainable connections between every object, InventSmith becomes more than a database—it becomes an evolving knowledge system capable of guiding inventors throughout the entire innovation lifecycle.
 
 END OF PART 25
 
 
 ## Part 26
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 26
 
 CANONICAL ENTITY CATALOG
 
 PURPOSE
 
-This catalog formally defines the remaining canonical entities required to implement Atlas as a complete inventor operating system.
+This catalog formally defines the remaining canonical entities required to implement InventSmith as a complete inventor operating system.
 
 IDEA ENTITY
 
@@ -4949,21 +4949,21 @@ Observer Pattern
 
 FINAL IMPLEMENTATION NOTE
 
-Every future Atlas capability must extend these canonical entities rather than introducing competing object models.
+Every future InventSmith capability must extend these canonical entities rather than introducing competing object models.
 
 END OF PART 26
 
 
 ## Part 27
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 27
 
 ADVANCED BUSINESS RULE CATALOG
 
 PURPOSE
 
-Business rules define how Atlas enforces consistency beyond database validation. They govern real-world inventor workflows, AI behavior, and lifecycle transitions.
+Business rules define how InventSmith enforces consistency beyond database validation. They govern real-world inventor workflows, AI behavior, and lifecycle transitions.
 
 RULE CLASSIFICATION
 
@@ -5157,14 +5157,14 @@ END OF PART 27
 
 ## Part 28
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 28
 
 CANONICAL SERVICE CONTRACTS
 
 PURPOSE
 
-Service contracts define how Atlas services exchange canonical objects while remaining independently deployable and fully interoperable.
+Service contracts define how InventSmith services exchange canonical objects while remaining independently deployable and fully interoperable.
 
 SERVICE CONTRACT PRINCIPLES
 
@@ -5340,21 +5340,21 @@ Recovery
 
 FINAL PRINCIPLE
 
-Every service communicates through stable, canonical contracts so Atlas evolves without fragmenting its knowledge model or introducing conflicting representations of inventor data.
+Every service communicates through stable, canonical contracts so InventSmith evolves without fragmenting its knowledge model or introducing conflicting representations of inventor data.
 
 END OF PART 28
 
 
 ## Part 29
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 29
 
 CANONICAL API ENDPOINT CATALOG
 
 PURPOSE
 
-This section establishes the standard endpoint organization for every Atlas service. Endpoints are grouped by domain and always exchange canonical objects.
+This section establishes the standard endpoint organization for every InventSmith service. Endpoints are grouped by domain and always exchange canonical objects.
 
 API VERSIONING
 
@@ -5486,21 +5486,21 @@ Automatic Integrity Verification
 
 FINAL REFERENCE
 
-Every external and internal interface must preserve the Atlas canonical data model. APIs are gateways to the knowledge system and may never expose conflicting representations of business objects.
+Every external and internal interface must preserve the InventSmith canonical data model. APIs are gateways to the knowledge system and may never expose conflicting representations of business objects.
 
 END OF PART 29
 
 
 ## Part 30
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 30
 
 CANONICAL REPOSITORY STRUCTURE
 
 PURPOSE
 
-The repository structure ensures that every implementation of Atlas remains consistent across engineering teams, deployment environments, and future platform expansions.
+The repository structure ensures that every implementation of InventSmith remains consistent across engineering teams, deployment environments, and future platform expansions.
 
 REPOSITORY LAYOUT
 
@@ -5667,14 +5667,14 @@ Implementation Priorities
 
 CLOSING PRINCIPLE
 
-The Atlas repository must evolve through disciplined extension of canonical models, preserving backward compatibility, traceability, and a single authoritative representation of inventor knowledge.
+The InventSmith repository must evolve through disciplined extension of canonical models, preserving backward compatibility, traceability, and a single authoritative representation of inventor knowledge.
 
 END OF PART 30
 
 
 ## Part 31
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 31
 
 DATABASE IMPLEMENTATION REFERENCE
@@ -5837,21 +5837,21 @@ Cache Hit Rate
 
 REFERENCE PRINCIPLE
 
-The physical database may evolve over time, but the canonical logical data model remains the permanent contract for Atlas.
+The physical database may evolve over time, but the canonical logical data model remains the permanent contract for InventSmith.
 
 END OF PART 31
 
 
 ## Part 32
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 32
 
 EVENT PAYLOAD REFERENCE
 
 PURPOSE
 
-This section standardizes every event emitted throughout the Atlas platform.
+This section standardizes every event emitted throughout the InventSmith platform.
 
 STANDARD EVENT HEADER
 
@@ -6006,21 +6006,21 @@ Documentation approved
 
 REFERENCE PRINCIPLE
 
-Atlas implementations must remain faithful to the canonical model while allowing infrastructure, storage engines, and deployment strategies to evolve independently.
+InventSmith implementations must remain faithful to the canonical model while allowing infrastructure, storage engines, and deployment strategies to evolve independently.
 
 END OF PART 32
 
 
 ## Part 33
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 33
 
 ANALYTICS & REASONING REFERENCE
 
 PURPOSE
 
-This section defines how Atlas measures system performance, evaluates inventor progress, scores entities, and explains AI reasoning.
+This section defines how InventSmith measures system performance, evaluates inventor progress, scores entities, and explains AI reasoning.
 
 ANALYTICS OBJECT
 
@@ -6154,21 +6154,21 @@ Documentation Review
 
 FINAL ENGINEERING PRINCIPLE
 
-Atlas measures not only what exists, but also the quality, trustworthiness, completeness, and usefulness of every piece of knowledge stored within the platform.
+InventSmith measures not only what exists, but also the quality, trustworthiness, completeness, and usefulness of every piece of knowledge stored within the platform.
 
 END OF PART 33
 
 
 ## Part 34
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 34
 
 KNOWLEDGE GRAPH MAINTENANCE & DATA LIFECYCLE
 
 PURPOSE
 
-This section defines how Atlas continuously maintains, validates, optimizes, and evolves its Knowledge Graph and long-term data assets while preserving integrity, explainability, and historical accuracy.
+This section defines how InventSmith continuously maintains, validates, optimizes, and evolves its Knowledge Graph and long-term data assets while preserving integrity, explainability, and historical accuracy.
 
 KNOWLEDGE GRAPH MAINTENANCE
 
@@ -6237,7 +6237,7 @@ Conflicting evidence
 
 AI MEMORY OPTIMIZATION
 
-Atlas periodically evaluates:
+InventSmith periodically evaluates:
 
 Unused memory
 Duplicate facts
@@ -6327,23 +6327,23 @@ ENGINEERING READINESS CHECKLIST
 
 FINAL PRINCIPLE
 
-Knowledge grows in value over time. Atlas therefore treats every validated relationship, decision, document, and recommendation as part of an ever-improving knowledge ecosystem that continuously strengthens the platform's ability to support inventors.
+Knowledge grows in value over time. InventSmith therefore treats every validated relationship, decision, document, and recommendation as part of an ever-improving knowledge ecosystem that continuously strengthens the platform's ability to support inventors.
 
 END OF PART 34
 
 
 ## Part 35
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 35
 
 PLATFORM REFERENCE STANDARDS
 
 PURPOSE
 
-This section establishes platform-wide standards that ensure every Atlas Bible, service, repository, and future feature aligns to one common architecture.
+This section establishes platform-wide standards that ensure every InventSmith Bible, service, repository, and future feature aligns to one common architecture.
 
-ATLAS OBJECT TAXONOMY
+INVENTSMITH OBJECT TAXONOMY
 
 Foundation Objects
 - Inventor
@@ -6408,25 +6408,25 @@ Singular Domain Names
 
 CROSS-BIBLE DEPENDENCY MATRIX
 
-ATLAS-001 Constitution
+INVENTSMITH-001 Constitution
 Defines governance.
 
-ATLAS-003 AI Specialist Team
+INVENTSMITH-003 AI Specialist Team
 Defines department behavior.
 
-ATLAS-004 Inventor Journey
+INVENTSMITH-004 Inventor Journey
 Defines user lifecycle.
 
-ATLAS-006 Business
+INVENTSMITH-006 Business
 Defines commercial rules.
 
-ATLAS-007 Workflow
+INVENTSMITH-007 Workflow
 Defines execution.
 
-ATLAS-008 Document
+INVENTSMITH-008 Document
 Defines documentation.
 
-ATLAS-009 Data Model
+INVENTSMITH-009 Data Model
 Defines canonical knowledge.
 
 ENGINEERING GOVERNANCE
@@ -6491,33 +6491,33 @@ Preserve compatibility.
 
 CONSOLIDATION STANDARD
 
-When ATLAS-009 is finalized:
+When INVENTSMITH-009 is finalized:
 
 Merge all numbered parts.
 Regenerate table of contents.
 Normalize headings.
 Verify numbering.
 Publish:
-ATLAS-009_DATA_MODEL_BIBLE_v1.0.docx
-ATLAS-009_DATA_MODEL_BIBLE_v1.0.md
+INVENTSMITH-009_DATA_MODEL_BIBLE_v1.0.docx
+INVENTSMITH-009_DATA_MODEL_BIBLE_v1.0.md
 
 FINAL PRINCIPLE
 
-Atlas succeeds only if every future capability builds upon the same canonical knowledge architecture. The Data Model Bible is therefore the permanent technical foundation of the Atlas platform.
+InventSmith succeeds only if every future capability builds upon the same canonical knowledge architecture. The Data Model Bible is therefore the permanent technical foundation of the InventSmith platform.
 
 END OF PART 35
 
 
 ## Part 36
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 36
 
 MASTER DATA DICTIONARY
 
 PURPOSE
 
-This section establishes the master reference for canonical field naming, metadata, identifiers, namespaces, and schema compatibility across the Atlas platform.
+This section establishes the master reference for canonical field naming, metadata, identifiers, namespaces, and schema compatibility across the InventSmith platform.
 
 GLOBAL FIELD NAMING
 
@@ -6664,21 +6664,21 @@ Migration documented
 
 REFERENCE PRINCIPLE
 
-The master data dictionary is the definitive reference for every field, identifier, namespace, and metadata element used throughout Atlas. Future development shall extend this dictionary rather than redefine existing standards.
+The master data dictionary is the definitive reference for every field, identifier, namespace, and metadata element used throughout InventSmith. Future development shall extend this dictionary rather than redefine existing standards.
 
 END OF PART 36
 
 
 ## Part 37
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 37
 
 SECURITY, COMPLIANCE & INTEROPERABILITY REFERENCE
 
 PURPOSE
 
-This section defines the canonical security classifications, compliance metadata, encryption requirements, audit retention policies, and interoperability standards for Atlas.
+This section defines the canonical security classifications, compliance metadata, encryption requirements, audit retention policies, and interoperability standards for InventSmith.
 
 SECURITY CLASSIFICATION MATRIX
 
@@ -6799,21 +6799,21 @@ Audit complete
 
 FINAL PRINCIPLE
 
-Security, compliance, and interoperability are integral parts of the canonical data model. Every Atlas implementation must preserve confidentiality, integrity, availability, traceability, and portability without compromising the single source of truth.
+Security, compliance, and interoperability are integral parts of the canonical data model. Every InventSmith implementation must preserve confidentiality, integrity, availability, traceability, and portability without compromising the single source of truth.
 
 END OF PART 37
 
 
 ## Part 38
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 38
 
 ENTERPRISE DEPLOYMENT & OPERATIONAL RESILIENCE
 
 PURPOSE
 
-This section defines the deployment architecture, resilience strategies, monitoring standards, and operational requirements necessary to operate Atlas at enterprise scale while preserving the canonical data model.
+This section defines the deployment architecture, resilience strategies, monitoring standards, and operational requirements necessary to operate InventSmith at enterprise scale while preserving the canonical data model.
 
 DEPLOYMENT ARCHITECTURE
 
@@ -6953,21 +6953,21 @@ Rollback verification
 
 FINAL PRINCIPLE
 
-Atlas is engineered as a continuously available knowledge platform. Operational excellence, resilience, and observability are treated as first-class architectural requirements alongside the canonical data model.
+InventSmith is engineered as a continuously available knowledge platform. Operational excellence, resilience, and observability are treated as first-class architectural requirements alongside the canonical data model.
 
 END OF PART 38
 
 
 ## Part 39
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 39
 
 REPOSITORY RELEASE GOVERNANCE
 
 PURPOSE
 
-This section defines the governance process for releasing updates to the Atlas Data Model while preserving compatibility, traceability, and architectural integrity.
+This section defines the governance process for releasing updates to the InventSmith Data Model while preserving compatibility, traceability, and architectural integrity.
 
 VERSION LIFECYCLE
 
@@ -7080,21 +7080,21 @@ The architecture supports future expansion without redesign.
 
 CLOSING PRINCIPLE
 
-The Atlas Data Model is the permanent technical foundation of the Atlas platform. Every future capability, AI department, workflow, document, integration, and service must build upon this canonical model to preserve a single, trusted source of truth for the inventor's entire innovation journey.
+The InventSmith Data Model is the permanent technical foundation of the InventSmith platform. Every future capability, AI department, workflow, document, integration, and service must build upon this canonical model to preserve a single, trusted source of truth for the inventor's entire innovation journey.
 
 END OF PART 39
 
 
 ## Part 40
 
-ATLAS-009 — DATA MODEL BIBLE
+INVENTSMITH-009 — DATA MODEL BIBLE
 Version 1.0 - Part 40
 
 FINAL APPENDICES, GLOSSARY & CERTIFICATION
 
 PURPOSE
 
-This concluding section provides the reference material required to maintain, publish, and govern the Atlas Data Model Bible as the authoritative engineering specification.
+This concluding section provides the reference material required to maintain, publish, and govern the InventSmith Data Model Bible as the authoritative engineering specification.
 
 GLOSSARY
 
@@ -7132,31 +7132,31 @@ SLO  Service Level Objective
 
 MASTER CROSS-REFERENCE
 
-ATLAS-001 Constitution
+INVENTSMITH-001 Constitution
 Platform governance
 
-ATLAS-003 AI Specialist Team
+INVENTSMITH-003 AI Specialist Team
 Department responsibilities
 
-ATLAS-004 Inventor Journey
+INVENTSMITH-004 Inventor Journey
 User lifecycle
 
-ATLAS-006 Business Bible
+INVENTSMITH-006 Business Bible
 Commercial operations
 
-ATLAS-007 Workflow Bible
+INVENTSMITH-007 Workflow Bible
 Execution model
 
-ATLAS-008 Document Bible
+INVENTSMITH-008 Document Bible
 Documentation standards
 
-ATLAS-009 Data Model Bible
+INVENTSMITH-009 Data Model Bible
 Canonical data architecture
 
 DOCUMENT CERTIFICATION
 
 Document Name
-ATLAS-009_DATA_MODEL_BIBLE_v1.0
+INVENTSMITH-009_DATA_MODEL_BIBLE_v1.0
 
 Status
 Engineering Baseline
@@ -7165,7 +7165,7 @@ Classification
 Internal
 
 Owner
-Atlas Architecture
+InventSmith Architecture
 
 Approval
 Architecture Review Board
@@ -7197,7 +7197,7 @@ FINAL RELEASE CHECKLIST
 
 OFFICIAL CONCLUSION
 
-The Atlas Data Model Bible establishes the permanent canonical knowledge architecture for Atlas. It defines how information is identified, stored, related, secured, searched, reasoned over, versioned, governed, and evolved. Every subsystem, workflow, AI department, integration, and future capability shall extend this foundation while preserving a single authoritative source of truth.
+The InventSmith Data Model Bible establishes the permanent canonical knowledge architecture for InventSmith. It defines how information is identified, stored, related, secured, searched, reasoned over, versioned, governed, and evolved. Every subsystem, workflow, AI department, integration, and future capability shall extend this foundation while preserving a single authoritative source of truth.
 
 END OF PART 40
-END OF ATLAS-009_DATA_MODEL_BIBLE_v1.0
+END OF INVENTSMITH-009_DATA_MODEL_BIBLE_v1.0

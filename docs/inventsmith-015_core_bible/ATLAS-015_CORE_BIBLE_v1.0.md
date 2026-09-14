@@ -1,33 +1,33 @@
-ATLAS-013 — CORE BIBLE
+INVENTSMITH-013 — CORE BIBLE
 Version 1.0
 FINAL MERGED
 # Revision History
 Version 1.0 - Initial merged edition.
 # Table of Contents
 Generated from numbered source files. Update fields in Word to refresh.
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 Status: Production Specification
 
 ====================================================================
 # CHAPTER 1
-ATLAS CORE FOUNDATION
+INVENTSMITH CORE FOUNDATION
 ====================================================================
 
 1.1 Purpose
 
-The Atlas Core Platform is the foundational software layer upon which every Atlas capability is built.
+The InventSmith Core Platform is the foundational software layer upon which every InventSmith capability is built.
 
-Where the Product Bible defines what Atlas must accomplish, the Core Bible defines how Atlas is engineered to accomplish those objectives consistently, securely, efficiently, and sustainably.
+Where the Product Bible defines what InventSmith must accomplish, the Core Bible defines how InventSmith is engineered to accomplish those objectives consistently, securely, efficiently, and sustainably.
 
-Atlas Core is not a feature.
+InventSmith Core is not a feature.
 
 It is the platform that enables every feature.
 
-Every subsystem, AI department, workflow, document generator, automation, dashboard, decision engine, research capability, integration, plugin, and future module operates through Atlas Core.
+Every subsystem, AI department, workflow, document generator, automation, dashboard, decision engine, research capability, integration, plugin, and future module operates through InventSmith Core.
 
-The purpose of Atlas Core is to provide a unified enterprise platform that enables:
+The purpose of InventSmith Core is to provide a unified enterprise platform that enables:
 
 • Consistent engineering standards
 • Predictable runtime behavior
@@ -41,13 +41,13 @@ The purpose of Atlas Core is to provide a unified enterprise platform that enabl
 • Enterprise observability
 • Platform governance
 
-Atlas Core exists so future Atlas developers build upon one platform instead of creating disconnected systems.
+InventSmith Core exists so future InventSmith developers build upon one platform instead of creating disconnected systems.
 
 --------------------------------------------------------------------
-1.2 Relationship to Other Atlas Bibles
+1.2 Relationship to Other InventSmith Bibles
 --------------------------------------------------------------------
 
-Atlas Core serves as the technical foundation for every Atlas specification.
+InventSmith Core serves as the technical foundation for every InventSmith specification.
 
 The Constitution defines philosophy.
 
@@ -55,7 +55,7 @@ The Product Bible defines platform behavior.
 
 The Core Bible defines platform implementation.
 
-Every future Bible references Atlas Core for shared architectural standards rather than redefining platform behavior.
+Every future Bible references InventSmith Core for shared architectural standards rather than redefining platform behavior.
 
 Examples include:
 
@@ -67,20 +67,20 @@ Data Model Bible
 Security Bible
 Infrastructure Bible
 
-No technical specification may contradict Atlas Core without formal platform revision approval.
+No technical specification may contradict InventSmith Core without formal platform revision approval.
 
 ====================================================================
 # CHAPTER 2
-ATLAS CORE RUNTIME ARCHITECTURE
+INVENTSMITH CORE RUNTIME ARCHITECTURE
 ====================================================================
 
 2.1 Runtime Philosophy
 
-Atlas executes as a coordinated collection of platform services operating within a unified runtime environment.
+InventSmith executes as a coordinated collection of platform services operating within a unified runtime environment.
 
-Rather than functioning as a collection of independent applications, Atlas behaves as one coherent operating platform composed of specialized modules.
+Rather than functioning as a collection of independent applications, InventSmith behaves as one coherent operating platform composed of specialized modules.
 
-Every runtime component participates within a common lifecycle managed by Atlas Core.
+Every runtime component participates within a common lifecycle managed by InventSmith Core.
 
 The runtime is responsible for:
 
@@ -98,10 +98,10 @@ The runtime is responsible for:
 
 No module bypasses the runtime lifecycle.
 
-Every executable capability operates under the supervision of Atlas Core.
+Every executable capability operates under the supervision of InventSmith Core.
 
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 
 ====================================================================
@@ -111,14 +111,14 @@ CORE SERVICES ARCHITECTURE
 
 3.1 Purpose
 
-Atlas Core Services provide the shared infrastructure required by every Atlas module.
+InventSmith Core Services provide the shared infrastructure required by every InventSmith module.
 Core Services are platform capabilities rather than business capabilities. They expose
 stable contracts that allow modules to consume functionality without depending upon
 implementation details.
 
 3.2 Core Service Categories
 
-The Atlas Core Platform includes, but is not limited to:
+The InventSmith Core Platform includes, but is not limited to:
 
 • Configuration Service
 • Service Registry
@@ -160,7 +160,7 @@ Service contracts shall:
 
 3.4 Service Lifetime Standards
 
-Atlas recognizes the following service lifetimes:
+InventSmith recognizes the following service lifetimes:
 
 Singleton
 Scoped
@@ -175,7 +175,7 @@ MODULE REGISTRATION FRAMEWORK
 
 4.1 Overview
 
-Every Atlas capability exists as a registered module.
+Every InventSmith capability exists as a registered module.
 
 Modules are discovered automatically during startup and participate in the platform lifecycle.
 
@@ -212,7 +212,7 @@ Modules failing validation shall never enter the operational state.
 
 Circular dependencies are prohibited.
 
-Business modules may depend upon Atlas Core but Atlas Core shall never depend upon
+Business modules may depend upon InventSmith Core but InventSmith Core shall never depend upon
 business modules.
 
 Optional integrations shall be declared explicitly and degrade gracefully when absent.
@@ -225,10 +225,10 @@ Each module declares:
 • Maximum Supported Core Version
 • Compatible Interface Versions
 
-Atlas validates compatibility before activation to prevent runtime instability.
+InventSmith validates compatibility before activation to prevent runtime instability.
 
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 
 ====================================================================
@@ -238,7 +238,7 @@ DEPENDENCY INJECTION & SERVICE DISCOVERY
 
 5.1 Objectives
 
-Atlas Core standardizes dependency management through a platform-wide dependency
+InventSmith Core standardizes dependency management through a platform-wide dependency
 injection framework. No module shall manually construct platform services.
 
 Benefits include:
@@ -251,7 +251,7 @@ Benefits include:
 
 5.2 Registration Standards
 
-All services shall register through Atlas Core during startup.
+All services shall register through InventSmith Core during startup.
 
 Registrations shall include:
 
@@ -283,7 +283,7 @@ EVENT BUS & MESSAGING
 
 6.1 Purpose
 
-The Atlas Event Bus enables asynchronous communication between independent modules
+The InventSmith Event Bus enables asynchronous communication between independent modules
 without creating compile-time dependencies.
 
 6.2 Event Principles
@@ -302,7 +302,7 @@ Events are immutable after publication.
 
 6.3 Messaging Standards
 
-Atlas distinguishes:
+InventSmith distinguishes:
 
 Commands
 Queries
@@ -333,8 +333,8 @@ Every published event shall be documented with:
 • Security classification
 • Expected processing behavior
 
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 
 ====================================================================
@@ -344,8 +344,8 @@ CONFIGURATION FRAMEWORK
 
 7.1 Purpose
 
-The Atlas Configuration Framework provides centralized, validated, and version-aware
-configuration management for every Atlas component.
+The InventSmith Configuration Framework provides centralized, validated, and version-aware
+configuration management for every InventSmith component.
 
 Configuration shall be externalized from application code whenever practical.
 
@@ -414,7 +414,7 @@ PLUGIN & EXTENSION FRAMEWORK
 
 9.1 Philosophy
 
-Atlas Core is designed to expand through extensions rather than core modification.
+InventSmith Core is designed to expand through extensions rather than core modification.
 
 Plugins extend platform capabilities while respecting published platform contracts.
 
@@ -450,7 +450,7 @@ Plugins may be disabled without impacting unrelated platform capabilities.
 
 Plugins execute within controlled boundaries.
 
-Atlas Core enforces:
+InventSmith Core enforces:
 
 • Permission boundaries
 • Version validation
@@ -458,8 +458,8 @@ Atlas Core enforces:
 • Resource isolation
 • Error containment
 
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 
 ====================================================================
@@ -469,7 +469,7 @@ AUTHENTICATION & AUTHORIZATION FRAMEWORK
 
 10.1 Purpose
 
-Atlas Core provides a unified identity framework for authenticating users, services,
+InventSmith Core provides a unified identity framework for authenticating users, services,
 AI agents, integrations, and background processes.
 
 Authentication verifies identity.
@@ -478,7 +478,7 @@ Authorization determines permitted actions.
 
 10.2 Identity Providers
 
-Atlas supports pluggable identity providers including:
+InventSmith supports pluggable identity providers including:
 
 • Internal Identity
 • OAuth 2.0
@@ -511,7 +511,7 @@ AI ORCHESTRATION FRAMEWORK
 
 11.1 Purpose
 
-Atlas Core coordinates multiple AI providers through a common orchestration layer.
+InventSmith Core coordinates multiple AI providers through a common orchestration layer.
 
 Business modules never communicate directly with model providers.
 
@@ -584,8 +584,8 @@ Workflows shall support:
 
 Workflow state shall remain recoverable after infrastructure failures.
 
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 
 ====================================================================
@@ -595,7 +595,7 @@ LOGGING, TELEMETRY & OBSERVABILITY
 
 13.1 Objectives
 
-Atlas Core shall provide enterprise-grade observability across every platform service,
+InventSmith Core shall provide enterprise-grade observability across every platform service,
 module, workflow, integration, and AI interaction.
 
 Observability consists of:
@@ -644,7 +644,7 @@ ERROR HANDLING & EXCEPTION STRATEGY
 
 Failures shall be isolated, observable, recoverable where possible, and understandable.
 
-Atlas shall fail gracefully rather than catastrophically.
+InventSmith shall fail gracefully rather than catastrophically.
 
 14.2 Exception Categories
 
@@ -699,8 +699,8 @@ Shutdown sequence:
 
 Graceful shutdown shall prevent unnecessary data loss and preserve operational integrity.
 
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 
 ====================================================================
@@ -710,7 +710,7 @@ PERFORMANCE, SCALABILITY & RELIABILITY
 
 16.1 Performance Philosophy
 
-Atlas Core shall be engineered to deliver predictable performance under normal,
+InventSmith Core shall be engineered to deliver predictable performance under normal,
 peak, and degraded operating conditions. Platform performance shall be measured,
 validated, and continuously improved through automated monitoring.
 
@@ -732,7 +732,7 @@ Platform engineering shall prioritize:
 
 16.3 Scalability
 
-Atlas shall support horizontal and vertical scaling.
+InventSmith shall support horizontal and vertical scaling.
 
 Core infrastructure shall remain stateless whenever practical to enable elastic
 deployment across multiple compute instances.
@@ -770,11 +770,11 @@ SHARED LIBRARIES & DOMAIN MODELS
 17.1 Purpose
 
 Shared libraries eliminate duplicated engineering effort while ensuring consistent
-behavior across Atlas modules.
+behavior across InventSmith modules.
 
 17.2 Shared Libraries
 
-Atlas Core maintains common libraries for:
+InventSmith Core maintains common libraries for:
 
 • Validation
 • Configuration
@@ -816,8 +816,8 @@ Breaking changes require:
 • Version increment
 • Consumer notification
 
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 
 ====================================================================
@@ -827,12 +827,12 @@ CORE TESTING STANDARDS
 
 18.1 Purpose
 
-Testing is a mandatory engineering discipline within Atlas Core. Every platform
+Testing is a mandatory engineering discipline within InventSmith Core. Every platform
 capability shall be verifiable through automated and repeatable testing.
 
 18.2 Testing Pyramid
 
-Atlas adopts a layered testing strategy consisting of:
+InventSmith adopts a layered testing strategy consisting of:
 
 • Unit Tests
 • Component Tests
@@ -867,7 +867,7 @@ OPERATIONAL GOVERNANCE
 
 19.1 Platform Governance
 
-Atlas Core establishes mandatory engineering standards governing all platform
+InventSmith Core establishes mandatory engineering standards governing all platform
 development.
 
 Governance objectives include:
@@ -934,12 +934,12 @@ External Services
 
 20.3 Future Evolution
 
-Atlas Core is designed to support future AI models, new infrastructure providers,
+InventSmith Core is designed to support future AI models, new infrastructure providers,
 additional workflow engines, new authentication systems, and emerging platform
 capabilities without requiring fundamental architectural redesign.
 
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 
 ====================================================================
@@ -950,11 +950,11 @@ PLATFORM SECURITY STANDARDS
 21.1 Security Philosophy
 
 Security is a foundational platform capability rather than a feature added after
-development. Every Atlas Core component shall be designed with secure defaults.
+development. Every InventSmith Core component shall be designed with secure defaults.
 
 21.2 Core Security Controls
 
-Atlas Core enforces:
+InventSmith Core enforces:
 
 • Encryption in transit
 • Encryption at rest
@@ -1050,8 +1050,8 @@ Background jobs shall support:
 Failed jobs shall be isolated, logged, retried when appropriate, and surfaced
 through operational dashboards for investigation.
 
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 
 ====================================================================
@@ -1061,7 +1061,7 @@ VERSIONING & COMPATIBILITY
 
 24.1 Objectives
 
-Atlas Core shall evolve without unnecessarily disrupting existing platform modules.
+InventSmith Core shall evolve without unnecessarily disrupting existing platform modules.
 Version management shall emphasize stability, backward compatibility, and
 predictable upgrade paths.
 
@@ -1094,7 +1094,7 @@ PLATFORM GOVERNANCE & LIFECYCLE
 
 25.1 Governance Board
 
-Atlas Core governance is responsible for:
+InventSmith Core governance is responsible for:
 
 • Architecture direction
 • Technical standards
@@ -1136,11 +1136,11 @@ REFERENCE APPENDICES
 
 Appendix A — Core Terminology
 
-Defines canonical platform vocabulary used across all Atlas Bibles.
+Defines canonical platform vocabulary used across all InventSmith Bibles.
 
 Appendix B — Platform Principles
 
-Summarizes mandatory engineering principles governing Atlas Core.
+Summarizes mandatory engineering principles governing InventSmith Core.
 
 Appendix C — Service Classification
 
@@ -1152,13 +1152,13 @@ Major architectural decisions shall be documented using standardized ADRs.
 
 Appendix E — Future Platform Evolution
 
-Atlas Core is intentionally designed to support emerging AI technologies,
+InventSmith Core is intentionally designed to support emerging AI technologies,
 distributed computing models, additional integration providers, and future
 platform capabilities while preserving the foundational architectural principles
 defined within this Bible.
 
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 
 ====================================================================
@@ -1168,7 +1168,7 @@ PLATFORM DATA GOVERNANCE
 
 27.1 Purpose
 
-Atlas Core establishes the enterprise standards governing how platform data is
+InventSmith Core establishes the enterprise standards governing how platform data is
 created, classified, validated, protected, retained, archived, and destroyed.
 
 27.2 Data Classification
@@ -1200,7 +1200,7 @@ Duplicate sources of truth are prohibited.
 
 27.4 Data Integrity
 
-Atlas Core shall enforce:
+InventSmith Core shall enforce:
 
 • Referential integrity
 • Transaction consistency
@@ -1242,7 +1242,7 @@ PLATFORM RESILIENCE
 
 29.1 Resilience Strategy
 
-Atlas Core shall continue operating despite partial infrastructure failures.
+InventSmith Core shall continue operating despite partial infrastructure failures.
 
 Resilience mechanisms include:
 
@@ -1270,8 +1270,8 @@ Recovery planning shall include:
 Operational recovery procedures shall be documented, tested, and periodically
 reviewed.
 
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 
 ====================================================================
@@ -1281,7 +1281,7 @@ PLATFORM DEPLOYMENT STANDARDS
 
 30.1 Deployment Philosophy
 
-Atlas Core shall support repeatable, automated, and verifiable deployments across
+InventSmith Core shall support repeatable, automated, and verifiable deployments across
 development, testing, staging, and production environments.
 
 30.2 Deployment Requirements
@@ -1308,7 +1308,7 @@ DEVELOPER EXPERIENCE
 
 31.1 Objectives
 
-Atlas Core shall provide a consistent engineering experience that minimizes setup
+InventSmith Core shall provide a consistent engineering experience that minimizes setup
 time and maximizes development productivity.
 
 Developer tooling shall include:
@@ -1340,7 +1340,7 @@ PLATFORM COMPLIANCE
 
 32.1 Compliance Objectives
 
-Atlas Core shall provide foundational capabilities supporting regulatory,
+InventSmith Core shall provide foundational capabilities supporting regulatory,
 organizational, and contractual compliance requirements.
 
 Capabilities include:
@@ -1356,11 +1356,11 @@ Capabilities include:
 32.2 Continuous Improvement
 
 Platform governance shall periodically review engineering standards, security
-controls, operational metrics, and architectural decisions to ensure Atlas Core
+controls, operational metrics, and architectural decisions to ensure InventSmith Core
 continues to support future platform evolution without compromising stability.
 
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 
 ====================================================================
@@ -1370,7 +1370,7 @@ PLATFORM OPERATIONS
 
 33.1 Operational Philosophy
 
-Atlas Core shall provide a predictable operational model allowing administrators,
+InventSmith Core shall provide a predictable operational model allowing administrators,
 platform engineers, and DevOps teams to monitor, manage, and maintain the
 platform with minimal operational overhead.
 
@@ -1412,7 +1412,7 @@ RELEASE MANAGEMENT
 
 34.1 Release Objectives
 
-Atlas releases shall be predictable, traceable, and reversible.
+InventSmith releases shall be predictable, traceable, and reversible.
 
 Every release shall include:
 
@@ -1435,7 +1435,7 @@ Every release shall include:
 
 34.3 Post-Release Validation
 
-Following deployment, Atlas Core shall automatically verify:
+Following deployment, InventSmith Core shall automatically verify:
 
 • Service health
 • API availability
@@ -1448,20 +1448,20 @@ Following deployment, Atlas Core shall automatically verify:
 # CHAPTER 35
 CONCLUSION
 
-Atlas Core establishes the architectural foundation that enables every current
-and future Atlas capability.
+InventSmith Core establishes the architectural foundation that enables every current
+and future InventSmith capability.
 
 Every engineering decision shall reinforce the principles of modularity,
 maintainability, security, observability, extensibility, and inventor-first
-design established by the Atlas Constitution and Product Bible.
+design established by the InventSmith Constitution and Product Bible.
 
-Future Atlas Bibles shall build upon this platform rather than redefine it.
+Future InventSmith Bibles shall build upon this platform rather than redefine it.
 
-This document serves as the authoritative technical foundation for the Atlas
+This document serves as the authoritative technical foundation for the InventSmith
 platform.
 
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 
 ====================================================================
@@ -1471,8 +1471,8 @@ ADVANCED AI ORCHESTRATION STANDARDS
 
 36.1 Purpose
 
-The AI Orchestration Layer is the intelligence coordination backbone of Atlas Core.
-Rather than coupling business modules to individual LLM vendors, Atlas exposes a
+The AI Orchestration Layer is the intelligence coordination backbone of InventSmith Core.
+Rather than coupling business modules to individual LLM vendors, InventSmith exposes a
 vendor-neutral orchestration framework that manages model selection, context,
 governance, execution, auditing, resilience, and optimization.
 
@@ -1493,7 +1493,7 @@ The orchestration layer shall:
 
 36.3 Context Assembly
 
-Before invoking an AI provider, Atlas Core constructs an execution context from:
+Before invoking an AI provider, InventSmith Core constructs an execution context from:
 
 • Inventor Twin memory
 • Active workflow state
@@ -1524,7 +1524,7 @@ Prompt changes require review and regression validation.
 
 36.5 AI Safety
 
-Atlas Core shall enforce:
+InventSmith Core shall enforce:
 
 • Sensitive data filtering
 • Prompt injection detection
@@ -1538,7 +1538,7 @@ Atlas Core shall enforce:
 PLATFORM GOVERNANCE MATURITY MODEL
 ====================================================================
 
-Atlas Core governance evolves through five maturity stages:
+InventSmith Core governance evolves through five maturity stages:
 
 Level 1 — Foundational
 Level 2 — Standardized
@@ -1553,11 +1553,11 @@ Core engineering teams shall periodically assess platform maturity and produce
 roadmaps addressing identified gaps.
 
 This governance model provides a repeatable framework for long-term evolution of
-the Atlas platform while maintaining alignment with the Atlas Constitution and
+the InventSmith platform while maintaining alignment with the InventSmith Constitution and
 Product Bible.
 
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 
 ====================================================================
@@ -1567,9 +1567,9 @@ ENTERPRISE SERVICE LIFECYCLE MANAGEMENT
 
 38.1 Purpose
 
-Atlas Core defines a standardized lifecycle for every platform service to ensure
+InventSmith Core defines a standardized lifecycle for every platform service to ensure
 consistent initialization, execution, monitoring, maintenance, upgrade, and
-retirement throughout the lifetime of the Atlas platform.
+retirement throughout the lifetime of the InventSmith platform.
 
 Every service, regardless of implementation technology, shall follow the same
 governance model to simplify operations and improve long-term maintainability.
@@ -1607,7 +1607,7 @@ Every service shall publish metadata describing:
 • Startup Priority
 • Shutdown Priority
 
-Atlas Core validates metadata before activation.
+InventSmith Core validates metadata before activation.
 
 38.4 Operational Contracts
 
@@ -1647,7 +1647,7 @@ PLATFORM RESOURCE MANAGEMENT
 
 39.1 Objectives
 
-Atlas Core manages shared computational resources to maximize reliability,
+InventSmith Core manages shared computational resources to maximize reliability,
 predictability, and operational efficiency.
 
 Resources include:
@@ -1694,11 +1694,11 @@ These metrics guide capacity planning and continuous optimization.
 
 Platform resource management remains invisible to feature teams.
 
-Atlas Core absorbs operational complexity so business developers focus on
+InventSmith Core absorbs operational complexity so business developers focus on
 inventor-facing functionality rather than infrastructure implementation.
 
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 
 ====================================================================
@@ -1709,13 +1709,13 @@ ENTERPRISE OBSERVABILITY GOVERNANCE
 40.1 Purpose
 
 Enterprise observability extends beyond logging by providing a complete operational
-understanding of the Atlas platform. Every platform capability shall emit
+understanding of the InventSmith platform. Every platform capability shall emit
 consistent telemetry that enables engineers to understand health, performance,
 capacity, reliability, and business impact without requiring code changes.
 
 40.2 Observability Domains
 
-Atlas Core standardizes collection across:
+InventSmith Core standardizes collection across:
 
 • Infrastructure
 • Platform Services
@@ -1763,7 +1763,7 @@ PLATFORM EVOLUTION STRATEGY
 
 41.1 Long-Term Vision
 
-Atlas Core is designed as a stable platform expected to support many generations
+InventSmith Core is designed as a stable platform expected to support many generations
 of AI technologies, cloud providers, workflow engines, storage systems, and
 future product capabilities.
 
@@ -1796,13 +1796,13 @@ Unmanaged technical debt is prohibited.
 
 41.4 Closing Principle
 
-Atlas Core exists to provide a stable, extensible, secure, observable, and
-enterprise-grade foundation supporting every current and future Atlas capability
+InventSmith Core exists to provide a stable, extensible, secure, observable, and
+enterprise-grade foundation supporting every current and future InventSmith capability
 while remaining faithful to the inventor-first principles established by the
-Atlas Constitution.
+InventSmith Constitution.
 
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 
 ====================================================================
@@ -1812,7 +1812,7 @@ REFERENCE IMPLEMENTATION STANDARDS
 
 42.1 Purpose
 
-This chapter defines the mandatory implementation standards that every Atlas
+This chapter defines the mandatory implementation standards that every InventSmith
 engineering team shall follow when developing platform modules, shared services,
 or infrastructure extensions.
 
@@ -1864,7 +1864,7 @@ Development teams shall favor:
 ARCHITECTURAL ANTI-PATTERNS
 ====================================================================
 
-The following practices are prohibited within Atlas Core:
+The following practices are prohibited within InventSmith Core:
 
 • Business logic inside infrastructure components
 • Duplicate domain models
@@ -1884,18 +1884,18 @@ production release.
 FINAL PLATFORM PRINCIPLES
 ====================================================================
 
-Atlas Core exists to make every future Atlas capability easier to design,
+InventSmith Core exists to make every future InventSmith capability easier to design,
 implement, operate, extend, secure, and maintain.
 
 Every architectural decision shall support long-term platform health while
-remaining faithful to the inventor-first philosophy defined by the Atlas
+remaining faithful to the inventor-first philosophy defined by the InventSmith
 Constitution.
 
 The platform succeeds when feature teams can innovate rapidly without needing to
 rebuild infrastructure, duplicate engineering effort, or compromise quality.
 
-ATLAS-013 — CORE BIBLE
-Project Atlas
+INVENTSMITH-013 — CORE BIBLE
+Project InventSmith
 Version 1.0
 
 ====================================================================
@@ -1905,7 +1905,7 @@ PLATFORM REFERENCE CHECKLISTS
 
 45.1 Core Module Checklist
 
-Every Atlas Core module shall be verified before production release.
+Every InventSmith Core module shall be verified before production release.
 
 Architecture
 
@@ -1957,34 +1957,34 @@ A deployment is considered production-ready only when:
 # CHAPTER 46
 FINAL STATEMENT
 
-Atlas Core is the authoritative technical foundation for Project Atlas.
+InventSmith Core is the authoritative technical foundation for Project InventSmith.
 
-All future Atlas services, applications, AI capabilities, workflows, integrations,
+All future InventSmith services, applications, AI capabilities, workflows, integrations,
 and infrastructure shall conform to the architectural principles, engineering
 standards, governance requirements, and operational guidance defined within this
 Bible.
 
-A stable platform enables continuous innovation. Atlas Core exists so inventors
+A stable platform enables continuous innovation. InventSmith Core exists so inventors
 benefit from a platform that is secure, reliable, scalable, maintainable, and
 capable of evolving for many years without sacrificing consistency or quality.
 
-END OF ATLAS-013_CORE_BIBLE_v1.0
+END OF INVENTSMITH-013_CORE_BIBLE_v1.0
 
 
-# ATLAS-015 CORE BIBLE — FULL EXPANSION (01–18)
+# INVENTSMITH-015 CORE BIBLE — FULL EXPANSION (01–18)
 ## Expansion 01
-ATLAS-015_CORE_BIBLE_v1.0-01.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-01.txt
 
-CHAPTER 1 — Unified Atlas Core Evolution Layer
+CHAPTER 1 — Unified InventSmith Core Evolution Layer
 
 Purpose
-This chapter defines the enterprise extension layer for the Atlas Core Bible,
-introducing a unified evolution model that allows all Atlas subsystems to
+This chapter defines the enterprise extension layer for the InventSmith Core Bible,
+introducing a unified evolution model that allows all InventSmith subsystems to
 operate as a single coordinated platform across repositories, DevOps pipelines,
 AI orchestration, and governance systems.
 
 Objectives
-• Unify Atlas 013, 014, and 015 domains under a shared execution model.
+• Unify InventSmith 013, 014, and 015 domains under a shared execution model.
 • Extend core architecture without modifying foundational contracts.
 • Enable cross-bible interoperability.
 • Introduce system-wide evolution governance.
@@ -1992,19 +1992,19 @@ Objectives
 
 Unified Platform Principle
 
-Atlas Core is no longer treated as a single isolated runtime.
+InventSmith Core is no longer treated as a single isolated runtime.
 It now operates as a distributed ecosystem composed of:
 
-• Repository Standards Layer (ATLAS-013)
-• DevOps & CI/CD Execution Layer (ATLAS-014)
-• Core Platform Intelligence Layer (ATLAS-015)
+• Repository Standards Layer (INVENTSMITH-013)
+• DevOps & CI/CD Execution Layer (INVENTSMITH-014)
+• Core Platform Intelligence Layer (INVENTSMITH-015)
 
 Each layer remains independent but interoperable through defined contracts,
 event flows, and governance policies.
 
 Cross-Bible Orchestration Model
 
-The Atlas ecosystem introduces a top-level orchestration model:
+The InventSmith ecosystem introduces a top-level orchestration model:
 
 1. Structural Layer (Repositories)
 2. Delivery Layer (CI/CD Pipelines)
@@ -2029,7 +2029,7 @@ Core Evolution Principles
 
 Enterprise Integration Boundaries
 
-Atlas Core must enforce strict boundaries between:
+InventSmith Core must enforce strict boundaries between:
 
 • Code structure (013)
 • Delivery pipelines (014)
@@ -2040,7 +2040,7 @@ formal governance approval.
 
 Future Evolution Direction
 
-The Atlas Core ecosystem is evolving toward:
+The InventSmith Core ecosystem is evolving toward:
 
 • Self-coordinating platform architecture
 • Autonomous cross-repository governance
@@ -2049,19 +2049,19 @@ The Atlas Core ecosystem is evolving toward:
 • Unified enterprise execution mesh
 
 This chapter establishes the foundation for all subsequent expansion of the
-ATLAS-015 Core Bible enterprise model.
+INVENTSMITH-015 Core Bible enterprise model.
 ## Expansion 02
-ATLAS-015_CORE_BIBLE_v1.0-02.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-02.txt
 
 CHAPTER 2 — Unified Core Runtime Architecture
 
 Purpose
-This chapter defines the unified runtime model that enables Atlas Core to
+This chapter defines the unified runtime model that enables InventSmith Core to
 operate as a single coordinated execution system across repositories,
 DevOps pipelines, AI orchestration layers, and governance subsystems.
 
 Objectives
-• Establish a single runtime model across Atlas layers.
+• Establish a single runtime model across InventSmith layers.
 • Enable deterministic execution behavior.
 • Standardize lifecycle coordination.
 • Provide cross-layer execution integrity.
@@ -2069,7 +2069,7 @@ Objectives
 
 Unified Runtime Model
 
-Atlas Core operates as a distributed but logically unified runtime composed of:
+InventSmith Core operates as a distributed but logically unified runtime composed of:
 
 • Execution Kernel
 • Event Processing Layer
@@ -2077,7 +2077,7 @@ Atlas Core operates as a distributed but logically unified runtime composed of:
 • AI Coordination Layer
 • Governance Enforcement Layer
 
-Each subsystem participates in a shared lifecycle governed by Atlas Core.
+Each subsystem participates in a shared lifecycle governed by InventSmith Core.
 
 Execution Kernel Responsibilities
 
@@ -2092,7 +2092,7 @@ The Execution Kernel is responsible for:
 
 Lifecycle Synchronization
 
-All Atlas components must follow synchronized lifecycle states:
+All InventSmith components must follow synchronized lifecycle states:
 
 1. Initialized
 2. Registered
@@ -2106,7 +2106,7 @@ No subsystem may bypass lifecycle state transitions.
 
 Cross-Layer Execution Integrity
 
-Atlas enforces execution integrity across:
+InventSmith enforces execution integrity across:
 
 • Repository layer (013)
 • CI/CD pipeline layer (014)
@@ -2156,20 +2156,20 @@ Each category defines:
 
 Future Evolution
 
-The Atlas runtime will evolve toward:
+The InventSmith runtime will evolve toward:
 
 • Fully event-sourced system kernel
 • AI-driven runtime optimization
 • Self-healing distributed execution graph
-• Autonomous lifecycle management across all Atlas layers
+• Autonomous lifecycle management across all InventSmith layers
 ## Expansion 03
-ATLAS-015_CORE_BIBLE_v1.0-03.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-03.txt
 
 CHAPTER 3 — Event Sourcing Core Architecture
 
 Purpose
 This chapter defines the enterprise event sourcing architecture that enables
-Atlas Core to reconstruct system state, ensure full auditability, and provide
+InventSmith Core to reconstruct system state, ensure full auditability, and provide
 deterministic replay of all platform activities across repositories, pipelines,
 runtime systems, and AI orchestration layers.
 
@@ -2182,7 +2182,7 @@ Objectives
 
 Event Sourcing Model
 
-Atlas Core adopts an event-sourced architecture where:
+InventSmith Core adopts an event-sourced architecture where:
 
 • State is derived from events
 • Events are immutable
@@ -2254,11 +2254,11 @@ System state can be reconstructed by:
 3. Rebuilding service state
 4. Validating against checkpoints
 
-This ensures full traceability across all Atlas layers.
+This ensures full traceability across all InventSmith layers.
 
 Event Integrity & Ordering Guarantees
 
-Atlas enforces:
+InventSmith enforces:
 
 • Global ordering within partitions
 • Idempotent event processing
@@ -2275,18 +2275,18 @@ The event sourcing model will evolve toward:
 • Self-healing event streams
 • Predictive system reconstruction
 ## Expansion 04
-ATLAS-015_CORE_BIBLE_v1.0-04.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-04.txt
 
 CHAPTER 4 — Unified Service Registry Evolution
 
 Purpose
 This chapter defines the evolved service registry architecture that enables
-Atlas Core to dynamically discover, track, and orchestrate all services across
+InventSmith Core to dynamically discover, track, and orchestrate all services across
 repositories, CI/CD pipelines, runtime systems, and AI orchestration layers
 in a unified, intelligent, and policy-controlled manner.
 
 Objectives
-• Enable dynamic service discovery across all Atlas layers.
+• Enable dynamic service discovery across all InventSmith layers.
 • Maintain real-time service topology awareness.
 • Support intelligent dependency resolution.
 • Improve runtime adaptability.
@@ -2307,7 +2307,7 @@ All services must be registered before activation.
 
 Dynamic Service Discovery
 
-Atlas Core supports runtime discovery through:
+InventSmith Core supports runtime discovery through:
 
 • Registry queries
 • Event-driven registration updates
@@ -2351,7 +2351,7 @@ The system continuously optimizes service graphs by:
 
 Fault-Aware Service Routing
 
-Atlas Core dynamically routes requests based on:
+InventSmith Core dynamically routes requests based on:
 
 • Service health status
 • Latency metrics
@@ -2393,18 +2393,18 @@ The Service Registry will evolve toward:
 • Predictive service provisioning
 • Global distributed service intelligence mesh
 ## Expansion 05
-ATLAS-015_CORE_BIBLE_v1.0-05.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-05.txt
 
 CHAPTER 5 — AI Coordination Layer Architecture
 
 Purpose
-This chapter defines the enterprise AI Coordination Layer within Atlas Core,
+This chapter defines the enterprise AI Coordination Layer within InventSmith Core,
 responsible for orchestrating all AI interactions, model selection, context
-assembly, execution governance, and response normalization across the Atlas
+assembly, execution governance, and response normalization across the InventSmith
 platform.
 
 Objectives
-• Centralize AI orchestration across all Atlas systems.
+• Centralize AI orchestration across all InventSmith systems.
 • Enable multi-model coordination and routing.
 • Enforce policy-driven AI execution.
 • Improve cost, safety, and performance optimization.
@@ -2467,7 +2467,7 @@ Prompts are version-controlled artifacts.
 
 Multi-Model Orchestration Strategy
 
-Atlas supports:
+InventSmith supports:
 
 • Primary model execution
 • Secondary validation models
@@ -2515,17 +2515,17 @@ The AI Coordination Layer will evolve toward:
 • Cross-platform AI federation
 • Enterprise AI governance mesh
 ## Expansion 06
-ATLAS-015_CORE_BIBLE_v1.0-06.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-06.txt
 
 CHAPTER 6 — Workflow Engine Integration Deep Expansion
 
 Purpose
-This chapter defines the extended workflow execution model for Atlas Core,
+This chapter defines the extended workflow execution model for InventSmith Core,
 enabling deterministic, resilient, and AI-orchestrated workflows that span
 repositories (013), CI/CD pipelines (014), and core runtime systems (015).
 
 Objectives
-• Enable unified workflow execution across all Atlas layers.
+• Enable unified workflow execution across all InventSmith layers.
 • Support AI-assisted task orchestration.
 • Ensure workflow durability and recoverability.
 • Standardize event-driven workflow triggers.
@@ -2623,18 +2623,18 @@ The workflow engine will evolve toward:
 • Predictive workflow scheduling
 • Cross-platform orchestration mesh
 ## Expansion 07
-ATLAS-015_CORE_BIBLE_v1.0-07.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-07.txt
 
 CHAPTER 7 — Enterprise Governance Enforcement Layer
 
 Purpose
-This chapter defines the enterprise governance enforcement layer for Atlas Core,
+This chapter defines the enterprise governance enforcement layer for InventSmith Core,
 ensuring that all operations across repositories (013), CI/CD pipelines (014),
 runtime systems (015), AI coordination, and workflows comply with centralized
 policy controls, regulatory requirements, and architectural standards.
 
 Objectives
-• Enforce unified governance across all Atlas layers.
+• Enforce unified governance across all InventSmith layers.
 • Standardize policy-as-code execution.
 • Enable real-time compliance validation.
 • Prevent unauthorized system behavior.
@@ -2669,7 +2669,7 @@ Policies govern:
 
 Cross-Layer Compliance Validation
 
-Every action in Atlas must pass validation across:
+Every action in InventSmith must pass validation across:
 
 • Repository standards (013)
 • CI/CD rules (014)
@@ -2698,7 +2698,7 @@ Decisions include:
 
 Real-Time Policy Enforcement Mesh
 
-Policies are distributed across all Atlas nodes:
+Policies are distributed across all InventSmith nodes:
 
 • Edge enforcement
 • Runtime enforcement
@@ -2748,17 +2748,17 @@ The governance layer will evolve toward:
 • Autonomous regulatory alignment
 • Continuous governance evolution
 ## Expansion 08
-ATLAS-015_CORE_BIBLE_v1.0-08.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-08.txt
 
 CHAPTER 8 — Advanced Security Integration Layer
 
 Purpose
-This chapter defines the advanced security integration layer within Atlas Core,
+This chapter defines the advanced security integration layer within InventSmith Core,
 ensuring unified, Zero Trust security enforcement across repositories (013),
 CI/CD pipelines (014), runtime systems (015), AI coordination, and workflows.
 
 Objectives
-• Enforce Zero Trust across all Atlas layers.
+• Enforce Zero Trust across all InventSmith layers.
 • Unify identity, access, and runtime security.
 • Detect and prevent threats in real time.
 • Secure supply chain and execution environments.
@@ -2766,7 +2766,7 @@ Objectives
 
 Zero Trust Core Model
 
-Atlas security operates on the principle that:
+InventSmith security operates on the principle that:
 
 • No system is trusted by default
 • Every request must be verified
@@ -2824,7 +2824,7 @@ Secrets are managed through:
 
 Supply Chain Runtime Validation
 
-At execution time, Atlas verifies:
+At execution time, InventSmith verifies:
 
 • Artifact signatures
 • Provenance integrity
@@ -2863,18 +2863,18 @@ The security layer will evolve toward:
 • AI-driven defense orchestration
 • Fully adaptive Zero Trust enforcement
 ## Expansion 09
-ATLAS-015_CORE_BIBLE_v1.0-09.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-09.txt
 
 CHAPTER 9 — Platform Observability & Intelligence Layer
 
 Purpose
-This chapter defines the unified observability and intelligence layer for Atlas Core,
+This chapter defines the unified observability and intelligence layer for InventSmith Core,
 enabling real-time insight into system behavior across repositories (013),
 CI/CD pipelines (014), runtime systems (015), AI orchestration, and governance
 systems.
 
 Objectives
-• Establish unified observability across all Atlas layers.
+• Establish unified observability across all InventSmith layers.
 • Enable real-time operational intelligence.
 • Correlate telemetry across systems.
 • Support predictive system analysis.
@@ -2882,7 +2882,7 @@ Objectives
 
 Unified Telemetry Architecture
 
-Atlas Core unifies telemetry into three primary domains:
+InventSmith Core unifies telemetry into three primary domains:
 
 • Metrics
 • Logs
@@ -2910,7 +2910,7 @@ This enables full system traceability.
 
 Event + Telemetry Fusion Model
 
-Atlas merges event streams with telemetry data to produce:
+InventSmith merges event streams with telemetry data to produce:
 
 • Unified system timelines
 • Root cause reconstruction paths
@@ -2979,15 +2979,15 @@ The observability layer will evolve toward:
 • Predictive system-wide diagnostics
 • Global unified intelligence mesh
 ## Expansion 10
-ATLAS-015_CORE_BIBLE_v1.0-10.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-10.txt
 
 CHAPTER 10 — Platform Resource Management & Optimization Layer
 
 Purpose
-This chapter defines the enterprise resource management layer for Atlas Core,
+This chapter defines the enterprise resource management layer for InventSmith Core,
 ensuring efficient allocation, scheduling, optimization, and governance of
 compute, storage, AI workloads, and cross-layer execution resources across
-the entire Atlas ecosystem.
+the entire InventSmith ecosystem.
 
 Objectives
 • Optimize system-wide resource utilization.
@@ -3102,18 +3102,18 @@ The resource layer will evolve toward:
 • Predictive resource provisioning
 • Global unified resource intelligence mesh
 ## Expansion 11
-ATLAS-015_CORE_BIBLE_v1.0-11.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-11.txt
 
 CHAPTER 11 — Platform Deployment & Release Architecture
 
 Purpose
-This chapter defines the enterprise deployment and release architecture for Atlas Core,
+This chapter defines the enterprise deployment and release architecture for InventSmith Core,
 ensuring controlled, observable, and reversible delivery of all system changes across
 repositories (013), CI/CD pipelines (014), runtime systems (015), AI orchestration,
 and governance layers.
 
 Objectives
-• Enable safe and consistent deployments across all Atlas layers.
+• Enable safe and consistent deployments across all InventSmith layers.
 • Support zero-downtime release strategies.
 • Improve release reliability and traceability.
 • Standardize environment promotion workflows.
@@ -3145,7 +3145,7 @@ Each rollout stage requires validation before progression.
 
 Zero-Downtime Deployment Strategy
 
-Atlas ensures:
+InventSmith ensures:
 
 • Parallel version execution
 • Backward-compatible interfaces
@@ -3231,18 +3231,18 @@ The deployment system will evolve toward:
 • Global deployment intelligence mesh
 • Zero-touch enterprise release systems
 ## Expansion 12
-ATLAS-015_CORE_BIBLE_v1.0-12.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-12.txt
 
 CHAPTER 12 — Developer Experience (DevEx) Platform Layer
 
 Purpose
-This chapter defines the enterprise Developer Experience (DevEx) layer for Atlas Core,
+This chapter defines the enterprise Developer Experience (DevEx) layer for InventSmith Core,
 ensuring developers operate within a unified, intelligent, and highly productive
 environment spanning repositories (013), CI/CD systems (014), runtime services (015),
 AI orchestration, and governance systems.
 
 Objectives
-• Improve developer productivity across all Atlas layers.
+• Improve developer productivity across all InventSmith layers.
 • Standardize development workflows.
 • Reduce friction between code, build, and runtime.
 • Enable AI-assisted development workflows.
@@ -3263,7 +3263,7 @@ All developer actions are tracked and optimized.
 
 Local-to-Production Parity Systems
 
-Atlas ensures:
+InventSmith ensures:
 
 • Environment consistency across stages
 • Configuration parity between dev/staging/prod
@@ -3347,18 +3347,18 @@ The Developer Experience layer will evolve toward:
 • Self-optimizing engineering environments
 • Global unified DevEx intelligence mesh
 ## Expansion 13
-ATLAS-015_CORE_BIBLE_v1.0-13.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-13.txt
 
 CHAPTER 13 — Platform Intelligence & Analytics Layer
 
 Purpose
-This chapter defines the enterprise intelligence and analytics layer for Atlas Core,
+This chapter defines the enterprise intelligence and analytics layer for InventSmith Core,
 providing unified visibility, predictive insights, and decision intelligence across
 repositories (013), CI/CD systems (014), runtime services (015), AI orchestration,
 and governance systems.
 
 Objectives
-• Unify analytics across all Atlas layers.
+• Unify analytics across all InventSmith layers.
 • Enable predictive platform intelligence.
 • Improve decision-making accuracy.
 • Provide real-time system-wide insights.
@@ -3451,18 +3451,18 @@ The intelligence layer evolves toward:
 • Cross-domain AI insight fusion
 • Global unified platform intelligence mesh
 ## Expansion 14
-ATLAS-015_CORE_BIBLE_v1.0-14.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-14.txt
 
 CHAPTER 14 — Platform Integration & Interoperability Layer
 
 Purpose
-This chapter defines the enterprise integration and interoperability layer for Atlas Core,
+This chapter defines the enterprise integration and interoperability layer for InventSmith Core,
 enabling seamless communication between repositories (013), CI/CD systems (014),
 runtime services (015), AI orchestration systems, governance engines, and external
 enterprise platforms through standardized contracts and unified communication models.
 
 Objectives
-• Enable cross-system interoperability across Atlas ecosystem.
+• Enable cross-system interoperability across InventSmith ecosystem.
 • Standardize API and event-based integration.
 • Ensure secure and governed external connectivity.
 • Reduce integration complexity and fragmentation.
@@ -3492,7 +3492,7 @@ All external and internal traffic is routed through a unified API gateway that p
 
 Event Bus Standardization at Enterprise Scale
 
-The Atlas event bus ensures:
+The InventSmith event bus ensures:
 
 • Unified event schema across all layers
 • Ordered and partitioned event streams
@@ -3550,12 +3550,12 @@ The integration layer will evolve toward:
 • Dynamic API evolution systems
 • Global enterprise integration intelligence mesh
 ## Expansion 15
-ATLAS-015_CORE_BIBLE_v1.0-15.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-15.txt
 
 CHAPTER 15 — Platform Resilience & Fault Tolerance Layer
 
 Purpose
-This chapter defines the enterprise resilience and fault tolerance layer for Atlas Core,
+This chapter defines the enterprise resilience and fault tolerance layer for InventSmith Core,
 ensuring continuous availability, graceful degradation, and automated recovery across
 repositories (013), CI/CD pipelines (014), runtime services (015), AI orchestration,
 and governance systems.
@@ -3569,7 +3569,7 @@ Objectives
 
 Distributed Failure Handling Model
 
-Atlas handles failures across:
+InventSmith handles failures across:
 
 • Repository systems (013)
 • CI/CD pipelines (014)
@@ -3593,7 +3593,7 @@ Healing actions are policy-governed and audited.
 
 Chaos Engineering Integration
 
-Atlas includes controlled fault injection:
+InventSmith includes controlled fault injection:
 
 • Random service failure simulation
 • Latency injection
@@ -3656,12 +3656,12 @@ The resilience layer evolves toward:
 • Global distributed resilience mesh
 • Self-optimizing reliability architecture
 ## Expansion 16
-ATLAS-015_CORE_BIBLE_v1.0-16.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-16.txt
 
 CHAPTER 16 — Platform Governance Intelligence Layer
 
 Purpose
-This chapter defines the governance intelligence layer for Atlas Core,
+This chapter defines the governance intelligence layer for InventSmith Core,
 enabling real-time policy reasoning, compliance evaluation, and autonomous
 governance decision support across repositories (013), CI/CD systems (014),
 runtime services (015), AI orchestration, and enterprise integrations.
@@ -3757,18 +3757,18 @@ The governance layer will evolve toward:
 • Predictive governance enforcement
 • Global unified governance intelligence mesh
 ## Expansion 17
-ATLAS-015_CORE_BIBLE_v1.0-17.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-17.txt
 
 CHAPTER 17 — Platform AI Orchestration Evolution Layer
 
 Purpose
-This chapter defines the advanced AI orchestration evolution layer for Atlas Core,
+This chapter defines the advanced AI orchestration evolution layer for InventSmith Core,
 enabling multi-agent coordination, autonomous decision synthesis, and cross-system
 AI governance across repositories (013), CI/CD pipelines (014), runtime systems (015),
 and enterprise intelligence services.
 
 Objectives
-• Enable multi-agent AI coordination across Atlas.
+• Enable multi-agent AI coordination across InventSmith.
 • Standardize AI decision orchestration.
 • Improve autonomy with controlled governance.
 • Support cross-model reasoning systems.
@@ -3776,7 +3776,7 @@ Objectives
 
 Multi-Agent Coordination Model
 
-Atlas AI systems operate as coordinated agents:
+InventSmith AI systems operate as coordinated agents:
 
 • Planning agents
 • Execution agents
@@ -3810,7 +3810,7 @@ Violations result in blocking or human escalation.
 
 Cross-Model Reasoning Orchestration
 
-Atlas supports multiple models working together:
+InventSmith supports multiple models working together:
 
 • Primary reasoning model
 • Verification model
@@ -3864,26 +3864,26 @@ The AI orchestration layer evolves toward:
 • Global enterprise AI coordination mesh
 • Adaptive intelligence infrastructures
 ## Expansion 18
-ATLAS-015_CORE_BIBLE_v1.0-18.txt
+INVENTSMITH-015_CORE_BIBLE_v1.0-18.txt
 
 CHAPTER 18 — Platform Future Architecture Synthesis Layer
 
 Purpose
-This chapter defines the final synthesis layer for Atlas Core, unifying all
+This chapter defines the final synthesis layer for InventSmith Core, unifying all
 enterprise capabilities across repositories (013), CI/CD pipelines (014),
 core runtime systems (015), AI orchestration, governance, security, observability,
 and intelligence systems into a single coherent evolution model.
 
 Objectives
-• Unify all Atlas layers into a single architectural model.
+• Unify all InventSmith layers into a single architectural model.
 • Define long-term evolution of the platform.
 • Enable autonomous enterprise system convergence.
 • Establish self-evolving architecture principles.
-• Provide blueprint for next-generation Atlas systems.
+• Provide blueprint for next-generation InventSmith systems.
 
-Unified Atlas Evolution Model
+Unified InventSmith Evolution Model
 
-Atlas operates as a converged system composed of:
+InventSmith operates as a converged system composed of:
 
 • Structural Layer (Repository Standards - 013)
 • Delivery Layer (CI/CD & DevOps - 014)
@@ -3906,11 +3906,11 @@ The abstraction layer defines:
 • Shared identity and context propagation
 • Global event synchronization model
 
-This enables consistent behavior across all Atlas components.
+This enables consistent behavior across all InventSmith components.
 
 Self-Evolving Architecture Principles
 
-Atlas systems are designed to evolve under strict governance:
+InventSmith systems are designed to evolve under strict governance:
 
 • Systems may adapt but not violate policy
 • AI may optimize but not override governance
@@ -3932,7 +3932,7 @@ All operations are coordinated through unified control planes.
 
 AI-Native Infrastructure Transformation
 
-Atlas transitions toward:
+InventSmith transitions toward:
 
 • AI-first system design
 • Predictive infrastructure behavior
@@ -3940,7 +3940,7 @@ Atlas transitions toward:
 • Self-healing enterprise systems
 • Intelligent decision automation
 
-Final Convergence of All Atlas Layers
+Final Convergence of All InventSmith Layers
 
 The system achieves full convergence:
 
@@ -3956,7 +3956,7 @@ All layers operate as one unified system.
 
 Next-Generation System Blueprint Framework
 
-Future Atlas systems will support:
+Future InventSmith systems will support:
 
 • Fully autonomous enterprise orchestration
 • Self-designing system architectures
@@ -3964,4 +3964,4 @@ Future Atlas systems will support:
 • Predictive global optimization
 • Continuous enterprise intelligence expansion
 
-This chapter concludes the ATLAS-015 Core Bible expansion series.
+This chapter concludes the INVENTSMITH-015 Core Bible expansion series.

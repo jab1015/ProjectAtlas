@@ -1,4 +1,4 @@
-# ATLAS PATENT INTELLIGENCE — DISCOVERY FOUNDATION
+# INVENTSMITH PATENT INTELLIGENCE — DISCOVERY FOUNDATION
 
 **Version 1.0 — July 2026**
 **Classification: Internal Engineering Reference**
@@ -12,11 +12,11 @@
 
 ## Document Purpose
 
-This document defines the **Discovery Foundation** of Atlas Patent Intelligence.
+This document defines the **Discovery Foundation** of InventSmith Patent Intelligence.
 
 It does not specify search execution, caching strategy, confidence scoring, cost controls, or founder review flow. Those belong in subsequent Patent Intelligence documents.
 
-This document answers one question: **How does Atlas determine what patent information it should search for — before any search begins?**
+This document answers one question: **How does InventSmith determine what patent information it should search for — before any search begins?**
 
 ---
 
@@ -43,7 +43,7 @@ Inventors make multi-year, financially material decisions based on the patent la
 - Who holds IP in the space (assignees, competitors, universities, NPEs)
 - What freedom the inventor has to operate commercially without infringing
 
-Without Atlas, founders spend 4 to 10 hours per invention conducting manual prior art searches across USPTO, Google Patents, and Espacenet — with inconsistent query strategies, no systematic classification search, and no coverage of international filings. Most stop when they run out of time, not when they have run out of relevant patents.
+Without InventSmith, founders spend 4 to 10 hours per invention conducting manual prior art searches across USPTO, Google Patents, and Espacenet — with inconsistent query strategies, no systematic classification search, and no coverage of international filings. Most stop when they run out of time, not when they have run out of relevant patents.
 
 Patent Intelligence replaces that manual process with a systematic, structured, repeatable research program that executes automatically — before the founder is asked to do anything.
 
@@ -58,14 +58,14 @@ Patent Intelligence is active from early-stage idea capture through post-launch 
 
 ### 1.3 How It Reduces Founder Effort
 
-The Atlas Automation Constitution (Principle 4) is explicit: the patent landscape belongs to Atlas to research, not to the inventor.
+The InventSmith Automation Constitution (Principle 4) is explicit: the patent landscape belongs to InventSmith to research, not to the inventor.
 
 Patent Intelligence reduces founder effort by:
 
 - **Eliminating blank-slate search.** The founder no longer needs to construct search queries from scratch or decide which patent databases to search.
-- **Eliminating coverage guesswork.** Atlas searches across classification codes, keyword variants, international terminology, assignee filings, and semantic concepts — systematic coverage the founder would not achieve manually.
-- **Eliminating redundant work.** Prior searches are reused. Atlas does not re-derive what it already knows.
-- **Concentrating founder attention.** The founder reviews structured findings and applies judgment to relevance — the one task that genuinely requires human expertise. Atlas handles everything upstream of that judgment.
+- **Eliminating coverage guesswork.** InventSmith searches across classification codes, keyword variants, international terminology, assignee filings, and semantic concepts — systematic coverage the founder would not achieve manually.
+- **Eliminating redundant work.** Prior searches are reused. InventSmith does not re-derive what it already knows.
+- **Concentrating founder attention.** The founder reviews structured findings and applies judgment to relevance — the one task that genuinely requires human expertise. InventSmith handles everything upstream of that judgment.
 
 ---
 
@@ -193,7 +193,7 @@ The following inputs are consumed by Patent Intelligence Discovery to derive the
 
 | Field | Required | Source | Description |
 |---|---|---|---|
-| `ideaBrief` | Optional (high value) | Stage 1 document | Atlas-generated Idea Brief document. Contains structured problem, solution, differentiation, and target audience — rich input for discovery when present. |
+| `ideaBrief` | Optional (high value) | Stage 1 document | InventSmith-generated Idea Brief document. Contains structured problem, solution, differentiation, and target audience — rich input for discovery when present. |
 | `patentReadinessReport` | Optional | Stage 4 document | If a prior run of Stage 4 produced a report, its contents seed Stage 9 incremental discovery. |
 | `priorArtSummary` | Optional | Prior Patent Intelligence run | Previously structured prior art findings. Scopes incremental discovery to delta-only searches. |
 
@@ -407,7 +407,7 @@ Keyword bundles organize the expanded keyword set into logical groups for struct
 | `primaryIPCCode` | IPC equivalent (used for international searches) |
 | `adjacentIPCCodes` | Related IPC codes |
 | `uspcCodes` | Legacy USPC codes for older US patent coverage |
-| `classificationConfidence` | How confident Atlas is in the classification derivation: `direct_match` | `inferred` | `approximate` |
+| `classificationConfidence` | How confident InventSmith is in the classification derivation: `direct_match` | `inferred` | `approximate` |
 | `classificationBasis` | What inputs drove this classification (mechanism description, known patents, LLM derivation) |
 
 ### 6.4 Assignee Targets
@@ -451,7 +451,7 @@ Discovery Confidence reflects how well-defined the research agenda is — not ho
 |---|---|
 | `overallDiscoveryConfidence` | `high` | `medium` | `low` |
 | `keywordCoverageScore` | How complete the keyword extraction was given available inputs |
-| `classificationCoverageScore` | How confident Atlas is in the classification derivation |
+| `classificationCoverageScore` | How confident InventSmith is in the classification derivation |
 | `assigneeCoverageScore` | How complete the assignee identification is given available competitor and competitive landscape data |
 | `missingInputsImpact` | Which missing optional inputs (Section 4) would most improve discovery precision if provided |
 | `ambiguities` | Specific ambiguities in the invention description that limit discovery precision |
@@ -482,9 +482,9 @@ Patent Intelligence must be built and operated according to the following perman
 - Every completed search result is a persistent artifact. Incremental discovery builds on prior results; it does not restart from zero.
 - When the invention context changes materially, only the affected discovery components are re-derived — not the entire package.
 
-**Never ask founders for information Atlas can infer.**
-- Classification codes, synonym expansions, industry terminology, assignee names — these are all derivable from invention description and competitor data Atlas already holds.
-- The only inputs Patent Intelligence should ever request from a founder are novel element statements and any specific patents the founder has already identified. Everything else is Atlas's job.
+**Never ask founders for information InventSmith can infer.**
+- Classification codes, synonym expansions, industry terminology, assignee names — these are all derivable from invention description and competitor data InventSmith already holds.
+- The only inputs Patent Intelligence should ever request from a founder are novel element statements and any specific patents the founder has already identified. Everything else is InventSmith's job.
 
 **Be provider independent.**
 - The Patent Intelligence Research Package is a provider-neutral specification. It does not reference USPTO, Google Patents, EPO, or any other search provider.

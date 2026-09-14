@@ -1,4 +1,4 @@
-# ATLAS PATENT INTELLIGENCE — SEARCH ENGINE
+# INVENTSMITH PATENT INTELLIGENCE — SEARCH ENGINE
 
 **Version 1.0 — July 2026**
 **Classification: Internal Engineering Reference**
@@ -13,11 +13,11 @@
 
 ## Document Purpose
 
-This document defines how Atlas **executes** patent searches after the Discovery subsystem has prepared the research package.
+This document defines how InventSmith **executes** patent searches after the Discovery subsystem has prepared the research package.
 
 Discovery determines **what** to search.
 
-This document defines **how** Atlas performs the search.
+This document defines **how** InventSmith performs the search.
 
 It does not specify confidence scoring, caching strategy, cost controls, founder review, or human approval. Those belong in subsequent Patent Intelligence documents.
 
@@ -38,9 +38,9 @@ It does not specify confidence scoring, caching strategy, cost controls, founder
 
 ## Section 1 — Search Engine Overview
 
-### 1.1 Role Within Atlas Patent Intelligence
+### 1.1 Role Within InventSmith Patent Intelligence
 
-The Search Engine is the execution layer of Atlas Patent Intelligence. It sits immediately downstream of Discovery and upstream of result analysis, founder review, and document assembly.
+The Search Engine is the execution layer of InventSmith Patent Intelligence. It sits immediately downstream of Discovery and upstream of result analysis, founder review, and document assembly.
 
 Its sole responsibility: **take a prepared Search Package and produce a ranked, normalized, deduplicated set of patent records.**
 

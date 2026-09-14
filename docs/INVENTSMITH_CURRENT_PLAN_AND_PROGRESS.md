@@ -28,7 +28,7 @@ The retired controlled-pilot 80% figure must never be used as overall InventSmit
 
 ## Naming rule
 
-The current customer-facing and documentation name is **InventSmith — The Inventor OS**. The former Atlas / ProjectAtlas wording is historical only and may remain solely where required for exact repository paths, compatibility identifiers, commit messages, emails, quotations, exhibits, or other factual historical evidence. Active product prose and current instructions must use InventSmith.
+The current customer-facing and documentation name is **InventSmith — The Inventor OS**. The former InventSmith / ProjectAtlas wording is historical only and may remain solely where required for exact repository paths, compatibility identifiers, commit messages, emails, quotations, exhibits, or other factual historical evidence. Active product prose and current instructions must use InventSmith.
 
 ## Source, hosting, and environment direction
 
