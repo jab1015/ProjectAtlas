@@ -28,7 +28,7 @@ The retired controlled-pilot 80% figure must never be used as overall InventSmit
 
 ## Naming rule
 
-The current customer-facing and documentation name is **InventSmith — The Inventor OS**. The former InventSmith / ProjectAtlas wording is historical only and may remain solely where required for exact repository paths, compatibility identifiers, commit messages, emails, quotations, exhibits, or other factual historical evidence. Active product prose and current instructions must use InventSmith.
+The current customer-facing and documentation name is **InventSmith — The Inventor OS**. The former **Atlas / ProjectAtlas** wording is historical only and may remain solely where required for exact repository paths, compatibility identifiers, commit messages, emails, quotations, exhibits, or other factual historical evidence. Active product prose and current instructions must use InventSmith.
 
 ## Source, hosting, and environment direction
 
@@ -84,7 +84,7 @@ Completed acceptance includes:
 - direct persistence behavior for inventor evidence changes, including canonical invention update, correct gate release, downstream invalidation/requeue, running-work protection, stale findings/deliverables, and execution history;
 - validation/decision → physical Patent → candidate generation/scoring → Product Design → Native CAD handoff;
 - software-only specification/architecture/security paths without fake physical CAD/manufacturer work;
-- hybrid acceptance preserving both applicable artifact branches;
+- hybrid acceptance preserving both applicable physical and software artifact branches;
 - regulated consequential outputs staying behind professional-review trust state;
 - versioned deliverable persistence using the highest prior version;
 - package selection using the newest revision even when the newest revision is stale, preventing an older clean artifact from masking invalidated work;
@@ -101,15 +101,15 @@ Real prototype, manufacturer quote, launch/customer, and professional-review gat
 
 ## Latest verified repository checkpoint
 
-**Verified clean head:** `bc93ed606866852e4ec88732e250d243a3db9a40`  
-**GitHub Actions:** workflow run **#564**, run ID `34905374828`  
+**Verified clean head:** `c76e209da0c1dd4266ee59157f740c4297048322`  
+**GitHub Actions:** workflow run **#586**, run ID `34907940666`  
 **Result:** **PASS**
 
-That exact head passed dependency installation, operational-script checks, web TypeScript, Convex TypeScript, the full regression suite, production dependency audit, and the Next.js production build. Production dependency audit was green at this checkpoint.
+That exact head passed dependency installation, operational-script checks, web TypeScript, Convex TypeScript, the full regression suite, production dependency audit, and the Next.js production build.
 
-PR #24 remains draft/open/unmerged and `main` remains untouched at the verified checkpoint.
+PR #24 remained draft/open/unmerged and `main` remained untouched at that verified checkpoint.
 
-The September 14 documentation/naming updates advance the branch beyond that verified implementation checkpoint and require their own exact-head CI result before the newer documentation head is called fully verified.
+The final active-document prose normalization and historical-name corrections advance the branch beyond that verified checkpoint; the live exact-head CI must be checked before the newer head is called fully verified.
 
 ## Current implementation order
 
@@ -125,7 +125,7 @@ The September 14 documentation/naming updates advance the branch beyond that ver
 
 - **Planned product destination:** defined in the master product spec.
 - **Implemented:** substantial end-to-end journey, organization architecture, classification, evidence, autonomous work, artifacts, physical/software/hybrid routing, professional gates, and Phase 1/2 hardening exist in the repository.
-- **Automated verification:** PASS through exact implementation head `bc93ed606866852e4ec88732e250d243a3db9a40` / workflow run #564; newer documentation head awaiting exact-head CI.
+- **Automated verification:** PASS through exact clean head `c76e209da0c1dd4266ee59157f740c4297048322` / workflow run #586; final documentation-content normalization is awaiting exact-head CI.
 - **Deployed to owner-controlled Vercel/Convex:** no.
 - **Live functionally verified:** no.
 - **Professional review completed:** only when a real qualified review is actually recorded; never infer this from repository-green or AI output.
