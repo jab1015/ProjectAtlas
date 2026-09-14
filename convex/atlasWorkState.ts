@@ -2,7 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { internalMutation, internalQuery, type MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { selectNextWorkItem, shouldRetryWork } from "./workOrchestratorLogic";
-import { canPromoteDeliverable, EVIDENCE_FRESHNESS_STALE_REASON, isSourceEligibleForPromotion, normalizeFinding, reliabilityFromVerificationStatus } from "./evidenceIntegrityLogic";
+import { canPromoteDeliverable, EVIDENCE_FRESHNESS_STALE_REASON, isSourceEligibleForPromotion, normalizeFinding, reliabilityFromVerificationStatus, sanitizeSourceUrls } from "./evidenceIntegrityLogic";
 import { remainingAutonomousCostUnitsAfterReservations, utcDateKey } from "./usagePolicyLogic";
 import { requiredProfessionalReviews } from "./professionalReviewPolicy";
 import { canTierRunWorkKind } from "./entitlementPolicyLogic";
@@ -245,6 +245,14 @@ const sourceVerificationValidator = v.object({
   notes: v.string(),
 });
 
+const retrievalEvidenceValidator = v.object({
+  sourceUrl: v.string(),
+  retrievedAt: v.number(),
+  provider: v.literal("openai_web_search"),
+  providerTitle: v.optional(v.string()),
+  claimSupportText: v.string(),
+});
+
 export const completeWork = internalMutation({
   args: {
     workItemId: v.id("atlasWorkItems"),
@@ -256,6 +264,7 @@ export const completeWork = internalMutation({
     assumptions: v.array(v.string()),
     limitations: v.array(v.string()),
     verifiedSources: v.array(sourceVerificationValidator),
+    retrievalEvidence: v.array(retrievalEvidenceValidator),
     storageId: v.optional(v.id("_storage")),
     mediaType: v.optional(v.string()),
     artifactMaturity: v.optional(v.union(v.literal("concept_visualization"), v.literal("preliminary_cad"), v.literal("prototype_candidate"), v.literal("engineering_reviewed"), v.literal("manufacturing_released"))),
@@ -298,21 +307,40 @@ export const completeWork = internalMutation({
 
     if (workItem.kind === "evidence_verification") {
       const existingSources = await ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", workItem.inventionId)).collect();
-      const verificationByUrl = new Map(args.verifiedSources.map((verification) => [verification.sourceUrl, verification]));
+      const verificationByUrl = new Map(args.verifiedSources.map((verification) => [sanitizeSourceUrls([verification.sourceUrl])[0], verification]).filter((entry): entry is [string, typeof args.verifiedSources[number]] => Boolean(entry[0])));
+      const retrievalByUrl = new Map(args.retrievalEvidence.map((evidence) => [sanitizeSourceUrls([evidence.sourceUrl])[0], evidence]).filter((entry): entry is [string, typeof args.retrievalEvidence[number]] => Boolean(entry[0])));
       for (const source of existingSources) {
         if (!source.locator) continue;
-        const verification = verificationByUrl.get(source.locator);
+        const normalizedLocator = sanitizeSourceUrls([source.locator])[0];
+        if (!normalizedLocator) continue;
+        const verification = verificationByUrl.get(normalizedLocator);
         if (!verification) continue;
-        const reliability = reliabilityFromVerificationStatus(verification.status);
+        const retrieval = retrievalByUrl.get(normalizedLocator);
+        const reliability = reliabilityFromVerificationStatus(verification.status, retrieval ? {
+          retrievalRecordedAt: retrieval.retrievedAt,
+          retrievalSourceUrl: retrieval.sourceUrl,
+          claimSupportExcerpt: retrieval.claimSupportText,
+        } : undefined);
         await ctx.db.patch(source._id, {
           reliability,
-          metadata: { ...(source.metadata ?? {}), verificationStatus: verification.status, verificationNotes: verification.notes, verifiedAt: args.completedAt },
+          metadata: {
+            ...(source.metadata ?? {}),
+            verificationStatus: verification.status,
+            verificationNotes: verification.notes,
+            verifiedAt: args.completedAt,
+            retrievalRecordedAt: retrieval?.retrievedAt,
+            retrievalSourceUrl: retrieval?.sourceUrl,
+            retrievalProvider: retrieval?.provider,
+            retrievalProviderTitle: retrieval?.providerTitle,
+            claimSupportExcerpt: retrieval?.claimSupportText,
+            claimSupportKind: retrieval ? "provider_retrieved_url_claim_association" : undefined,
+          },
         });
       }
 
       const refreshedSources = await ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", workItem.inventionId)).collect();
       const reliableSourceIds = new Set(refreshedSources.filter((source) => isSourceEligibleForPromotion(source, args.completedAt)).map((source) => String(source._id)));
-      const disputedSourceIds = new Set(existingSources.filter((source) => source.locator && verificationByUrl.get(source.locator)?.status === "disputed").map((source) => String(source._id)));
+      const disputedSourceIds = new Set(existingSources.filter((source) => source.locator && verificationByUrl.get(sanitizeSourceUrls([source.locator])[0] ?? "")?.status === "disputed").map((source) => String(source._id)));
       const existingFindings = await ctx.db.query("evidenceFindings").withIndex("by_inventionId", (q) => q.eq("inventionId", workItem.inventionId)).collect();
       for (const finding of existingFindings) {
         if (finding.kind !== "sourced_fact" || finding.sourceIds.length === 0) continue;
