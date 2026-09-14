@@ -84,6 +84,39 @@ describe("validation/decision to versioned artifact handoff", () => {
     expect(isDeliverableReadyForExternalUse(spec.trustState, spec.staleReason)).toBe(false);
   });
 
+  it("keeps hybrid inventions on both physical and software artifact paths from the same validated handoff", () => {
+    const { classification, byKind } = representativePlan({
+      title: "Connected medication organizer",
+      problemStatement: "Families need a clearer way to track whether scheduled medication compartments were opened.",
+      solutionDescription: "A physical sensor-equipped medication organizer with a companion mobile application and cloud alerts for caregivers.",
+    });
+
+    expect(classification.productType).toBe("hybrid");
+    const patent = byKind.get("patent_design_handoff")!;
+    const physicalDesign = byKind.get("design_candidate_generation")!;
+    const softwareSpec = byKind.get("software_product_specification")!;
+    const nativeCad = byKind.get("native_cad_generation")!;
+    const securityReview = byKind.get("software_security_privacy_review")!;
+
+    expect(physicalDesign.dependsOnKinds).toContain("patent_design_handoff");
+    expect(softwareSpec.dependsOnKinds).toContain("patent_design_handoff");
+    expect(byKind.has("product_design_specification")).toBe(true);
+    expect(nativeCad.dependsOnKinds).toContain("product_design_specification");
+    expect(byKind.has("software_architecture")).toBe(true);
+    expect(securityReview.dependsOnKinds).toContain("software_architecture");
+
+    const artifacts = [
+      artifactFor(patent, 1, "Shared patent/design handoff"),
+      artifactFor(byKind.get("product_design_specification")!, 1, "Physical design specification"),
+      artifactFor(softwareSpec, 1, "Companion software specification"),
+    ];
+    expect(selectLatestDeliverables(artifacts).map((artifact) => artifact.kind)).toEqual(expect.arrayContaining([
+      "patent_design_handoff",
+      "product_design_specification",
+      "software_product_specification",
+    ]));
+  });
+
   it("preserves professional review gates for consequential artifacts instead of treating generated output as authorized", () => {
     const { classification, byKind } = representativePlan({
       title: "Rehabilitation tracking medical device",
