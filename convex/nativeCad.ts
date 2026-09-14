@@ -42,6 +42,40 @@ async function settleCadUsage(ctx: any, workItem: any, inventionId: Id<"inventio
   }
 }
 
+async function cadAttemptAlreadySettled(ctx: any, workItemId: Id<"atlasWorkItems">, attemptNumber: number) {
+  const events = await ctx.db.query("atlasExecutionEvents").withIndex("by_workItemId", (q: any) => q.eq("workItemId", workItemId)).collect();
+  return events.some((event: any) =>
+    event.attemptNumber === attemptNumber &&
+    (event.eventType === "work_completed" || event.eventType === "work_failed" || event.eventType === "work_blocked")
+  );
+}
+
+async function settleLateCadAttemptCostOnce(
+  ctx: any,
+  workItem: any,
+  attemptNumber: number,
+  actualCostUnits: number,
+  usageKnown: boolean,
+  now: number,
+  summary: string
+) {
+  if (await cadAttemptAlreadySettled(ctx, workItem._id, attemptNumber)) return;
+  if (actualCostUnits > 0) {
+    await settleCadUsage(ctx, { reservationDateKey: workItem.reservationDateKey, reservedCostUnits: undefined }, workItem.inventionId, actualCostUnits, 0, now);
+  }
+  await ctx.db.insert("atlasExecutionEvents", {
+    inventionId: workItem.inventionId,
+    workItemId: workItem._id,
+    eventType: "work_failed",
+    actorType: "system",
+    summary,
+    attemptNumber,
+    costUnits: usageKnown ? actualCostUnits : undefined,
+    metadata: { staleAttempt: true, usageKnown },
+    createdAt: now,
+  });
+}
+
 export const requestNativeCadGeneration = mutation({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, args) => {
@@ -124,18 +158,46 @@ const cadArtifactValidator = v.object({ kind: v.string(), title: v.string(), sto
 
 export const recordNativeCadSuccess = internalMutation({
   args: {
-    inventionId: v.id("inventions"), workItemId: v.id("atlasWorkItems"), artifacts: v.array(cadArtifactValidator), sourceSpec: v.any(), triangleCount: v.number(), partCount: v.number(), assumptions: v.array(v.string()), unresolvedEngineering: v.array(v.string()), actualCostUnits: v.number(), completedAt: v.number(),
+    inventionId: v.id("inventions"),
+    workItemId: v.id("atlasWorkItems"),
+    attemptNumber: v.number(),
+    artifacts: v.array(cadArtifactValidator),
+    sourceSpec: v.any(),
+    triangleCount: v.number(),
+    partCount: v.number(),
+    assumptions: v.array(v.string()),
+    unresolvedEngineering: v.array(v.string()),
+    actualCostUnits: v.number(),
+    completedAt: v.number(),
   },
   handler: async (ctx, args) => {
     const workItem = await ctx.db.get(args.workItemId);
-    if (!workItem || workItem.inventionId !== args.inventionId || workItem.status !== "running") throw new ConvexError("Native CAD work is not running");
+    if (!workItem || workItem.inventionId !== args.inventionId) throw new ConvexError("Native CAD work item not found");
+
+    const attemptIsCurrent = workItem.status === "running" && workItem.attemptCount === args.attemptNumber;
+    const leaseIsCurrent = !workItem.leaseExpiresAt || workItem.leaseExpiresAt > args.completedAt;
+    if (!attemptIsCurrent || !leaseIsCurrent) {
+      for (const artifact of args.artifacts) await ctx.storage.delete(artifact.storageId);
+      await settleLateCadAttemptCostOnce(
+        ctx,
+        workItem,
+        args.attemptNumber,
+        args.actualCostUnits,
+        true,
+        args.completedAt,
+        "A late native CAD result was discarded because its work attempt no longer owns the item."
+      );
+      return { discarded: true, actualCostUnits: args.actualCostUnits };
+    }
+
     const currentInvention = await ctx.db.get(args.inventionId);
     if (!currentInvention) throw new ConvexError("Invention not found");
 
     if (workItem.claimedAt && currentInvention.updatedAt > workItem.claimedAt) {
       for (const artifact of args.artifacts) await ctx.storage.delete(artifact.storageId);
       await settleCadUsage(ctx, workItem, args.inventionId, args.actualCostUnits, 0, args.completedAt);
-      await ctx.db.patch(workItem._id, { status: "queued", reservedCostUnits: undefined, reservationDateKey: undefined, claimedAt: undefined, startedAt: undefined, lastError: "Invention inputs changed while CAD was generating; generated artifacts were discarded.", updatedAt: args.completedAt });
+      await ctx.db.patch(workItem._id, { status: "queued", reservedCostUnits: undefined, reservationDateKey: undefined, claimedAt: undefined, startedAt: undefined, leaseExpiresAt: undefined, lastError: "Invention inputs changed while CAD was generating; generated artifacts were discarded.", updatedAt: args.completedAt });
+      await ctx.db.insert("atlasExecutionEvents", { inventionId: args.inventionId, workItemId: args.workItemId, eventType: "work_failed", actorType: "system", summary: "InventSmith discarded native CAD because the invention changed during generation.", attemptNumber: args.attemptNumber, costUnits: args.actualCostUnits, metadata: { staleInputDiscarded: true, retryScheduled: true, usageKnown: true }, createdAt: args.completedAt });
       return { discarded: true, actualCostUnits: args.actualCostUnits };
     }
 
@@ -157,22 +219,43 @@ export const recordNativeCadSuccess = internalMutation({
     await settleCadUsage(ctx, workItem, args.inventionId, args.actualCostUnits, 1, args.completedAt);
     await ctx.db.patch(args.workItemId, { status: "completed", outputSummary: `Generated a ${args.partCount}-part preliminary native CAD package with STEP, STL, DXF, editable source, orthographic views, and exploded view.`, actualCostUnits: args.actualCostUnits, completedAt: args.completedAt, claimedAt: undefined, startedAt: undefined, leaseExpiresAt: undefined, reservedCostUnits: undefined, reservationDateKey: undefined, updatedAt: args.completedAt });
     const usageScope = await resolveInventionUsageScope(ctx, args.inventionId);
-    await ctx.db.insert("atlasExecutionEvents", { inventionId: args.inventionId, workItemId: args.workItemId, eventType: "work_completed", actorType: "atlas", summary: `InventSmith generated native preliminary CAD: ${args.partCount} parts, ${args.triangleCount} mesh facets, STEP/STL/DXF/source plus orthographic and exploded-view artifacts.`, costUnits: args.actualCostUnits, metadata: { artifactKinds: args.artifacts.map((item) => item.kind), maturity: "preliminary_cad", usageScope: usageScope?.scope, usageUserId: usageScope ? String(usageScope.usageUserId) : undefined }, createdAt: args.completedAt });
+    await ctx.db.insert("atlasExecutionEvents", { inventionId: args.inventionId, workItemId: args.workItemId, eventType: "work_completed", actorType: "atlas", summary: `InventSmith generated native preliminary CAD: ${args.partCount} parts, ${args.triangleCount} mesh facets, STEP/STL/DXF/source plus orthographic and exploded-view artifacts.`, attemptNumber: args.attemptNumber, costUnits: args.actualCostUnits, metadata: { artifactKinds: args.artifacts.map((item) => item.kind), maturity: "preliminary_cad", usageKnown: true, usageScope: usageScope?.scope, usageUserId: usageScope ? String(usageScope.usageUserId) : undefined }, createdAt: args.completedAt });
     return { discarded: false, actualCostUnits: args.actualCostUnits };
   },
 });
 
 export const recordNativeCadFailure = internalMutation({
-  args: { inventionId: v.id("inventions"), workItemId: v.id("atlasWorkItems"), error: v.string(), failedAt: v.number() },
+  args: {
+    inventionId: v.id("inventions"),
+    workItemId: v.id("atlasWorkItems"),
+    attemptNumber: v.number(),
+    error: v.string(),
+    actualCostUnits: v.number(),
+    usageKnown: v.boolean(),
+    failedAt: v.number(),
+  },
   handler: async (ctx, args) => {
     const workItem = await ctx.db.get(args.workItemId);
-    if (!workItem || workItem.inventionId !== args.inventionId) return { willRetry: false };
-    const invention = await ctx.db.get(args.inventionId);
+    if (!workItem || workItem.inventionId !== args.inventionId) return { willRetry: false, staleAttempt: true };
+
+    if (workItem.status !== "running" || workItem.attemptCount !== args.attemptNumber) {
+      await settleLateCadAttemptCostOnce(
+        ctx,
+        workItem,
+        args.attemptNumber,
+        args.actualCostUnits,
+        args.usageKnown,
+        args.failedAt,
+        "A late native CAD failure was ignored because a newer attempt owns the work item."
+      );
+      return { willRetry: false, staleAttempt: true };
+    }
+
     const willRetry = workItem.attemptCount < (workItem.maxAttempts ?? 3);
-    if (!willRetry && invention) await settleCadUsage(ctx, workItem, args.inventionId, 0, 0, args.failedAt);
-    await ctx.db.patch(workItem._id, { status: willRetry ? "queued" : "failed", reservedCostUnits: willRetry ? workItem.reservedCostUnits : undefined, reservationDateKey: willRetry ? workItem.reservationDateKey : undefined, lastError: args.error.slice(0, 2000), startedAt: undefined, claimedAt: undefined, leaseExpiresAt: undefined, updatedAt: args.failedAt });
-    await ctx.db.insert("atlasExecutionEvents", { inventionId: args.inventionId, workItemId: args.workItemId, eventType: "work_failed", actorType: "system", summary: willRetry ? "Native CAD generation failed and is eligible for autonomous retry." : "Native CAD generation exhausted its retry limit.", metadata: { error: args.error.slice(0, 1000), willRetry }, createdAt: args.failedAt });
-    return { willRetry };
+    await settleCadUsage(ctx, workItem, args.inventionId, args.actualCostUnits, 0, args.failedAt);
+    await ctx.db.patch(workItem._id, { status: willRetry ? "queued" : "failed", reservedCostUnits: undefined, reservationDateKey: undefined, lastError: args.error.slice(0, 2000), startedAt: undefined, claimedAt: undefined, leaseExpiresAt: undefined, updatedAt: args.failedAt });
+    await ctx.db.insert("atlasExecutionEvents", { inventionId: args.inventionId, workItemId: args.workItemId, eventType: "work_failed", actorType: "system", summary: willRetry ? "Native CAD generation failed and is eligible for autonomous retry." : "Native CAD generation exhausted its retry limit.", attemptNumber: args.attemptNumber, costUnits: args.usageKnown ? args.actualCostUnits : undefined, metadata: { error: args.error.slice(0, 1000), willRetry, usageKnown: args.usageKnown }, createdAt: args.failedAt });
+    return { willRetry, staleAttempt: false };
   },
 });
 
