@@ -64,29 +64,6 @@ function buildContext(
   };
 }
 
-async function persistSection(
-  ctx: Parameters<Parameters<typeof internalAction>[0]["handler"]>[0],
-  researchId: Id<"validationResearch">,
-  args: {
-    sectionKey: ValidationSectionKey;
-    sectionEntry: Record<string, unknown>;
-    completedSectionCount: number;
-    lastCompletedSection: ValidationSectionKey;
-    overallStatus: "IN_PROGRESS";
-    updatedAt: number;
-  }
-) {
-  await ctx.runMutation(internal.validationResearchSessionMutations.patchValidationSection, {
-    researchId,
-    sectionKey: args.sectionKey,
-    sectionEntry: args.sectionEntry,
-    completedSectionCount: args.completedSectionCount,
-    lastCompletedSection: args.lastCompletedSection,
-    overallStatus: args.overallStatus,
-    updatedAt: args.updatedAt,
-  });
-}
-
 export const runValidationResearchOrchestration = internalAction({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
@@ -123,18 +100,33 @@ export const runValidationResearchOrchestration = internalAction({
           console.error(`[Orchestration] ${message}: researchId=${researchId}`, error);
         },
         persistCompletedSection: async (args) => {
-          await persistSection(ctx, researchId as Id<"validationResearch">, args);
+          await ctx.runMutation(internal.validationResearchSessionMutations.patchValidationSection, {
+            researchId: researchId as Id<"validationResearch">,
+            sectionKey: args.sectionKey,
+            sectionEntry: args.sectionEntry,
+            completedSectionCount: args.completedSectionCount,
+            lastCompletedSection: args.lastCompletedSection,
+            overallStatus: args.overallStatus,
+            updatedAt: args.updatedAt,
+          });
         },
         persistFailedSection: async (args) => {
-          await persistSection(ctx, researchId as Id<"validationResearch">, args);
+          await ctx.runMutation(internal.validationResearchSessionMutations.patchValidationSection, {
+            researchId: researchId as Id<"validationResearch">,
+            sectionKey: args.sectionKey,
+            sectionEntry: args.sectionEntry,
+            completedSectionCount: args.completedSectionCount,
+            lastCompletedSection: args.lastCompletedSection,
+            overallStatus: args.overallStatus,
+            updatedAt: args.updatedAt,
+          });
         },
       });
 
-      const finalTs = Date.now();
       await ctx.runMutation(internal.validationResearchSessionMutations.finaliseValidationResearch, {
         researchId,
         overallStatus: sectionSummary.finalOverallStatus,
-        completedAt: finalTs,
+        completedAt: Date.now(),
         researchStatus: sectionSummary.finalResearchStatus,
       });
     } catch (err) {
@@ -202,10 +194,26 @@ export const retryFailedValidationResearchSections = internalAction({
           console.error(`[ValidationRetry] ${message}: researchId=${researchId}`, error);
         },
         persistCompletedSection: async (args) => {
-          await persistSection(ctx, researchId, args);
+          await ctx.runMutation(internal.validationResearchSessionMutations.patchValidationSection, {
+            researchId,
+            sectionKey: args.sectionKey,
+            sectionEntry: args.sectionEntry,
+            completedSectionCount: args.completedSectionCount,
+            lastCompletedSection: args.lastCompletedSection,
+            overallStatus: args.overallStatus,
+            updatedAt: args.updatedAt,
+          });
         },
         persistFailedSection: async (args) => {
-          await persistSection(ctx, researchId, args);
+          await ctx.runMutation(internal.validationResearchSessionMutations.patchValidationSection, {
+            researchId,
+            sectionKey: args.sectionKey,
+            sectionEntry: args.sectionEntry,
+            completedSectionCount: args.completedSectionCount,
+            lastCompletedSection: args.lastCompletedSection,
+            overallStatus: args.overallStatus,
+            updatedAt: args.updatedAt,
+          });
         },
       });
 
