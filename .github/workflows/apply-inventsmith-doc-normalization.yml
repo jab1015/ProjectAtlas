@@ -1,6 +1,11 @@
 name: Apply InventSmith documentation normalization
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - inventsmith/full-product-build
+    paths:
+      - .github/workflows/apply-inventsmith-doc-normalization.yml
+      - scripts/apply-inventsmith-stage-docs.py
 permissions:
   contents: write
 jobs:
