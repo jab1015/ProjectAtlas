@@ -8,13 +8,13 @@
 Define the sales strategy, build the sales toolkit, and establish the channels and processes through which the invention will be sold.
 
 **Why this stage exists:**
-Marketing creates awareness and intent. Sales converts intent into revenue. These are distinct disciplines, and most inventors conflate them. They believe that if they get enough people to see the product, sales will follow naturally. Sales requires deliberate infrastructure: who is responsible for conversion, through what channel, with what tools, at what conversion rate, and with what follow-up when a prospect doesn't buy on first contact. Atlas builds the inventor's sales infrastructure before launch — not after — so the first week of sales is executed against a plan, not improvised in real time.
+Marketing creates awareness and intent. Sales converts intent into revenue. These are distinct disciplines, and most inventors conflate them. They believe that if they get enough people to see the product, sales will follow naturally. Sales requires deliberate infrastructure: who is responsible for conversion, through what channel, with what tools, at what conversion rate, and with what follow-up when a prospect doesn't buy on first contact. InventSmith builds the inventor's sales infrastructure before launch — not after — so the first week of sales is executed against a plan, not improvised in real time.
 
 **Primary objective:**
 Produce a Sales Strategy with defined distribution channels, a sales process, a complete sales toolkit, and realistic first-year sales projections across three scenarios.
 
 **Success definition:**
-Atlas considers this stage successful when the inventor has selected their primary sales channels with economic justification, built a sales toolkit that any salesperson or sales channel can execute, and produced first-year sales projections grounded in the marketing channel reach estimates and sales funnel conversion assumptions.
+InventSmith considers this stage successful when the inventor has selected their primary sales channels with economic justification, built a sales toolkit that any salesperson or sales channel can execute, and produced first-year sales projections grounded in the marketing channel reach estimates and sales funnel conversion assumptions.
 
 ---
 
@@ -28,25 +28,25 @@ Atlas considers this stage successful when the inventor has selected their prima
 
 ---
 
-## Atlas Responsibilities
+## InventSmith Responsibilities
 
-**How Atlas guides the inventor:**
-Atlas evaluates sales channel options systematically — presenting the margin, control, effort, and timing trade-offs of each — and helps the inventor select the channels most appropriate for the product category, manufacturing constraints, and first-year revenue targets. It then builds the sales infrastructure: the funnel model, the toolkit, the projections, and the post-purchase sequence. Atlas makes the first year of sales as predictable as the available information allows.
+**How InventSmith guides the inventor:**
+InventSmith evaluates sales channel options systematically — presenting the margin, control, effort, and timing trade-offs of each — and helps the inventor select the channels most appropriate for the product category, manufacturing constraints, and first-year revenue targets. It then builds the sales infrastructure: the funnel model, the toolkit, the projections, and the post-purchase sequence. InventSmith makes the first year of sales as predictable as the available information allows.
 
-**What Atlas analyzes:**
+**What InventSmith analyzes:**
 - Pricing Strategy from Stage 10 — the retail price, gross margin, and what channel margins are sustainable
 - Marketing Plan from Stage 11 — the channels that will generate leads and the volume those channels are expected to produce
 - Customer Segment Profiles from Stage 3 — how each segment makes purchase decisions and which channels they use
 - Manufacturing Plan from Stage 7 — available inventory, lead times, and reorder constraints
 - The inventor's preferred channels and realistic execution capacity
 
-**What Atlas recommends:**
+**What InventSmith recommends:**
 - Primary and secondary sales channels with explicit margin and effort trade-off reasoning
 - Sales funnel conversion rate assumptions appropriate for the product category and channel
 - First-year sales projections under three scenarios
 - A post-purchase experience design that maximizes early review generation and repeat purchase
 
-**What Atlas tracks:**
+**What InventSmith tracks:**
 - Whether primary and secondary channels are selected with documented rationale
 - Whether the Sales Toolkit is complete across all required components
 - Whether First-Year Sales Projections are complete across three scenarios
@@ -65,18 +65,18 @@ Atlas evaluates sales channel options systematically — presenting the margin, 
 
 ---
 
-## Atlas Guidance
+## InventSmith Guidance
 
-Atlas opens Stage 12 by clarifying the distinction between marketing channels and sales channels — a distinction that first-time inventors frequently blur. Marketing channels create awareness and intent. Sales channels complete the transaction. A customer might discover the product through an Instagram ad (marketing channel) and then purchase it on Amazon (sales channel). These are different decisions with different economics and different operational requirements.
+InventSmith opens Stage 12 by clarifying the distinction between marketing channels and sales channels — a distinction that first-time inventors frequently blur. Marketing channels create awareness and intent. Sales channels complete the transaction. A customer might discover the product through an Instagram ad (marketing channel) and then purchase it on Amazon (sales channel). These are different decisions with different economics and different operational requirements.
 
-Atlas presents the primary sales channel options with honest trade-off analysis:
+InventSmith presents the primary sales channel options with honest trade-off analysis:
 - **Direct-to-consumer (owned storefront)**: highest margin, most control, but requires the most marketing investment to drive traffic
 - **Marketplace (Amazon, Etsy, specialty platforms)**: access to an existing audience, but lower margin and less brand control
 - **Wholesale and retail placement**: large volume potential, but long sales cycles, retailer margin requirements, and minimum order demands
 - **B2B direct**: appropriate for products that solve a business problem; higher average order value but longer sales cycle
 - **Distributor**: outsources the sales function but sacrifices significant margin
 
-Atlas builds the Sales Funnel Model: starting with the marketing channel reach estimates from Stage 11, it applies conversion rate assumptions at each stage — awareness to consideration, consideration to intent, intent to purchase — to produce a revenue estimate. The conversion rates are grounded in category benchmarks, not optimism. The funnel model makes the revenue projection auditable: anyone can see exactly what assumptions produced the number.
+InventSmith builds the Sales Funnel Model: starting with the marketing channel reach estimates from Stage 11, it applies conversion rate assumptions at each stage — awareness to consideration, consideration to intent, intent to purchase — to produce a revenue estimate. The conversion rates are grounded in category benchmarks, not optimism. The funnel model makes the revenue projection auditable: anyone can see exactly what assumptions produced the number.
 
 The Sales Toolkit is built from the Messaging Architecture developed in Stage 11:
 - **Product one-pager**: the complete product story on a single page — for retail buyers, wholesale partners, and press
@@ -109,7 +109,7 @@ The post-purchase experience is designed before launch: from order confirmation 
 - **Sales Toolkit** — product one-pager, FAQ document, objection handling guide, and competitor comparison sheet
 - **First-Year Sales Projections** — three scenarios (conservative, base, optimistic) with documented assumptions
 - **Post-Purchase Experience Plan** — the complete customer sequence from order confirmation to review request
-- **Sales Readiness Assessment** — Atlas's evaluation of readiness to launch sales operations
+- **Sales Readiness Assessment** — InventSmith's evaluation of readiness to launch sales operations
 
 ---
 
@@ -123,7 +123,7 @@ The post-purchase experience is designed before launch: from order confirmation 
 
 ## Readiness Evaluation
 
-Atlas evaluates the inventor's readiness using three states only. No numeric scores.
+InventSmith evaluates the inventor's readiness using three states only. No numeric scores.
 
 **Not Ready:**
 - Primary sales channel has not been selected or evaluated
@@ -174,7 +174,7 @@ The following information moves from Stage 12 into Stage 13 (Funding) and Stage 
 
 ## Future Integrations
 
-- **E-commerce platform integration** (Shopify API) — set up the storefront directly from Atlas with product listing pre-populated from the design specification, messaging, and photography brief
+- **E-commerce platform integration** (Shopify API) — set up the storefront directly from InventSmith with product listing pre-populated from the design specification, messaging, and photography brief
 - **Marketplace listing generation** (Amazon Seller Central) — generate an optimized Amazon product listing from the Messaging Architecture and product specification
 - **CRM platform setup** (HubSpot, Pipedrive) — configure the sales pipeline structure for wholesale or B2B channel sales
 - **Wholesale buyer discovery** (RangeMe, Faire) — for wholesale distribution, identify and contact retail buyers in the target product category

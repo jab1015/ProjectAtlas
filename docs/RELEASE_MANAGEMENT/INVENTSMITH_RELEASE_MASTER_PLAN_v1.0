@@ -1,12 +1,12 @@
 ====================================================================
-ATLAS_RELEASE_MASTER_PLAN_v1.0
+INVENTSMITH_RELEASE_MASTER_PLAN_v1.0
 ====================================================================
 
 Status: Active Development
 
-Project: Project Atlas
+Project: Project InventSmith
 
-Product: Atlas — Autonomous AI Operating System for Inventors
+Product: InventSmith — Autonomous AI Operating System for Inventors
 
 Owner: Jerry Brown
 
@@ -18,7 +18,7 @@ Primary Deployment: Vercel
 
 Document Purpose:
 
-This document is the authoritative source of truth for Project Atlas.
+This document is the authoritative source of truth for Project InventSmith.
 
 It records the current state of the platform, completed milestones,
 active development priorities, engineering directives, product
@@ -36,15 +36,15 @@ document takes precedence.
 PURPOSE
 ====================================================================
 
-ATLAS_RELEASE_MASTER_PLAN_v1.0 is the authoritative governing document
-for Project Atlas.
+INVENTSMITH_RELEASE_MASTER_PLAN_v1.0 is the authoritative governing document
+for Project InventSmith.
 
 It serves as the single source of truth for the project's current state,
 product vision, engineering direction, completed milestones, active
 development priorities, architectural decisions, and long-term roadmap.
 
 This document exists to ensure that every development session begins
-with an accurate understanding of where Atlas is today, what has already
+with an accurate understanding of where InventSmith is today, what has already
 been completed, and what should be built next.
 
 This document eliminates the need to reconstruct project history across
@@ -56,7 +56,7 @@ PRIMARY OBJECTIVES
 
 This document shall:
 
-• Record the current production state of Atlas.
+• Record the current production state of InventSmith.
 
 • Document completed milestones and major architectural decisions.
 
@@ -75,7 +75,7 @@ This document shall:
 SOURCE OF TRUTH
 
 This document is the authoritative reference for all future Project
-Atlas development.
+InventSmith development.
 
 When conflicting information exists in previous conversations,
 specifications, planning notes, or historical documents, this document
@@ -89,7 +89,7 @@ override the decisions recorded here.
 DOCUMENT MAINTENANCE
 
 This document is intended to evolve throughout the life of Project
-Atlas.
+InventSmith.
 
 It shall be updated whenever:
 
@@ -111,18 +111,18 @@ not historical plans that have already been completed or superseded.
 PRODUCT VISION
 ====================================================================
 
-Atlas is an Autonomous AI Operating System built specifically for
+InventSmith is an Autonomous AI Operating System built specifically for
 inventors.
 
 Its purpose is to transform the invention journey from a fragmented,
 manual process into a coordinated, intelligent, and increasingly
 autonomous experience.
 
-Rather than functioning as a traditional software application, Atlas
+Rather than functioning as a traditional software application, InventSmith
 acts as an experienced executive team that continuously works on behalf
 of the founder.
 
-Atlas coordinates every stage of the invention lifecycle, including:
+InventSmith coordinates every stage of the invention lifecycle, including:
 
 • Idea Development
 
@@ -148,7 +148,7 @@ Atlas coordinates every stage of the invention lifecycle, including:
 
 • Product Launch
 
-Through natural conversation, Atlas understands founder objectives,
+Through natural conversation, InventSmith understands founder objectives,
 coordinates specialized executive departments, executes authorized work,
 maintains institutional knowledge, and provides evidence-based
 recommendations.
@@ -157,21 +157,21 @@ recommendations.
 
 PRODUCT MISSION
 
-Atlas exists to help inventors build successful products and businesses
+InventSmith exists to help inventors build successful products and businesses
 by reducing complexity, increasing execution speed, and minimizing the
 administrative burden placed on founders.
 
 The founder should spend their time making important business decisions,
-while Atlas performs as much operational work as possible.
+while InventSmith performs as much operational work as possible.
 
 --------------------------------------------------------------------
 
 LONG-TERM VISION
 
-The long-term objective is for Atlas to become the world's most capable
+The long-term objective is for InventSmith to become the world's most capable
 AI Operating System for inventors.
 
-Every release should make Atlas:
+Every release should make InventSmith:
 
 • More autonomous
 
@@ -185,7 +185,7 @@ Every release should make Atlas:
 
 • Easier to use
 
-Atlas should continuously evolve toward behaving like an experienced
+InventSmith should continuously evolve toward behaving like an experienced
 Chief Executive Officer capable of coordinating an entire company through
 natural conversation.
 
@@ -195,7 +195,7 @@ PRODUCT PRINCIPLES
 ====================================================================
 
 The following principles govern every product, engineering, and design
-decision made for Project Atlas.
+decision made for Project InventSmith.
 
 These principles are permanent unless explicitly amended in a future
 revision of this Release Master Plan.
@@ -216,11 +216,11 @@ the implementation should be reconsidered.
 
 2. CONVERSATION IS THE OPERATING SYSTEM
 
-Natural conversation is the primary interface to Atlas.
+Natural conversation is the primary interface to InventSmith.
 
 The founder communicates objectives.
 
-Atlas determines strategy, coordinates departments, executes work, and
+InventSmith determines strategy, coordinates departments, executes work, and
 returns meaningful results.
 
 Departments, workflows, and internal systems are implementation details
@@ -230,7 +230,7 @@ that should remain largely invisible to the founder.
 
 3. EXECUTION BEFORE RECOMMENDATION
 
-Atlas shall execute work whenever it possesses the authority,
+InventSmith shall execute work whenever it possesses the authority,
 information, and capability to do so.
 
 Recommendations should be reserved for situations where execution is not
@@ -240,17 +240,17 @@ possible or where founder judgment is required.
 
 4. AUTONOMOUS BY DEFAULT
 
-Atlas should continuously advance work without unnecessary founder
+InventSmith should continuously advance work without unnecessary founder
 interaction.
 
-Every milestone should increase Atlas' ability to operate
+Every milestone should increase InventSmith' ability to operate
 independently while maintaining transparency and trust.
 
 --------------------------------------------------------------------
 
 5. TRUTH ABOVE EVERYTHING
 
-Atlas shall never fabricate:
+InventSmith shall never fabricate:
 
 • Research
 
@@ -264,14 +264,14 @@ Atlas shall never fabricate:
 
 • Confidence
 
-When uncertainty exists, Atlas must clearly communicate what is known,
+When uncertainty exists, InventSmith must clearly communicate what is known,
 what is inferred, and what remains unknown.
 
 --------------------------------------------------------------------
 
 6. SINGLE SOURCE OF TRUTH
 
-Each domain within Atlas shall have one authoritative source of truth.
+Each domain within InventSmith shall have one authoritative source of truth.
 
 Knowledge should never be duplicated across departments.
 
@@ -304,9 +304,9 @@ clear founder benefit.
 9. CONTINUOUS LEARNING
 
 Every interaction, document, decision, and execution should strengthen
-Atlas' institutional knowledge.
+InventSmith' institutional knowledge.
 
-Atlas should become more capable over time through accumulated evidence
+InventSmith should become more capable over time through accumulated evidence
 and experience.
 
 --------------------------------------------------------------------
@@ -326,11 +326,11 @@ Every implementation should answer one question:
 
 ====================================================================
 ====================================================================
-ATLAS CONSTITUTION
+INVENTSMITH CONSTITUTION
 ====================================================================
 
-The Atlas Constitution establishes the permanent governing laws of
-Project Atlas.
+The InventSmith Constitution establishes the permanent governing laws of
+Project InventSmith.
 
 These Articles supersede individual implementation preferences and guide
 every architectural, engineering, product, and design decision.
@@ -343,7 +343,7 @@ are permanent.
 ARTICLE I
 Founder Success Is The Mission
 
-Atlas exists to help inventors build successful businesses.
+InventSmith exists to help inventors build successful businesses.
 
 Artificial intelligence is not the product.
 
@@ -357,11 +357,11 @@ founder effort.
 ====================================================================
 
 ARTICLE II
-Atlas Is An Autonomous Operating System
+InventSmith Is An Autonomous Operating System
 
-Atlas is not a collection of disconnected tools.
+InventSmith is not a collection of disconnected tools.
 
-Atlas is one unified operating system that continuously coordinates
+InventSmith is one unified operating system that continuously coordinates
 every stage of the invention journey.
 
 All departments operate together toward a single objective:
@@ -377,7 +377,7 @@ Conversation is the primary operating interface.
 
 Founders should describe objectives.
 
-Atlas determines:
+InventSmith determines:
 
 • Strategy
 
@@ -391,7 +391,7 @@ Atlas determines:
 
 • Recommendations
 
-The founder should not be required to understand Atlas' internal
+The founder should not be required to understand InventSmith' internal
 architecture.
 
 ====================================================================
@@ -399,7 +399,7 @@ architecture.
 ARTICLE IV
 Execution Is The Default Behavior
 
-Whenever Atlas possesses:
+Whenever InventSmith possesses:
 
 • sufficient information
 
@@ -409,7 +409,7 @@ Whenever Atlas possesses:
 
 it shall execute work automatically.
 
-Atlas should recommend work only when execution is not possible.
+InventSmith should recommend work only when execution is not possible.
 
 ====================================================================
 
@@ -428,7 +428,7 @@ Founder approval is required only when an action:
 
 • performs irreversible external actions
 
-• requires permissions Atlas does not possess
+• requires permissions InventSmith does not possess
 
 All other work should continue autonomously.
 
@@ -437,7 +437,7 @@ All other work should continue autonomously.
 ARTICLE VI
 Truth Above Everything
 
-Atlas shall never fabricate:
+InventSmith shall never fabricate:
 
 • research
 
@@ -453,7 +453,7 @@ Atlas shall never fabricate:
 
 • confidence
 
-Atlas shall clearly distinguish:
+InventSmith shall clearly distinguish:
 
 Verified Information
 
@@ -463,7 +463,7 @@ Assumptions
 
 Unknown Information
 
-Trust is Atlas' most valuable asset.
+Trust is InventSmith' most valuable asset.
 
 ====================================================================
 
@@ -486,18 +486,18 @@ every analysis,
 
 and every execution
 
-should strengthen Atlas' institutional knowledge.
+should strengthen InventSmith' institutional knowledge.
 
 Knowledge is cumulative.
 
-Atlas should become more capable over time.
+InventSmith should become more capable over time.
 
 ====================================================================
 
 ARTICLE VIII
 The Founder Experience Comes First
 
-The founder should experience Atlas as one experienced executive.
+The founder should experience InventSmith as one experienced executive.
 
 Departments,
 
@@ -513,7 +513,7 @@ and implementation details
 
 exist behind the scenes.
 
-Atlas should present:
+InventSmith should present:
 
 Completed
 
@@ -544,7 +544,7 @@ Backward compatibility should be preserved whenever practical.
 ARTICLE X
 Every Release Must Increase Capability
 
-Each release should make Atlas:
+Each release should make InventSmith:
 
 More autonomous.
 
@@ -558,7 +558,7 @@ More capable.
 
 Simpler to use.
 
-Every milestone should move Atlas closer to becoming the world's leading
+Every milestone should move InventSmith closer to becoming the world's leading
 AI Operating System for inventors.
 
 ====================================================================
@@ -576,7 +576,7 @@ Phase 3 — Autonomous Founder Operating System
 
 Current Platform Status
 
-Atlas has evolved from a proof of concept into a production architecture
+InventSmith has evolved from a proof of concept into a production architecture
 capable of coordinating autonomous executive departments, maintaining
 persistent knowledge, and executing inventor workflows through natural
 conversation.
@@ -637,7 +637,7 @@ The following core platform capabilities are operational:
 CURRENT DEVELOPMENT FOCUS
 
 The platform architecture is now sufficiently mature that future
-development should focus on expanding Atlas' real-world capabilities
+development should focus on expanding InventSmith' real-world capabilities
 rather than redesigning existing systems.
 
 Primary development priorities are:
@@ -648,7 +648,7 @@ Primary development priorities are:
 
 • Expanding department intelligence.
 
-• Connecting Atlas to external services.
+• Connecting InventSmith to external services.
 
 • Reducing founder interruptions.
 
@@ -656,10 +656,10 @@ Primary development priorities are:
 
 CURRENT PRODUCT OBJECTIVE
 
-Atlas should behave as an experienced Chief Executive Officer that
+InventSmith should behave as an experienced Chief Executive Officer that
 coordinates the inventor's company through natural conversation.
 
-The founder should focus on making business decisions while Atlas
+The founder should focus on making business decisions while InventSmith
 performs as much operational work as possible within its authority.
 
 --------------------------------------------------------------------
@@ -681,7 +681,7 @@ continuously improving:
 
 • Commercial Readiness
 
-Every completed milestone should move Atlas closer to becoming a fully
+Every completed milestone should move InventSmith closer to becoming a fully
 autonomous operating system for inventors.
 
 ====================================================================
@@ -689,20 +689,20 @@ autonomous operating system for inventors.
 ARCHITECTURE OVERVIEW
 ====================================================================
 
-Atlas is designed as a modular, conversation-first Autonomous AI
+InventSmith is designed as a modular, conversation-first Autonomous AI
 Operating System.
 
 Each major platform component has a clearly defined responsibility while
 working together through a unified execution model.
 
-No subsystem should operate independently of the overall Atlas
+No subsystem should operate independently of the overall InventSmith
 architecture.
 
 ====================================================================
 
 FOUNDATION LAYER
 
-Provides the core infrastructure required for all Atlas capabilities.
+Provides the core infrastructure required for all InventSmith capabilities.
 
 Primary Components
 
@@ -747,7 +747,7 @@ domain while sharing verified information with the rest of the platform.
 
 EXECUTION LAYER
 
-Coordinates autonomous work throughout Atlas.
+Coordinates autonomous work throughout InventSmith.
 
 Primary Components
 
@@ -771,7 +771,7 @@ whenever authority permits.
 
 KNOWLEDGE LAYER
 
-Atlas continuously builds institutional knowledge.
+InventSmith continuously builds institutional knowledge.
 
 Knowledge sources include:
 
@@ -796,7 +796,7 @@ improves future decision making.
 
 FOUNDER EXPERIENCE LAYER
 
-The founder interacts with Atlas through a single unified executive
+The founder interacts with InventSmith through a single unified executive
 experience.
 
 Primary Surfaces
@@ -855,7 +855,7 @@ Completed
 
 Summary
 
-Established the foundational Atlas architecture, project structure, core
+Established the foundational InventSmith architecture, project structure, core
 development standards, and long-term product direction.
 
 Major Outcomes
@@ -920,7 +920,7 @@ Completed
 
 Summary
 
-Established Atlas' executive coordination model and departmental
+Established InventSmith' executive coordination model and departmental
 architecture.
 
 Major Outcomes
@@ -989,7 +989,7 @@ Summary
 
 The engineering, intelligence, executive, evidence, conversation, and
 autonomous operating system capabilities have been implemented through
-successive milestones, resulting in the current Atlas Operating System
+successive milestones, resulting in the current InventSmith Operating System
 architecture documented within this Release Master Plan.
 
 These milestones collectively introduced capabilities including:
@@ -1029,7 +1029,7 @@ within the project repository and release history.
 
 COMPLETED ARCHITECTURAL OBJECTIVES
 
-Atlas now possesses:
+InventSmith now possesses:
 
 ✓ Stable modular architecture
 
@@ -1075,14 +1075,14 @@ Highest
 
 MISSION
 
-Transform Atlas from an engineering-driven platform into a founder-first
+Transform InventSmith from an engineering-driven platform into a founder-first
 operating system.
 
 The underlying architecture is now sufficiently mature that future
 development should focus on improving the founder experience rather than
 building additional infrastructure.
 
-Atlas should feel like hiring an experienced CEO—not operating a complex
+InventSmith should feel like hiring an experienced CEO—not operating a complex
 software platform.
 
 ====================================================================
@@ -1116,7 +1116,7 @@ execution contracts,
 
 and technical implementation details should remain behind the scenes.
 
-Atlas should communicate business outcomes rather than internal system
+InventSmith should communicate business outcomes rather than internal system
 activity.
 
 --------------------------------------------------------------------
@@ -1125,7 +1125,7 @@ activity.
 
 Replace technical status messages with executive language.
 
-Instead of describing what the software is doing internally, Atlas
+Instead of describing what the software is doing internally, InventSmith
 should communicate:
 
 • Completed
@@ -1142,7 +1142,7 @@ should communicate:
 
 4. Reduce Founder Interruptions
 
-Atlas should continue executing work whenever authority permits.
+InventSmith should continue executing work whenever authority permits.
 
 Founder interaction should occur only when required by the Authority
 Boundaries defined within this Release Master Plan.
@@ -1162,7 +1162,7 @@ requested.
 
 6. Create A CEO Experience
 
-Every interaction should reinforce the feeling that Atlas is operating
+Every interaction should reinforce the feeling that InventSmith is operating
 the inventor's business rather than waiting for instructions.
 
 ====================================================================
@@ -1181,7 +1181,7 @@ AT-018 will be considered complete when:
 
 ✓ Founder interruptions are minimized.
 
-✓ Atlas consistently behaves like an experienced executive.
+✓ InventSmith consistently behaves like an experienced executive.
 
 ====================================================================
 
@@ -1196,7 +1196,7 @@ document.
 FUTURE ROADMAP
 ====================================================================
 
-The following milestones represent the planned evolution of Atlas after
+The following milestones represent the planned evolution of InventSmith after
 completion of the current active milestone.
 
 The roadmap is intended to guide development priorities while remaining
@@ -1214,7 +1214,7 @@ Autonomous Authority Expansion
 
 Objective
 
-Expand Atlas' ability to execute work independently while minimizing
+Expand InventSmith' ability to execute work independently while minimizing
 founder interruptions.
 
 Primary Goals
@@ -1260,7 +1260,7 @@ Validation & Market Intelligence
 
 Objective
 
-Increase Atlas' ability to validate inventions using real-world market
+Increase InventSmith' ability to validate inventions using real-world market
 data and customer feedback.
 
 Primary Goals
@@ -1328,11 +1328,11 @@ Primary Goals
 
 LONG-TERM PLATFORM EVOLUTION
 
-Future releases should continue expanding Atlas through additional
+Future releases should continue expanding InventSmith through additional
 executive intelligence, automation, external integrations, engineering
 capabilities, and commercialization support.
 
-Every future milestone should strengthen Atlas' ability to operate as a
+Every future milestone should strengthen InventSmith' ability to operate as a
 trusted executive partner for inventors while preserving the stable
 architecture established by this Release Master Plan.
 
@@ -1342,7 +1342,7 @@ ENGINEERING DIRECTIVES
 ====================================================================
 
 The following directives govern all future engineering work on Project
-Atlas.
+InventSmith.
 
 Every implementation shall comply with these directives unless
 superseded by a future revision of this Release Master Plan.
@@ -1362,7 +1362,7 @@ Favor incremental improvement over disruptive redesign.
 
 2. CONVERSATION FIRST
 
-Conversation is Atlas' primary operating interface.
+Conversation is InventSmith' primary operating interface.
 
 Every new capability should be accessible through natural conversation
 before introducing additional user interface complexity.
@@ -1373,16 +1373,16 @@ User interface components should support conversation—not replace it.
 
 3. EXECUTE BEFORE RECOMMENDING
 
-Whenever Atlas possesses sufficient authority, information, and
+Whenever InventSmith possesses sufficient authority, information, and
 capability, it shall execute work automatically.
 
-Do not ask founders to perform work Atlas can complete itself.
+Do not ask founders to perform work InventSmith can complete itself.
 
 ====================================================================
 
 4. HONOR AUTHORITY BOUNDARIES
 
-Atlas shall request founder approval only when an action:
+InventSmith shall request founder approval only when an action:
 
 • Requires spending money
 
@@ -1394,7 +1394,7 @@ Atlas shall request founder approval only when an action:
 
 • Performs irreversible external actions
 
-• Requires permissions or credentials Atlas does not possess
+• Requires permissions or credentials InventSmith does not possess
 
 All other work should continue autonomously.
 
@@ -1414,7 +1414,7 @@ independent copies.
 
 6. EVIDENCE-BASED REASONING
 
-Atlas shall distinguish between:
+InventSmith shall distinguish between:
 
 • Verified Evidence
 
@@ -1430,7 +1430,7 @@ Recommendations must always identify their supporting evidence.
 
 7. MODULAR DEVELOPMENT
 
-Every new capability shall integrate with the existing Atlas
+Every new capability shall integrate with the existing InventSmith
 architecture through clearly defined interfaces.
 
 Avoid tightly coupled implementations.
@@ -1482,22 +1482,22 @@ Engineering progress should always result in founder progress.
 PRODUCT BOUNDARIES
 ====================================================================
 
-The following boundaries define the intended scope of Project Atlas.
+The following boundaries define the intended scope of Project InventSmith.
 
-These boundaries ensure Atlas remains focused on its mission and does
+These boundaries ensure InventSmith remains focused on its mission and does
 not gradually evolve into a generic software platform.
 
 ====================================================================
 
-ATLAS IS
+INVENTSMITH IS
 
-Atlas is an Autonomous AI Operating System for inventors.
+InventSmith is an Autonomous AI Operating System for inventors.
 
-Atlas coordinates the complete invention journey through intelligent
+InventSmith coordinates the complete invention journey through intelligent
 planning, executive reasoning, persistent knowledge, and autonomous
 execution.
 
-Atlas serves as an experienced executive team capable of helping
+InventSmith serves as an experienced executive team capable of helping
 founders move inventions from idea to commercialization.
 
 Conversation is the primary operating interface.
@@ -1506,9 +1506,9 @@ Execution is the primary product capability.
 
 ====================================================================
 
-ATLAS IS NOT
+INVENTSMITH IS NOT
 
-Atlas is not:
+InventSmith is not:
 
 • A generic chatbot
 
@@ -1528,16 +1528,16 @@ Atlas is not:
 
 • A collection of disconnected AI tools
 
-Those capabilities may exist within Atlas when they support the
+Those capabilities may exist within InventSmith when they support the
 inventor journey, but they are not the product itself.
 
 ====================================================================
 
 FOUNDER EXPERIENCE
 
-The founder should experience Atlas as one intelligent executive.
+The founder should experience InventSmith as one intelligent executive.
 
-Atlas should not require founders to understand:
+InventSmith should not require founders to understand:
 
 • Departments
 
@@ -1579,7 +1579,7 @@ should be reconsidered.
 
 LONG-TERM PRODUCT DIRECTION
 
-Atlas should become progressively:
+InventSmith should become progressively:
 
 • More Autonomous
 
@@ -1595,7 +1595,7 @@ Atlas should become progressively:
 
 • Simpler To Use
 
-Every release should increase Atlas' ability to operate as a trusted
+Every release should increase InventSmith' ability to operate as a trusted
 executive partner while making the founder experience feel simpler—not
 more complicated.
 
@@ -1604,7 +1604,7 @@ more complicated.
 SUCCESS CRITERIA
 ====================================================================
 
-Project Atlas is successful only when it consistently helps founders
+Project InventSmith is successful only when it consistently helps founders
 make meaningful progress while reducing the complexity of the invention
 journey.
 
@@ -1614,16 +1614,16 @@ Success shall be measured by founder outcomes rather than feature count.
 
 FOUNDER EXPERIENCE
 
-Atlas should feel like an experienced executive operating the founder's
+InventSmith should feel like an experienced executive operating the founder's
 business.
 
 Success Indicators
 
-✓ Founders immediately understand what Atlas has completed.
+✓ Founders immediately understand what InventSmith has completed.
 
-✓ Founders immediately understand what Atlas is currently doing.
+✓ Founders immediately understand what InventSmith is currently doing.
 
-✓ Founders immediately understand what Atlas recommends next.
+✓ Founders immediately understand what InventSmith recommends next.
 
 ✓ Founders immediately know when their action is required.
 
@@ -1633,17 +1633,17 @@ Success Indicators
 
 AUTONOMOUS EXECUTION
 
-Atlas should continuously advance work whenever authority permits.
+InventSmith should continuously advance work whenever authority permits.
 
 Success Indicators
 
-✓ Atlas independently plans work.
+✓ InventSmith independently plans work.
 
-✓ Atlas independently coordinates departments.
+✓ InventSmith independently coordinates departments.
 
-✓ Atlas independently resumes work after dependencies are resolved.
+✓ InventSmith independently resumes work after dependencies are resolved.
 
-✓ Atlas minimizes unnecessary founder interruptions.
+✓ InventSmith minimizes unnecessary founder interruptions.
 
 ✓ Founder approval is requested only at defined authority boundaries.
 
@@ -1651,7 +1651,7 @@ Success Indicators
 
 INTELLIGENCE
 
-Atlas should provide trustworthy, evidence-based reasoning.
+InventSmith should provide trustworthy, evidence-based reasoning.
 
 Success Indicators
 
@@ -1663,13 +1663,13 @@ Success Indicators
 
 ✓ Executive reasoning considers cross-department impacts.
 
-✓ Atlas clearly distinguishes verified information from inference.
+✓ InventSmith clearly distinguishes verified information from inference.
 
 ====================================================================
 
 KNOWLEDGE
 
-Atlas should become more valuable with every interaction.
+InventSmith should become more valuable with every interaction.
 
 Success Indicators
 
@@ -1685,7 +1685,7 @@ Success Indicators
 
 ENGINEERING
 
-Atlas should remain stable while continuously expanding capabilities.
+InventSmith should remain stable while continuously expanding capabilities.
 
 Success Indicators
 
@@ -1701,26 +1701,26 @@ Success Indicators
 
 FOUNDER TRUST
 
-Trust is Atlas' most valuable asset.
+Trust is InventSmith' most valuable asset.
 
 Success Indicators
 
-✓ Atlas never fabricates execution.
+✓ InventSmith never fabricates execution.
 
-✓ Atlas never fabricates evidence.
+✓ InventSmith never fabricates evidence.
 
-✓ Atlas clearly communicates uncertainty.
+✓ InventSmith clearly communicates uncertainty.
 
-✓ Atlas accurately represents platform capabilities.
+✓ InventSmith accurately represents platform capabilities.
 
-✓ Founders can rely upon Atlas' recommendations.
+✓ Founders can rely upon InventSmith' recommendations.
 
 ====================================================================
 
 LONG-TERM SUCCESS
 
-Atlas succeeds when inventors can move from idea to commercialization
-primarily through natural conversation while Atlas coordinates,
+InventSmith succeeds when inventors can move from idea to commercialization
+primarily through natural conversation while InventSmith coordinates,
 executes, and manages the operational work behind the scenes.
 
 The ultimate measure of success is that founders spend less time
@@ -1732,7 +1732,7 @@ RELEASE GOVERNANCE
 ====================================================================
 
 This Release Master Plan is the authoritative governing document for
-Project Atlas.
+Project InventSmith.
 
 It shall remain the single source of truth for the project's current
 state, architecture, development priorities, engineering directives,
@@ -1780,7 +1780,7 @@ This document shall be updated whenever:
 • Product principles or constitutional articles are revised.
 
 The Release Master Plan should always describe the current reality of
-Project Atlas—not historical intentions.
+Project InventSmith—not historical intentions.
 
 ====================================================================
 
@@ -1801,7 +1801,7 @@ Before proposing implementation work, development shall determine:
 
 • Product principles
 
-• Atlas Constitution
+• InventSmith Constitution
 
 • Future roadmap
 
@@ -1841,10 +1841,10 @@ DOCUMENT COMPLETION
 ====================================================================
 
 Document Name:
-ATLAS_RELEASE_MASTER_PLAN_v1.0.md
+INVENTSMITH_RELEASE_MASTER_PLAN_v1.0.md
 
 Project:
-Project Atlas — Autonomous AI Operating System for Inventors
+Project InventSmith — Autonomous AI Operating System for Inventors
 
 Owner:
 Jerry Brown
@@ -1863,7 +1863,7 @@ Single Source of Truth
 REVISION POLICY
 
 This document is intended to evolve throughout the lifetime of Project
-Atlas.
+InventSmith.
 
 Future revisions shall update this document to reflect the current state
 of the platform while preserving internal consistency and architectural
@@ -1883,17 +1883,17 @@ When changes are made:
   duplicated.
 
 At all times, this document shall present one clear and authoritative
-view of Project Atlas.
+view of Project InventSmith.
 
 ====================================================================
 
 FINAL DECLARATION
 
-Project Atlas exists to help inventors transform ideas into successful
+Project InventSmith exists to help inventors transform ideas into successful
 products through trusted executive intelligence, autonomous execution,
 and evidence-based decision making.
 
-Every release should make Atlas:
+Every release should make InventSmith:
 
 • More autonomous.
 
@@ -1905,7 +1905,7 @@ Every release should make Atlas:
 
 • Simpler for founders to use.
 
-The success of Project Atlas will be measured not by the number of
+The success of Project InventSmith will be measured not by the number of
 features implemented, but by the measurable progress founders achieve
 using the platform.
 

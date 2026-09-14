@@ -8,13 +8,13 @@
 Define the invention's brand identity — name, voice, visual language, and market positioning — so every customer-facing element tells a single, coherent story.
 
 **Why this stage exists:**
-Branding is not a logo exercise. It is the inventor's answer to the question: why should someone trust you and choose your product over everything else available? A strong brand commands premium pricing, earns word-of-mouth, and creates the emotional association that makes customers loyal even when a cheaper competitor enters the market. A weak brand — or no brand — leaves the product competing purely on price against anyone willing to undercut. Atlas makes branding rigorous: it connects the Customer Segment Profiles from Stage 3 to every brand decision, ensuring that every creative choice serves the actual customer rather than the inventor's aesthetic preferences.
+Branding is not a logo exercise. It is the inventor's answer to the question: why should someone trust you and choose your product over everything else available? A strong brand commands premium pricing, earns word-of-mouth, and creates the emotional association that makes customers loyal even when a cheaper competitor enters the market. A weak brand — or no brand — leaves the product competing purely on price against anyone willing to undercut. InventSmith makes branding rigorous: it connects the Customer Segment Profiles from Stage 3 to every brand decision, ensuring that every creative choice serves the actual customer rather than the inventor's aesthetic preferences.
 
 **Primary objective:**
 Produce a Brand Identity System that defines the product's name, positioning statement, voice, visual direction, and core messaging — ready to be applied to packaging, marketing materials, and the sales process.
 
 **Success definition:**
-Atlas considers this stage successful when the inventor has a complete, internally consistent Brand Identity System: a product name that has been tested for trademark viability, a positioning statement that clearly differentiates the product, a voice guide that anyone creating content can apply consistently, and a visual direction brief ready to hand to a designer.
+InventSmith considers this stage successful when the inventor has a complete, internally consistent Brand Identity System: a product name that has been tested for trademark viability, a positioning statement that clearly differentiates the product, a voice guide that anyone creating content can apply consistently, and a visual direction brief ready to hand to a designer.
 
 ---
 
@@ -28,26 +28,26 @@ Atlas considers this stage successful when the inventor has a complete, internal
 
 ---
 
-## Atlas Responsibilities
+## InventSmith Responsibilities
 
-**How Atlas guides the inventor:**
-Atlas leads a structured brand positioning workshop built on the customer context established in Stages 2 and 3. It connects every brand decision back to the target customer — who they are, what they value, and what kind of brand they trust. Atlas guides the inventor through brand archetype selection, positioning statement construction, and name evaluation. It synthesizes all of these into a Brand Identity System that is internally consistent — the name, the voice, and the visual direction all reflect the same underlying brand character.
+**How InventSmith guides the inventor:**
+InventSmith leads a structured brand positioning workshop built on the customer context established in Stages 2 and 3. It connects every brand decision back to the target customer — who they are, what they value, and what kind of brand they trust. InventSmith guides the inventor through brand archetype selection, positioning statement construction, and name evaluation. It synthesizes all of these into a Brand Identity System that is internally consistent — the name, the voice, and the visual direction all reflect the same underlying brand character.
 
-**What Atlas analyzes:**
+**What InventSmith analyzes:**
 - Customer Segment Profiles from Stage 3 — the definitive source for who the brand must speak to and resonate with
 - Competitive Landscape from Stage 2 — what existing brands in the space look and sound like, and where the whitespace exists
 - Product Design Specification from Stage 5 — the product's physical character, materials, and aesthetic inform what visual direction is authentic
 - The inventor's name candidates — for syllable count, memorability, connotation, trademark search viability, and domain availability
 - Internal consistency across all brand elements — whether the name, voice, and visual direction express the same character
 
-**What Atlas recommends:**
+**What InventSmith recommends:**
 - A brand archetype and what it implies for voice, visual language, and messaging
 - A recommended product name from the evaluated candidates, with reasoning
 - A positioning statement using a proven structure
 - Voice attributes with specific "sounds like / doesn't sound like" examples
 - Visual direction keywords and aesthetic reference categories for designer briefing
 
-**What Atlas tracks:**
+**What InventSmith tracks:**
 - Whether the product name has had a preliminary trademark search conducted
 - Whether the Brand Positioning Statement is complete and reviewed
 - Whether the Brand Voice Guide has at least 3 defined attributes with examples
@@ -67,15 +67,15 @@ Atlas leads a structured brand positioning workshop built on the customer contex
 
 ---
 
-## Atlas Guidance
+## InventSmith Guidance
 
-Atlas opens Stage 8 by returning to the customer. Brand decisions made without a specific customer in mind produce generic brands — and generic brands do not command loyalty or pricing power. Atlas reminds the inventor of the Customer Segment Profiles from Stage 3 and asks: "If this brand were a person, what kind of person would your primary customer trust completely? Not like — trust. What does that person sound like, look like, value?"
+InventSmith opens Stage 8 by returning to the customer. Brand decisions made without a specific customer in mind produce generic brands — and generic brands do not command loyalty or pricing power. InventSmith reminds the inventor of the Customer Segment Profiles from Stage 3 and asks: "If this brand were a person, what kind of person would your primary customer trust completely? Not like — trust. What does that person sound like, look like, value?"
 
-From there, Atlas guides the inventor through brand archetype selection. It presents the relevant archetypes with clear descriptions and examples of what each one implies for voice, visual language, and messaging. The inventor selects the archetype that best fits the customer relationship they want to build, and Atlas explains what that means in practice.
+From there, InventSmith guides the inventor through brand archetype selection. It presents the relevant archetypes with clear descriptions and examples of what each one implies for voice, visual language, and messaging. The inventor selects the archetype that best fits the customer relationship they want to build, and InventSmith explains what that means in practice.
 
-Atlas evaluates name candidates against five dimensions: syllable count and phonetic ease, memorability, connotation (intended and unintended), trademark search viability (guiding the inventor through a USPTO TESS search), and domain availability. It presents its evaluation clearly and recommends the strongest candidate — explaining why. If no strong candidate exists, Atlas generates name suggestions based on the brand archetype, the positioning attributes, and the category keywords.
+InventSmith evaluates name candidates against five dimensions: syllable count and phonetic ease, memorability, connotation (intended and unintended), trademark search viability (guiding the inventor through a USPTO TESS search), and domain availability. It presents its evaluation clearly and recommends the strongest candidate — explaining why. If no strong candidate exists, InventSmith generates name suggestions based on the brand archetype, the positioning attributes, and the category keywords.
 
-The Brand Positioning Statement is drafted using the Geoffrey Moore template: "For [target customer] who [has the problem], [Product Name] is a [category] that [key benefit], unlike [competitor] which [differentiating limitation]." Atlas drafts a candidate statement from the invention record and presents it for the inventor to refine.
+The Brand Positioning Statement is drafted using the Geoffrey Moore template: "For [target customer] who [has the problem], [Product Name] is a [category] that [key benefit], unlike [competitor] which [differentiating limitation]." InventSmith drafts a candidate statement from the invention record and presents it for the inventor to refine.
 
 The Brand Voice Guide is built from 3–4 defining voice attributes, each one illustrated with a "sounds like / doesn't sound like" pair. These examples are specific — not "warm" vs. "cold" but actual sample sentences that show the voice in action.
 
@@ -116,7 +116,7 @@ The Visual Direction Brief is not a design document — it is a designer briefin
 
 ## Readiness Evaluation
 
-Atlas evaluates the inventor's readiness using three states only. No numeric scores.
+InventSmith evaluates the inventor's readiness using three states only. No numeric scores.
 
 **Not Ready:**
 - Product name has not been decided or shortlisted
@@ -167,7 +167,7 @@ The following information moves from Stage 8 into Stage 9 (Intellectual Property
 
 ## Future Integrations
 
-- **Trademark search API** (USPTO TESS, TrademarkNow) — automated preliminary trademark clearance search for name candidates within Atlas
+- **Trademark search API** (USPTO TESS, TrademarkNow) — automated preliminary trademark clearance search for name candidates within InventSmith
 - **Domain availability API** (Namecheap, GoDaddy) — real-time domain availability check integrated into the name evaluation process
 - **AI visual concept generation** (image generation tools) — generate mood board visuals from the Visual Direction Brief keywords to give the inventor a visual preview before designer engagement
 - **AI brand name generation** — generate name candidates based on positioning attributes, category keywords, and availability constraints

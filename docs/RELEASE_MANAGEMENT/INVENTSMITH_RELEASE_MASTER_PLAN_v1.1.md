@@ -1,4 +1,4 @@
-# ATLAS RELEASE MASTER PLAN
+# INVENTSMITH RELEASE MASTER PLAN
 Version 1.1
 
 Status: ACTIVE
@@ -9,11 +9,11 @@ Last Updated: July 2026
 
 # Executive Summary
 
-Project Atlas has successfully transitioned from architectural planning into implementation.
+Project InventSmith has successfully transitioned from architectural planning into implementation.
 
 The foundational autonomous AI operating system is now complete.
 
-Atlas now possesses:
+InventSmith now possesses:
 
 - Unified Autonomous Execution Engine
 - Unified Provider Platform
@@ -84,7 +84,7 @@ COMPLETE
 
 Purpose
 
-Single execution path for every Atlas department.
+Single execution path for every InventSmith department.
 
 Result
 
@@ -105,7 +105,7 @@ Provider abstraction layer.
 
 Result
 
-Atlas can support multiple AI providers without department changes.
+InventSmith can support multiple AI providers without department changes.
 
 ---
 
@@ -241,7 +241,7 @@ Lifecycle events centralized:
 
 • Stage Advanced
 
-Atlas now:
+InventSmith now:
 
 Prepares work automatically
 
@@ -458,7 +458,7 @@ Enterprise
 
 # Success Criteria
 
-Atlas MVP Complete when:
+InventSmith MVP Complete when:
 
 ✓ All inventor stages operational
 
@@ -490,7 +490,7 @@ Key architectural decisions:
 
 • Introduce the Autonomous Stage Lifecycle Engine before expanding additional inventor stages to ensure all future functionality follows a single orchestration model.
 
-This approach minimizes technical debt, simplifies future enhancements, and provides a consistent execution path across all Atlas capabilities.
+This approach minimizes technical debt, simplifies future enhancements, and provides a consistent execution path across all InventSmith capabilities.
 
 ---
 
@@ -556,17 +556,17 @@ On Track
 
 # VERIFIED MILESTONE HISTORY
 
-This section serves as the official implementation history of Project Atlas.
+This section serves as the official implementation history of Project InventSmith.
 
 Unlike planning documents, every milestone listed below represents work that has been completed, verified through testing, and integrated into the production architecture unless otherwise noted.
 
-The purpose of this section is to preserve the historical evolution of Atlas, document the reasoning behind major architectural decisions, and provide future contributors with the context necessary to understand why the platform was built as it exists today.
+The purpose of this section is to preserve the historical evolution of InventSmith, document the reasoning behind major architectural decisions, and provide future contributors with the context necessary to understand why the platform was built as it exists today.
 
 ---
 
 # Foundation Release
 
-The Foundation Release established Atlas as a functional inventor platform capable of supporting authenticated users, invention workspaces, guided inventor journeys, and foundational analytics.
+The Foundation Release established InventSmith as a functional inventor platform capable of supporting authenticated users, invention workspaces, guided inventor journeys, and foundational analytics.
 
 Core capabilities delivered during this phase included:
 
@@ -584,15 +584,15 @@ This release provided the user-facing experience but intentionally limited auton
 
 Result
 
-Atlas successfully transitioned from concept into a working SaaS platform.
+InventSmith successfully transitioned from concept into a working SaaS platform.
 
 ---
 
 # Platform Architecture Initiative
 
-Following completion of the Foundation Release, development priorities shifted away from additional user-facing functionality and toward building the autonomous operating system that would eventually power every Atlas department.
+Following completion of the Foundation Release, development priorities shifted away from additional user-facing functionality and toward building the autonomous operating system that would eventually power every InventSmith department.
 
-Rather than allowing individual departments to develop independent execution logic, provider integrations, and orchestration pipelines, Atlas adopted a platform-first architecture.
+Rather than allowing individual departments to develop independent execution logic, provider integrations, and orchestration pipelines, InventSmith adopted a platform-first architecture.
 
 This decision dramatically reduced future technical debt by ensuring every AI capability would ultimately execute through a single centralized infrastructure.
 
@@ -608,7 +608,7 @@ COMPLETE
 
 Objective
 
-Create one centralized execution engine responsible for coordinating every autonomous task performed throughout Atlas.
+Create one centralized execution engine responsible for coordinating every autonomous task performed throughout InventSmith.
 
 Prior State
 
@@ -645,7 +645,7 @@ Benefits
 
 Outcome
 
-Atlas established its first centralized execution pipeline.
+InventSmith established its first centralized execution pipeline.
 
 This milestone became the backbone for every autonomous capability implemented afterward.
 
@@ -659,7 +659,7 @@ COMPLETE
 
 Objective
 
-Separate provider-specific implementations from Atlas business logic.
+Separate provider-specific implementations from InventSmith business logic.
 
 Prior State
 
@@ -680,7 +680,7 @@ AT-027 introduced:
 
 Architectural Impact
 
-Atlas business logic became provider-agnostic.
+InventSmith business logic became provider-agnostic.
 
 Departments no longer interact directly with AI vendors.
 
@@ -737,7 +737,7 @@ Benefits
 
 Outcome
 
-Atlas gained a common intelligence layer capable of supporting trustworthy autonomous recommendations.
+InventSmith gained a common intelligence layer capable of supporting trustworthy autonomous recommendations.
 
 ---
 
@@ -753,7 +753,7 @@ Perform a comprehensive compliance review of the newly implemented autonomous pl
 
 Purpose
 
-Rather than introducing additional features, this milestone verified that recent architectural work aligned with Atlas governance and engineering principles.
+Rather than introducing additional features, this milestone verified that recent architectural work aligned with InventSmith governance and engineering principles.
 
 Major Findings
 
@@ -771,7 +771,7 @@ Verified gaps included:
 
 Strategic Decision
 
-Instead of beginning new inventor functionality immediately, Atlas prioritized completing the platform architecture.
+Instead of beginning new inventor functionality immediately, InventSmith prioritized completing the platform architecture.
 
 This decision ensured future development would occur on a stable, centralized foundation rather than accumulating technical debt.
 
@@ -795,7 +795,7 @@ Objective
 
 Complete the unified provider execution architecture identified during the AT-029 compliance audit.
 
-AT-030 eliminated the final layer of fragmented provider execution by introducing a centralized adapter dispatch system that standardizes every interaction between Atlas and external AI providers.
+AT-030 eliminated the final layer of fragmented provider execution by introducing a centralized adapter dispatch system that standardizes every interaction between InventSmith and external AI providers.
 
 This milestone established a single execution pathway regardless of which provider ultimately fulfills a request.
 
@@ -807,7 +807,7 @@ Although the Provider Platform introduced centralized provider management, execu
 
 Provider implementations could still expose subtle behavioral differences through individual execution paths.
 
-While functional, this architecture did not fully satisfy Atlas' goal of complete provider abstraction.
+While functional, this architecture did not fully satisfy InventSmith' goal of complete provider abstraction.
 
 ---
 
@@ -917,7 +917,7 @@ Examples include:
 
 • Validation failures
 
-This significantly simplifies downstream error handling throughout Atlas.
+This significantly simplifies downstream error handling throughout InventSmith.
 
 ---
 
@@ -981,7 +981,7 @@ Successful
 
 AT-030 completed one of the largest architectural objectives identified during the platform audit.
 
-Atlas now possessed a single provider execution architecture capable of supporting any future AI provider through standardized contracts.
+InventSmith now possessed a single provider execution architecture capable of supporting any future AI provider through standardized contracts.
 
 This milestone established the final execution pathway required before enforcing provider boundaries across the entire platform.
 
@@ -999,9 +999,9 @@ Commit
 
 Objective
 
-Ensure every interaction between Atlas and external AI providers passes exclusively through the Provider Manager.
+Ensure every interaction between InventSmith and external AI providers passes exclusively through the Provider Manager.
 
-AT-031 established one of the most important governance guarantees within the Atlas architecture:
+AT-031 established one of the most important governance guarantees within the InventSmith architecture:
 
 No department may communicate directly with an AI provider.
 
@@ -1097,7 +1097,7 @@ Future integrations
 
 ## Governance Impact
 
-AT-031 fully aligned Atlas with its engineering principles.
+AT-031 fully aligned InventSmith with its engineering principles.
 
 The platform now enforces:
 
@@ -1111,7 +1111,7 @@ One Confidence System
 
 One Lifecycle
 
-These principles remain foundational to all future Atlas development.
+These principles remain foundational to all future InventSmith development.
 
 ---
 
@@ -1157,7 +1157,7 @@ Successful
 
 AT-031 completed the Provider Platform architecture originally envisioned during the Foundation Release.
 
-Atlas now possesses one authoritative provider boundary shared by every autonomous department.
+InventSmith now possesses one authoritative provider boundary shared by every autonomous department.
 
 This milestone effectively eliminated fragmented provider integration across the platform.
 
@@ -1165,7 +1165,7 @@ This milestone effectively eliminated fragmented provider integration across the
 
 # Transition to Autonomous Lifecycle Management
 
-With execution centralized, providers unified, and architectural boundaries fully enforced, Atlas had completed the core infrastructure required to support true autonomous workflow orchestration.
+With execution centralized, providers unified, and architectural boundaries fully enforced, InventSmith had completed the core infrastructure required to support true autonomous workflow orchestration.
 
 At this stage, the remaining challenge was no longer executing work.
 
@@ -1193,19 +1193,19 @@ Objective
 
 Implement a centralized lifecycle orchestration engine responsible for managing every stage of the inventor journey.
 
-AT-032 represents one of the most significant architectural milestones in Project Atlas.
+AT-032 represents one of the most significant architectural milestones in Project InventSmith.
 
-Previous milestones established how Atlas executes autonomous work.
+Previous milestones established how InventSmith executes autonomous work.
 
-AT-032 established **when** autonomous work begins, **why** it should occur, and **how** Atlas continuously adapts as an invention progresses.
+AT-032 established **when** autonomous work begins, **why** it should occur, and **how** InventSmith continuously adapts as an invention progresses.
 
-The Autonomous Stage Lifecycle Engine transformed Atlas from a platform capable of executing autonomous tasks into a platform capable of autonomously coordinating the inventor journey itself.
+The Autonomous Stage Lifecycle Engine transformed InventSmith from a platform capable of executing autonomous tasks into a platform capable of autonomously coordinating the inventor journey itself.
 
 ---
 
 # Strategic Background
 
-Prior to AT-032, Atlas possessed:
+Prior to AT-032, InventSmith possessed:
 
 • Unified Execution Engine
 
@@ -1219,7 +1219,7 @@ Prior to AT-032, Atlas possessed:
 
 These systems executed work efficiently but required individual departments to determine when execution should occur.
 
-This created unnecessary duplication and prevented Atlas from behaving as a unified autonomous operating system.
+This created unnecessary duplication and prevented InventSmith from behaving as a unified autonomous operating system.
 
 The solution was to create one centralized lifecycle coordinator responsible for every inventor stage.
 
@@ -1227,23 +1227,23 @@ The solution was to create one centralized lifecycle coordinator responsible for
 
 # Design Philosophy
 
-Atlas stages are no longer passive containers.
+InventSmith stages are no longer passive containers.
 
 Each stage behaves as a living system.
 
-When a founder enters a stage, Atlas immediately begins working.
+When a founder enters a stage, InventSmith immediately begins working.
 
-Instead of waiting for user interaction, Atlas prepares information, evaluates evidence, measures confidence, identifies risks, recommends next actions, and coordinates autonomous execution before the founder requests assistance.
+Instead of waiting for user interaction, InventSmith prepares information, evaluates evidence, measures confidence, identifies risks, recommends next actions, and coordinates autonomous execution before the founder requests assistance.
 
 The founder no longer drives every workflow.
 
-Atlas becomes an active partner.
+InventSmith becomes an active partner.
 
 ---
 
 # Lifecycle Architecture
 
-The Stage Lifecycle Engine became the highest orchestration layer within Atlas.
+The Stage Lifecycle Engine became the highest orchestration layer within InventSmith.
 
 All inventor workflow now follows this architecture.
 
@@ -1431,7 +1431,7 @@ Responsibilities include:
 
 ## Stage Advanced
 
-Executed when Atlas transitions to the next inventor stage.
+Executed when InventSmith transitions to the next inventor stage.
 
 Responsibilities include:
 
@@ -1449,7 +1449,7 @@ Responsibilities include:
 
 One of the most important capabilities introduced by AT-032 is automatic stage preparation.
 
-Whenever a stage opens, Atlas immediately performs preparation activities without waiting for founder interaction.
+Whenever a stage opens, InventSmith immediately performs preparation activities without waiting for founder interaction.
 
 Preparation includes:
 
@@ -1501,7 +1501,7 @@ Cross-stage dependencies
 
 Recommendation quality
 
-Rather than relying on manual refreshes, Atlas continuously adapts as information changes.
+Rather than relying on manual refreshes, InventSmith continuously adapts as information changes.
 
 ---
 
@@ -1569,7 +1569,7 @@ Manufacturing constraints
 
 Business assumptions
 
-Rather than repeatedly asking founders for identical information, Atlas intelligently reuses validated knowledge throughout the invention lifecycle.
+Rather than repeatedly asking founders for identical information, InventSmith intelligently reuses validated knowledge throughout the invention lifecycle.
 
 ---
 
@@ -1605,13 +1605,13 @@ Provider-backed work requiring authorization remains paused until approval is gr
 
 Once approved, the lifecycle engine automatically resumes execution without requiring manual intervention.
 
-This maintains Atlas' governance principles while preserving autonomous workflow continuity.
+This maintains InventSmith' governance principles while preserving autonomous workflow continuity.
 
 ---
 
 # Architectural Impact
 
-AT-032 elevated Atlas from an autonomous execution platform to an autonomous operating system.
+AT-032 elevated InventSmith from an autonomous execution platform to an autonomous operating system.
 
 Before this milestone:
 
@@ -1699,9 +1699,9 @@ The approval lifecycle is implemented but requires end-to-end production verific
 
 # Outcome
 
-AT-032 marks the completion of the foundational autonomous platform envisioned during the early architecture planning phases of Project Atlas.
+AT-032 marks the completion of the foundational autonomous platform envisioned during the early architecture planning phases of Project InventSmith.
 
-With the addition of the Autonomous Stage Lifecycle Engine, Atlas now possesses:
+With the addition of the Autonomous Stage Lifecycle Engine, InventSmith now possesses:
 
 • One execution engine
 
@@ -1719,37 +1719,37 @@ The platform infrastructure is now complete.
 
 Future development can focus almost exclusively on expanding inventor capabilities, commercialization workflows, and production readiness rather than building additional core architecture.
 
-This milestone represents the transition of Atlas from a collection of intelligent services into a cohesive autonomous operating system capable of proactively guiding inventors throughout the entire invention journey.
+This milestone represents the transition of InventSmith from a collection of intelligent services into a cohesive autonomous operating system capable of proactively guiding inventors throughout the entire invention journey.
 
 ---
 
 # ARCHITECTURE EVOLUTION TIMELINE
 
-The architecture of Atlas did not emerge fully formed.
+The architecture of InventSmith did not emerge fully formed.
 
 It evolved through multiple intentional phases, each solving a specific challenge encountered during the platform's growth.
 
-Rather than continuously adding features, Atlas adopted a platform-first strategy that prioritized long-term scalability, maintainability, and autonomous intelligence over short-term functionality.
+Rather than continuously adding features, InventSmith adopted a platform-first strategy that prioritized long-term scalability, maintainability, and autonomous intelligence over short-term functionality.
 
-This section documents the architectural evolution of Atlas and explains the reasoning behind each major transition.
+This section documents the architectural evolution of InventSmith and explains the reasoning behind each major transition.
 
 ---
 
 # Phase I — Vision
 
-Project Atlas began with a simple but ambitious question:
+Project InventSmith began with a simple but ambitious question:
 
 > What if inventors had an AI co-founder instead of another project management application?
 
 Traditional inventor platforms focused on storing information.
 
-Atlas was envisioned as something fundamentally different.
+InventSmith was envisioned as something fundamentally different.
 
-Instead of acting as a repository of documents, Atlas would actively guide founders through every stage of invention, product development, intellectual property, commercialization, and business growth.
+Instead of acting as a repository of documents, InventSmith would actively guide founders through every stage of invention, product development, intellectual property, commercialization, and business growth.
 
 The original vision established several core principles.
 
-Atlas would:
+InventSmith would:
 
 • Think before acting.
 
@@ -1793,7 +1793,7 @@ Primary objectives included:
 
 This phase intentionally emphasized user experience over autonomous behavior.
 
-Atlas became a functional SaaS application capable of managing invention projects, but autonomous intelligence remained limited.
+InventSmith became a functional SaaS application capable of managing invention projects, but autonomous intelligence remained limited.
 
 Result
 
@@ -1827,7 +1827,7 @@ More importantly, each department risked evolving differently, making long-term 
 
 A strategic architectural decision was made.
 
-Rather than expanding departments individually, Atlas would first construct a centralized autonomous platform capable of supporting every department equally.
+Rather than expanding departments individually, InventSmith would first construct a centralized autonomous platform capable of supporting every department equally.
 
 This decision fundamentally changed the project's implementation roadmap.
 
@@ -1837,7 +1837,7 @@ This decision fundamentally changed the project's implementation roadmap.
 
 The Platform Architecture Initiative introduced the foundational services required for autonomous operation.
 
-Instead of allowing departments to implement execution independently, Atlas centralized all critical platform responsibilities.
+Instead of allowing departments to implement execution independently, InventSmith centralized all critical platform responsibilities.
 
 Major platform capabilities introduced during this phase included:
 
@@ -1887,7 +1887,7 @@ While simple, this approach introduced several limitations:
 
 • Increased maintenance costs
 
-As Atlas expanded, this model became unsustainable.
+As InventSmith expanded, this model became unsustainable.
 
 ---
 
@@ -1947,7 +1947,7 @@ Provider Adapter
 
 Provider
 
-Atlas business logic became provider-independent.
+InventSmith business logic became provider-independent.
 
 Future provider integrations could now be implemented without modifying departmental code.
 
@@ -1995,7 +1995,7 @@ Recommendations
 
 Founder
 
-Rather than waiting for founders to request work, Atlas now proactively prepares stages, evaluates readiness, coordinates autonomous execution, and recommends next actions.
+Rather than waiting for founders to request work, InventSmith now proactively prepares stages, evaluates readiness, coordinates autonomous execution, and recommends next actions.
 
 The inventor journey became event-driven rather than manually initiated.
 
@@ -2003,7 +2003,7 @@ The inventor journey became event-driven rather than manually initiated.
 
 # Architectural Principles
 
-Several principles emerged throughout Atlas' evolution.
+Several principles emerged throughout InventSmith' evolution.
 
 ## Platform Before Features
 
@@ -2047,7 +2047,7 @@ This enables future replacement of providers, services, and execution strategies
 
 ## Founder Control
 
-Despite increasing autonomy, Atlas preserves founder authority.
+Despite increasing autonomy, InventSmith preserves founder authority.
 
 AI may recommend.
 
@@ -2063,7 +2063,7 @@ Autonomy exists to reduce workload—not eliminate human judgment.
 
 ## Explainable Intelligence
 
-Every recommendation generated by Atlas should be understandable.
+Every recommendation generated by InventSmith should be understandable.
 
 Recommendations include:
 
@@ -2085,13 +2085,13 @@ Transparency builds trust between the platform and the founder.
 
 # Architectural Maturity
 
-Atlas has progressed through four distinct levels of maturity.
+InventSmith has progressed through four distinct levels of maturity.
 
 Level 1
 
 Information Platform
 
-Atlas stores inventor information.
+InventSmith stores inventor information.
 
 Status
 
@@ -2103,7 +2103,7 @@ Level 2
 
 Workflow Platform
 
-Atlas guides founders through structured stages.
+InventSmith guides founders through structured stages.
 
 Status
 
@@ -2115,7 +2115,7 @@ Level 3
 
 Autonomous Operating System
 
-Atlas proactively coordinates execution, intelligence, and recommendations.
+InventSmith proactively coordinates execution, intelligence, and recommendations.
 
 Status
 
@@ -2127,7 +2127,7 @@ Level 4
 
 Commercialization Platform
 
-Atlas autonomously assists founders through manufacturing, launch, funding, marketing, and business growth.
+InventSmith autonomously assists founders through manufacturing, launch, funding, marketing, and business growth.
 
 Status
 
@@ -2137,31 +2137,31 @@ In Progress
 
 # Strategic Outcome
 
-The Platform Architecture Initiative fundamentally transformed Atlas.
+The Platform Architecture Initiative fundamentally transformed InventSmith.
 
 The project no longer consists of isolated AI features connected by user interfaces.
 
-Instead, Atlas operates as a cohesive autonomous operating system built upon centralized execution, unified provider management, shared confidence intelligence, lifecycle orchestration, and explainable decision support.
+Instead, InventSmith operates as a cohesive autonomous operating system built upon centralized execution, unified provider management, shared confidence intelligence, lifecycle orchestration, and explainable decision support.
 
 Future development can now focus primarily on expanding inventor capabilities rather than building additional platform infrastructure.
 
-This architectural transition represents the single most important evolution in Project Atlas and establishes the foundation upon which all future commercialization and enterprise capabilities will be built.
+This architectural transition represents the single most important evolution in Project InventSmith and establishes the foundation upon which all future commercialization and enterprise capabilities will be built.
 
 ---
 
 # PLATFORM CAPABILITY MATRIX
 
-The Platform Capability Matrix provides a comprehensive inventory of every major subsystem within Project Atlas.
+The Platform Capability Matrix provides a comprehensive inventory of every major subsystem within Project InventSmith.
 
 Unlike milestone documentation, which records *when* capabilities were implemented, this matrix describes *what* currently exists, *why* it exists, its architectural responsibilities, current maturity, and future expansion plans.
 
-This section serves as the authoritative reference for understanding the operational state of the Atlas platform.
+This section serves as the authoritative reference for understanding the operational state of the InventSmith platform.
 
 ---
 
 # Capability Maturity Levels
 
-Atlas classifies platform capabilities into four maturity levels.
+InventSmith classifies platform capabilities into four maturity levels.
 
 | Level | Description |
 |---------|-------------|
@@ -2182,7 +2182,7 @@ Operational
 
 Purpose
 
-The Journey Engine manages the inventor's progression through the Atlas invention lifecycle.
+The Journey Engine manages the inventor's progression through the InventSmith invention lifecycle.
 
 Responsibilities
 
@@ -2272,7 +2272,7 @@ Operational
 
 Purpose
 
-Executes every autonomous task throughout Atlas.
+Executes every autonomous task throughout InventSmith.
 
 Responsibilities
 
@@ -2382,7 +2382,7 @@ Operational
 
 Purpose
 
-Calculates confidence across every Atlas recommendation.
+Calculates confidence across every InventSmith recommendation.
 
 Responsibilities
 
@@ -2798,7 +2798,7 @@ Status
 
 Planned Expansion
 
-The commercialization platform represents the next major evolution of Atlas.
+The commercialization platform represents the next major evolution of InventSmith.
 
 Planned capabilities include:
 
@@ -2832,31 +2832,31 @@ Planned
 
 # Overall Platform Assessment
 
-The current Atlas architecture is composed of centralized platform services rather than isolated application modules.
+The current InventSmith architecture is composed of centralized platform services rather than isolated application modules.
 
 Every major capability now builds upon shared infrastructure, allowing new departments and features to be introduced without duplicating execution logic, provider integrations, confidence calculations, or lifecycle management.
 
 This architecture significantly improves scalability, maintainability, and long-term extensibility while preserving a consistent founder experience across the entire platform.
 
-The Platform Capability Matrix confirms that the foundational architecture of Atlas has reached operational maturity and is positioned to support continued expansion into commercialization, enterprise collaboration, and advanced autonomous inventor assistance.
+The Platform Capability Matrix confirms that the foundational architecture of InventSmith has reached operational maturity and is positioned to support continued expansion into commercialization, enterprise collaboration, and advanced autonomous inventor assistance.
 
 ---
 
 # PRODUCTION READINESS & RISK REGISTER
 
-The purpose of this section is to provide an executive assessment of Atlas' operational readiness for production deployment.
+The purpose of this section is to provide an executive assessment of InventSmith' operational readiness for production deployment.
 
 While previous sections describe what has been built, this section evaluates whether those capabilities have been sufficiently validated to support production use by inventors.
 
 Production readiness extends beyond software completion.
 
-Atlas must demonstrate operational reliability, architectural stability, security, observability, governance compliance, and predictable autonomous behavior before being considered production ready.
+InventSmith must demonstrate operational reliability, architectural stability, security, observability, governance compliance, and predictable autonomous behavior before being considered production ready.
 
 ---
 
 # Production Readiness Overview
 
-The Atlas platform has completed its foundational architecture.
+The InventSmith platform has completed its foundational architecture.
 
 Core platform services—including execution orchestration, provider management, lifecycle coordination, confidence intelligence, evidence management, and founder governance—are operational and integrated.
 
@@ -3010,7 +3010,7 @@ Operational
 
 Assessment
 
-Founder approval workflows remain central to Atlas governance.
+Founder approval workflows remain central to InventSmith governance.
 
 Autonomous execution pauses appropriately when founder authorization is required.
 
@@ -3038,7 +3038,7 @@ Assessment
 
 Recommendations include confidence scores, supporting evidence, rationale, and identified risks.
 
-This transparency reinforces founder trust and aligns with Atlas' explainable AI principles.
+This transparency reinforces founder trust and aligns with InventSmith' explainable AI principles.
 
 Current Risk
 
@@ -3106,7 +3106,7 @@ Operational
 
 Assessment
 
-Atlas captures execution history, provider metrics, lifecycle events, and operational telemetry through centralized services.
+InventSmith captures execution history, provider metrics, lifecycle events, and operational telemetry through centralized services.
 
 Current Risk
 
@@ -3264,7 +3264,7 @@ Operational Foundation
 
 Assessment
 
-Atlas governance principles have been incorporated into the platform architecture through centralized execution, explainable recommendations, and founder approval workflows.
+InventSmith governance principles have been incorporated into the platform architecture through centralized execution, explainable recommendations, and founder approval workflows.
 
 Future Areas
 
@@ -3286,7 +3286,7 @@ Low
 
 # Remaining Production Validation
 
-The following activities remain before Atlas should be considered fully production validated.
+The following activities remain before InventSmith should be considered fully production validated.
 
 | Validation Activity | Priority | Status |
 |---------------------|----------|--------|
@@ -3319,7 +3319,7 @@ The following activities remain before Atlas should be considered fully producti
 
 # Executive Readiness Summary
 
-Atlas has successfully completed the architectural transformation originally envisioned during the Platform Architecture Initiative.
+InventSmith has successfully completed the architectural transformation originally envisioned during the Platform Architecture Initiative.
 
 The platform now possesses a stable, centralized, and scalable foundation capable of supporting autonomous inventor assistance across the entire invention lifecycle.
 
@@ -3327,19 +3327,19 @@ Remaining work is focused primarily on operational validation and functional exp
 
 From an engineering perspective, the greatest implementation risks have been substantially mitigated through centralized execution, provider abstraction, lifecycle orchestration, confidence intelligence, and evidence-driven recommendations.
 
-Atlas is now positioned to transition from platform construction into sustained product expansion, commercialization capabilities, and production hardening.
+InventSmith is now positioned to transition from platform construction into sustained product expansion, commercialization capabilities, and production hardening.
 
 ---
 
 # FUTURE ROADMAP
 
-The completion of the Platform Architecture Initiative marks the end of Atlas' foundational engineering phase.
+The completion of the Platform Architecture Initiative marks the end of InventSmith' foundational engineering phase.
 
 Beginning with the next milestone, development priorities shift from constructing core infrastructure to expanding inventor capabilities, commercialization workflows, and enterprise readiness.
 
 Unlike earlier milestones, which focused heavily on platform architecture, future milestones are expected to leverage the existing execution framework, provider platform, confidence intelligence, and lifecycle orchestration already in place.
 
-The roadmap presented below reflects the current strategic direction of Project Atlas and will evolve as implementation progresses.
+The roadmap presented below reflects the current strategic direction of Project InventSmith and will evolve as implementation progresses.
 
 ---
 
@@ -3395,7 +3395,7 @@ Primary Deliverables
 
 Outcome
 
-Established Atlas as a functional inventor platform.
+Established InventSmith as a functional inventor platform.
 
 ---
 
@@ -3421,7 +3421,7 @@ Primary Deliverables
 
 Outcome
 
-Established Atlas as an autonomous operating system capable of coordinating intelligent workflows across the inventor journey.
+Established InventSmith as an autonomous operating system capable of coordinating intelligent workflows across the inventor journey.
 
 ---
 
@@ -3467,7 +3467,7 @@ Planned
 
 Objective
 
-Extend Atlas beyond invention management into full commercialization support.
+Extend InventSmith beyond invention management into full commercialization support.
 
 Planned Capabilities
 
@@ -3535,7 +3535,7 @@ White-label deployments
 
 Expected Outcome
 
-Transform Atlas into a scalable innovation operating system suitable for organizations of all sizes.
+Transform InventSmith into a scalable innovation operating system suitable for organizations of all sizes.
 
 ---
 
@@ -3605,7 +3605,7 @@ High
 
 Objective
 
-Increase collaboration between Atlas departments through shared evidence and coordinated recommendations.
+Increase collaboration between InventSmith departments through shared evidence and coordinated recommendations.
 
 Primary Deliverables
 
@@ -3647,7 +3647,7 @@ Primary Deliverables
 
 Success Criteria
 
-Atlas actively assists founders in bringing products to market using evidence-driven automation.
+InventSmith actively assists founders in bringing products to market using evidence-driven automation.
 
 ---
 
@@ -3669,19 +3669,19 @@ Additional milestones are expected to address:
 
 • Third-party ecosystem support
 
-The roadmap will continue to evolve as Atlas matures and user feedback shapes future priorities.
+The roadmap will continue to evolve as InventSmith matures and user feedback shapes future priorities.
 
 ---
 
 # Long-Term Vision
 
-The long-term vision for Atlas extends beyond serving as an invention management application.
+The long-term vision for InventSmith extends beyond serving as an invention management application.
 
-Atlas is intended to become an autonomous operating system for innovation.
+InventSmith is intended to become an autonomous operating system for innovation.
 
-Rather than replacing inventors, Atlas augments their decision-making by continuously preparing information, coordinating specialized intelligence, evaluating confidence, identifying risks, and recommending the next best actions.
+Rather than replacing inventors, InventSmith augments their decision-making by continuously preparing information, coordinating specialized intelligence, evaluating confidence, identifying risks, and recommending the next best actions.
 
-As commercialization and enterprise capabilities mature, Atlas will provide continuous assistance from initial concept through product launch, business growth, and ongoing portfolio management.
+As commercialization and enterprise capabilities mature, InventSmith will provide continuous assistance from initial concept through product launch, business growth, and ongoing portfolio management.
 
 ---
 
@@ -3721,35 +3721,35 @@ Founder Metrics
 
 • Platform engagement
 
-These metrics will guide future prioritization and ensure that Atlas continues to fulfill its mission of empowering inventors through trustworthy, explainable, and scalable autonomous intelligence.
+These metrics will guide future prioritization and ensure that InventSmith continues to fulfill its mission of empowering inventors through trustworthy, explainable, and scalable autonomous intelligence.
 
 ---
 
 # Roadmap Summary
 
-With the foundational platform complete, Atlas enters its next chapter focused on capability expansion rather than architectural construction.
+With the foundational platform complete, InventSmith enters its next chapter focused on capability expansion rather than architectural construction.
 
 Future milestones will leverage the centralized infrastructure established during the Platform Architecture Initiative, enabling rapid delivery of new inventor experiences while preserving consistency, maintainability, and long-term scalability.
 
-The roadmap outlined above represents the strategic path toward realizing Atlas as the world's leading autonomous operating system for inventors.
+The roadmap outlined above represents the strategic path toward realizing InventSmith as the world's leading autonomous operating system for inventors.
 
 ---
 
 # ORION STRATEGIC NOTES
 
-The following observations document the architectural philosophy that guided the design and implementation of Project Atlas.
+The following observations document the architectural philosophy that guided the design and implementation of Project InventSmith.
 
 Unlike technical specifications, these notes explain *why* major architectural decisions were made.
 
-Their purpose is to preserve institutional knowledge so that future contributors understand not only how Atlas functions, but also the principles that shaped its evolution.
+Their purpose is to preserve institutional knowledge so that future contributors understand not only how InventSmith functions, but also the principles that shaped its evolution.
 
 Architectural consistency depends as much on preserving intent as it does on preserving code.
 
 ---
 
-# Atlas Was Never Intended to Be "Another AI Chatbot"
+# InventSmith Was Never Intended to Be "Another AI Chatbot"
 
-One of the earliest design decisions was to reject the idea of Atlas as a conversational AI application.
+One of the earliest design decisions was to reject the idea of InventSmith as a conversational AI application.
 
 While conversational interfaces provide an intuitive means of interacting with complex systems, conversation itself was never the product.
 
@@ -3757,9 +3757,9 @@ The product is autonomous inventor assistance.
 
 Every conversation, recommendation, workflow, and execution exists to move an invention forward.
 
-This distinction fundamentally separates Atlas from general-purpose AI assistants.
+This distinction fundamentally separates InventSmith from general-purpose AI assistants.
 
-Atlas is measured by inventor outcomes—not by conversation quality alone.
+InventSmith is measured by inventor outcomes—not by conversation quality alone.
 
 ---
 
@@ -3779,7 +3779,7 @@ This decision now allows future capabilities to be implemented rapidly while mai
 
 # Centralization Over Fragmentation
 
-One of the strongest architectural principles adopted by Atlas is centralized responsibility.
+One of the strongest architectural principles adopted by InventSmith is centralized responsibility.
 
 Whenever multiple departments required the same capability, that capability became a shared platform service rather than being implemented repeatedly.
 
@@ -3807,7 +3807,7 @@ Founders make decisions that affect intellectual property, finances, manufacturi
 
 Recommendations that cannot be explained should not influence those decisions.
 
-For this reason, every autonomous recommendation generated by Atlas should ultimately provide:
+For this reason, every autonomous recommendation generated by InventSmith should ultimately provide:
 
 • Supporting evidence
 
@@ -3829,7 +3829,7 @@ Explainability transforms AI from a black box into a trusted advisor.
 
 Confidence is not merely a numerical score.
 
-Within Atlas, confidence represents the system's measured belief that available evidence supports a recommendation or conclusion.
+Within InventSmith, confidence represents the system's measured belief that available evidence supports a recommendation or conclusion.
 
 Treating confidence as a shared platform service ensures consistency across every department.
 
@@ -3841,17 +3841,17 @@ Confidence therefore becomes a foundation for informed decision-making rather th
 
 # The Founder Remains the Decision Maker
 
-Atlas is designed to automate preparation, research, coordination, and recommendation—not authority.
+InventSmith is designed to automate preparation, research, coordination, and recommendation—not authority.
 
 Critical business decisions remain the responsibility of the founder.
 
-Atlas may recommend.
+InventSmith may recommend.
 
-Atlas may prepare.
+InventSmith may prepare.
 
-Atlas may automate.
+InventSmith may automate.
 
-Atlas does not replace founder judgment.
+InventSmith does not replace founder judgment.
 
 The founder approval framework exists to preserve this principle while still enabling meaningful autonomous execution.
 
@@ -3861,7 +3861,7 @@ The founder approval framework exists to preserve this principle while still ena
 
 Repeatedly asking founders for information they have already provided creates friction and reduces confidence in the platform.
 
-Whenever information has been validated, Atlas should automatically reuse that knowledge wherever appropriate.
+Whenever information has been validated, InventSmith should automatically reuse that knowledge wherever appropriate.
 
 Examples include:
 
@@ -3883,13 +3883,13 @@ Validated knowledge should persist throughout the inventor journey unless supers
 
 # Every Department Should Think Like Part of One Company
 
-Atlas is composed of specialized intelligence domains, including patent, engineering, manufacturing, market research, business planning, and commercialization.
+InventSmith is composed of specialized intelligence domains, including patent, engineering, manufacturing, market research, business planning, and commercialization.
 
 These departments should never behave as isolated tools.
 
 Instead, they should function as collaborative specialists sharing knowledge, coordinating recommendations, and contributing toward a common objective.
 
-The founder should experience Atlas as one intelligent organization—not as a collection of disconnected AI systems.
+The founder should experience InventSmith as one intelligent organization—not as a collection of disconnected AI systems.
 
 ---
 
@@ -3897,19 +3897,19 @@ The founder should experience Atlas as one intelligent organization—not as a c
 
 Technology evolves rapidly.
 
-AI providers, frameworks, models, and infrastructure will continue to change throughout the lifetime of Atlas.
+AI providers, frameworks, models, and infrastructure will continue to change throughout the lifetime of InventSmith.
 
 The platform therefore avoids coupling business logic to specific technologies whenever practical.
 
 Provider abstraction, standardized contracts, centralized execution, and shared platform services allow future technologies to be adopted with minimal disruption.
 
-This flexibility protects Atlas from technological obsolescence.
+This flexibility protects InventSmith from technological obsolescence.
 
 ---
 
 # Automation Must Reduce Complexity
 
-Every autonomous capability introduced into Atlas should simplify the founder experience.
+Every autonomous capability introduced into InventSmith should simplify the founder experience.
 
 Automation that merely hides complexity without reducing it does not fulfill the platform's purpose.
 
@@ -3923,7 +3923,7 @@ If the answer is no, the feature should be reconsidered.
 
 # Long-Term Vision
 
-Atlas is intended to become the operating system for innovation.
+InventSmith is intended to become the operating system for innovation.
 
 Its role extends beyond managing invention documents or generating isolated AI responses.
 
@@ -3945,7 +3945,7 @@ The long-term vision is a platform that continuously:
 
 • Accelerates commercialization
 
-Success will not be measured by the sophistication of individual AI models, but by the measurable success of the inventors who rely upon Atlas.
+Success will not be measured by the sophistication of individual AI models, but by the measurable success of the inventors who rely upon InventSmith.
 
 ---
 
@@ -3977,13 +3977,13 @@ Once centralized execution, provider management, lifecycle coordination, and con
 
 Architectural shortcuts often appear efficient in the short term but become increasingly expensive as systems evolve.
 
-Disciplined adherence to platform architecture has prevented many of these issues within Atlas.
+Disciplined adherence to platform architecture has prevented many of these issues within InventSmith.
 
 ---
 
 # Closing Perspective
 
-Project Atlas represents more than a software application.
+Project InventSmith represents more than a software application.
 
 It is the result of a deliberate architectural philosophy centered on empowering inventors through trustworthy, explainable, and scalable autonomous intelligence.
 
@@ -3991,13 +3991,13 @@ The platform's greatest strength is not any individual feature, but the cohesive
 
 **Helping inventors transform ideas into successful products with greater confidence, less effort, and better decisions.**
 
-These principles should continue to guide every future milestone, architectural decision, and expansion of the Atlas platform.
+These principles should continue to guide every future milestone, architectural decision, and expansion of the InventSmith platform.
 
 ---
 
 # APPENDICES
 
-The appendices provide supporting reference material for the Atlas Release Master Plan.
+The appendices provide supporting reference material for the InventSmith Release Master Plan.
 
 These references are intended to assist contributors, maintainers, product managers, architects, and future development teams by establishing common terminology, document relationships, repository organization, and governance references.
 
@@ -4009,7 +4009,7 @@ Unlike previous sections, the appendices are reference material and should be up
 
 ## Autonomous Execution
 
-The automated performance of work by Atlas through the Unified Autonomous Execution Engine without requiring manual task orchestration.
+The automated performance of work by InventSmith through the Unified Autonomous Execution Engine without requiring manual task orchestration.
 
 ---
 
@@ -4021,7 +4021,7 @@ The centralized platform service responsible for evaluating the reliability of r
 
 ## Evidence
 
-Validated information collected or generated by Atlas that supports recommendations, readiness calculations, and autonomous decision-making.
+Validated information collected or generated by InventSmith that supports recommendations, readiness calculations, and autonomous decision-making.
 
 Evidence may originate from founder input, AI analysis, uploaded documentation, research, or external integrations.
 
@@ -4029,7 +4029,7 @@ Evidence may originate from founder input, AI analysis, uploaded documentation, 
 
 ## Founder
 
-The inventor, entrepreneur, or organization using Atlas to develop and commercialize one or more inventions.
+The inventor, entrepreneur, or organization using InventSmith to develop and commercialize one or more inventions.
 
 The founder remains the final decision-maker for all significant business actions.
 
@@ -4037,7 +4037,7 @@ The founder remains the final decision-maker for all significant business action
 
 ## Journey Engine
 
-The platform service responsible for managing progression through the Atlas inventor lifecycle.
+The platform service responsible for managing progression through the InventSmith inventor lifecycle.
 
 ---
 
@@ -4069,7 +4069,7 @@ The component responsible for routing provider requests through standardized pro
 
 ## Recommendation
 
-An evidence-based action proposed by Atlas to help the founder advance an invention toward commercialization.
+An evidence-based action proposed by InventSmith to help the founder advance an invention toward commercialization.
 
 Recommendations include supporting rationale, confidence, evidence references, and identified risks.
 
@@ -4083,7 +4083,7 @@ A measurement of how prepared an invention is to advance within the inventor jou
 
 ## Stage
 
-A defined phase of the Atlas inventor journey representing a major milestone in invention development.
+A defined phase of the InventSmith inventor journey representing a major milestone in invention development.
 
 ---
 
@@ -4146,7 +4146,7 @@ Recommendations
 
 Founder
 
-This architecture represents the authoritative execution path for autonomous work throughout Atlas.
+This architecture represents the authoritative execution path for autonomous work throughout InventSmith.
 
 ---
 
@@ -4184,7 +4184,7 @@ Department-specific implementations should consume these services rather than re
 
 # Appendix E — Repository Organization
 
-The Atlas repository is organized to promote separation of concerns between platform infrastructure, founder experience, intelligence domains, and operational tooling.
+The InventSmith repository is organized to promote separation of concerns between platform infrastructure, founder experience, intelligence domains, and operational tooling.
 
 High-level repository areas include:
 
@@ -4212,11 +4212,11 @@ Repository organization may evolve over time, but centralized platform services 
 
 # Appendix F — Related Governance Documents
 
-This Release Master Plan should be read alongside the broader Atlas governance library.
+This Release Master Plan should be read alongside the broader InventSmith governance library.
 
 Key companion documents include:
 
-• Atlas Constitution
+• InventSmith Constitution
 
 • AI Specialist Team Bible
 
@@ -4234,13 +4234,13 @@ Key companion documents include:
 
 • Core Architecture Documentation
 
-Together these documents define the architectural, operational, and governance standards for Project Atlas.
+Together these documents define the architectural, operational, and governance standards for Project InventSmith.
 
 ---
 
 # Appendix G — Release Definitions
 
-Project Atlas uses the following release classifications.
+Project InventSmith uses the following release classifications.
 
 ### Foundation Release
 
@@ -4298,13 +4298,13 @@ Version history should clearly document substantive architectural and strategic 
 
 # Closing Statement
 
-Project Atlas has evolved from an ambitious concept into a unified autonomous operating system for inventors.
+Project InventSmith has evolved from an ambitious concept into a unified autonomous operating system for inventors.
 
-Through deliberate architectural planning, disciplined platform engineering, and a commitment to explainable, founder-first intelligence, Atlas now possesses the foundation necessary to support long-term innovation and commercialization.
+Through deliberate architectural planning, disciplined platform engineering, and a commitment to explainable, founder-first intelligence, InventSmith now possesses the foundation necessary to support long-term innovation and commercialization.
 
 This Release Master Plan documents not only the current state of the platform but also the principles, milestones, and strategic decisions that shaped its evolution.
 
-As Atlas continues to grow, this document should serve as the authoritative reference for release planning, architectural governance, and long-term product strategy, ensuring that future development remains aligned with the vision of empowering inventors through trustworthy, scalable, and autonomous intelligence.
+As InventSmith continues to grow, this document should serve as the authoritative reference for release planning, architectural governance, and long-term product strategy, ensuring that future development remains aligned with the vision of empowering inventors through trustworthy, scalable, and autonomous intelligence.
 
 ---
 

@@ -8,13 +8,13 @@
 Determine whether the problem the inventor identified is real, widespread, and worth solving before any further investment of time or money.
 
 **Why this stage exists:**
-Most failed inventions are solutions to problems that either don't exist at scale, that the target market has already solved satisfactorily, or that customers are unwilling to pay to solve. Validation is the cheapest stage in the entire journey — it costs time and intellectual honesty, not money. Inventors who skip Validation waste months on Patent Readiness, Product Design, and Prototype work only to discover at launch that no one wants their product. Atlas makes Validation rigorous without making it bureaucratic. The goal is a defensible answer to one question: is this worth pursuing?
+Most failed inventions are solutions to problems that either don't exist at scale, that the target market has already solved satisfactorily, or that customers are unwilling to pay to solve. Validation is the cheapest stage in the entire journey — it costs time and intellectual honesty, not money. Inventors who skip Validation waste months on Patent Readiness, Product Design, and Prototype work only to discover at launch that no one wants their product. InventSmith makes Validation rigorous without making it bureaucratic. The goal is a defensible answer to one question: is this worth pursuing?
 
 **Primary objective:**
 Confirm that the problem is real, that the target market experiences it acutely enough to seek a better solution, and that the proposed solution concept resonates with that market.
 
 **Success definition:**
-Atlas considers this stage successful when the inventor has conducted structured validation with real potential customers, documented their findings honestly, and made a deliberate, recorded decision to proceed — or not. A go decision must be supported by evidence. A no-go decision must be respected.
+InventSmith considers this stage successful when the inventor has conducted structured validation with real potential customers, documented their findings honestly, and made a deliberate, recorded decision to proceed — or not. A go decision must be supported by evidence. A no-go decision must be respected.
 
 ---
 
@@ -28,24 +28,24 @@ Atlas considers this stage successful when the inventor has conducted structured
 
 ---
 
-## Atlas Responsibilities
+## InventSmith Responsibilities
 
-**How Atlas guides the inventor:**
-Atlas converts the Idea Brief into a structured validation research plan — not a checklist to complete, but a living research agenda that the inventor works through with Atlas's support. Atlas explains what good validation looks like, distinguishes real evidence from wishful thinking, and provides practical tools: interview question templates, a competitive analysis framework, and a method for synthesizing findings into a defensible conclusion. Atlas surfaces validation theater — "I asked my friends and they liked it" — and redirects the inventor toward evidence that actually reduces risk.
+**How InventSmith guides the inventor:**
+InventSmith converts the Idea Brief into a structured validation research plan — not a checklist to complete, but a living research agenda that the inventor works through with InventSmith's support. InventSmith explains what good validation looks like, distinguishes real evidence from wishful thinking, and provides practical tools: interview question templates, a competitive analysis framework, and a method for synthesizing findings into a defensible conclusion. InventSmith surfaces validation theater — "I asked my friends and they liked it" — and redirects the inventor toward evidence that actually reduces risk.
 
-**What Atlas analyzes:**
+**What InventSmith analyzes:**
 - The five most important assumptions embedded in the Idea Brief, ranked by risk
 - Interview and survey data the inventor provides — for patterns, contradictions, and signal quality
 - Competitive alternatives the inventor evaluates — for coverage, completeness, and objectivity
 - The strength and source of validation evidence — distinguishing high-quality signals from confirmation bias
 
-**What Atlas recommends:**
+**What InventSmith recommends:**
 - Specific validation methods for each assumption: customer interview, survey question, market size proxy, competitor review, or community listening
 - Interview question templates tailored to the specific audience and problem
 - A minimum research bar before considering validation complete
 - A go/no-go recommendation with the reasoning made explicit
 
-**What Atlas tracks:**
+**What InventSmith tracks:**
 - Number of customer interviews completed and whether subjects match the target audience profile
 - Percentage of interviewees who confirmed the problem as real and significant
 - Number of competitive alternatives analyzed
@@ -63,17 +63,17 @@ Atlas converts the Idea Brief into a structured validation research plan — not
 
 ---
 
-## Atlas Guidance
+## InventSmith Guidance
 
-Atlas opens this stage by presenting the five most critical assumptions embedded in the inventor's Idea Brief — ranked from highest to lowest risk. This framing does two things: it tells the inventor exactly what they need to test, and it prevents them from spending all their energy validating what they already believe while ignoring what they don't.
+InventSmith opens this stage by presenting the five most critical assumptions embedded in the inventor's Idea Brief — ranked from highest to lowest risk. This framing does two things: it tells the inventor exactly what they need to test, and it prevents them from spending all their energy validating what they already believe while ignoring what they don't.
 
-For each assumption, Atlas recommends a specific validation method and explains why. The methods are practical and accessible: structured 1:1 interviews, simple surveys, reviewing public complaints in forums and communities, or analyzing how competitors are described in reviews. Atlas does not require expensive research.
+For each assumption, InventSmith recommends a specific validation method and explains why. The methods are practical and accessible: structured 1:1 interviews, simple surveys, reviewing public complaints in forums and communities, or analyzing how competitors are described in reviews. InventSmith does not require expensive research.
 
-Atlas provides interview templates — specific questions, in a specific order, designed to elicit honest answers rather than polite agreement. It explicitly warns against leading questions and against interviewing only people who already agree with the inventor.
+InventSmith provides interview templates — specific questions, in a specific order, designed to elicit honest answers rather than polite agreement. It explicitly warns against leading questions and against interviewing only people who already agree with the inventor.
 
-As the inventor returns with findings, Atlas helps them synthesize. It asks: "What percentage of the people you talked to confirmed they have this problem? What do they currently do about it? What would they need to see before paying for a better solution?" It surfaces contradictions between what the inventor expected to find and what they actually found — and holds space for the inventor to sit with uncomfortable data rather than dismiss it.
+As the inventor returns with findings, InventSmith helps them synthesize. It asks: "What percentage of the people you talked to confirmed they have this problem? What do they currently do about it? What would they need to see before paying for a better solution?" It surfaces contradictions between what the inventor expected to find and what they actually found — and holds space for the inventor to sit with uncomfortable data rather than dismiss it.
 
-The stage concludes with Atlas drafting a Validation Report and presenting a go/no-go recommendation. The inventor reviews both, corrects anything inaccurate, and records their decision. Atlas accepts a go decision with insufficient evidence only if the inventor explicitly acknowledges and documents the risk they are accepting.
+The stage concludes with InventSmith drafting a Validation Report and presenting a go/no-go recommendation. The inventor reviews both, corrects anything inaccurate, and records their decision. InventSmith accepts a go decision with insufficient evidence only if the inventor explicitly acknowledges and documents the risk they are accepting.
 
 ---
 
@@ -96,14 +96,14 @@ The stage concludes with Atlas drafting a Validation Report and presenting a go/
 - **Validation Report** — structured analysis of all validation activities, findings, and conclusions
 - **Assumption Risk Map** — the five highest-risk assumptions ranked, with a status for each: validated, unvalidated, or refuted
 - **Competitive Landscape** — a side-by-side analysis of 3–5 existing alternatives across price, capability, accessibility, and user satisfaction
-- **Problem-Market Fit Evaluation** — Atlas's assessment of the strength of evidence for the problem's existence and severity
-- **Go/No-Go Recommendation** — Atlas's recommendation on whether to proceed, with the reasoning made explicit and the inventor's documented decision
+- **Problem-Market Fit Evaluation** — InventSmith's assessment of the strength of evidence for the problem's existence and severity
+- **Go/No-Go Recommendation** — InventSmith's recommendation on whether to proceed, with the reasoning made explicit and the inventor's documented decision
 
 ---
 
 ## Documents Created
 
-- **Validation Report** — the primary deliverable; includes methodology, findings, the Assumption Risk Map, and Atlas's assessment
+- **Validation Report** — the primary deliverable; includes methodology, findings, the Assumption Risk Map, and InventSmith's assessment
 - **Competitive Landscape** — a named, structured competitor comparison committed to the invention record; carried forward to Stage 3 and Stage 8
 - **Go/No-Go Decision Record** — the inventor's documented decision, including any acknowledged risks if proceeding below the evidence threshold
 
@@ -111,7 +111,7 @@ The stage concludes with Atlas drafting a Validation Report and presenting a go/
 
 ## Readiness Evaluation
 
-Atlas evaluates the inventor's readiness using three states only. No numeric scores.
+InventSmith evaluates the inventor's readiness using three states only. No numeric scores.
 
 **Not Ready:**
 - Fewer than 5 customer interviews completed, or interviews were conducted with friends and family who have no relevant experience with the problem
@@ -164,10 +164,10 @@ No validation findings are discarded. All interview synthesis, competitive obser
 
 ## Future Integrations
 
-- **Survey tool integration** (Typeform, Tally) — generate and deploy a validation survey directly from Atlas, with responses flowing back automatically into the Validation Report
-- **Interview scheduling** (Cal.com) — let inventors schedule validation interviews through Atlas with a pre-populated agenda
-- **Community listening** (Reddit API, relevant forum APIs) — Atlas surfaces real posts where people describe the problem to corroborate interview findings with organic evidence
-- **AI-powered interview assistant** — an Atlas-guided AI that conducts structured validation interviews on the inventor's behalf and summarizes findings
+- **Survey tool integration** (Typeform, Tally) — generate and deploy a validation survey directly from InventSmith, with responses flowing back automatically into the Validation Report
+- **Interview scheduling** (Cal.com) — let inventors schedule validation interviews through InventSmith with a pre-populated agenda
+- **Community listening** (Reddit API, relevant forum APIs) — InventSmith surfaces real posts where people describe the problem to corroborate interview findings with organic evidence
+- **AI-powered interview assistant** — an InventSmith-guided AI that conducts structured validation interviews on the inventor's behalf and summarizes findings
 - **Startup and funding databases** (Crunchbase, PitchBook) — cross-reference the competitive landscape with funded competitors to surface overlooked rivals and recent entrants
 
 ---
