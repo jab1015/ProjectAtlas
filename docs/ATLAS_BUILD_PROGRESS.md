@@ -73,9 +73,15 @@ Repository acceptance now goes beyond isolated subsystem wiring:
 - representative physical, software, hybrid and regulated work-plan journeys are exercised together;
 - the acceptance layer exposed and fixed a real classification blind spot where connected hardware with a companion/mobile/cloud application could be misclassified as physical-only;
 - direct persistence-level evidence behavior executes `applyInventorEvidenceChange` against a fake datastore and verifies canonical invention-record update, matching real-world evidence-gate release, downstream work invalidation/requeue, preservation of running and idea-capture work, stale findings/deliverables, and execution-event history;
-- unrelated inventor evidence does not release a mismatched blocked real-world gate.
+- unrelated inventor evidence does not release a mismatched blocked real-world gate;
+- validation/decision → artifact handoff acceptance now verifies the physical patent/design handoff transitively through candidate generation → candidate scoring → Product Design specification → Native CAD;
+- software-only acceptance preserves software specification/architecture/security paths without inventing physical CAD/manufacturing work;
+- hybrid acceptance preserves both physical and software artifact branches from the same evidence-backed handoff;
+- regulated acceptance keeps consequential output behind professional-review trust gates;
+- package selection uses the newest deliverable version even when that newest revision is stale, preventing an older clean artifact from hiding newer invalidated work;
+- `completeWork` now uses shared `buildDeliverablePersistencePlan` logic: new artifacts increment from the highest prior version, ordinary generated output begins as an InventSmith draft, and consequential output begins as `professional_review_required` with the required review records.
 
-The next Phase 2 boundary is the deeper validation/decision → versioned package/artifact handoff across representative product types.
+The current Phase 2 handoff boundary is repository-implemented and automatically verified. Remaining work moves into deeper consequential-operation behavior, real-world engineering/prototype/RFQ acceptance, and deployed/live acceptance later.
 
 ## Validation recovery implementation
 
@@ -116,8 +122,8 @@ The regenerated lockfile is committed. At the latest exact verified checkpoint, 
 
 ## Exact verified repository checkpoint
 
-**Verified head:** `48cca7eb6974a67ea13e6a05bfcb531ac83f636e`  
-**GitHub Actions:** Atlas CI run **#543** / run ID `34891037710`  
+**Verified head:** `cfd456f005161dce4ab4d5e848bf9163614e1742`  
+**GitHub Actions:** Atlas CI run **#554** / run ID `34904379065`  
 **Result:** **PASS**
 
 The exact PR-head verification passed:
@@ -126,7 +132,7 @@ The exact PR-head verification passed:
 - operational-script syntax checks;
 - web TypeScript;
 - Convex TypeScript;
-- full regression suite, including conservative unknown-provider-usage settlement and persistence-level inventor-evidence behavior;
+- full regression suite, including conservative usage settlement, persistence-level inventor-evidence behavior, representative validation/artifact handoff, and deliverable-persistence decisions;
 - production dependency audit with **0 vulnerabilities**;
 - Next.js **15.5.25** production build.
 
@@ -144,8 +150,8 @@ See `docs/ATLAS_DEPLOYMENT_RUNBOOK.md` for the fresh owner-controlled deployment
 
 ## Next implementation priorities
 
-1. **Deepen representative end-to-end repository acceptance.** Continue from persisted inventor evidence through validation/research → decision → versioned package/artifact using physical, software, hybrid and regulated fixtures, while preserving real-world evidence gates.
-2. **Continue consequential-operation behavioral security tests.** Prefer direct behavior tests over source-string assertions for destructive, billing, privacy, professional-review and organization-management boundaries.
+1. **Continue consequential-operation behavioral security tests.** Prefer direct behavior tests over source-string assertions for professional-review recording/promotion, destructive, billing, privacy and organization-management boundaries.
+2. **Deepen real-world engineering/prototype/RFQ acceptance.** Verify representative physical and hybrid flows preserve physical-evidence gates, manufacturer-quote truth, artifact maturity and refresh behavior.
 3. **Continue artifact-quality and safety review.** CAD, documents, exports and commercial deliverables must be checked for content quality, versioning, limitations and appropriate maturity labels—not just file existence.
 4. **Prepare—not provision—the fresh runtime.** Keep Vercel/Convex environment-variable ownership, auth, webhook/billing and operational requirements documented until the owner is ready to create the actual services.
 5. **Low-priority cleanup:** remove obsolete “coming soon” / overbroad readiness wording that remains in unreachable legacy root-page branches even though Stage 5+ routing now bypasses them.
@@ -160,4 +166,4 @@ Read, in order:
 4. `docs/ATLAS_DEPLOYMENT_RUNBOOK.md`
 5. `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md`
 
-Then fetch live branch `inventsmith/full-product-build` and draft PR #24 before changing anything. Treat `48cca7eb6974a67ea13e6a05bfcb531ac83f636e` / Atlas CI #543 as the latest fully verified implementation checkpoint **unless the live branch has advanced and a newer exact-head run is green**. Do not merge PR #24, do not restart completed organization/accounting/invitation/classification work, and do not reintroduce MadeThis synchronization instructions.
+Then fetch live branch `inventsmith/full-product-build` and draft PR #24 before changing anything. Treat `cfd456f005161dce4ab4d5e848bf9163614e1742` / Atlas CI #554 as the latest fully verified implementation checkpoint **unless the live branch has advanced and a newer exact-head run is green**. Do not merge PR #24, do not restart completed organization/accounting/invitation/classification/artifact-handoff work, and do not reintroduce MadeThis synchronization instructions.
