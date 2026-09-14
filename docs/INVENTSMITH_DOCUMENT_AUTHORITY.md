@@ -8,14 +8,15 @@ This file defines documentation authority, naming, and historical-reference rule
 
 The customer-facing and current product name is **InventSmith — The Inventor OS** by **Modern Methods**.
 
-The former **InventSmith / ProjectAtlas** name is historical only. It may remain only where changing it would make a factual record inaccurate, including:
+The former **Atlas / ProjectAtlas** name is historical only. It may remain only where changing it would make a factual record inaccurate, including:
 
 - the current historical GitHub repository slug `jab1015/ProjectAtlas` until a separately reviewed repository rename is performed;
 - exact historical commit messages, branch names, workflow names, environment-variable/code identifiers, email subjects, quotations, screenshots, exhibits, or third-party records;
 - historical chronology explaining that the same product was previously developed under the former working name;
-- compatibility identifiers that must remain until a tested code-level migration is performed.
+- compatibility identifiers that must remain until a tested code-level migration is performed;
+- the separately excluded `Atlas-fama` tree, which is intentionally not part of active InventSmith product work.
 
-Current product prose, active plans, current-state descriptions, handoff instructions, headings, and canonical documentation must use **InventSmith**, not InventSmith.
+Current product prose, active plans, current-state descriptions, handoff instructions, headings, and canonical documentation must use **InventSmith**, not the former Atlas working name.
 
 ## Current authoritative documents
 
@@ -29,7 +30,7 @@ Read these first, in this order:
 
 ## Historical and specialized documents
 
-Older documents created under the former working name remain historical/specialized source material. They may preserve the former name where it is part of the original historical record, but they do not define the current customer-facing name or override the authoritative InventSmith documents above.
+Older documents created under the former Atlas / ProjectAtlas working name remain historical/specialized source material. They may preserve the former name where it is part of the original historical record, but they do not define the current customer-facing name or override the authoritative InventSmith documents above.
 
 Any older statement that says or implies that only Stages 1–4 are the destination; Stages 5–15 are merely future scope; a controlled pilot equals overall completion; Product Design/CAD/manufacturing/funding/launch are outside the intended product; the customer-facing product uses the former working name; subscriptions are purely user-scoped; the architecture is inherently single-user/single-invention; the old $39/$79/$149 pricing ladder remains authoritative; organization seats multiply paid AI allowance; software/apps are outside InventSmith's invention scope; regulated inventions must be blanket-rejected rather than professionally gated; MadeThis remains the deployment target; or repository-green alone means production acceptance is superseded.
 
@@ -73,7 +74,7 @@ The active branch is `inventsmith/full-product-build`; draft PR #24 remains inte
 
 Implemented repository foundations include organization-native architecture; organization-scoped entitlements and usage accounting; invention authorization/sharing; privacy/export/deletion behavior; consent-based invitations; complete journey wiring; physical/software/hybrid/regulated classification and routing; evidence and trust boundaries; partial validation/recovery; attempt/lease worker reliability; genuine prototype/quote/launch/professional evidence gates; versioned artifact persistence; professional-review state; representative physical/software/hybrid/regulated acceptance; and direct real-world evidence gate behavior.
 
-The latest fully verified implementation checkpoint before the September 14 documentation/naming updates is `bc93ed606866852e4ec88732e250d243a3db9a40`, workflow run #564 / run ID `34905374828`, PASS. Later documentation/naming commits must receive their own exact-head CI result before being called fully verified.
+The last fully verified clean checkpoint before the final documentation-content normalization was `c76e209da0c1dd4266ee59157f740c4297048322`, Atlas CI run #586 / run ID `34907940666`, PASS. Any later naming/documentation commit must receive its own exact-head CI result before being called fully verified.
 
 ## Continuation rule
 
