@@ -46,8 +46,19 @@ export function getValidationResearchViewState(
   const finishedSections = sections.filter((section) => section.status !== "pending");
   const failedSections = finishedSections.filter((section) => section.status === "failed");
   const isFailed = validationResearch?.status === "failed";
-  const isPartial = validationResearch?.status === "partial";
   const isGenerating = rebuilding || validationResearch?.status === "running";
+
+  // The orchestration layer can persist a true partial result while older query
+  // normalization paths may omit that status. Infer partial from observable
+  // section outcomes so a mixed success/failure run can never be presented as
+  // fully complete merely because the status field was lost in translation.
+  const isPartial =
+    validationResearch?.status === "partial" ||
+    (!isGenerating &&
+      !isFailed &&
+      failedSections.length > 0 &&
+      finishedSections.some((section) => section.status !== "failed"));
+
   const progressCount = finishedSections.length;
   const progressPct =
     totalSections > 0
