@@ -17,8 +17,10 @@ You invent. InventSmith does the work.
 - The Guild — specialist departments
 - Workbench — inventor-facing workspace
 
-## Rename policy
-InventSmith replaces Atlas as the customer-facing product identity. Existing internal technical identifiers may retain `atlas` where renaming them would create database, deployment, authentication, integration, or migration risk. Internal identifiers are implementation details and must not be exposed as the customer-facing product name.
+## Naming policy
+InventSmith is the current customer-facing product identity. The former Atlas / ProjectAtlas working name may remain only in exact historical records or compatibility-sensitive internal identifiers where renaming could create database, deployment, authentication, integration, webhook, environment, or migration risk. Internal compatibility identifiers are implementation details and must not be exposed as the customer-facing product name.
 
-## Managed-environment invariant
-Rebranding must not recreate or wipe the existing Convex database, authentication population, Vercel project, domain, storage, environment bindings, subscription state, or production data.
+## Hosting and environment boundary
+The former MadeThis-managed environment is historical only and is not the current deployment target. Rebranding work must not modify, depend on, migrate, or synchronize back to that environment.
+
+The intended fresh runtime is owner-controlled by Modern Methods using GitHub as source/CI authority, Vercel for the Next.js application, and Convex for backend/database/auth/storage/functions. Those owner-controlled Vercel/Convex resources are not yet live-verified and must not be described as production until actual deployment and acceptance occur.
