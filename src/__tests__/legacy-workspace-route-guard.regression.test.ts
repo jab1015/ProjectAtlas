@@ -14,13 +14,15 @@ describe("InventSmith legacy invention workspace guard", () => {
     expect(source).toContain("Opening the complete InventSmith journey");
   });
 
-  it("preserves the specialized Stage 1–4 intake/validation workspace", () => {
+  it("preserves the specialized Stage 1–4 workspace while adding Stage 2 recovery", () => {
     const source = readFileSync(
       join(process.cwd(), "src/app/(app)/invention/[id]/layout.tsx"),
       "utf8"
     );
 
     expect(source).toContain("pathname === rootPath");
-    expect(source).toContain("return children");
+    expect(source).toContain("state.currentStageId === 2");
+    expect(source).toContain("validationResearchRecovery:getValidationRecoveryState");
+    expect(source).toContain("{children}");
   });
 });
