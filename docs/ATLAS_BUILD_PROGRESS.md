@@ -17,7 +17,7 @@ The common destination remains:
 
 The inventor should not have to manage departments or manually sequence the process. InventSmith owns routing, dependencies, evidence state, work status, human gates, and next actions.
 
-No historical Atlas or controlled-pilot completion percentage should be treated as overall InventSmith completion.
+The retired controlled-pilot 80% figure must never be used as overall InventSmith completion. No historical Atlas or controlled-pilot completion percentage should be treated as overall InventSmith completion.
 
 ## Hosting and source-of-truth direction
 
