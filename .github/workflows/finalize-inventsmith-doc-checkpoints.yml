@@ -1,0 +1,34 @@
+name: Finalize InventSmith documentation checkpoints
+on:
+  push:
+    branches:
+      - inventsmith/full-product-build
+    paths:
+      - .github/workflows/finalize-inventsmith-doc-checkpoints.yml
+      - scripts/finalize-inventsmith-doc-checkpoints.py
+permissions:
+  contents: write
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: inventsmith/full-product-build
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/finalize-inventsmith-doc-checkpoints.py
+      - name: Commit docs and remove one-time helper
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f scripts/finalize-inventsmith-doc-checkpoints.py .github/workflows/finalize-inventsmith-doc-checkpoints.yml
+          git add -A docs scripts .github/workflows
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+          git commit -m "docs: finalize InventSmith naming and verification checkpoints"
+          git push origin HEAD:inventsmith/full-product-build
