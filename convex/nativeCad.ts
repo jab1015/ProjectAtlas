@@ -6,6 +6,7 @@ import { canTierRunWorkKind } from "./entitlementPolicyLogic";
 import { requireInventionEditAccess, requireInventionReadAccess } from "./organizations";
 import { ensureOrganizationDailyUsage } from "./organizationDailyUsage";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
+import { conservativeAttemptSettlementCost } from "./usageSettlementLogic";
 
 const runAvailableWork = makeFunctionReference<"action", { inventionId: Id<"inventions">; costBudgetUnits?: number }, unknown>("atlasWorkOrchestration:runAvailableWork");
 
@@ -254,9 +255,14 @@ export const recordNativeCadFailure = internalMutation({
     }
 
     const willRetry = workItem.attemptCount < (workItem.maxAttempts ?? 3);
-    await settleCadUsage(ctx, workItem, args.inventionId, args.actualCostUnits, 0, args.failedAt);
+    const settledCostUnits = conservativeAttemptSettlementCost({
+      usageKnown: args.usageKnown,
+      actualCostUnits: args.actualCostUnits,
+      reservedCostUnits: workItem.reservedCostUnits,
+    });
+    await settleCadUsage(ctx, workItem, args.inventionId, settledCostUnits, 0, args.failedAt);
     await ctx.db.patch(workItem._id, { status: willRetry ? "queued" : "failed", reservedCostUnits: undefined, reservationDateKey: undefined, lastError: args.error.slice(0, 2000), startedAt: undefined, claimedAt: undefined, leaseExpiresAt: undefined, updatedAt: args.failedAt });
-    await ctx.db.insert("atlasExecutionEvents", { inventionId: args.inventionId, workItemId: args.workItemId, eventType: "work_failed", actorType: "system", summary: willRetry ? "Native CAD generation failed and is eligible for autonomous retry." : "Native CAD generation exhausted its retry limit.", attemptNumber: args.attemptNumber, costUnits: args.usageKnown ? args.actualCostUnits : undefined, metadata: { error: args.error.slice(0, 1000), willRetry, usageKnown: args.usageKnown }, createdAt: args.failedAt });
+    await ctx.db.insert("atlasExecutionEvents", { inventionId: args.inventionId, workItemId: args.workItemId, eventType: "work_failed", actorType: "system", summary: willRetry ? "Native CAD generation failed and is eligible for autonomous retry." : "Native CAD generation exhausted its retry limit.", attemptNumber: args.attemptNumber, costUnits: args.usageKnown ? args.actualCostUnits : undefined, metadata: { error: args.error.slice(0, 1000), willRetry, usageKnown: args.usageKnown, budgetDebitUnits: settledCostUnits }, createdAt: args.failedAt });
     return { willRetry, staleAttempt: false };
   },
 });

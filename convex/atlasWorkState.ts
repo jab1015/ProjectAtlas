@@ -8,6 +8,7 @@ import { requiredProfessionalReviews } from "./professionalReviewPolicy";
 import { canTierRunWorkKind } from "./entitlementPolicyLogic";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { ensureOrganizationDailyUsage, findOrganizationDailyUsage } from "./organizationDailyUsage";
+import { conservativeAttemptSettlementCost } from "./usageSettlementLogic";
 
 async function settleUsageReservation(
   ctx: MutationCtx,
@@ -535,7 +536,12 @@ export const failWork = internalMutation({
     }
 
     const willRetry = shouldRetryWork(item.attemptCount, item.maxAttempts ?? 3);
-    await settleUsageReservation(ctx, item, item.inventionId, args.actualCostUnits, 0, args.failedAt);
+    const settledCostUnits = conservativeAttemptSettlementCost({
+      usageKnown: args.usageKnown,
+      actualCostUnits: args.actualCostUnits,
+      reservedCostUnits: item.reservedCostUnits,
+    });
+    await settleUsageReservation(ctx, item, item.inventionId, settledCostUnits, 0, args.failedAt);
     await ctx.db.patch(item._id, {
       status: willRetry ? "queued" : "failed",
       lastError: args.error.slice(0, 1000),
@@ -551,8 +557,8 @@ export const failWork = internalMutation({
       actorType: "atlas",
       summary: "Autonomous work attempt failed.",
       attemptNumber: args.attemptNumber,
-      costUnits: args.actualCostUnits,
-      metadata: { retryScheduled: willRetry, usageKnown: args.usageKnown },
+      costUnits: args.usageKnown ? args.actualCostUnits : undefined,
+      metadata: { retryScheduled: willRetry, usageKnown: args.usageKnown, budgetDebitUnits: settledCostUnits },
       createdAt: args.failedAt,
     });
     return { willRetry, staleAttempt: false };
@@ -586,7 +592,12 @@ export const blockWorkForHuman = internalMutation({
       return { accepted: false };
     }
 
-    await settleUsageReservation(ctx, item, item.inventionId, args.actualCostUnits, 0, args.blockedAt);
+    const settledCostUnits = conservativeAttemptSettlementCost({
+      usageKnown: args.usageKnown,
+      actualCostUnits: args.actualCostUnits,
+      reservedCostUnits: item.reservedCostUnits,
+    });
+    await settleUsageReservation(ctx, item, item.inventionId, settledCostUnits, 0, args.blockedAt);
     await ctx.db.patch(args.workItemId, {
       status: "blocked",
       blockedReason: args.reason,
@@ -603,8 +614,8 @@ export const blockWorkForHuman = internalMutation({
       actorType: "atlas",
       summary: args.reason.slice(0, 500),
       attemptNumber: args.attemptNumber,
-      costUnits: args.actualCostUnits,
-      metadata: { gateType: args.gateType, usageKnown: args.usageKnown },
+      costUnits: args.usageKnown ? args.actualCostUnits : undefined,
+      metadata: { gateType: args.gateType, usageKnown: args.usageKnown, budgetDebitUnits: settledCostUnits },
       createdAt: args.blockedAt,
     });
     return { accepted: true };
