@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { query } from "./_generated/server";
 import { requireOrganizationRole } from "./organizations";
+import { canManageBilling } from "./organizationPolicyLogic";
 
 const INVENTION_LIMIT = 100;
 const ROW_LIMIT = 750;
@@ -19,7 +20,8 @@ function bounded<T>(rows: T[], limit: number, label: string) {
 export const getOrganizationStructuredExport = query({
   args: { organizationId: v.id("organizations") },
   handler: async (ctx, args) => {
-    await requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"]);
+    const { membership } = await requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"]);
+    const includeBillingAttribution = canManageBilling(membership.role);
     const organization = await ctx.db.get(args.organizationId);
     if (!organization || organization.status === "closed") throw new ConvexError("Organization not found");
 
@@ -82,14 +84,19 @@ export const getOrganizationStructuredExport = query({
 
     const [dailyUsage, subscriptionEvents, invitations] = await Promise.all([
       ctx.db.query("organizationDailyUsage").withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId)).take(EVENT_LIMIT + 1),
-      ctx.db.query("subscriptionEvents").withIndex("by_appliedOrganizationId", (q) => q.eq("appliedOrganizationId", args.organizationId)).take(ROW_LIMIT + 1),
+      includeBillingAttribution
+        ? ctx.db.query("subscriptionEvents").withIndex("by_appliedOrganizationId", (q) => q.eq("appliedOrganizationId", args.organizationId)).take(ROW_LIMIT + 1)
+        : Promise.resolve([]),
       ctx.db.query("organizationInvitations").withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId)).take(ROW_LIMIT + 1),
     ]);
 
     return {
       exportVersion: 4,
       generatedAt: Date.now(),
-      scope: "Organization-owned InventSmith structured project, membership invitation, and billing-attribution data. Binary bytes and authentication secrets are not embedded.",
+      scope: includeBillingAttribution
+        ? "Organization-owned InventSmith structured project, membership invitation, and owner-authorized billing-attribution data. Binary bytes and authentication secrets are not embedded."
+        : "Organization-owned InventSmith structured project and membership invitation data. Raw billing-attribution data is excluded because organization billing authority is owner-only. Binary bytes and authentication secrets are not embedded.",
+      billingAttributionIncluded: includeBillingAttribution,
       organization: {
         organizationId: organization._id,
         name: organization.name,

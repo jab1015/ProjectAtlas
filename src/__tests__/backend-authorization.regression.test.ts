@@ -74,6 +74,15 @@ describe("backend authorization boundaries", () => {
     expect(exportedFunctionBlock(ownership, "transferOwnership")).toContain("The new owner must already be an active organization member");
   });
 
+  it("keeps raw organization billing attribution owner-only even though admins may export project data", () => {
+    const exportSource = source("organizationExport.ts");
+    const block = exportedFunctionBlock(exportSource, "getOrganizationStructuredExport");
+    expect(block).toContain('requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"])');
+    expect(block).toContain("canManageBilling(membership.role)");
+    expect(block).toContain("includeBillingAttribution");
+    expect(block).toContain(': Promise.resolve([])');
+  });
+
   it("binds file access to a fulfilled purchase token and product", () => {
     const block = exportedFunctionBlock(source("files.ts"), "getByProduct");
     expect(block).toContain("by_downloadToken");

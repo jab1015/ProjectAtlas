@@ -34,9 +34,14 @@ describe("organization-aware personal data export", () => {
     expect(source).toContain("event.appliedUserId === userId");
     expect(source).toContain("belongsToPersonalOrganization");
     expect(source).toContain("if (!belongsToUser && !belongsToPersonalOrganization) return false");
+    expect(organizationExport).toContain("canManageBilling");
+    expect(organizationExport).toContain("includeBillingAttribution");
     expect(organizationExport).toContain('query("subscriptionEvents")');
     expect(organizationExport).toContain('withIndex("by_appliedOrganizationId"');
+    expect(organizationExport).toContain(': Promise.resolve([])');
+    expect(organizationExport).toContain("billingAttributionIncluded: includeBillingAttribution");
     expect(organizationExport).toContain("subscriptionEvents: bounded(subscriptionEvents");
+    expect(organizationExport).toContain("organization billing authority is owner-only");
     expect(organizationExport).toContain("subscriptionUpdatedAt: organization.subscriptionUpdatedAt");
   });
 
