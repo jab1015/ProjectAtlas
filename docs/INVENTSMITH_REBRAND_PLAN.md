@@ -1,10 +1,10 @@
 # InventSmith Naming and Rebrand Plan
 
-**Status:** canonical product rename approved; active documentation normalization in progress  
+**Status:** canonical product rename approved; active documentation normalization complete, with historical/technical compatibility references preserved intentionally  
 **Current customer-facing name:** InventSmith  
 **Descriptor:** The Inventor OS  
 **Publisher:** Modern Methods  
-**Former working name:** InventSmith / ProjectAtlas — historical references only
+**Former working name:** Atlas / ProjectAtlas — historical references only
 
 ## Canonical naming rule
 
@@ -43,12 +43,13 @@ The former active `ATLAS_BUILD_PROGRESS.md` and `ATLAS_DEPLOYMENT_RUNBOOK.md` fi
 - Existing database IDs and stored records.
 - Exact workflow/commit/branch names used as historical or CI evidence.
 - Historical release, email, exhibit, and conception records where changing the wording would falsify history.
+- The separately excluded `Atlas-fama` tree, which is not part of the active InventSmith product work and is intentionally left untouched.
 
 A repository rename can be evaluated separately after active documentation and code compatibility references are inventoried. It is not required for the product itself to be fully branded InventSmith.
 
 ## Safety rule
 
-Do not perform a blind global former-name-to-InventSmith replacement. Review each occurrence. Rename current product identity and current documentation; preserve factual historical references and compatibility identifiers until their migration is independently tested.
+Do not perform a blind former-name-to-InventSmith replacement. Review each occurrence. Rename current product identity and current documentation; preserve factual historical references and compatibility identifiers until their migration is independently tested.
 
 ## Acceptance criteria
 
