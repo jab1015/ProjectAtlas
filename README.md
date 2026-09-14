@@ -15,6 +15,12 @@ Idea → Evidence → Validation → Market Research → Prior Art / Patent Read
 
 The older feasibility/IP-readiness pilot is a historical foundation milestone, not the definition of the finished product and not an overall completion percentage.
 
+## Naming and repository history
+
+The current product name is **InventSmith — The Inventor OS**. Historical records may use the former Atlas / ProjectAtlas working name. Preserve that wording only where it is part of an exact historical record, repository path, compatibility identifier, commit/workflow name, quotation, exhibit, or third-party evidence.
+
+The GitHub repository currently retains the historical slug `jab1015/ProjectAtlas`. Renaming that repository is a separate compatibility-sensitive operation and is not required for the customer-facing product to be InventSmith.
+
 ## Repository and hosting direction
 
 Source of truth is this GitHub repository. Active implementation continues on `inventsmith/full-product-build` in draft PR #24 until the owner explicitly approves a merge.
@@ -39,14 +45,15 @@ Capability status is tracked independently as planned, implemented, automated ve
 
 - `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md` — authoritative product destination.
 - `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md` — current continuation plan and implementation history.
-- `docs/ATLAS_BUILD_PROGRESS.md` — living build/readiness tracker; legacy filename retained for compatibility.
+- `docs/INVENTSMITH_BUILD_PROGRESS.md` — living build/readiness tracker.
 - `docs/INVENTSMITH_CAPABILITY_MATRIX.md` — evidence-based capability and verification matrix.
-- `docs/ATLAS_DEPLOYMENT_RUNBOOK.md` — fresh owner-controlled Convex/Vercel deployment and acceptance runbook; legacy filename retained for links.
+- `docs/INVENTSMITH_DEPLOYMENT_RUNBOOK.md` — fresh owner-controlled Convex/Vercel deployment and acceptance runbook.
+- `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md` — naming, precedence, and supersession rules.
 - `docs/MADETHIS_SYNC_HANDOFF_2026-08-15.md` — historical MadeThis handoff, explicitly retired and not an active deployment instruction.
 
 ## Local and CI verification
 
-Inspect `package.json` and `.github/workflows/atlas-ci.yml` before changing verification commands. The current CI gate installs from the lockfile and verifies:
+Inspect `package.json` and the repository's CI workflow before changing verification commands. The workflow file currently retains a historical compatibility filename; that internal filename does not define the product identity. The current CI gate installs from the lockfile and verifies:
 
 ```text
 npm ci
@@ -65,7 +72,7 @@ Mocks belong only in explicit test/development paths. Missing live providers in 
 
 Never commit credentials or print secret values. Server credentials belong in Convex/Vercel secret configuration. Browser-exposed `NEXT_PUBLIC_*` values must contain only intentionally public configuration.
 
-Legacy internal `Atlas`/`ATLAS_*` technical identifiers may remain where changing them would create stored-data, route, webhook, environment, or compatibility risk. Customer-facing identity is InventSmith — The Inventor OS by Modern Methods.
+Historical internal `Atlas` / `ATLAS_*` technical identifiers may remain where changing them would create stored-data, route, webhook, environment, or compatibility risk. Customer-facing identity and current documentation are **InventSmith — The Inventor OS by Modern Methods**.
 
 ## Release boundary
 
