@@ -1,0 +1,30 @@
+name: Apply manufacturing maturity gate
+on:
+  push:
+    branches:
+      - inventsmith/full-product-build
+    paths:
+      - .github/workflows/apply-manufacturing-maturity-gate.yml
+      - scripts/apply-manufacturing-maturity-gate.py
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: inventsmith/full-product-build
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/apply-manufacturing-maturity-gate.py
+      - name: Commit source, tests, and remove one-time helper
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f scripts/apply-manufacturing-maturity-gate.py .github/workflows/apply-manufacturing-maturity-gate.yml
+          git add -A convex src scripts .github/workflows
+          git commit -m "feat: enforce manufacturing maturity before readiness"
+          git push origin HEAD:inventsmith/full-product-build
