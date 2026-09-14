@@ -4,7 +4,7 @@ import type { Id } from "./_generated/dataModel";
 import { selectNextWorkItem, shouldRetryWork } from "./workOrchestratorLogic";
 import { canPromoteDeliverable, EVIDENCE_FRESHNESS_STALE_REASON, isSourceEligibleForPromotion, normalizeFinding, reliabilityFromVerificationStatus, sanitizeSourceUrls } from "./evidenceIntegrityLogic";
 import { remainingAutonomousCostUnitsAfterReservations, utcDateKey } from "./usagePolicyLogic";
-import { requiredProfessionalReviews } from "./professionalReviewPolicy";
+import { buildDeliverablePersistencePlan } from "./deliverablePersistenceLogic";
 import { canTierRunWorkKind } from "./entitlementPolicyLogic";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { ensureOrganizationDailyUsage, findOrganizationDailyUsage } from "./organizationDailyUsage";
@@ -421,16 +421,15 @@ export const completeWork = internalMutation({
     }
 
     const deliverableKind = workItem.deliverableKind ?? workItem.kind;
-    const requiredReviews = requiredProfessionalReviews(deliverableKind);
     const priorVersions = await ctx.db.query("atlasDeliverables").withIndex("by_inventionId_kind", (q) => q.eq("inventionId", workItem.inventionId).eq("kind", deliverableKind)).collect();
-    const version = priorVersions.reduce((highest, deliverable) => Math.max(highest, deliverable.version), 0) + 1;
+    const { requiredReviews, trustState, version } = buildDeliverablePersistencePlan(deliverableKind, priorVersions);
     const deliverableId = await ctx.db.insert("atlasDeliverables", {
       inventionId: workItem.inventionId,
       workItemId: workItem._id,
       kind: deliverableKind,
       title: args.deliverableTitle,
       version,
-      trustState: requiredReviews.length ? "professional_review_required" : "atlas_draft",
+      trustState,
       content: args.markdown,
       storageId: args.storageId,
       mediaType: args.mediaType,
