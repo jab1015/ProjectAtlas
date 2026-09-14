@@ -10,7 +10,7 @@
 
 ## Purpose and operating instruction
 
-This is the current handoff document for a new chat, coding session, or future worker. Resume from this file plus `INVENTSMITH_MASTER_PRODUCT_SPEC.md`, `ATLAS_BUILD_PROGRESS.md`, `ATLAS_DEPLOYMENT_RUNBOOK.md`, and `INVENTSMITH_DOCUMENT_AUTHORITY.md`. Do not revert to the retired Atlas controlled-pilot scope.
+This is the current handoff document for a new chat, coding session, or future worker. Resume from this file plus `INVENTSMITH_MASTER_PRODUCT_SPEC.md`, `INVENTSMITH_BUILD_PROGRESS.md`, `INVENTSMITH_DEPLOYMENT_RUNBOOK.md`, and `INVENTSMITH_DOCUMENT_AUTHORITY.md`. Do not revert to the retired controlled-pilot scope created under the former working name.
 
 Continue routine investigation, implementation, tests, CI verification, documentation, and re-review autonomously until a genuine founder-only action is required. Do not merge PR #24. Do not weaken authentication, authorization, evidence, entitlement, usage, professional-review, physical-evidence, or human-approval controls merely to make tests pass.
 
@@ -26,11 +26,15 @@ The inventor should not have to manage departments. InventSmith owns routing, se
 
 The retired controlled-pilot 80% figure must never be used as overall InventSmith completion.
 
+## Naming rule
+
+The current customer-facing and documentation name is **InventSmith — The Inventor OS**. The former Atlas / ProjectAtlas wording is historical only and may remain solely where required for exact repository paths, compatibility identifiers, commit messages, emails, quotations, exhibits, or other factual historical evidence. Active product prose and current instructions must use InventSmith.
+
 ## Source, hosting, and environment direction
 
 The owner-controlled target is locked as:
 
-- **GitHub:** `jab1015/ProjectAtlas` — repository and CI source of truth.
+- **GitHub:** `jab1015/ProjectAtlas` — historical repository slug and current repository/CI source of truth. A repository rename may be considered separately after compatibility review.
 - **Vercel:** future Modern Methods-owned Next.js deployment.
 - **Convex:** future Modern Methods-owned database/auth/storage/functions deployment.
 
@@ -98,12 +102,14 @@ Real prototype, manufacturer quote, launch/customer, and professional-review gat
 ## Latest verified repository checkpoint
 
 **Verified clean head:** `bc93ed606866852e4ec88732e250d243a3db9a40`  
-**GitHub Actions:** Atlas CI **#564**, run ID `34905374828`  
+**GitHub Actions:** workflow run **#564**, run ID `34905374828`  
 **Result:** **PASS**
 
 That exact head passed dependency installation, operational-script checks, web TypeScript, Convex TypeScript, the full regression suite, production dependency audit, and the Next.js production build. Production dependency audit was green at this checkpoint.
 
 PR #24 remains draft/open/unmerged and `main` remains untouched at the verified checkpoint.
+
+The September 14 documentation/naming updates advance the branch beyond that verified implementation checkpoint and require their own exact-head CI result before the newer documentation head is called fully verified.
 
 ## Current implementation order
 
@@ -119,7 +125,7 @@ PR #24 remains draft/open/unmerged and `main` remains untouched at the verified 
 
 - **Planned product destination:** defined in the master product spec.
 - **Implemented:** substantial end-to-end journey, organization architecture, classification, evidence, autonomous work, artifacts, physical/software/hybrid routing, professional gates, and Phase 1/2 hardening exist in the repository.
-- **Automated verification:** PASS through exact head `bc93ed606866852e4ec88732e250d243a3db9a40` / Atlas CI #564.
+- **Automated verification:** PASS through exact implementation head `bc93ed606866852e4ec88732e250d243a3db9a40` / workflow run #564; newer documentation head awaiting exact-head CI.
 - **Deployed to owner-controlled Vercel/Convex:** no.
 - **Live functionally verified:** no.
 - **Professional review completed:** only when a real qualified review is actually recorded; never infer this from repository-green or AI output.
@@ -130,8 +136,8 @@ Read, in order:
 
 1. `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`
 2. `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`
-3. `docs/ATLAS_BUILD_PROGRESS.md`
-4. `docs/ATLAS_DEPLOYMENT_RUNBOOK.md`
+3. `docs/INVENTSMITH_BUILD_PROGRESS.md`
+4. `docs/INVENTSMITH_DEPLOYMENT_RUNBOOK.md`
 5. `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md`
 
-Then fetch the live `inventsmith/full-product-build` branch, draft PR #24, and exact-head Atlas CI. Trust the live repository over this document if the branch has advanced. Do not restart completed work, do not merge PR #24, and do not reintroduce MadeThis synchronization. The immediate implementation priority is engineering/prototype/RFQ maturity enforcement followed by consequential-operation behavioral security and artifact-quality acceptance.
+Then fetch the live `inventsmith/full-product-build` branch, draft PR #24, and exact-head CI. Trust the live repository over this document if the branch has advanced. Do not restart completed work, do not merge PR #24, and do not reintroduce MadeThis synchronization. The immediate implementation priority is engineering/prototype/RFQ maturity enforcement followed by consequential-operation behavioral security and artifact-quality acceptance.
