@@ -10,66 +10,91 @@ Each capability is tracked independently:
 
 - **Planned** — required by the master product specification.
 - **Implemented** — repository code supporting the capability exists on the branch.
-- **Automated verification passed** — the exact relevant code has passed deterministic automated checks. A historical green run does not automatically verify later changes.
-- **Deployed** — exact implementation/configuration is deployed to the owner-controlled environment.
+- **Automated verification passed** — the exact relevant implementation has passed deterministic automated checks. A historical green run does not automatically verify later changes.
+- **Deployed** — exact implementation/configuration is deployed to owner-controlled infrastructure.
 - **Live functionally verified** — authenticated representative behavior has been exercised successfully on that deployment.
 - **Professional review** — `not applicable`, `required`, or `completed` based on the artifact/capability.
 
-## Current infrastructure boundary
+## Naming and infrastructure boundary
 
-Owner-controlled Vercel and Convex are **not yet deployed**. Therefore no capability is currently marked owner-controlled `deployed` or `live functionally verified` in this matrix. The former MadeThis runtime is intentionally outside the acceptance path and is not counted as deployment evidence.
+The current product is **InventSmith — The Inventor OS**. Former-name wording is historical/compatibility-only. The GitHub repository currently retains the historical slug `jab1015/ProjectAtlas`; that slug does not define the customer-facing product name.
+
+Owner-controlled Vercel and Convex are **not yet deployed**. Therefore no capability is currently marked owner-controlled `deployed` or `live functionally verified`. The former MadeThis runtime is intentionally outside the acceptance path and is not counted as deployment evidence.
+
+## Latest verified implementation checkpoint
+
+**Exact verified implementation head:** `bc93ed606866852e4ec88732e250d243a3db9a40`  
+**Workflow run:** #564 / run ID `34905374828`  
+**Result:** PASS across dependency installation, operational-script checks, web TypeScript, Convex TypeScript, full regression suite, production dependency audit, and Next.js production build.
+
+September 14 documentation/naming commits advance the branch beyond that implementation checkpoint. They require their own exact-head CI before the newer documentation head is described as fully verified.
 
 ## Foundation / trust / runtime matrix
 
-| Capability | Planned | Implemented | Automated verification passed | Deployed | Live functionally verified | Professional review | Current evidence / gap |
+| Capability | Planned | Implemented | Automated verification | Deployed | Live verified | Professional review | Current evidence / remaining boundary |
 |---|---|---|---|---|---|---|---|
-| 15-stage journey visibility/navigation | yes | yes | historical branch coverage; exact current head pending CI | no | no | n/a | `journey-map.tsx` exposes all 15 stages and routes later stages to dependency-aware workspaces. |
-| Validation mixed success/failure truth | yes | yes, current batch | exact current head pending CI | no | no | n/a | Runner now distinguishes `PARTIAL`; UI/shared type contract and regression test added. |
-| Validation targeted retry preserving successful sections | yes | partial | no | no | no | n/a | Failed sections remain explicit; targeted failed-only execution still requires completion. |
-| Context-only validation confidence honesty | yes | yes, current batch | exact current head pending CI | no | no | n/a | Fixed 0.75/high removed; context-only confidence is conservative and labels AI inference/unverified external claims. |
-| Claim/source evidence integrity | yes | partial | prior regression coverage exists; stronger retrieval-binding tests pending | no | no | n/a | URL sanitization/freshness/source coverage exist, but evidence-verification promotion still needs binding to actual retrieval execution/claim support rather than model labels alone. |
-| Usage accounting across success/failure/human gate/retry | yes | partial | prior accounting tests exist; identified defect remains | no | no | n/a | Successful/stale-output settlement is implemented; `failWork`/`blockWorkForHuman` still settle zero in paths that may have already incurred model cost. |
-| Backend behavioral authorization/isolation | yes | implemented foundation | existing behavioral coverage requires focused re-verification on current head | no | no | n/a | Organization-native backend guards and authorization tests exist; current batch will re-check unauthenticated, cross-tenant, admin and entitlement behavior. |
-| Worker lease/attempt/late-response reliability | yes | partial/implemented foundation | existing worker regressions require focused re-review | no | no | n/a | Leases/retries/stale-input handling exist; attempt identity and late-response behavior remain under Phase 1G review. |
-| Production provider unavailable behavior | yes | partial | pending focused test | no | no | n/a | Main work orchestrator fails if AI credentials are absent; legacy validation provider/factory paths need final mock-fallback audit. |
-| Fresh owner-controlled deployment path | yes | documentation implemented | documentation/static CI pending current head | no | no | n/a | Deployment runbook now targets owner Vercel + Convex and explicitly retires MadeThis synchronization. |
+| 15-stage journey visibility/navigation | yes | yes | passed through verified implementation checkpoint | no | no | n/a | Stage 5+ routes into complete Journey Center. |
+| Validation mixed success/failure truth | yes | yes | passed | no | no | n/a | `PARTIAL` is distinct from completed/failed. |
+| Failed-only validation retry preserving successful sections | yes | yes | passed | no | no | n/a | Org-aware recovery and edit-gated retry implemented; live provider retry acceptance remains. |
+| Context-only confidence honesty | yes | yes | passed | no | no | n/a | Conservative evidence-based confidence; no fabricated independent-retrieval claim. |
+| Claim/source evidence integrity | yes | yes repository foundation | passed | no | no | n/a | Provider-returned source records + exact normalized URL/claim association required; live-provider calibration remains. |
+| Usage accounting across success/failure/human gate/retry | yes | yes | passed | no | no | n/a | Known incurred cost preserved; unknown usage conservatively debits reserved budget while remaining unknown. |
+| Backend behavioral authorization/isolation | yes | implemented foundation | passed baseline | no | no | n/a | Direct unauthenticated/cross-tenant/Viewer/Edit/Manage behavior covered; deeper consequential-operation coverage remains. |
+| Professional-review audit behavior | yes | yes | passed | no | no | required where applicable | Reviewer reference/audit fields and all-required-review promotion behavior covered. |
+| Worker lease/attempt/late-response reliability | yes | yes | passed | no | no | n/a | Attempt identity, pre-provider lease validation, stale/late protection, bounded retry and CAD cleanup implemented; deployed soak remains. |
+| Production provider unavailable behavior | yes | yes in primary paths | automated provider/orchestrator coverage passed | no | no | n/a | Live provider acceptance still required after deployment. |
+| Fresh owner-controlled deployment path | yes | documentation implemented | documentation head pending fresh exact-head CI | no | no | n/a | `INVENTSMITH_DEPLOYMENT_RUNBOOK.md` targets Modern Methods-owned Vercel + Convex and retires MadeThis synchronization. |
 
 ## Core inventor experience
 
-| Capability | Planned | Implemented | Automated verification passed | Deployed | Live functionally verified | Professional review | Current evidence / gap |
+| Capability | Planned | Implemented | Automated verification | Deployed | Live verified | Professional review | Current evidence / remaining boundary |
 |---|---|---|---|---|---|---|---|
-| Sign in / session | yes | repository foundation | historical tests/build only | no | no | n/a | Fresh Convex Auth deployment and live acceptance pending. |
-| Create/classify invention | yes | yes | historical branch regressions | no | no | n/a | Physical/software/hybrid/regulated/unsupported/business-only routing exists. |
-| Evidence upload/original preservation | yes | yes | historical regression coverage | no | no | n/a | Binary ingestion/extraction/retry foundation exists; live PDF/DOCX/XLSX/image acceptance pending. |
-| Evidence provenance / processing states / invalidation | yes | yes | historical branch coverage | no | no | n/a | Canonical evidence and downstream staleness foundations exist; retrieval-trust hardening remains open as above. |
-| Validation / market / prior-art research | yes | yes with open trust fixes | mixed-state/confidence changes pending exact-head CI | no | no | legal/patent professional review required for consequential conclusions | Current Phase 1B/C/D work is correcting truth boundaries. |
-| Decision/review workflow | yes | yes | historical branch coverage | no | no | depends on decision | Consequential approvals retain server-side gates. |
-| Versioned downloadable packages | yes | yes | historical export tests | no | no | depends on contents | PDF/DOCX and other artifact foundations exist; representative rendered QA pending. |
-| Ask InventSmith grounded in invention record | yes | yes | historical regressions | no | no | n/a | Grounded/canonical write-back foundation exists; live-provider execution claims remain acceptance item. |
+| Sign in / session | yes | repository foundation | historical/current build coverage | no | no | n/a | Fresh Convex Auth live acceptance pending. |
+| Create/classify invention | yes | yes | passed representative regressions | no | no | n/a | Physical/software/hybrid/regulated/unsupported/business-only routing exists; connected-hardware companion-app blind spot fixed. |
+| Evidence upload/original preservation | yes | yes | regression foundation passed | no | no | n/a | Live PDF/DOCX/XLSX/image ingestion acceptance pending. |
+| Evidence provenance / processing / invalidation | yes | yes | passed | no | no | n/a | Direct persistence behavior verifies correct gate release and downstream stale/requeue behavior. |
+| Validation / market / prior-art research | yes | yes | Phase 1 B/C/D regressions passed | no | no | legal/patent review required for consequential conclusions | Live provider/retrieval calibration remains. |
+| Decision/review workflow | yes | yes | passed representative behavior | no | no | depends on decision | Professional review, inventor decisions, and external authorization remain distinct. |
+| Versioned downloadable packages | yes | yes | passed persistence/handoff tests | no | no | depends on contents | Newest revision selection verified even when newest revision is stale; rendered QA remains. |
+| Ask InventSmith grounded in invention record | yes | yes | regression foundation exists | no | no | n/a | Live provider execution acceptance remains. |
 
 ## Product design / engineering
 
-| Capability | Planned | Implemented | Automated verification passed | Deployed | Live functionally verified | Professional review | Current evidence / gap |
+| Capability | Planned | Implemented | Automated verification | Deployed | Live verified | Professional review | Current evidence / remaining boundary |
 |---|---|---|---|---|---|---|---|
-| Requirements → design candidates → comparison/selection | yes | yes | historical full-product regression coverage | no | no | engineering review required for consequential release | Implemented physical Product Design flow. |
-| Concept Visualization maturity | yes | yes | historical tests | no | no | not required for concept visualization | Must remain clearly distinct from CAD/release. |
-| Preliminary native CAD | yes, supported categories only | yes foundation | historical CAD regressions | no | no | qualified engineering review required before release claims | STEP/STL/DXF/editable source foundations exist for explicitly supported geometry. |
-| Prototype Candidate | yes | workflow/evidence gates implemented | historical tests | no | no | engineering/prototype evidence required | AI output cannot fabricate physical test evidence. |
-| Engineering Reviewed | yes | gate/record foundation | historical tests | no | no | required and not globally completed | Must be backed by actual reviewer records. |
-| Manufacturing Released | yes | gate foundation | historical tests | no | no | required where applicable and not globally completed | Cannot be inferred from generated CAD/specifications. |
+| Requirements → design candidates → comparison/selection | yes | yes | representative handoff coverage passed | no | no | engineering review required for consequential release | Physical Patent → candidate generation/scoring → Product Design handoff verified. |
+| Concept visualization maturity | yes | yes | repository tests | no | no | not required for concept visualization | Must remain distinct from CAD/release. |
+| Preliminary native CAD | yes for supported categories | yes foundation | CAD/worker regressions passed | no | no | qualified engineering review required before release claims | STEP/STL/DXF/editable source foundation with attempt/cleanup protection. |
+| Prototype Candidate | yes | workflow/evidence gates implemented | gate behavior coverage exists | no | no | engineering/prototype evidence required | AI output cannot fabricate physical test evidence. |
+| Engineering Reviewed | yes | gate/record foundation | professional review behavior passed | no | no | required and not globally completed | Must be backed by actual reviewer records. |
+| Manufacturing Released | yes | gate foundation | real-world quote gate behavior passed | no | no | required where applicable and not globally completed | Cannot be inferred from generated CAD/specifications or model prose. |
+
+## Representative Phase 2 acceptance
+
+| Area | Repository acceptance state | Remaining work |
+|---|---|---|
+| Physical work-plan journey | representative dependency closure and artifact chain covered | Deeper prototype/RFQ/manufacturing maturity enforcement |
+| Software-only journey | software spec/architecture/security branch covered without fake physical gates | Deeper implementation/test/release evidence acceptance |
+| Hybrid journey | both physical + software artifact branches preserved | Drive farther through prototype/RFQ + software delivery convergence |
+| Regulated journey | consequential outputs remain behind professional-review trust state | Real qualified professional/live acceptance after deployment |
+| Inventor evidence persistence | direct fake-datastore mutation behavior covered | Expand additional evidence categories and replacement/removal cases |
+| Manufacturer quote gate | direct behavior covered | Prove downstream costing/readiness invalidation and refresh semantics |
+| Actual sales/launch evidence gate | direct behavior covered | Deeper post-launch analytics/growth behavior |
+| Versioned artifact persistence | highest prior version + consequential review state covered | Rendered/export package quality and limitation labeling |
+| Professional review | audit/reference/multi-review promotion covered | More role/authorization boundaries and live review workflow |
 
 ## Commercial journey
 
-| Capability | Planned | Implemented | Automated verification passed | Deployed | Live functionally verified | Professional review | Current evidence / gap |
+| Capability | Planned | Implemented | Automated verification | Deployed | Live verified | Professional review | Current evidence / remaining boundary |
 |---|---|---|---|---|---|---|---|
-| Prototype/testing and evidence-driven revision | yes | yes foundation | historical tests | no | no | engineering review where applicable | Genuine test evidence still required in real journeys. |
-| Manufacturing/RFQ/quote comparison | yes | yes foundation | historical tests | no | no | specialist review may apply | Genuine supplier quote gate remains mandatory. |
-| IP/legal preparation/routing | yes | yes | historical tests | no | no | qualified legal/patent review required for consequential advice | No patentability/FTO/legal approval claims. |
-| Branding/positioning/assets | yes | yes | historical tests | no | no | trademark/legal review where appropriate | Generated brand artifacts require visual QA. |
-| Pricing/unit economics | yes | yes | historical tests | no | no | financial/professional review depending use | Modeled inputs must not masquerade as quotes/actuals. |
-| Marketing/sales | yes | yes | historical tests | no | no | n/a | Must remain invention/evidence-specific. |
-| Funding / pitch / financial artifacts | yes | yes | historical artifact tests | no | no | financial/legal review depending use | Editable PPTX and spreadsheet foundations exist. |
-| Launch/growth | yes | yes workflow foundation | historical tests | no | no | n/a | Actual-performance analysis requires genuine post-launch evidence. |
+| Prototype/testing and evidence-driven revision | yes | foundation implemented | relevant gate tests | no | no | engineering review where applicable | Genuine test evidence still required in real journeys. |
+| Manufacturing/RFQ/quote comparison | yes | foundation implemented | direct quote-gate behavior passed | no | no | specialist review may apply | Genuine supplier quote remains mandatory. |
+| IP/legal preparation/routing | yes | yes | repository tests | no | no | qualified legal/patent review required | No patentability/FTO/legal approval claims. |
+| Branding/positioning/assets | yes | yes | repository tests | no | no | trademark/legal review where appropriate | Generated assets require visual QA. |
+| Pricing/unit economics | yes | yes | repository tests | no | no | financial/professional review depending use | Modeled inputs must not masquerade as quotes/actuals. |
+| Marketing/sales | yes | yes | repository tests | no | no | n/a | Must remain invention/evidence-specific. |
+| Funding / pitch / financial artifacts | yes | yes | artifact foundations tested | no | no | financial/legal review depending use | Editable package quality review remains. |
+| Launch/growth | yes | workflow foundation | launch evidence gate behavior covered | no | no | n/a | Actual-performance analysis requires genuine post-launch evidence. |
 
 ## Hosting / external integration blockers
 
@@ -82,14 +107,13 @@ Owner-controlled Vercel and Convex are **not yet deployed**. Therefore no capabi
 | Paid checkout/billing/webhooks | adapter hardening/docs yes | owner-selected billing integration/secrets required; do not bypass entitlement while absent |
 | Custom domain/DNS | not required for current source work | intentionally deferred; no DNS changes authorized |
 
-## Immediate Phase 1 tracker
+## Immediate implementation tracker
 
-1. **A Journey after foundation:** verified implemented; preserve dependency gates.
-2. **B Partial validation:** mixed-state fix implemented; finish targeted failed-section retry and verify exact-head CI.
-3. **C Fixed confidence:** fixed in current batch; exact-head CI pending.
-4. **D Evidence promotion:** open — bind promotion to actual retrieval execution/claim support and add fabricated-citation/prompt-injection regressions.
-5. **E Usage accounting:** open — propagate known incurred cost into failed/human-gated settlement; preserve unknown-vs-zero distinction and single settlement.
-6. **F Behavioral security:** re-verify existing runtime tests and add missing behavioral cases if source-string checks remain material.
-7. **G Worker reliability:** re-review attempt identity, late response, duplicate completion, timeouts/cancellation, stale inputs, retry/storage cleanup and bounded context/output.
+1. **Engineering/prototype/RFQ maturity enforcement:** current highest-priority coding work.
+2. **Consequential-operation behavioral security:** external-use authorization, destructive/privacy, billing-sensitive, and org-management boundaries.
+3. **Artifact quality and packaging:** newest revision, provenance, limitations, maturity, stale/review/external-use state in exports.
+4. **Deeper representative lifecycle acceptance:** especially physical/hybrid validation → design → CAD → prototype → RFQ → manufacturing readiness.
+5. **Prepare, not provision, owner-controlled runtime:** maintain Vercel/Convex/auth/provider/billing configuration and acceptance procedures.
+6. **Live acceptance later:** authenticated multi-user/provider/concurrency/billing/professional/representative journey checks after deployment.
 
 Update this file after each cohesive batch with exact CI evidence rather than an overall completion percentage.
