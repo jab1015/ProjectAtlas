@@ -47,9 +47,16 @@ describe("validation/decision to versioned artifact handoff", () => {
 
     expect(classification.productType).toBe("physical");
     const patent = byKind.get("patent_design_handoff")!;
+    const candidateGeneration = byKind.get("design_candidate_generation")!;
+    const candidateScoring = byKind.get("design_candidate_scoring")!;
     const design = byKind.get("product_design_specification")!;
     const cad = byKind.get("native_cad_generation")!;
-    expect(design.dependsOnKinds).toContain("patent_design_handoff");
+
+    // The patent handoff is intentionally transitive: it constrains candidate generation,
+    // which feeds scoring, the selected design specification, and finally native CAD.
+    expect(candidateGeneration.dependsOnKinds).toContain("patent_design_handoff");
+    expect(candidateScoring.dependsOnKinds).toContain("design_candidate_generation");
+    expect(design.dependsOnKinds).toContain("design_candidate_scoring");
     expect(cad.dependsOnKinds).toContain("product_design_specification");
 
     const oldDesign = artifactFor(design, 1, "Earlier design package");
