@@ -45,7 +45,7 @@ Implemented classification supports:
 
 - **Physical inventions:** applicable Product Design, CAD/engineering, physical prototype and manufacturing flow.
 - **Software inventions:** software product design, UX, architecture, data/API, security/privacy, prototype/build, QA/beta and distribution/release flow without irrelevant physical gates.
-- **Hybrid inventions:** both applicable branches.
+- **Hybrid inventions:** both applicable branches, including connected physical products with companion/mobile/cloud applications.
 - **Regulated inventions:** supported with professional review gates where consequential.
 - **Unsupported harmful/abusive concepts:** rejected before normal invention workspace creation.
 - **Business-only concepts:** routed outside the invention-product workflow when appropriate.
@@ -61,10 +61,21 @@ Phase 1 findings are tracked independently. Do not collapse these into one overa
 | **A — Journey after foundation** | Full 15-stage journey/routing exists; Stage 5+ root redirects to Journey Center | Route/journey regressions pass | Legacy unreachable copy in the old root page still contains obsolete wording and should be cleaned when convenient |
 | **B — Partial validation** | Mixed results persist as partial; successful sections are preserved; failed-only retry exists; Stage 2 route shows recovery state; org collaborators can view state while retry stays edit-gated | Partial/orchestration/recovery tests pass | Live provider failure/retry acceptance remains for deployed environment |
 | **C — Confidence truth** | Context-only AI output uses conservative confidence; external-data sections are reduced without independent retrieval; prompt forbids invented evidence/research claims | Confidence regressions pass | Live independent-retrieval calibration remains |
-| **D — Evidence promotion** | Model labels alone fail closed. Web-research work now requests provider-returned `web_search_call.action.sources`; sourced claims are bound only to exact normalized URLs the provider reports as retrieved; trace metadata is persisted before reliability/promotion can advance | Evidence-integrity and provider-retrieval regressions pass | Deployed live-provider acceptance and continued calibration of source/claim semantics remain |
-| **E — Usage accounting** | Attempt costs carry through complete/fail/human-gate paths; known incurred cost is no longer silently zeroed; reservations settle through shared user/org accounting | Typechecks/regressions pass | Further behavior coverage for unknown-cost/provider interruption cases remains useful |
+| **D — Evidence promotion** | Model labels alone fail closed. Web-research work requests provider-returned `web_search_call.action.sources`; sourced claims are bound only to exact normalized URLs the provider reports as retrieved; trace metadata is persisted before reliability/promotion can advance | Evidence-integrity, provider-retrieval and full-suite regressions pass | Deployed live-provider acceptance and continued calibration of source/claim semantics remain |
+| **E — Usage accounting** | Attempt costs carry through complete/fail/human-gate paths; known incurred cost is no longer silently zeroed; ambiguous/unknown provider usage conservatively consumes the reserved attempt budget while remaining explicitly marked as unknown rather than fabricated measured cost | Unknown-usage settlement, organization usage, orchestration and full-suite regressions pass | Deployed provider-interruption acceptance remains |
 | **F — Behavioral security** | Direct behavior tests cover unauthenticated, cross-user, org membership, viewer/edit/manage and entitlement boundaries | Behavioral authorization regressions pass | Continue expanding direct runtime behavior tests for especially consequential operations |
 | **G — Worker reliability** | Central workers and Native CAD carry attempt identity; stale/late attempts cannot overwrite newer attempts; CAD partial storage is cleaned; retries are bounded; current-attempt and lease validity are rechecked before expensive provider execution | Worker lease, orchestration, CAD and full-suite regressions pass | Deployed concurrency/lease-expiry soak remains |
+
+## Phase 2 representative acceptance progress
+
+Repository acceptance now goes beyond isolated subsystem wiring:
+
+- representative physical, software, hybrid and regulated work-plan journeys are exercised together;
+- the acceptance layer exposed and fixed a real classification blind spot where connected hardware with a companion/mobile/cloud application could be misclassified as physical-only;
+- direct persistence-level evidence behavior executes `applyInventorEvidenceChange` against a fake datastore and verifies canonical invention-record update, matching real-world evidence-gate release, downstream work invalidation/requeue, preservation of running and idea-capture work, stale findings/deliverables, and execution-event history;
+- unrelated inventor evidence does not release a mismatched blocked real-world gate.
+
+The next Phase 2 boundary is the deeper validation/decision → versioned package/artifact handoff across representative product types.
 
 ## Validation recovery implementation
 
@@ -89,6 +100,8 @@ Patent/prior-art material remains research/readiness, not a patentability, freed
 
 Autonomous work claims carry attempt identity. Completion, failure and human-gate outcomes reject stale ownership. Known incurred model/image/CAD costs are carried into settlement instead of being silently recorded as zero. Late-attempt settlement uses execution-event evidence for idempotency, and Native CAD cleans stored artifacts when generation fails before a valid commit.
 
+When provider usage is ambiguous, InventSmith does not silently convert the attempt to zero cost. It conservatively debits the reserved attempt budget while preserving `usageKnown: false`, so quota safety does not masquerade as measured provider billing data.
+
 Current-attempt identity and lease expiry are also checked before provider context is released for general autonomous work and Native CAD. An already-expired or superseded worker is therefore rejected before it can initiate another expensive provider call; commit-time guards remain in place as a second boundary.
 
 ## Dependency-security checkpoint
@@ -103,8 +116,8 @@ The regenerated lockfile is committed. At the latest exact verified checkpoint, 
 
 ## Exact verified repository checkpoint
 
-**Verified head:** `8665a8c0a99cda9c3e723bb2fe8b00e643cca46e`  
-**GitHub Actions:** Atlas CI run **#534** / run ID `34889738571`  
+**Verified head:** `48cca7eb6974a67ea13e6a05bfcb531ac83f636e`  
+**GitHub Actions:** Atlas CI run **#543** / run ID `34891037710`  
 **Result:** **PASS**
 
 The exact PR-head verification passed:
@@ -113,7 +126,7 @@ The exact PR-head verification passed:
 - operational-script syntax checks;
 - web TypeScript;
 - Convex TypeScript;
-- **400 / 400 regression tests** across **73 test files**;
+- full regression suite, including conservative unknown-provider-usage settlement and persistence-level inventor-evidence behavior;
 - production dependency audit with **0 vulnerabilities**;
 - Next.js **15.5.25** production build.
 
@@ -121,7 +134,7 @@ This status means **automated repository verification passed** for that exact SH
 
 ## Deployment / live status
 
-- **Implemented:** substantial product and Phase 1 hardening code exists in the repository.
+- **Implemented:** substantial product, Phase 1 hardening, and expanding Phase 2 acceptance code exists in the repository.
 - **Automated verification passed:** yes, at the exact checkpoint above.
 - **Deployed to owner-controlled Vercel/Convex:** no.
 - **Live functionally verified:** no.
@@ -131,12 +144,11 @@ See `docs/ATLAS_DEPLOYMENT_RUNBOOK.md` for the fresh owner-controlled deployment
 
 ## Next implementation priorities
 
-1. **Deepen representative end-to-end repository acceptance.** Exercise create invention → evidence → ingestion/extraction → validation/research → decision → versioned package/artifact using physical, software and hybrid fixtures, while preserving real-world evidence gates.
-2. **Expand provider-interruption accounting tests.** Exercise unknown-usage and transport-failure outcomes so resource accounting remains conservative under ambiguous provider failures.
-3. **Continue consequential-operation behavioral security tests.** Prefer direct behavior tests over source-string assertions for destructive, billing, privacy, professional-review and organization-management boundaries.
-4. **Continue artifact-quality and safety review.** CAD, documents, exports and commercial deliverables must be checked for content quality, versioning, limitations and appropriate maturity labels—not just file existence.
-5. **Prepare—not provision—the fresh runtime.** Keep Vercel/Convex environment-variable ownership, auth, webhook/billing and operational requirements documented until the owner is ready to create the actual services.
-6. **Low-priority cleanup:** remove obsolete “coming soon” / overbroad readiness wording that remains in unreachable legacy root-page branches even though Stage 5+ routing now bypasses them.
+1. **Deepen representative end-to-end repository acceptance.** Continue from persisted inventor evidence through validation/research → decision → versioned package/artifact using physical, software, hybrid and regulated fixtures, while preserving real-world evidence gates.
+2. **Continue consequential-operation behavioral security tests.** Prefer direct behavior tests over source-string assertions for destructive, billing, privacy, professional-review and organization-management boundaries.
+3. **Continue artifact-quality and safety review.** CAD, documents, exports and commercial deliverables must be checked for content quality, versioning, limitations and appropriate maturity labels—not just file existence.
+4. **Prepare—not provision—the fresh runtime.** Keep Vercel/Convex environment-variable ownership, auth, webhook/billing and operational requirements documented until the owner is ready to create the actual services.
+5. **Low-priority cleanup:** remove obsolete “coming soon” / overbroad readiness wording that remains in unreachable legacy root-page branches even though Stage 5+ routing now bypasses them.
 
 ## New-chat handoff
 
@@ -148,4 +160,4 @@ Read, in order:
 4. `docs/ATLAS_DEPLOYMENT_RUNBOOK.md`
 5. `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md`
 
-Then fetch live branch `inventsmith/full-product-build` and draft PR #24 before changing anything. Treat `8665a8c0a99cda9c3e723bb2fe8b00e643cca46e` / Atlas CI #534 as the latest fully verified implementation checkpoint **unless the live branch has advanced and a newer exact-head run is green**. Do not merge PR #24, do not restart completed organization/accounting/invitation/classification work, and do not reintroduce MadeThis synchronization instructions.
+Then fetch live branch `inventsmith/full-product-build` and draft PR #24 before changing anything. Treat `48cca7eb6974a67ea13e6a05bfcb531ac83f636e` / Atlas CI #543 as the latest fully verified implementation checkpoint **unless the live branch has advanced and a newer exact-head run is green**. Do not merge PR #24, do not restart completed organization/accounting/invitation/classification work, and do not reintroduce MadeThis synchronization instructions.
