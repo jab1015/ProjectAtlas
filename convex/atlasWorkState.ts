@@ -9,6 +9,7 @@ import { canTierRunWorkKind } from "./entitlementPolicyLogic";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { ensureOrganizationDailyUsage, findOrganizationDailyUsage } from "./organizationDailyUsage";
 import { conservativeAttemptSettlementCost } from "./usageSettlementLogic";
+import { isManufacturingMaturityEligible } from "./manufacturingMaturityLogic";
 
 async function settleUsageReservation(
   ctx: MutationCtx,
@@ -128,6 +129,7 @@ export const claimNextWork = internalMutation({
   args: { inventionId: v.id("inventions"), availableCostUnits: v.number(), now: v.number() },
   handler: async (ctx, args) => {
     const items = await ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect();
+    const deliverables = await ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect();
     const usageScope = await resolveInventionUsageScope(ctx, args.inventionId);
     if (!usageScope) throw new ConvexError("Invention not found");
     const dateKey = utcDateKey(args.now);
@@ -153,7 +155,8 @@ export const claimNextWork = internalMutation({
       items.map((item) => ({ ...item, _id: String(item._id) })),
       Math.min(args.availableCostUnits, serverAvailableUnits),
       args.now,
-      (kind) => canTierRunWorkKind(usageScope.plan, kind)
+      (kind) => canTierRunWorkKind(usageScope.plan, kind),
+      (kind) => isManufacturingMaturityEligible(kind, deliverables)
     );
     if (!selection.selected) return { workItemId: null, attemptNumber: null, reason: selection.reason };
 

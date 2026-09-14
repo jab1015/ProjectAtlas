@@ -100,9 +100,11 @@ const lifecycleWork: FullProductWorkPlanItem[] = lifecycleStages.flatMap((stage)
       ? [...item.dependsOnKinds, "prototype_physical_evidence"]
       : item.kind === "manufacturer_quote_comparison"
         ? [...item.dependsOnKinds, "manufacturer_quote_evidence"]
-        : item.kind === "launch_performance"
-          ? [...item.dependsOnKinds, "launch_actual_evidence"]
-          : [...item.dependsOnKinds],
+        : item.kind === "manufacturing_readiness"
+          ? [...item.dependsOnKinds, "prototype_readiness"]
+          : item.kind === "launch_performance"
+            ? [...item.dependsOnKinds, "launch_actual_evidence"]
+            : [...item.dependsOnKinds],
     inputSnapshot: {
       department: stage.name.toLowerCase().replaceAll(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""),
       stageId: stage.id,
