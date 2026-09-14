@@ -142,7 +142,7 @@ describe("InventSmith complete idea-to-market repository acceptance contract", (
 
   it("keeps the product promise tied to the complete destination rather than the retired pilot", () => {
     const spec = readFileSync(join(process.cwd(), "docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md"), "utf8");
-    const progress = readFileSync(join(process.cwd(), "docs/ATLAS_BUILD_PROGRESS.md"), "utf8");
+    const progress = readFileSync(join(process.cwd(), "docs/INVENTSMITH_BUILD_PROGRESS.md"), "utf8");
     expect(spec).toContain("Idea → Evidence → Validation");
     expect(spec).toContain("Launch → Growth");
     expect(spec).toContain("InventSmith is not complete until the complete idea-to-market operating system");
