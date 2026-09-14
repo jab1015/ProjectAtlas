@@ -118,7 +118,7 @@ describe("invention authorization behavior", () => {
       ],
     });
 
-    await expect(requireInventionReadAccess(ctx, "inv1" as any)).resolves.toMatchObject({ access: "read" });
+    await expect(requireInventionReadAccess(ctx, "inv1" as any)).resolves.toMatchObject({ access: "view" });
     await expect(requireInventionEditAccess(ctx, "inv1" as any)).rejects.toThrow("Invention edit access required");
     await expect(requireInventionManageAccess(ctx, "inv1" as any)).rejects.toThrow("Invention management access required");
   });
