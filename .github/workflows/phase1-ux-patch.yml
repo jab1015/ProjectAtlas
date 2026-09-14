@@ -1,0 +1,192 @@
+name: Apply Phase 1 UX patch
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout implementation branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Apply targeted Phase 1 UX corrections
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('src/app/(app)/invention/[id]/page.tsx')
+          text = path.read_text()
+
+          text = text.replace(
+              'import { ArrowLeft, ArrowRight, Lock, PartyPopper, RefreshCw } from "lucide-react";',
+              'import { ArrowLeft, ArrowRight, PartyPopper, RefreshCw } from "lucide-react";'
+          )
+          text = text.replace(
+              'import { trackStageCompleted, trackContinueClicked, trackUpgradePromptShown } from "@/lib/analytics";',
+              'import { trackStageCompleted, trackContinueClicked } from "@/lib/analytics";'
+          )
+
+          old = '''function CongratulatoryScreen({ inventionTitle }: { inventionTitle: string }) {'''
+          new = '''function CongratulatoryScreen({ inventionTitle, inventionId }: { inventionTitle: string; inventionId: Id<"inventions"> }) {'''
+          if old not in text:
+              raise SystemExit('CongratulatoryScreen signature not found')
+          text = text.replace(old, new, 1)
+
+          old = '''              {inventionTitle} is patent-ready.'''
+          new = '''              Foundation complete for {inventionTitle}.'''
+          if old not in text:
+              raise SystemExit('patent-ready copy not found')
+          text = text.replace(old, new, 1)
+
+          old = '''              You&rsquo;ve completed all four foundation stages — idea capture,
+              validation, market research, and patent readiness. This is a real
+              milestone.'''
+          new = '''              You&rsquo;ve completed the foundation workspace — idea capture,
+              validation, market research, and preliminary patent-readiness work.
+              InventSmith can now continue the applicable product journey.'''
+          if old not in text:
+              raise SystemExit('foundation copy not found')
+          text = text.replace(old, new, 1)
+
+          old = '''          <div className="rounded-xl border border-border bg-muted/30 p-5 text-left space-y-2">
+            <p className="text-sm font-medium text-foreground">Coming soon: Pro</p>
+            <p className="text-sm text-muted-foreground">
+              Stages 5–15 — product design, IP protection, manufacturing,
+              funding, and launch — are on the way. Upgrade when ready.
+            </p>
+          </div>
+          <Button asChild size="lg" className="w-full">
+            <Link href="/dashboard">Back to Dashboard</Link>
+          </Button>'''
+          new = '''          <div className="rounded-xl border border-border bg-muted/30 p-5 text-left space-y-2">
+            <p className="text-sm font-medium text-foreground">Continue the full InventSmith journey</p>
+            <p className="text-sm text-muted-foreground">
+              Product design, engineering/CAD where applicable, prototype planning,
+              manufacturing or software delivery, commercialization, launch, and growth
+              are available from the journey workspace.
+            </p>
+          </div>
+          <Button asChild size="lg" className="w-full">
+            <Link href={`/invention/${inventionId}/journey`}>Continue to Full Journey</Link>
+          </Button>'''
+          if old not in text:
+              raise SystemExit('coming soon block not found')
+          text = text.replace(old, new, 1)
+
+          start = text.index('// ── Upgrade screen for stages 5+')
+          end = text.index('// ── Stage 1 field values come from the invention record itself')
+          replacement = '''// ── Fallback for stages managed by the full journey workspace ─────────────────\n\nfunction FullJourneyStage({ stageId, stageName, inventionId }: { stageId: number; stageName: string; inventionId: Id<"inventions"> }) {\n  return (\n    <div className="min-h-screen flex flex-col bg-background">\n      <AppNav />\n      <main className="flex-1 flex items-center justify-center px-4">\n        <div className="text-center space-y-6 max-w-sm">\n          <div>\n            <p className="text-xs font-medium uppercase tracking-widest text-primary mb-2">\n              Stage {stageId}\n            </p>\n            <h1\n              className="text-2xl font-bold text-foreground mb-2"\n              style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}\n            >\n              {stageName}\n            </h1>\n            <p className="text-muted-foreground">\n              This stage is managed in the full InventSmith journey workspace, where\n              dependencies, evidence, work status, and next actions stay connected.\n            </p>\n          </div>\n          <Button asChild>\n            <Link href={`/invention/${inventionId}/journey`}>Open Full Journey</Link>\n          </Button>\n        </div>\n      </main>\n      <footer className="border-t border-border">\n        <MadeThisBadge />\n      </footer>\n    </div>\n  );\n}\n\n'''
+          text = text[:start] + replacement + text[end:]
+
+          old = '''  const forceRegenerateValidation = useMutation(api.validationResearchSessionMutations.forceRegenerateValidation);'''
+          new = '''  const forceRegenerateValidation = useMutation(api.validationResearchSessionMutations.forceRegenerateValidation);\n  const retryFailedValidationSections = useMutation(api.validationResearchSessionMutations.retryFailedValidationSections);'''
+          if old not in text:
+              raise SystemExit('validation mutation anchor not found')
+          text = text.replace(old, new, 1)
+
+          old = '''  const [rebuilding, setRebuilding] = useState(false);
+  const [rebuildError, setRebuildError] = useState<string | null>(null);'''
+          new = '''  const [rebuilding, setRebuilding] = useState(false);\n  const [retryingFailed, setRetryingFailed] = useState(false);\n  const [rebuildError, setRebuildError] = useState<string | null>(null);'''
+          if old not in text:
+              raise SystemExit('validation state anchor not found')
+          text = text.replace(old, new, 1)
+
+          anchor = '''  }, [forceRegenerateValidation, inventionId]);
+
+  const TOTAL_SECTIONS = 11;'''
+          replacement = '''  }, [forceRegenerateValidation, inventionId]);\n\n  const handleRetryFailedValidation = useCallback(async () => {\n    setRebuildError(null);\n    setRetryingFailed(true);\n    try {\n      const result = await retryFailedValidationSections({ inventionId });\n      if (!result.queued) {\n        setRebuildError("There are no failed validation sections to retry.");\n      }\n    } catch (err) {\n      console.error("Retry failed sections failed:", err);\n      setRebuildError(err instanceof Error ? err.message : "Retry failed. Please try again.");\n    } finally {\n      setRetryingFailed(false);\n    }\n  }, [retryFailedValidationSections, inventionId]);\n\n  const TOTAL_SECTIONS = 11;'''
+          if anchor not in text:
+              raise SystemExit('retry handler anchor not found')
+          text = text.replace(anchor, replacement, 1)
+
+          old = '''                {isGenerating
+                  ? "Research is running. Sections will appear as they complete."
+                  : "Research has completed. Click Rebuild to regenerate with updated information."}'''
+          new = '''                {isGenerating\n                  ? "Research is running. Sections will appear as they complete."\n                  : failedSections.length > 0\n                  ? `${completedSections.length} sections completed and ${failedSections.length} failed. Retry only the failed sections or rebuild the full validation if the invention changed.`\n                  : "Research has completed. Rebuild only when the invention or evidence has materially changed."}'''
+          if old not in text:
+              raise SystemExit('status description anchor not found')
+          text = text.replace(old, new, 1)
+
+          old = '''              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRebuildValidation}
+                  disabled={rebuilding}
+                  className="gap-1.5 text-sm w-fit"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5${rebuilding ? " animate-spin" : ""}`} />
+                  {rebuilding ? "Rebuilding…" : "Rebuild Validation"}
+                </Button>
+                {rebuildError && (
+                  <p className="text-xs text-destructive">{rebuildError}</p>
+                )}
+              </div>'''
+          new = '''              <div className="flex flex-wrap items-center gap-3">\n                {failedSections.length > 0 && !isGenerating && (\n                  <Button\n                    size="sm"\n                    onClick={handleRetryFailedValidation}\n                    disabled={rebuilding || retryingFailed}\n                    className="gap-1.5 text-sm w-fit"\n                  >\n                    <RefreshCw className={`h-3.5 w-3.5${retryingFailed ? " animate-spin" : ""}`} />\n                    {retryingFailed ? "Retrying…" : `Retry ${failedSections.length} Failed Section${failedSections.length === 1 ? "" : "s"}`}\n                  </Button>\n                )}\n                <Button\n                  variant="outline"\n                  size="sm"\n                  onClick={handleRebuildValidation}\n                  disabled={rebuilding || retryingFailed}\n                  className="gap-1.5 text-sm w-fit"\n                >\n                  <RefreshCw className={`h-3.5 w-3.5${rebuilding ? " animate-spin" : ""}`} />\n                  {rebuilding ? "Rebuilding…" : "Rebuild Validation"}\n                </Button>\n                {rebuildError && (\n                  <p className="text-xs text-destructive">{rebuildError}</p>\n                )}\n              </div>'''
+          if old not in text:
+              raise SystemExit('top rebuild controls anchor not found')
+          text = text.replace(old, new, 1)
+
+          old = '''                  {isGenerating
+                    ? "InventSmith is researching your invention. New sections will appear automatically."
+                    : allSectionsError
+                    ? "Validation encountered errors. Click Rebuild to try again."
+                    : "InventSmith has completed the first round of validation research for your invention."}'''
+          new = '''                  {isGenerating\n                    ? "InventSmith is researching your invention. New sections will appear automatically."\n                    : allSectionsError\n                    ? "Validation encountered errors. Retry the failed sections or rebuild the full validation."\n                    : failedSections.length > 0\n                    ? "Validation is partial. Successful sections remain available while failed sections can be retried independently."\n                    : "InventSmith has completed the current validation research pass for your invention."}'''
+          if old not in text:
+              raise SystemExit('summary copy anchor not found')
+          text = text.replace(old, new, 1)
+
+          old = '''                  ) : (
+                    <span className="text-primary font-medium">
+                      Validation complete — {completedSections.length} of {TOTAL_SECTIONS} sections
+                    </span>
+                  )}'''
+          new = '''                  ) : failedSections.length > 0 ? (\n                    <span className="text-amber-700 dark:text-amber-400 font-medium">\n                      Validation partial — {completedSections.length} completed, {failedSections.length} failed\n                    </span>\n                  ) : (\n                    <span className="text-primary font-medium">\n                      Validation complete — {completedSections.length} of {TOTAL_SECTIONS} sections\n                    </span>\n                  )}'''
+          if old not in text:
+              raise SystemExit('progress copy anchor not found')
+          text = text.replace(old, new, 1)
+
+          old = '''                    onClick={handleRebuildValidation}
+                    disabled={rebuilding}'''
+          new = '''                    onClick={handleRebuildValidation}\n                    disabled={rebuilding || retryingFailed}'''
+          if old not in text:
+              raise SystemExit('secondary rebuild button anchor not found')
+          text = text.replace(old, new, 1)
+
+          old = '''    return <CongratulatoryScreen inventionTitle={invention.title} />;'''
+          new = '''    return <CongratulatoryScreen inventionTitle={invention.title} inventionId={inventionId} />;'''
+          if old not in text:
+              raise SystemExit('congrats call anchor not found')
+          text = text.replace(old, new, 1)
+
+          old = '''  // Stages 5+: show coming soon
+  if (!currentStage.enabled || stageId > 4) {
+    return <ComingSoonStage stageId={stageId} stageName={currentStage.name} />;
+  }'''
+          new = '''  // Stages managed by the full journey workspace should never be presented as unavailable.\n  if (!currentStage.enabled || stageId > 4) {\n    return <FullJourneyStage stageId={stageId} stageName={currentStage.name} inventionId={inventionId} />;\n  }'''
+          if old not in text:
+              raise SystemExit('Stage 5 fallback anchor not found')
+          text = text.replace(old, new, 1)
+
+          path.write_text(text)
+          PY
+
+      - name: Commit patch if needed
+        run: |
+          if git diff --quiet; then
+            echo "Phase 1 UX patch already applied."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add 'src/app/(app)/invention/[id]/page.tsx'
+          git commit -m "fix: expose partial validation retry and full journey"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
