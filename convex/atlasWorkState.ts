@@ -25,10 +25,6 @@ async function settleUsageReservation(
   if (usageScope.scope === "organization") {
     let organizationUsage = await findOrganizationDailyUsage(ctx, usageScope.organizationId, dateKey);
 
-    // A work item claimed immediately before this additive ledger deployed may
-    // still have its reservation in the former creator row. If no organization
-    // ledger exists yet, settle that pre-ledger reservation in place; the first
-    // later org operation will bootstrap from the already-settled legacy total.
     if (!organizationUsage && reservedCostUnits > 0) {
       const transitionalUsage = await ctx.db
         .query("atlasDailyUsage")
@@ -79,6 +75,54 @@ async function settleUsageReservation(
   }
 }
 
+async function attemptAlreadySettled(
+  ctx: MutationCtx,
+  workItemId: Id<"atlasWorkItems">,
+  attemptNumber: number
+): Promise<boolean> {
+  const events = await ctx.db
+    .query("atlasExecutionEvents")
+    .withIndex("by_workItemId", (q) => q.eq("workItemId", workItemId))
+    .collect();
+  return events.some((event) =>
+    event.attemptNumber === attemptNumber &&
+    (event.eventType === "work_completed" || event.eventType === "work_failed" || event.eventType === "work_blocked")
+  );
+}
+
+async function settleLateAttemptCostOnce(
+  ctx: MutationCtx,
+  item: { _id: Id<"atlasWorkItems">; inventionId: Id<"inventions">; reservationDateKey?: string },
+  attemptNumber: number,
+  actualCostUnits: number,
+  usageKnown: boolean,
+  now: number,
+  summary: string
+) {
+  if (await attemptAlreadySettled(ctx, item._id, attemptNumber)) return;
+  if (actualCostUnits > 0) {
+    await settleUsageReservation(
+      ctx,
+      { reservationDateKey: item.reservationDateKey, reservedCostUnits: undefined },
+      item.inventionId,
+      actualCostUnits,
+      0,
+      now
+    );
+  }
+  await ctx.db.insert("atlasExecutionEvents", {
+    inventionId: item.inventionId,
+    workItemId: item._id,
+    eventType: "work_failed",
+    actorType: "system",
+    summary,
+    attemptNumber,
+    costUnits: actualCostUnits,
+    metadata: { staleAttempt: true, costOnlySettlement: true, usageKnown },
+    createdAt: now,
+  });
+}
+
 export const claimNextWork = internalMutation({
   args: { inventionId: v.id("inventions"), availableCostUnits: v.number(), now: v.number() },
   handler: async (ctx, args) => {
@@ -110,8 +154,10 @@ export const claimNextWork = internalMutation({
       args.now,
       (kind) => canTierRunWorkKind(usageScope.plan, kind)
     );
-    if (!selection.selected) return { workItemId: null, reason: selection.reason };
+    if (!selection.selected) return { workItemId: null, attemptNumber: null, reason: selection.reason };
+
     const workItemId = selection.selected._id as typeof items[number]["_id"];
+    const attemptNumber = selection.selected.attemptCount + 1;
     const reservation = selection.selected.reservedCostUnits ?? selection.selected.estimatedCostUnits ?? 0;
     if (!selection.selected.reservedCostUnits && reservation > 0) {
       if (organizationUsage) {
@@ -141,7 +187,7 @@ export const claimNextWork = internalMutation({
       claimedAt: args.now,
       leaseExpiresAt: args.now + 10 * 60 * 1000,
       startedAt: args.now,
-      attemptCount: selection.selected.attemptCount + 1,
+      attemptCount: attemptNumber,
       lastError: undefined,
       reservedCostUnits: reservation || undefined,
       reservationDateKey: reservation ? selection.selected.reservationDateKey ?? dateKey : undefined,
@@ -153,7 +199,7 @@ export const claimNextWork = internalMutation({
       eventType: "work_claimed",
       actorType: "atlas",
       summary: `InventSmith claimed ${selection.selected.kind}.`,
-      attemptNumber: selection.selected.attemptCount + 1,
+      attemptNumber,
       metadata: {
         usageScope: usageScope.scope,
         usageOrganizationId: usageScope.organizationId ? String(usageScope.organizationId) : undefined,
@@ -161,7 +207,7 @@ export const claimNextWork = internalMutation({
       },
       createdAt: args.now,
     });
-    return { workItemId, reason: "selected" as const };
+    return { workItemId, attemptNumber, reason: "selected" as const };
   },
 });
 
@@ -200,6 +246,7 @@ const sourceVerificationValidator = v.object({
 export const completeWork = internalMutation({
   args: {
     workItemId: v.id("atlasWorkItems"),
+    attemptNumber: v.number(),
     summary: v.string(),
     deliverableTitle: v.string(),
     markdown: v.string(),
@@ -217,6 +264,9 @@ export const completeWork = internalMutation({
   handler: async (ctx, args) => {
     const workItem = await ctx.db.get(args.workItemId);
     if (!workItem || workItem.status !== "running") throw new ConvexError("Work item is not running");
+    if (workItem.attemptCount !== args.attemptNumber) throw new ConvexError("Work attempt is no longer current");
+    if (workItem.leaseExpiresAt && workItem.leaseExpiresAt <= args.completedAt) throw new ConvexError("Work attempt lease expired before completion");
+
     const currentInvention = await ctx.db.get(workItem.inventionId);
     if (currentInvention && workItem.claimedAt && currentInvention.updatedAt > workItem.claimedAt) {
       await ctx.db.patch(workItem._id, {
@@ -233,9 +283,9 @@ export const completeWork = internalMutation({
         eventType: "work_failed",
         actorType: "system",
         summary: "InventSmith discarded an output because the invention changed during generation.",
-        attemptNumber: workItem.attemptCount,
+        attemptNumber: args.attemptNumber,
         costUnits: args.actualCostUnits,
-        metadata: { retryScheduled: true, staleInputDiscarded: true },
+        metadata: { retryScheduled: true, staleInputDiscarded: true, usageKnown: true },
         createdAt: args.completedAt,
       });
       await settleUsageReservation(ctx, workItem, workItem.inventionId, args.actualCostUnits, 0, args.completedAt);
@@ -280,6 +330,7 @@ export const completeWork = internalMutation({
         }
       }
     }
+
     const sourcedFindings = findings.filter((finding) => finding.kind === "sourced_fact");
     const sourceCoverage = findings.length === 0
       ? 0
@@ -407,9 +458,9 @@ export const completeWork = internalMutation({
       eventType: "work_completed",
       actorType: "atlas",
       summary: args.summary.slice(0, 500),
-      attemptNumber: workItem.attemptCount,
+      attemptNumber: args.attemptNumber,
       costUnits: args.actualCostUnits,
-      metadata: { findingCount: findings.length, sourceCount: sourceIds.length, sourceCoverage },
+      metadata: { findingCount: findings.length, sourceCount: sourceIds.length, sourceCoverage, usageKnown: true },
       createdAt: args.completedAt,
     });
     await settleUsageReservation(ctx, workItem, workItem.inventionId, args.actualCostUnits, 1, args.completedAt);
@@ -428,12 +479,33 @@ export const completeWork = internalMutation({
 });
 
 export const failWork = internalMutation({
-  args: { workItemId: v.id("atlasWorkItems"), error: v.string(), failedAt: v.number() },
+  args: {
+    workItemId: v.id("atlasWorkItems"),
+    attemptNumber: v.number(),
+    error: v.string(),
+    actualCostUnits: v.number(),
+    usageKnown: v.boolean(),
+    failedAt: v.number(),
+  },
   handler: async (ctx, args) => {
     const item = await ctx.db.get(args.workItemId);
-    if (!item) return { willRetry: false };
+    if (!item) return { willRetry: false, staleAttempt: true };
+
+    if (item.status !== "running" || item.attemptCount !== args.attemptNumber) {
+      await settleLateAttemptCostOnce(
+        ctx,
+        item,
+        args.attemptNumber,
+        args.actualCostUnits,
+        args.usageKnown,
+        args.failedAt,
+        "A late InventSmith worker result was ignored because a newer attempt owns this work item."
+      );
+      return { willRetry: false, staleAttempt: true };
+    }
+
     const willRetry = shouldRetryWork(item.attemptCount, item.maxAttempts ?? 3);
-    await settleUsageReservation(ctx, item, item.inventionId, 0, 0, args.failedAt);
+    await settleUsageReservation(ctx, item, item.inventionId, args.actualCostUnits, 0, args.failedAt);
     await ctx.db.patch(item._id, {
       status: willRetry ? "queued" : "failed",
       lastError: args.error.slice(0, 1000),
@@ -448,25 +520,43 @@ export const failWork = internalMutation({
       eventType: "work_failed",
       actorType: "atlas",
       summary: "Autonomous work attempt failed.",
-      attemptNumber: item.attemptCount,
-      metadata: { retryScheduled: willRetry },
+      attemptNumber: args.attemptNumber,
+      costUnits: args.actualCostUnits,
+      metadata: { retryScheduled: willRetry, usageKnown: args.usageKnown },
       createdAt: args.failedAt,
     });
-    return { willRetry };
+    return { willRetry, staleAttempt: false };
   },
 });
 
 export const blockWorkForHuman = internalMutation({
   args: {
     workItemId: v.id("atlasWorkItems"),
+    attemptNumber: v.number(),
     reason: v.string(),
     gateType: v.union(v.literal("decision"), v.literal("authorization"), v.literal("private_information"), v.literal("professional_review"), v.literal("payment"), v.literal("physical_work")),
+    actualCostUnits: v.number(),
+    usageKnown: v.boolean(),
     blockedAt: v.number(),
   },
   handler: async (ctx, args) => {
     const item = await ctx.db.get(args.workItemId);
     if (!item) throw new ConvexError("Work item not found");
-    await settleUsageReservation(ctx, item, item.inventionId, 0, 0, args.blockedAt);
+
+    if (item.status !== "running" || item.attemptCount !== args.attemptNumber) {
+      await settleLateAttemptCostOnce(
+        ctx,
+        item,
+        args.attemptNumber,
+        args.actualCostUnits,
+        args.usageKnown,
+        args.blockedAt,
+        "A late human-gate result was ignored because a newer attempt owns this work item."
+      );
+      return { accepted: false };
+    }
+
+    await settleUsageReservation(ctx, item, item.inventionId, args.actualCostUnits, 0, args.blockedAt);
     await ctx.db.patch(args.workItemId, {
       status: "blocked",
       blockedReason: args.reason,
@@ -482,9 +572,11 @@ export const blockWorkForHuman = internalMutation({
       eventType: "work_blocked",
       actorType: "atlas",
       summary: args.reason.slice(0, 500),
-      attemptNumber: item.attemptCount,
-      metadata: { gateType: args.gateType },
+      attemptNumber: args.attemptNumber,
+      costUnits: args.actualCostUnits,
+      metadata: { gateType: args.gateType, usageKnown: args.usageKnown },
       createdAt: args.blockedAt,
     });
+    return { accepted: true };
   },
 });
