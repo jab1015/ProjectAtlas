@@ -91,13 +91,13 @@ Production dependencies remain on the patched lines established during hardening
 
 ## Exact verified repository checkpoint
 
-**Verified clean implementation head:** `bc93ed606866852e4ec88732e250d243a3db9a40`  
-**GitHub Actions:** workflow run **#564** / run ID `34905374828`  
+**Verified clean documentation checkpoint:** `c76e209da0c1dd4266ee59157f740c4297048322`  
+**GitHub Actions:** workflow run **#586** / run ID `34907940666`  
 **Result:** **PASS**
 
 That exact PR head passed dependency installation, operational-script checks, web TypeScript, Convex TypeScript, the full regression suite, production dependency audit, and the Next.js production build.
 
-The immediately preceding implementation run #563 was cancelled when the documentation commit advanced the PR head after its regression/audit stages had already passed; #564 verified the resulting newer exact head successfully.
+Run #586 verified the cleaned InventSmith documentation/naming head after the active-document filename conversions, Stage 1–15 blueprint normalization, release-plan renames, and removal of the first one-time documentation helper.
 
 PR #24 remains draft/open/unmerged. `main` remains untouched at this checkpoint.
 
@@ -106,7 +106,7 @@ This status means repository verification is distinct from deployment, live func
 ## Deployment / live status
 
 - **Implemented:** substantial complete-journey product code, Phase 1 hardening, and expanding Phase 2 behavioral acceptance exist in the repository.
-- **Automated verification passed:** yes through exact head `bc93ed606866852e4ec88732e250d243a3db9a40` / workflow run #564.
+- **Automated verification passed:** yes through exact clean documentation checkpoint `c76e209da0c1dd4266ee59157f740c4297048322` / workflow run #586. Later documentation-content corrections require their own live exact-head CI check.
 - **Deployed to owner-controlled Vercel/Convex:** no.
 - **Live functionally verified:** no.
 - **Professional review:** required for consequential legal, engineering, regulatory, manufacturing, and other gated outputs as applicable; completion must come from real qualified review, not AI inference.

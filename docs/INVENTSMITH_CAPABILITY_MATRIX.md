@@ -23,11 +23,11 @@ Owner-controlled Vercel and Convex are **not yet deployed**. Therefore no capabi
 
 ## Latest verified implementation checkpoint
 
-**Exact verified implementation head:** `bc93ed606866852e4ec88732e250d243a3db9a40`  
-**Workflow run:** #564 / run ID `34905374828`  
+**Exact verified clean documentation checkpoint:** `c76e209da0c1dd4266ee59157f740c4297048322`  
+**Workflow run:** #586 / run ID `34907940666`  
 **Result:** PASS across dependency installation, operational-script checks, web TypeScript, Convex TypeScript, full regression suite, production dependency audit, and Next.js production build.
 
-September 14 documentation/naming commits advance the branch beyond that implementation checkpoint. They require their own exact-head CI before the newer documentation head is described as fully verified.
+Later final documentation-content normalization and historical-name corrections advance the branch beyond that checkpoint. The live branch/PR exact-head CI must be checked before a newer head is described as fully verified.
 
 ## Foundation / trust / runtime matrix
 
@@ -43,7 +43,7 @@ September 14 documentation/naming commits advance the branch beyond that impleme
 | Professional-review audit behavior | yes | yes | passed | no | no | required where applicable | Reviewer reference/audit fields and all-required-review promotion behavior covered. |
 | Worker lease/attempt/late-response reliability | yes | yes | passed | no | no | n/a | Attempt identity, pre-provider lease validation, stale/late protection, bounded retry and CAD cleanup implemented; deployed soak remains. |
 | Production provider unavailable behavior | yes | yes in primary paths | automated provider/orchestrator coverage passed | no | no | n/a | Live provider acceptance still required after deployment. |
-| Fresh owner-controlled deployment path | yes | documentation implemented | documentation head pending fresh exact-head CI | no | no | n/a | `INVENTSMITH_DEPLOYMENT_RUNBOOK.md` targets Modern Methods-owned Vercel + Convex and retires MadeThis synchronization. |
+| Fresh owner-controlled deployment path | yes | documentation implemented | passed through verified documentation checkpoint; later doc-only corrections pending live exact-head check | no | no | n/a | `INVENTSMITH_DEPLOYMENT_RUNBOOK.md` targets Modern Methods-owned Vercel + Convex and retires MadeThis synchronization. |
 
 ## Core inventor experience
 
