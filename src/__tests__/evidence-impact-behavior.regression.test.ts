@@ -48,7 +48,7 @@ function fakeContext(initial: Tables) {
 }
 
 describe("inventor evidence impact behavior", () => {
-  it("records extracted evidence, releases the matching real-world gate, and invalidates downstream outputs", async () => {
+  it("records extracted evidence, releases the matching real-world gate, and invalidates only its downstream outputs", async () => {
     const { ctx, tables, inserts } = fakeContext({
       inventions: [{ _id: "inv_1", updatedAt: 10 }],
       inventionRecords: [{
@@ -107,6 +107,7 @@ describe("inventor evidence impact behavior", () => {
         status: "evidence_checked",
         updatedAt: 20,
       }],
+      deliverableDependencies: [],
       atlasDeliverables: [{
         _id: "deliverable_1",
         inventionId: "inv_1",
@@ -155,12 +156,9 @@ describe("inventor evidence impact behavior", () => {
     expect(gate.actualCostUnits).toBeUndefined();
     expect(gate.lastError).toContain("Prototype evidence was supplied");
 
-    const downstream = tables.atlasWorkItems.find((item) => item._id === "work_market")!;
-    expect(downstream.status).toBe("queued");
-    expect(downstream.attemptCount).toBe(0);
-    expect(downstream.completedAt).toBeUndefined();
-    expect(downstream.outputSummary).toBeUndefined();
-    expect(downstream.lastError).toContain("Inventor evidence was uploaded");
+    const unrelatedMarket = tables.atlasWorkItems.find((item) => item._id === "work_market")!;
+    expect(unrelatedMarket.status).toBe("completed");
+    expect(unrelatedMarket.outputSummary).toBe("Old market analysis");
 
     expect(tables.atlasWorkItems.find((item) => item._id === "work_running")!.status).toBe("running");
     expect(tables.atlasWorkItems.find((item) => item._id === "work_idea")!.status).toBe("completed");
@@ -206,6 +204,7 @@ describe("inventor evidence impact behavior", () => {
       }],
       evidenceFindings: [],
       atlasDeliverables: [],
+      deliverableDependencies: [],
       atlasExecutionEvents: [],
     });
 

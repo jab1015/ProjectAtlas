@@ -1,5 +1,6 @@
 import type { MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
+import { evidenceGateRootKind, impactedWorkKindsForEvidence } from "./evidenceImpactScopeLogic";
 
 const PRESERVE_WORK_KINDS = new Set(["idea_capture"]);
 
@@ -25,6 +26,31 @@ function evidenceGateRelease(input: { action: "uploaded" | "removed"; evidenceKi
     return {
       lastError: "Actual sales/launch evidence was supplied; InventSmith can evaluate the post-launch evidence gate again.",
       summary: "InventSmith released the launch evidence gate because actual sales/launch analytics were supplied.",
+    };
+  }
+  return null;
+}
+
+function removedEvidenceGateBlock(evidenceKind: string | undefined) {
+  if (evidenceKind === "prototype_test") {
+    return {
+      blockedReason: "Current physical prototype test evidence is required before downstream prototype conclusions can be relied on.",
+      humanGateType: "physical_work" as const,
+      summary: "InventSmith blocked the physical prototype-evidence gate because its supporting evidence was removed.",
+    };
+  }
+  if (evidenceKind === "manufacturer_quote") {
+    return {
+      blockedReason: "A current real manufacturer quote/RFQ response is required before quote comparison and manufacturing readiness can proceed.",
+      humanGateType: "authorization" as const,
+      summary: "InventSmith blocked the manufacturer quote-evidence gate because its supporting quote/RFQ evidence was removed.",
+    };
+  }
+  if (evidenceKind === "sales_evidence") {
+    return {
+      blockedReason: "Current actual launch/sales/customer evidence is required before post-launch performance conclusions can proceed.",
+      humanGateType: "private_information" as const,
+      summary: "InventSmith blocked the launch evidence gate because its supporting actual-market evidence was removed.",
     };
   }
   return null;
@@ -91,6 +117,8 @@ export async function applyInventorEvidenceChange(
     .query("atlasWorkItems")
     .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
     .collect();
+  const impactedKinds = impactedWorkKindsForEvidence(workItems, input.evidenceKind);
+  const gateRootKind = evidenceGateRootKind(input.evidenceKind);
 
   for (const item of workItems) {
     if (PRESERVE_WORK_KINDS.has(item.kind)) continue;
@@ -126,6 +154,40 @@ export async function applyInventorEvidenceChange(
       continue;
     }
 
+    if (impactedKinds && !impactedKinds.has(item.kind)) continue;
+
+    if (input.action === "removed" && gateRootKind && item.kind === gateRootKind) {
+      const block = removedEvidenceGateBlock(input.evidenceKind);
+      if (block) {
+        await ctx.db.patch(item._id, {
+          status: "blocked",
+          attemptCount: 0,
+          completedAt: undefined,
+          startedAt: undefined,
+          claimedAt: undefined,
+          leaseExpiresAt: undefined,
+          reservedCostUnits: undefined,
+          reservationDateKey: undefined,
+          actualCostUnits: undefined,
+          outputSummary: undefined,
+          blockedReason: block.blockedReason,
+          humanGateType: block.humanGateType,
+          lastError: reason,
+          updatedAt: input.now,
+        });
+        await ctx.db.insert("atlasExecutionEvents", {
+          inventionId,
+          workItemId: item._id,
+          eventType: "work_blocked",
+          actorType: "system",
+          summary: block.summary,
+          metadata: { evidenceKind: input.evidenceKind, sourceId: input.sourceId ? String(input.sourceId) : undefined },
+          createdAt: input.now,
+        });
+        continue;
+      }
+    }
+
     if (item.status === "completed" || item.status === "failed" || item.status === "stale") {
       await ctx.db.patch(item._id, {
         status: "queued",
@@ -151,29 +213,59 @@ export async function applyInventorEvidenceChange(
     .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
     .collect();
 
-  for (const finding of findings) {
-    const sourceIds = input.sourceId
-      ? finding.sourceIds.filter((sourceId) => sourceId !== input.sourceId)
-      : finding.sourceIds;
-    await ctx.db.patch(finding._id, {
-      sourceIds,
-      status: "stale",
-      updatedAt: input.now,
-    });
-  }
-
   const deliverables = await ctx.db
     .query("atlasDeliverables")
     .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
     .collect();
+  const workKindById = new Map(workItems.map((item) => [String(item._id), item.kind]));
+  const impactedDeliverableIds = new Set<string>();
 
   for (const deliverable of deliverables) {
-    const sourceIds = input.sourceId
+    const linkedKind = deliverable.workItemId ? workKindById.get(String(deliverable.workItemId)) : undefined;
+    const directlyReferencesRemovedSource = Boolean(
+      input.action === "removed" &&
+      input.sourceId &&
+      deliverable.sourceIds.some((sourceId) => sourceId === input.sourceId)
+    );
+    const graphImpacted = impactedKinds === null || Boolean(linkedKind && impactedKinds.has(linkedKind));
+    if (!graphImpacted && !directlyReferencesRemovedSource) continue;
+
+    const sourceIds = input.action === "removed" && input.sourceId
       ? deliverable.sourceIds.filter((sourceId) => sourceId !== input.sourceId)
       : deliverable.sourceIds;
     await ctx.db.patch(deliverable._id, {
       sourceIds,
       staleReason: reason,
+      updatedAt: input.now,
+    });
+    impactedDeliverableIds.add(String(deliverable._id));
+  }
+
+  const deliverableDependencies = await ctx.db
+    .query("deliverableDependencies")
+    .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
+    .collect();
+  const impactedFindingIds = new Set(
+    deliverableDependencies
+      .filter((dependency) => dependency.dependencyType === "finding" && impactedDeliverableIds.has(String(dependency.deliverableId)))
+      .map((dependency) => dependency.dependencyId)
+  );
+
+  for (const finding of findings) {
+    const directlyReferencesRemovedSource = Boolean(
+      input.action === "removed" &&
+      input.sourceId &&
+      finding.sourceIds.some((sourceId) => sourceId === input.sourceId)
+    );
+    const shouldStale = impactedKinds === null || impactedFindingIds.has(String(finding._id)) || directlyReferencesRemovedSource;
+    if (!shouldStale) continue;
+
+    const sourceIds = input.action === "removed" && input.sourceId
+      ? finding.sourceIds.filter((sourceId) => sourceId !== input.sourceId)
+      : finding.sourceIds;
+    await ctx.db.patch(finding._id, {
+      sourceIds,
+      status: "stale",
       updatedAt: input.now,
     });
   }

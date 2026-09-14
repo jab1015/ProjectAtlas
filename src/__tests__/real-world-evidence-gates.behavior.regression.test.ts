@@ -63,6 +63,7 @@ function baseTables(workItems: Row[]): Tables {
     atlasWorkItems: workItems,
     evidenceFindings: [],
     atlasDeliverables: [],
+    deliverableDependencies: [],
     atlasExecutionEvents: [],
   };
 }
@@ -128,6 +129,55 @@ describe("real-world evidence gate behavior", () => {
     expect(launchGate.humanGateType).toBeUndefined();
     expect(launchGate.lastError).toMatch(/sales\/launch evidence was supplied/i);
     expect(quoteGate.status).toBe("blocked");
+  });
+
+  it("refreshes quote-dependent costing/readiness without rerunning unrelated completed work", async () => {
+    const { ctx, tables } = fakeContext(baseTables([
+      blockedGate("manufacturer_quote_evidence", "quote_gate"),
+      { _id: "costing", inventionId: "inv_1", kind: "manufacturing_unit_economics", status: "completed", attemptCount: 1, completedAt: 20, outputSummary: "Pre-quote cost model", updatedAt: 20 },
+      { _id: "comparison", inventionId: "inv_1", kind: "manufacturer_quote_comparison", status: "completed", attemptCount: 1, completedAt: 21, outputSummary: "Old comparison", dependsOnKinds: ["manufacturing_unit_economics", "manufacturer_quote_evidence"], updatedAt: 21 },
+      { _id: "readiness", inventionId: "inv_1", kind: "manufacturing_readiness", status: "completed", attemptCount: 1, completedAt: 22, outputSummary: "Old readiness", dependsOnKinds: ["manufacturer_quote_comparison"], updatedAt: 22 },
+      { _id: "market", inventionId: "inv_1", kind: "market_analysis", status: "completed", attemptCount: 1, completedAt: 10, outputSummary: "Unrelated market result", updatedAt: 10 },
+    ]));
+
+    await applyInventorEvidenceChange(ctx, "inv_1" as any, {
+      action: "uploaded",
+      sourceId: "quote_source_2" as any,
+      label: "Updated factory quote",
+      evidenceKind: "manufacturer_quote",
+      extraction: { supplier: "Example Factory", unitPrice: 4.25 },
+      now: 500,
+    });
+
+    expect(tables.atlasWorkItems.find((item) => item._id === "quote_gate")?.status).toBe("queued");
+    expect(tables.atlasWorkItems.find((item) => item._id === "costing")?.status).toBe("queued");
+    expect(tables.atlasWorkItems.find((item) => item._id === "comparison")?.status).toBe("queued");
+    expect(tables.atlasWorkItems.find((item) => item._id === "readiness")?.status).toBe("queued");
+    expect(tables.atlasWorkItems.find((item) => item._id === "market")?.status).toBe("completed");
+  });
+
+  it("blocks a previously satisfied quote gate when its real quote evidence is removed", async () => {
+    const { ctx, tables } = fakeContext(baseTables([
+      { _id: "quote_gate", inventionId: "inv_1", kind: "manufacturer_quote_evidence", status: "completed", attemptCount: 1, completedAt: 20, outputSummary: "Quote confirmed", updatedAt: 20 },
+      { _id: "comparison", inventionId: "inv_1", kind: "manufacturer_quote_comparison", status: "completed", attemptCount: 1, completedAt: 21, outputSummary: "Old comparison", dependsOnKinds: ["manufacturer_quote_evidence"], updatedAt: 21 },
+    ]));
+
+    await applyInventorEvidenceChange(ctx, "inv_1" as any, {
+      action: "removed",
+      sourceId: "quote_source" as any,
+      label: "Factory RFQ response",
+      evidenceKind: "manufacturer_quote",
+      now: 600,
+    });
+
+    const gate = tables.atlasWorkItems.find((item) => item._id === "quote_gate")!;
+    expect(gate.status).toBe("blocked");
+    expect(gate.humanGateType).toBe("authorization");
+    expect(gate.blockedReason).toMatch(/current real manufacturer quote/i);
+    expect(tables.atlasWorkItems.find((item) => item._id === "comparison")?.status).toBe("queued");
+    expect(tables.atlasExecutionEvents).toEqual(expect.arrayContaining([
+      expect.objectContaining({ eventType: "work_blocked", workItemId: "quote_gate" }),
+    ]));
   });
 
   it("does not release an external gate for removed or mismatched evidence", async () => {
