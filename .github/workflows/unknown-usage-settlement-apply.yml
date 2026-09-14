@@ -1,0 +1,28 @@
+name: Apply unknown usage settlement
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: inventsmith/full-product-build
+      - run: python scripts/apply-unknown-usage-settlement-patch.py
+      - run: |
+          npm ci
+          npx tsc --noEmit
+          npx tsc -p convex --noEmit
+          npm test -- --run src/__tests__/unknown-usage-settlement.regression.test.ts src/__tests__/organization-usage.regression.test.ts src/__tests__/work-orchestrator.regression.test.ts
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add convex/usageSettlementLogic.ts convex/atlasWorkState.ts convex/nativeCad.ts src/__tests__/unknown-usage-settlement.regression.test.ts
+          git commit -m "fix: conservatively settle unknown provider usage"
+          git push origin HEAD:inventsmith/full-product-build
