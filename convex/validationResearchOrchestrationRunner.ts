@@ -30,6 +30,7 @@ interface RunValidationSectionsArgs {
   persistCompletedSection: (args: PersistValidationSectionArgs) => Promise<void>;
   persistFailedSection: (args: PersistValidationSectionArgs) => Promise<void>;
   now: () => number;
+  initialCompletedCount?: number;
   onError?: (message: string, error: unknown) => void;
 }
 
@@ -119,9 +120,10 @@ export async function runValidationSections({
   persistCompletedSection,
   persistFailedSection,
   now,
+  initialCompletedCount = 0,
   onError,
 }: RunValidationSectionsArgs): Promise<ValidationSectionRunSummary> {
-  let completedCount = 0;
+  let completedCount = Math.max(0, initialCompletedCount);
   let failedCount = 0;
 
   for (const sectionKey of sectionOrder) {
