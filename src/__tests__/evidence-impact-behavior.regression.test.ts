@@ -163,10 +163,12 @@ describe("inventor evidence impact behavior", () => {
     expect(tables.atlasWorkItems.find((item) => item._id === "work_running")!.status).toBe("running");
     expect(tables.atlasWorkItems.find((item) => item._id === "work_idea")!.status).toBe("completed");
 
-    expect(tables.evidenceFindings[0].status).toBe("stale");
-    expect(tables.evidenceFindings[0].sourceIds).toEqual(["other_source"]);
-    expect(tables.atlasDeliverables[0].sourceIds).toEqual(["other_source"]);
-    expect(tables.atlasDeliverables[0].staleReason).toContain("Inventor evidence was uploaded");
+    // The finding/deliverable are not linked to the prototype work graph in this fixture,
+    // so a scoped upload must leave them current and preserve their source references.
+    expect(tables.evidenceFindings[0].status).toBe("evidence_checked");
+    expect(tables.evidenceFindings[0].sourceIds).toEqual(["source_1", "other_source"]);
+    expect(tables.atlasDeliverables[0].sourceIds).toEqual(["source_1", "other_source"]);
+    expect(tables.atlasDeliverables[0].staleReason).toBeUndefined();
 
     expect(inserts).toEqual(expect.arrayContaining([
       expect.objectContaining({
