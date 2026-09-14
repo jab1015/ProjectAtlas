@@ -1,8 +1,21 @@
 # InventSmith Document Authority
 
-**Updated:** August 16, 2026
+**Updated:** September 14, 2026
 
-This file prevents historical Atlas planning documents from overriding the current InventSmith product direction.
+This file defines documentation authority, naming, and historical-reference rules for InventSmith.
+
+## Canonical product name
+
+The customer-facing and current product name is **InventSmith — The Inventor OS** by **Modern Methods**.
+
+The former **Atlas / ProjectAtlas** name is historical only. It may remain only where changing it would make a factual record inaccurate, including:
+
+- the current historical GitHub repository slug `jab1015/ProjectAtlas` until a separately reviewed repository rename is performed;
+- exact historical commit messages, branch names, workflow names, environment-variable/code identifiers, email subjects, quotations, screenshots, exhibits, or third-party records;
+- historical chronology explaining that the same product was previously developed under the former working name;
+- compatibility identifiers that must remain until a tested code-level migration is performed.
+
+Current product prose, active plans, current-state descriptions, handoff instructions, headings, and canonical documentation must use **InventSmith**, not Atlas.
 
 ## Current authoritative documents
 
@@ -10,17 +23,17 @@ Read these first, in this order:
 
 1. `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md` — authoritative product destination and non-negotiable requirements.
 2. `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md` — authoritative implementation checkpoint and continuation order.
-3. `docs/ATLAS_BUILD_PROGRESS.md` — concise repository progress/acceptance status; legacy filename retained for compatibility.
-4. `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md` — document precedence and supersession rules.
-5. `docs/ATLAS_DEPLOYMENT_RUNBOOK.md` — authoritative MadeThis handoff, deployment and live-acceptance procedure; legacy filename retained for compatibility.
+3. `docs/INVENTSMITH_BUILD_PROGRESS.md` — concise repository progress and acceptance status.
+4. `docs/INVENTSMITH_DEPLOYMENT_RUNBOOK.md` — owner-controlled deployment and live-acceptance procedure.
+5. `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md` — document precedence, naming, and supersession rules.
 
-## Historical/specialized planning documents
+## Historical and specialized documents
 
-Older `ATLAS_*` roadmaps, reset plans, automation plans, release plans, controlled-pilot plans, stage blueprints, research architecture documents, Bibles and other historical material remain useful for compatible detail and subsystem history. They do not override the current InventSmith master specification or current plan/progress checkpoint.
+Older documents created under the former working name remain historical/specialized source material. They may preserve the former name where it is part of the original historical record, but they do not define the current customer-facing name or override the authoritative InventSmith documents above.
 
-In particular, any older statement that says or implies that only Stages 1–4 are the destination; Stages 5–15 are merely future scope; a controlled pilot equals overall completion; Product Design/CAD/manufacturing/funding/launch are outside the intended product; the customer-facing product is Atlas; subscriptions are purely user-scoped; the architecture is inherently single-user/single-invention; the old $39/$79/$149 pricing ladder remains authoritative; organization seats multiply paid AI allowance; software/apps are outside InventSmith's invention scope; regulated inventions must be blanket-rejected rather than professionally gated; or repository-green alone means production acceptance is superseded.
+Any older statement that says or implies that only Stages 1–4 are the destination; Stages 5–15 are merely future scope; a controlled pilot equals overall completion; Product Design/CAD/manufacturing/funding/launch are outside the intended product; the customer-facing product uses the former working name; subscriptions are purely user-scoped; the architecture is inherently single-user/single-invention; the old $39/$79/$149 pricing ladder remains authoritative; organization seats multiply paid AI allowance; software/apps are outside InventSmith's invention scope; regulated inventions must be blanket-rejected rather than professionally gated; MadeThis remains the deployment target; or repository-green alone means production acceptance is superseded.
 
-## Current locked product/architecture decisions
+## Current locked product and architecture decisions
 
 - Customer-facing product: **InventSmith — The Inventor OS** by **Modern Methods**.
 - Complete idea-to-market destination remains mandatory.
@@ -44,14 +57,26 @@ In particular, any older statement that says or implies that only Stages 1–4 a
 - Internal cost economics are not customer-wide data; detailed provider/cost intelligence is restricted to authorized organization administration.
 - Repository CI success is necessary but not sufficient for live/physical/professional/billing acceptance.
 
+## Hosting and deployment authority
+
+The active owner-controlled target is:
+
+- **GitHub:** repository/source/CI authority;
+- **Vercel:** future Modern Methods-owned web deployment;
+- **Convex:** future Modern Methods-owned backend/database/auth/storage/functions deployment.
+
+The prior MadeThis-managed environment is retired from the implementation plan. Do not synchronize back to it, deploy to it, modify it, migrate its test data, or treat it as the source of truth. MadeThis references remain only where historically or evidentially necessary.
+
 ## Current implementation truth
 
-The organization schema, shared organization usage ledger, organization-scoped entitlement foundation, invention-level authorization/sharing foundations, organization-safe privacy/export/deletion behavior, measured cost-unit attribution/scenario reporting, consent-based team invitation foundation, complete journey wiring, genuine prototype/quote/launch/professional evidence gates, and product-type classification/routing foundation are implemented on `inventsmith/full-product-build`.
+The active branch is `inventsmith/full-product-build`; draft PR #24 remains intentionally unmerged.
 
-Atlas CI #463 on `e533dd96f1768e4cff36a502ee9779f3b97c5cb4` fully passed the classification/routing implementation through operational checks, both TypeScript targets, regression tests, production dependency audit and Next production build. Later business-only classification/documentation commits require a fresh full green CI pass before the new SHA is pinned for MadeThis replication.
+Implemented repository foundations include organization-native architecture; organization-scoped entitlements and usage accounting; invention authorization/sharing; privacy/export/deletion behavior; consent-based invitations; complete journey wiring; physical/software/hybrid/regulated classification and routing; evidence and trust boundaries; partial validation/recovery; attempt/lease worker reliability; genuine prototype/quote/launch/professional evidence gates; versioned artifact persistence; professional-review state; representative physical/software/hybrid/regulated acceptance; and direct real-world evidence gate behavior.
+
+The latest fully verified implementation checkpoint before the September 14 documentation/naming updates is `bc93ed606866852e4ec88732e250d243a3db9a40`, workflow run #564 / run ID `34905374828`, PASS. Later documentation/naming commits must receive their own exact-head CI result before being called fully verified.
 
 ## Continuation rule
 
-A new chat or coding worker must not spend time reconciling every historical Atlas document before continuing implementation. Use the authority order above, preserve compatible historical detail, and treat conflicting older release-scope language as superseded. Draft PR #24 remains intentionally unmerged until GitHub implementation is complete and founder approval is given.
+A new chat or coding worker should use the authoritative InventSmith documents above and continue from the live branch/PR/CI state. Do not restart completed work, do not merge PR #24, do not reintroduce MadeThis synchronization, and do not treat historical former-name documents as current product authority.
 
-When repository inspection finds no remaining code-only blocker and the current head is fully green, the next step is to pin the exact GitHub SHA and hand it to MadeThis for deterministic replication. Live authentication, external billing, real provider/runtime economics, artifact-quality review and genuine physical/professional/market evidence are acceptance work after replication; they must not be fabricated inside the repository merely to claim completion.
+Repository implementation, automated verification, deployment, live functional verification, and professional review are separate statuses and must remain separately reported.
