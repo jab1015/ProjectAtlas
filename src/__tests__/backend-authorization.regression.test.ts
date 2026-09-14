@@ -23,9 +23,55 @@ describe("backend authorization boundaries", () => {
     ["productFiles.ts", "remove"], ["productFiles.ts", "updateSortOrder"],
     ["products.ts", "listAll"], ["products.ts", "getById"],
     ["purchases.ts", "getByEmail"], ["purchases.ts", "getRecent"], ["purchases.ts", "listAll"], ["purchases.ts", "getStats"],
-    ["privacyRequests.ts", "listPending"], ["privacyRequests.ts", "resolve"],
+    ["privacyRequests.ts", "listPending"], ["privacyRequests.ts", "resolve"], ["privacyRequests.ts", "executeAccountDeletion"],
+    ["privacyExport.ts", "getStructuredExportForUser"],
   ])("requires administrator authorization in %s:%s", (file, name) => {
     expect(exportedFunctionBlock(source(file), name)).toContain("await requireAdmin(ctx)");
+  });
+
+  it("binds self-service privacy operations to the authenticated account instead of accepting a target user ID", () => {
+    const requests = source("privacyRequests.ts");
+    const exportSource = source("privacyExport.ts");
+    const requestBlock = exportedFunctionBlock(requests, "request");
+    const listMineBlock = exportedFunctionBlock(requests, "listMine");
+    const selfExportBlock = exportedFunctionBlock(exportSource, "getMyStructuredExport");
+
+    for (const block of [requestBlock, listMineBlock, selfExportBlock]) {
+      expect(block).toContain("getAuthUserId(ctx)");
+      expect(block).not.toContain('args: { userId: v.id("users") }');
+    }
+    expect(requestBlock).toContain('q.eq("userId", userId)');
+    expect(listMineBlock).toContain('q.eq("userId", userId)');
+    expect(selfExportBlock).toContain("buildStructuredExport(ctx, userId)");
+  });
+
+  it("keeps account deletion behind admin execution and target-account safety checks", () => {
+    const requests = source("privacyRequests.ts");
+    const deletion = source("accountDeletion.ts");
+    const execute = exportedFunctionBlock(requests, "executeAccountDeletion");
+
+    expect(execute).toContain("await requireAdmin(ctx)");
+    expect(execute).toContain('request.requestType !== "account_deletion"');
+    expect(execute).toContain('request.status === "completed" || request.status === "declined"');
+    expect(execute).toContain('user.role === "admin"');
+    expect(execute).toContain("requiresExternalBillingResolution");
+    expect(execute).toContain("await deleteAccountData(ctx, request.userId)");
+
+    expect(deletion).toContain('membership.role === "owner" && organization.kind !== "personal"');
+    expect(deletion).toContain("Transfer or close company/studio ownership before deleting this account");
+  });
+
+  it("requires owner/admin authority for organization member management and owner-only authority for ownership transfer", () => {
+    const organizations = source("organizations.ts");
+    const ownership = source("organizationOwnership.ts");
+
+    for (const name of ["updateMemberRole", "removeMember", "addMemberByEmail"]) {
+      expect(exportedFunctionBlock(organizations, name)).toContain('requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"])');
+    }
+    expect(exportedFunctionBlock(organizations, "updateMemberRole")).toContain('membership.role === "owner"');
+    expect(exportedFunctionBlock(organizations, "removeMember")).toContain('membership.role === "owner"');
+    expect(exportedFunctionBlock(ownership, "transferOwnership")).toContain('["owner"]');
+    expect(exportedFunctionBlock(ownership, "transferOwnership")).toContain("The new owner must already be an active organization member");
   });
 
   it("binds file access to a fulfilled purchase token and product", () => {
