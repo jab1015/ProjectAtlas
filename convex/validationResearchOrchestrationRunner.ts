@@ -19,8 +19,8 @@ export interface PersistValidationSectionArgs {
 export interface ValidationSectionRunSummary {
   completedCount: number;
   failedCount: number;
-  finalOverallStatus: "COMPLETED" | "FAILED";
-  finalResearchStatus: "completed" | "failed";
+  finalOverallStatus: "COMPLETED" | "PARTIAL" | "FAILED";
+  finalResearchStatus: "completed" | "partial" | "failed";
 }
 
 interface RunValidationSectionsArgs {
@@ -98,11 +98,18 @@ export function buildFailedSectionEntry(
 }
 
 export function getFinalValidationResearchStatus(
-  completedCount: number
+  completedCount: number,
+  failedCount: number
 ): Pick<ValidationSectionRunSummary, "finalOverallStatus" | "finalResearchStatus"> {
-  return completedCount > 0
-    ? { finalOverallStatus: "COMPLETED", finalResearchStatus: "completed" }
-    : { finalOverallStatus: "FAILED", finalResearchStatus: "failed" };
+  if (completedCount > 0 && failedCount > 0) {
+    return { finalOverallStatus: "PARTIAL", finalResearchStatus: "partial" };
+  }
+
+  if (completedCount > 0) {
+    return { finalOverallStatus: "COMPLETED", finalResearchStatus: "completed" };
+  }
+
+  return { finalOverallStatus: "FAILED", finalResearchStatus: "failed" };
 }
 
 export async function runValidationSections({
@@ -157,6 +164,6 @@ export async function runValidationSections({
   return {
     completedCount,
     failedCount,
-    ...getFinalValidationResearchStatus(completedCount),
+    ...getFinalValidationResearchStatus(completedCount, failedCount),
   };
 }
