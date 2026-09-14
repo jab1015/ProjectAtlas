@@ -7,7 +7,7 @@ import { canResolveApproval, canResolveDecision, canRespondToBlockedWork } from 
 import { MAX_AUTONOMOUS_RUN_BUDGET, remainingAutonomousCostUnitsAfterReservations, utcDateKey } from "./usagePolicyLogic";
 import { evaluatePilotPackage } from "./pilotEvaluationLogic";
 import { isAdmin } from "./authHelpers";
-import { deriveTrustStateFromProfessionalReviews } from "./professionalReviewLogic";
+import { deriveTrustStateFromProfessionalReviews, validateProfessionalReviewRecord } from "./professionalReviewLogic";
 import {
   requireInventionEditAccess,
   requireInventionManageAccess,
@@ -363,16 +363,16 @@ export const recordProfessionalReview = mutation({
     }
     const review = await ctx.db.get(args.reviewId);
     if (!review) throw new ConvexError("Professional review not found");
-    const reviewerName = args.reviewerName.trim();
-    if (reviewerName.length < 2) throw new ConvexError("Reviewer name is required");
+    const validatedReview = validateProfessionalReviewRecord(args);
+    if (!validatedReview.valid) throw new ConvexError(validatedReview.error);
 
     const now = Date.now();
     const status = args.accepted ? "accepted" as const : "changes_requested" as const;
     await ctx.db.patch(review._id, {
       status,
-      reviewerName,
-      reviewerReference: args.reviewerReference?.trim() || undefined,
-      notes: args.notes?.trim() || undefined,
+      reviewerName: validatedReview.reviewerName,
+      reviewerReference: validatedReview.reviewerReference,
+      notes: validatedReview.notes,
       reviewedAt: now,
       updatedAt: now,
     });
