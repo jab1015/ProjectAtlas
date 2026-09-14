@@ -11,7 +11,7 @@ import { generateExplodedDrawing, generateOrthographicDrawing } from "./cadDrawi
 
 const getNativeCadContext = makeFunctionReference<"query", { inventionId: Id<"inventions">; workItemId: Id<"atlasWorkItems"> }, any>("nativeCad:getNativeCadContext");
 const recordNativeCadSuccess = makeFunctionReference<"mutation", any, { discarded: boolean; actualCostUnits: number }>("nativeCad:recordNativeCadSuccess");
-const recordNativeCadFailure = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; workItemId: Id<"atlasWorkItems">; error: string; failedAt: number }, { willRetry: boolean }>("nativeCad:recordNativeCadFailure");
+const recordNativeCadFailure = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; workItemId: Id<"atlasWorkItems">; attemptNumber: number; error: string; actualCostUnits: number; usageKnown: boolean; failedAt: number }, { willRetry: boolean; staleAttempt: boolean }>("nativeCad:recordNativeCadFailure");
 
 const vecSchema = { type: "array", minItems: 3, maxItems: 3, items: { type: "number" } } as const;
 const vec2Schema = { type: "array", minItems: 2, maxItems: 2, items: { type: "number" } } as const;
@@ -93,16 +93,30 @@ function toAssemblySpec(model: ModelCadSpec): CadAssemblySpec {
   return { name: model.assemblyName.trim().slice(0, 180) || "InventSmith Product", units: "mm", revision: model.revision.trim().slice(0, 40) || "A", assumptions: model.assumptions.slice(0, 40).map((item) => item.slice(0, 1000)), unresolvedEngineering: model.unresolvedEngineering.slice(0, 40).map((item) => item.slice(0, 1000)), parts: model.parts.map(toPart) };
 }
 
-async function storeText(ctx: any, content: string, mediaType: string): Promise<Id<"_storage">> { return await ctx.storage.store(new Blob([content], { type: mediaType })); }
+async function storeText(ctx: any, content: string, mediaType: string): Promise<Id<"_storage">> {
+  return await ctx.storage.store(new Blob([content], { type: mediaType }));
+}
 
 export const generateNativeCad = internalAction({
-  args: { inventionId: v.id("inventions"), workItemId: v.id("atlasWorkItems") },
+  args: { inventionId: v.id("inventions"), workItemId: v.id("atlasWorkItems"), attemptNumber: v.number() },
   handler: async (ctx, args) => {
+    let incurredCostUnits = 0;
+    let usageKnown = true;
+    const storedIds: Id<"_storage">[] = [];
+
+    const storeTracked = async (content: string, mediaType: string) => {
+      const storageId = await storeText(ctx, content, mediaType);
+      storedIds.push(storageId);
+      return storageId;
+    };
+
     try {
       const apiKey = process.env.OPENAI_API_KEY;
       if (!apiKey) throw new Error("OPENAI_API_KEY is not configured for native CAD specification generation");
-      const context = await ctx.runQuery(getNativeCadContext, args);
+      const context = await ctx.runQuery(getNativeCadContext, { inventionId: args.inventionId, workItemId: args.workItemId });
       const client = new OpenAI({ apiKey });
+
+      usageKnown = false;
       const response = await client.responses.create({
         model: process.env.ATLAS_OPENAI_MODEL ?? "gpt-5.4-mini",
         max_output_tokens: 7000,
@@ -113,18 +127,25 @@ export const generateNativeCad = internalAction({
         ],
         text: { format: { type: "json_schema", name: "inventsmith_native_cad_spec", strict: true, schema: cadSpecSchema } },
       });
+      incurredCostUnits = costUnitsFromTokens(response.usage?.total_tokens);
+      usageKnown = true;
 
       const spec = toAssemblySpec(JSON.parse(response.output_text) as ModelCadSpec);
       const generated = generateCadArtifacts(spec);
       const orthographicSvg = generateOrthographicDrawing(spec);
       const explodedSvg = generateExplodedDrawing(spec);
-      const [stepStorageId, stlStorageId, dxfStorageId, sourceStorageId, orthographicStorageId, explodedStorageId] = await Promise.all([
-        storeText(ctx, generated.step, "model/step"), storeText(ctx, generated.stl, "model/stl"), storeText(ctx, generated.dxf, "application/dxf"), storeText(ctx, generated.sourceJson, "application/json"), storeText(ctx, orthographicSvg, "image/svg+xml"), storeText(ctx, explodedSvg, "image/svg+xml"),
-      ]);
-      const actualCostUnits = costUnitsFromTokens(response.usage?.total_tokens);
+
+      const stepStorageId = await storeTracked(generated.step, "model/step");
+      const stlStorageId = await storeTracked(generated.stl, "model/stl");
+      const dxfStorageId = await storeTracked(generated.dxf, "application/dxf");
+      const sourceStorageId = await storeTracked(generated.sourceJson, "application/json");
+      const orthographicStorageId = await storeTracked(orthographicSvg, "image/svg+xml");
+      const explodedStorageId = await storeTracked(explodedSvg, "image/svg+xml");
+
       const result = await ctx.runMutation(recordNativeCadSuccess, {
         inventionId: args.inventionId,
         workItemId: args.workItemId,
+        attemptNumber: args.attemptNumber,
         artifacts: [
           { kind: "native_cad_step", title: `${spec.name} — STEP CAD`, storageId: stepStorageId, mediaType: "model/step" },
           { kind: "native_cad_stl", title: `${spec.name} — STL prototype mesh`, storageId: stlStorageId, mediaType: "model/stl" },
@@ -138,13 +159,28 @@ export const generateNativeCad = internalAction({
         partCount: generated.partCount,
         assumptions: spec.assumptions,
         unresolvedEngineering: spec.unresolvedEngineering,
-        actualCostUnits,
+        actualCostUnits: incurredCostUnits,
         completedAt: Date.now(),
       });
-      return { ...result, failed: false, actualCostUnits };
+      return { ...result, failed: false, actualCostUnits: incurredCostUnits };
     } catch (error) {
-      const failure = await ctx.runMutation(recordNativeCadFailure, { inventionId: args.inventionId, workItemId: args.workItemId, error: error instanceof Error ? error.message : "Native CAD generation failed", failedAt: Date.now() });
-      return { discarded: false, failed: true, willRetry: failure.willRetry, actualCostUnits: 0 };
+      for (const storageId of storedIds) {
+        try {
+          await ctx.storage.delete(storageId);
+        } catch (cleanupError) {
+          console.error("[NativeCAD] Failed to clean up partial artifact", storageId, cleanupError);
+        }
+      }
+      const failure = await ctx.runMutation(recordNativeCadFailure, {
+        inventionId: args.inventionId,
+        workItemId: args.workItemId,
+        attemptNumber: args.attemptNumber,
+        error: error instanceof Error ? error.message : "Native CAD generation failed",
+        actualCostUnits: incurredCostUnits,
+        usageKnown,
+        failedAt: Date.now(),
+      });
+      return { discarded: false, failed: true, willRetry: failure.willRetry, actualCostUnits: incurredCostUnits };
     }
   },
 });
