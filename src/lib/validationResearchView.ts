@@ -1,4 +1,9 @@
-export type ValidationResearchStatus = "running" | "complete" | "failed" | undefined;
+export type ValidationResearchStatus =
+  | "running"
+  | "complete"
+  | "partial"
+  | "failed"
+  | undefined;
 
 export interface ValidationResearchSectionView {
   sectionId?: string;
@@ -25,6 +30,7 @@ export interface ValidationResearchViewState {
   failedSections: ValidationResearchSectionView[];
   isGenerating: boolean;
   isFailed: boolean;
+  isPartial: boolean;
   allSectionsError: boolean;
   progressCount: number;
   progressPct: number;
@@ -40,6 +46,7 @@ export function getValidationResearchViewState(
   const finishedSections = sections.filter((section) => section.status !== "pending");
   const failedSections = finishedSections.filter((section) => section.status === "failed");
   const isFailed = validationResearch?.status === "failed";
+  const isPartial = validationResearch?.status === "partial";
   const isGenerating = rebuilding || validationResearch?.status === "running";
   const progressCount = finishedSections.length;
   const progressPct =
@@ -62,6 +69,8 @@ export function getValidationResearchViewState(
     statusLabel = "Validation failed";
   } else if (isGenerating) {
     statusLabel = "Research in progress";
+  } else if (isPartial) {
+    statusLabel = "Validation partially complete";
   } else if (validationResearch?.status === "complete") {
     statusLabel =
       failedSections.length > 0
@@ -74,6 +83,7 @@ export function getValidationResearchViewState(
     failedSections,
     isGenerating,
     isFailed,
+    isPartial,
     allSectionsError,
     progressCount,
     progressPct,
