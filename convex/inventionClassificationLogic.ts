@@ -18,6 +18,8 @@ export interface InventionClassification {
 
 const SOFTWARE_PATTERNS = [
   /\b(app|software|saas|software platform|website|web app|mobile app|ios|android|api|algorithm|cloud service|digital service|browser extension|desktop software|ai assistant|machine learning)\b/i,
+  /\b(?:mobile|web|cloud|desktop|patient|customer|companion) application\b/i,
+  /\bcompanion (?:app|software)\b/i,
 ];
 
 const PHYSICAL_PATTERNS = [
