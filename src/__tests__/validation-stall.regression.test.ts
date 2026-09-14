@@ -59,6 +59,49 @@ describe("validation orchestration stall regression", () => {
     expect(persisted.map((entry) => entry.completedSectionCount)).toEqual([1, 2]);
   });
 
+  it("reports partial when at least one section succeeds and another fails", async () => {
+    const persisted: PersistValidationSectionArgs[] = [];
+
+    const summary = await runValidationSections({
+      sectionOrder,
+      inventionContext: context,
+      now: () => 321,
+      provider: {
+        generateSection: async (_ctx, sectionKey) => {
+          if (sectionKey === "customerSegments") {
+            throw new Error("retrieval unavailable");
+          }
+          return {
+            sectionKey,
+            generatedContent: `Generated ${sectionKey}`,
+            confidence: {
+              score: 0.5,
+              level: "moderate",
+              evidenceSummary: "Generated from available evidence.",
+              assumptions: [],
+              missingInformation: [],
+            },
+            evidenceSummary: "Generated from available evidence.",
+            assumptions: [],
+            missingInformation: [],
+            generatedAt: 321,
+            providerVersion: "test",
+          };
+        },
+      },
+      persistCompletedSection: async (args) => persisted.push(args),
+      persistFailedSection: async (args) => persisted.push(args),
+    });
+
+    expect(summary.finalOverallStatus).toBe("PARTIAL");
+    expect(summary.finalResearchStatus).toBe("partial");
+    expect(summary.completedCount).toBe(1);
+    expect(summary.failedCount).toBe(1);
+    expect(persisted).toHaveLength(2);
+    expect(persisted[0].sectionEntry.sectionStatus).toBe("COMPLETED");
+    expect(persisted[1].sectionEntry.sectionStatus).toBe("FAILED");
+  });
+
   it("does not count a section as complete when its DB write fails", async () => {
     const persistedFailures: PersistValidationSectionArgs[] = [];
 
@@ -113,5 +156,25 @@ describe("validation orchestration stall regression", () => {
     expect(state.isGenerating).toBe(false);
     expect(state.statusLabel).toBe("Validation failed");
     expect(state.allSectionsError).toBe(true);
+  });
+
+  it("surfaces a partial research row without calling it complete", () => {
+    const state = getValidationResearchViewState(
+      {
+        status: "partial",
+        sections: [
+          { sectionId: "validationPlan", status: "generated" },
+          { sectionId: "customerSegments", status: "failed" },
+        ],
+      },
+      false,
+      11
+    );
+
+    expect(state.isGenerating).toBe(false);
+    expect(state.isFailed).toBe(false);
+    expect(state.isPartial).toBe(true);
+    expect(state.statusLabel).toBe("Validation partially complete");
+    expect(state.failedSections).toHaveLength(1);
   });
 });
