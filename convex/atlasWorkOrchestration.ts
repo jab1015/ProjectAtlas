@@ -11,13 +11,13 @@ import { MAX_AUTONOMOUS_RUN_BUDGET } from "./usagePolicyLogic";
 import { restrictedPilotReason, triageInventionRisk } from "./riskTriageLogic";
 import { buildPitchDeckArtifact } from "./pitchDeckArtifact";
 
-const claimNextWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; availableCostUnits: number; now: number }, { workItemId: Id<"atlasWorkItems"> | null; reason: string }>("atlasWorkState:claimNextWork");
+const claimNextWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; availableCostUnits: number; now: number }, { workItemId: Id<"atlasWorkItems"> | null; attemptNumber: number | null; reason: string }>("atlasWorkState:claimNextWork");
 const getWorkContext = makeFunctionReference<"query", { workItemId: Id<"atlasWorkItems"> }, any>("atlasWorkState:getWorkContext");
 const completeWork = makeFunctionReference<"mutation", any, void>("atlasWorkState:completeWork");
-const failWork = makeFunctionReference<"mutation", { workItemId: Id<"atlasWorkItems">; error: string; failedAt: number }, { willRetry: boolean }>("atlasWorkState:failWork");
-const blockWorkForHuman = makeFunctionReference<"mutation", any, void>("atlasWorkState:blockWorkForHuman");
+const failWork = makeFunctionReference<"mutation", { workItemId: Id<"atlasWorkItems">; attemptNumber: number; error: string; actualCostUnits: number; usageKnown: boolean; failedAt: number }, { willRetry: boolean; staleAttempt: boolean }>("atlasWorkState:failWork");
+const blockWorkForHuman = makeFunctionReference<"mutation", any, { accepted: boolean }>("atlasWorkState:blockWorkForHuman");
 const continueAvailableWork = makeFunctionReference<"action", { inventionId: Id<"inventions">; costBudgetUnits?: number }, unknown>("atlasWorkOrchestration:runAvailableWork");
-const generateNativeCad = makeFunctionReference<"action", { inventionId: Id<"inventions">; workItemId: Id<"atlasWorkItems"> }, { discarded: boolean; failed: boolean; willRetry?: boolean; actualCostUnits: number }>("nativeCadGeneration:generateNativeCad");
+const generateNativeCad = makeFunctionReference<"action", { inventionId: Id<"inventions">; workItemId: Id<"atlasWorkItems">; attemptNumber: number }, { discarded: boolean; failed: boolean; willRetry?: boolean; actualCostUnits: number }>("nativeCadGeneration:generateNativeCad");
 
 const resultSchema = {
   type: "object",
@@ -57,7 +57,7 @@ function assignmentInstructions(kind: string): string {
     technical_feasibility: "Assess mechanisms, constraints, failure modes, prototype questions, and engineering risks without representing the concept as engineering approved.",
     materials_manufacturing: "Compare candidate materials and manufacturing processes, including cost drivers, tolerances, tooling, assembly, sustainability, and unresolved engineering checks.",
     regulatory_screening: "Identify potentially applicable US federal, state, local, industry, testing, labeling, and certification categories. Present a screening checklist, not a compliance conclusion.",
-    evidence_verification: "Independently inspect every supplied source locator supporting a material claim. Confirm that it resolves to relevant content, classify evidence quality, flag conflicts, and leave uncertainty unverified. Return one verifiedSources entry per inspected locator. Do not promote a source merely because its URL looks plausible.",
+    evidence_verification: "Independently inspect every supplied source locator supporting a material claim. Confirm that it resolves to relevant content, classify evidence quality, flag conflicts, and leave uncertainty unverified. Return one verifiedSources entry per inspected locator. A model classification alone does not promote stored evidence; trusted promotion requires a separate traceable retrieval and claim-support record.",
     ip_readiness: "Prepare an organized invention disclosure and patent-professional handoff brief using existing work. Clearly separate inventor contribution, prior-art observations, and legal questions.",
     feature_prior_art_comparison: "Build a feature-by-feature comparison between the proposed invention and the most relevant preliminary prior art. Cite source locators, distinguish absence of evidence from evidence of difference, and do not offer a patentability or design-around opinion.",
     distinguishing_features: "Develop potentially distinguishing feature hypotheses and alternative embodiments from the comparison. Preserve inventor contribution, explain tradeoffs, and label every novelty statement as a hypothesis for patent-professional review.",
@@ -102,17 +102,30 @@ export const runAvailableWork = internalAction({
 
     for (let completed = 0; completed < 2; completed += 1) {
       const claim = await ctx.runMutation(claimNextWork, { inventionId, availableCostUnits: remainingBudget, now: Date.now() });
-      if (!claim.workItemId) return { completed, stopReason: claim.reason, remainingBudget };
+      if (!claim.workItemId || claim.attemptNumber === null) return { completed, stopReason: claim.reason, remainingBudget };
+
+      const attemptNumber = claim.attemptNumber;
+      let incurredCostUnits = 0;
+      let usageKnown = true;
+
       try {
         const { workItem, invention, record, sources, findings, deliverables } = await ctx.runQuery(getWorkContext, { workItemId: claim.workItemId });
         const risk = triageInventionRisk(invention);
         if (risk.restricted) {
-          await ctx.runMutation(blockWorkForHuman, { workItemId: claim.workItemId, reason: restrictedPilotReason(risk.categories), gateType: "professional_review", blockedAt: Date.now() });
+          await ctx.runMutation(blockWorkForHuman, {
+            workItemId: claim.workItemId,
+            attemptNumber,
+            reason: restrictedPilotReason(risk.categories),
+            gateType: "professional_review",
+            actualCostUnits: 0,
+            usageKnown: true,
+            blockedAt: Date.now(),
+          });
           return { completed, stopReason: "restricted_product_category", remainingBudget };
         }
 
         if (workItem.kind === "native_cad_generation") {
-          const cadResult = await ctx.runAction(generateNativeCad, { inventionId, workItemId: claim.workItemId });
+          const cadResult = await ctx.runAction(generateNativeCad, { inventionId, workItemId: claim.workItemId, attemptNumber });
           remainingBudget = Math.max(0, remainingBudget - (cadResult.actualCostUnits ?? 0));
           if (cadResult.failed) {
             if (shouldScheduleAutonomousRetry(Boolean(cadResult.willRetry), remainingBudget)) await ctx.scheduler.runAfter(2_000, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget });
@@ -121,6 +134,7 @@ export const runAvailableWork = internalAction({
           continue;
         }
 
+        usageKnown = false;
         const response = await client.responses.create({
           model: process.env.ATLAS_OPENAI_MODEL ?? "gpt-5.4-mini",
           max_output_tokens: 8000,
@@ -147,10 +161,20 @@ export const runAvailableWork = internalAction({
           text: { format: { type: "json_schema", name: "atlas_work_result", strict: true, schema: resultSchema } },
         });
 
+        incurredCostUnits = costUnitsFromTokens(response.usage?.total_tokens);
+        usageKnown = true;
         const result = JSON.parse(response.output_text);
-        let units = costUnitsFromTokens(response.usage?.total_tokens);
         if (result.needsHuman) {
-          await ctx.runMutation(blockWorkForHuman, { workItemId: claim.workItemId, reason: result.humanReason, gateType: result.humanGateType, blockedAt: Date.now() });
+          await ctx.runMutation(blockWorkForHuman, {
+            workItemId: claim.workItemId,
+            attemptNumber,
+            reason: result.humanReason,
+            gateType: result.humanGateType,
+            actualCostUnits: incurredCostUnits,
+            usageKnown,
+            blockedAt: Date.now(),
+          });
+          remainingBudget = Math.max(0, remainingBudget - incurredCostUnits);
           return { completed, stopReason: "human_gate", remainingBudget };
         }
 
@@ -166,19 +190,21 @@ export const runAvailableWork = internalAction({
             : workItem.kind === "brand_asset_brief"
               ? buildBrandIdentityPrompt(imagePrompt)
               : buildConceptImagePrompt(imagePrompt);
+          usageKnown = false;
           const imageResult = await client.images.generate({ model: process.env.ATLAS_IMAGE_MODEL ?? "gpt-image-2", prompt });
           const imageBase64 = imageResult.data?.[0]?.b64_json;
           if (!imageBase64) throw new Error("Image generation returned no image data");
+          incurredCostUnits += workItem.kind === "product_render_generation"
+            ? PRODUCT_RENDER_COST_UNITS
+            : workItem.kind === "brand_asset_brief"
+              ? BRAND_IDENTITY_COST_UNITS
+              : CONCEPT_IMAGE_COST_UNITS;
+          usageKnown = true;
           const bytes = Uint8Array.from(Buffer.from(imageBase64, "base64"));
           storageId = await ctx.storage.store(new Blob([bytes], { type: "image/png" }));
           mediaType = "image/png";
           artifactMaturity = "concept_visualization";
           generationPrompt = result.conceptImagePrompt;
-          units += workItem.kind === "product_render_generation"
-            ? PRODUCT_RENDER_COST_UNITS
-            : workItem.kind === "brand_asset_brief"
-              ? BRAND_IDENTITY_COST_UNITS
-              : CONCEPT_IMAGE_COST_UNITS;
         } else if (workItem.kind === "pitch_deck_content") {
           const currentRender = deliverables
             .filter((item: any) => item.kind === "product_render_board" && item.storageId && item.mediaType === "image/png" && !item.staleReason)
@@ -195,6 +221,7 @@ export const runAvailableWork = internalAction({
 
         await ctx.runMutation(completeWork, {
           workItemId: claim.workItemId,
+          attemptNumber,
           summary: result.summary,
           deliverableTitle: result.deliverableTitle,
           markdown: result.markdown,
@@ -206,14 +233,24 @@ export const runAvailableWork = internalAction({
           mediaType,
           artifactMaturity,
           generationPrompt,
-          actualCostUnits: units,
+          actualCostUnits: incurredCostUnits,
           completedAt: Date.now(),
         });
-        remainingBudget = Math.max(0, remainingBudget - units);
+        remainingBudget = Math.max(0, remainingBudget - incurredCostUnits);
       } catch (error) {
-        const failure = await ctx.runMutation(failWork, { workItemId: claim.workItemId, error: error instanceof Error ? error.message : "Autonomous work failed", failedAt: Date.now() });
-        if (shouldScheduleAutonomousRetry(failure.willRetry, remainingBudget)) await ctx.scheduler.runAfter(2_000, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget });
-        return { completed, stopReason: "failed", remainingBudget };
+        const failure = await ctx.runMutation(failWork, {
+          workItemId: claim.workItemId,
+          attemptNumber,
+          error: error instanceof Error ? error.message : "Autonomous work failed",
+          actualCostUnits: incurredCostUnits,
+          usageKnown,
+          failedAt: Date.now(),
+        });
+        remainingBudget = Math.max(0, remainingBudget - incurredCostUnits);
+        if (!failure.staleAttempt && shouldScheduleAutonomousRetry(failure.willRetry, remainingBudget)) {
+          await ctx.scheduler.runAfter(2_000, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget });
+        }
+        return { completed, stopReason: failure.staleAttempt ? "stale_attempt" : "failed", remainingBudget };
       }
     }
 
