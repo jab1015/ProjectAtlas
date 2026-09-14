@@ -14,7 +14,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: inventsmith/full-product-build
-      - run: python scripts/apply-evidence-retrieval-patch.py
+      - run: |
+          python scripts/apply-evidence-retrieval-patch.py
+          python scripts/fix-evidence-retrieval-import.py
       - run: |
           npm ci
           npx tsc --noEmit
