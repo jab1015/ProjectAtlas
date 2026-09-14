@@ -89,8 +89,12 @@ describe("validation orchestration stall regression", () => {
           };
         },
       },
-      persistCompletedSection: async (args) => persisted.push(args),
-      persistFailedSection: async (args) => persisted.push(args),
+      persistCompletedSection: async (args) => {
+        persisted.push(args);
+      },
+      persistFailedSection: async (args) => {
+        persisted.push(args);
+      },
     });
 
     expect(summary.finalOverallStatus).toBe("PARTIAL");
