@@ -1,0 +1,15 @@
+from pathlib import Path
+
+# Refresh only the known stale verification checkpoint blocks. The live branch/CI remains authoritative.
+build = Path('docs/INVENTSMITH_BUILD_PROGRESS.md')
+text = build.read_text(encoding='utf-8')
+text = text.replace('**Verified clean implementation head:** `bc93ed606866852e4ec88732e250d243a3db9a40`  \n**GitHub Actions:** workflow run **#564** / run ID `34905374828`  \n**Result:** **PASS**', '**Verified clean documentation checkpoint:** `c76e209da0c1dd4266ee59157f740c4297048322`  \n**GitHub Actions:** workflow run **#586** / run ID `34907940666`  \n**Result:** **PASS**')
+text = text.replace('The immediately preceding implementation run #563 was cancelled when the documentation commit advanced the PR head after its regression/audit stages had already passed; #564 verified the resulting newer exact head successfully.\n\n', 'Run #586 verified the cleaned InventSmith documentation/naming head after the active-document filename conversions, Stage 1–15 blueprint normalization, release-plan renames, and removal of the first one-time documentation helper.\n\n')
+text = text.replace('- **Automated verification passed:** yes through exact head `bc93ed606866852e4ec88732e250d243a3db9a40` / workflow run #564.', '- **Automated verification passed:** yes through exact clean documentation checkpoint `c76e209da0c1dd4266ee59157f740c4297048322` / workflow run #586. Later documentation-content corrections require their own live exact-head CI check.')
+build.write_text(text, encoding='utf-8')
+
+matrix = Path('docs/INVENTSMITH_CAPABILITY_MATRIX.md')
+text = matrix.read_text(encoding='utf-8')
+text = text.replace('**Exact verified implementation head:** `bc93ed606866852e4ec88732e250d243a3db9a40`  \n**Workflow run:** #564 / run ID `34905374828`  \n**Result:** PASS across dependency installation, operational-script checks, web TypeScript, Convex TypeScript, full regression suite, production dependency audit, and Next.js production build.\n\nSeptember 14 documentation/naming commits advance the branch beyond that implementation checkpoint. They require their own exact-head CI before the newer documentation head is described as fully verified.', '**Exact verified clean documentation checkpoint:** `c76e209da0c1dd4266ee59157f740c4297048322`  \n**Workflow run:** #586 / run ID `34907940666`  \n**Result:** PASS across dependency installation, operational-script checks, web TypeScript, Convex TypeScript, full regression suite, production dependency audit, and Next.js production build.\n\nLater final documentation-content normalization and historical-name corrections advance the branch beyond that checkpoint. The live branch/PR exact-head CI must be checked before a newer head is described as fully verified.')
+text = text.replace('| Fresh owner-controlled deployment path | yes | documentation implemented | documentation head pending fresh exact-head CI |', '| Fresh owner-controlled deployment path | yes | documentation implemented | passed through verified documentation checkpoint; later doc-only corrections pending live exact-head check |')
+matrix.write_text(text, encoding='utf-8')
