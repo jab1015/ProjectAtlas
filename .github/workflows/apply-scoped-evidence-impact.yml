@@ -1,0 +1,30 @@
+name: Apply scoped evidence impact
+on:
+  push:
+    branches:
+      - inventsmith/full-product-build
+    paths:
+      - .github/workflows/apply-scoped-evidence-impact.yml
+      - scripts/apply-scoped-evidence-impact.py
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: inventsmith/full-product-build
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/apply-scoped-evidence-impact.py
+      - name: Commit source/tests and remove helper
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f scripts/apply-scoped-evidence-impact.py .github/workflows/apply-scoped-evidence-impact.yml
+          git add -A convex src scripts .github/workflows
+          git commit -m "feat: scope real-world evidence invalidation"
+          git push origin HEAD:inventsmith/full-product-build
