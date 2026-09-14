@@ -9,7 +9,7 @@ import { costUnitsFromTokens } from "./workOrchestratorLogic";
 import { generateCadArtifacts, type CadAssemblySpec, type CadPartSpec, type Vec2 } from "./cadGeometry";
 import { generateExplodedDrawing, generateOrthographicDrawing } from "./cadDrawing";
 
-const getNativeCadContext = makeFunctionReference<"query", { inventionId: Id<"inventions">; workItemId: Id<"atlasWorkItems"> }, any>("nativeCad:getNativeCadContext");
+const getNativeCadContext = makeFunctionReference<"query", { inventionId: Id<"inventions">; workItemId: Id<"atlasWorkItems">; attemptNumber: number; now: number }, any>("nativeCad:getNativeCadContext");
 const recordNativeCadSuccess = makeFunctionReference<"mutation", any, { discarded: boolean; actualCostUnits: number }>("nativeCad:recordNativeCadSuccess");
 const recordNativeCadFailure = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; workItemId: Id<"atlasWorkItems">; attemptNumber: number; error: string; actualCostUnits: number; usageKnown: boolean; failedAt: number }, { willRetry: boolean; staleAttempt: boolean }>("nativeCad:recordNativeCadFailure");
 
@@ -113,7 +113,7 @@ export const generateNativeCad = internalAction({
     try {
       const apiKey = process.env.OPENAI_API_KEY;
       if (!apiKey) throw new Error("OPENAI_API_KEY is not configured for native CAD specification generation");
-      const context = await ctx.runQuery(getNativeCadContext, { inventionId: args.inventionId, workItemId: args.workItemId });
+      const context = await ctx.runQuery(getNativeCadContext, { inventionId: args.inventionId, workItemId: args.workItemId, attemptNumber: args.attemptNumber, now: Date.now() });
       const client = new OpenAI({ apiKey });
 
       usageKnown = false;

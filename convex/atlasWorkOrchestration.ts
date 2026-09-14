@@ -12,7 +12,7 @@ import { restrictedPilotReason, triageInventionRisk } from "./riskTriageLogic";
 import { buildPitchDeckArtifact } from "./pitchDeckArtifact";
 
 const claimNextWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; availableCostUnits: number; now: number }, { workItemId: Id<"atlasWorkItems"> | null; attemptNumber: number | null; reason: string }>("atlasWorkState:claimNextWork");
-const getWorkContext = makeFunctionReference<"query", { workItemId: Id<"atlasWorkItems"> }, any>("atlasWorkState:getWorkContext");
+const getWorkContext = makeFunctionReference<"query", { workItemId: Id<"atlasWorkItems">; attemptNumber: number; now: number }, any>("atlasWorkState:getWorkContext");
 const completeWork = makeFunctionReference<"mutation", any, void>("atlasWorkState:completeWork");
 const failWork = makeFunctionReference<"mutation", { workItemId: Id<"atlasWorkItems">; attemptNumber: number; error: string; actualCostUnits: number; usageKnown: boolean; failedAt: number }, { willRetry: boolean; staleAttempt: boolean }>("atlasWorkState:failWork");
 const blockWorkForHuman = makeFunctionReference<"mutation", any, { accepted: boolean }>("atlasWorkState:blockWorkForHuman");
@@ -109,7 +109,7 @@ export const runAvailableWork = internalAction({
       let usageKnown = true;
 
       try {
-        const { workItem, invention, record, sources, findings, deliverables } = await ctx.runQuery(getWorkContext, { workItemId: claim.workItemId });
+        const { workItem, invention, record, sources, findings, deliverables } = await ctx.runQuery(getWorkContext, { workItemId: claim.workItemId, attemptNumber, now: Date.now() });
         const risk = triageInventionRisk(invention);
         if (risk.restricted) {
           await ctx.runMutation(blockWorkForHuman, {

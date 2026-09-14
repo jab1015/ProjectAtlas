@@ -133,11 +133,13 @@ export const requestNativeCadGeneration = mutation({
 });
 
 export const getNativeCadContext = internalQuery({
-  args: { inventionId: v.id("inventions"), workItemId: v.id("atlasWorkItems") },
+  args: { inventionId: v.id("inventions"), workItemId: v.id("atlasWorkItems"), attemptNumber: v.number(), now: v.number() },
   handler: async (ctx, args) => {
     const invention = await ctx.db.get(args.inventionId);
     const workItem = await ctx.db.get(args.workItemId);
     if (!invention || !workItem || workItem.inventionId !== args.inventionId || workItem.kind !== "native_cad_generation") throw new ConvexError("Native CAD work context not found");
+    if (workItem.status !== "running" || workItem.attemptCount !== args.attemptNumber) throw new ConvexError("Native CAD work attempt is no longer current");
+    if (workItem.leaseExpiresAt && workItem.leaseExpiresAt <= args.now) throw new ConvexError("Native CAD work attempt lease expired before provider execution");
     const [record, deliverables, findings] = await Promise.all([
       ctx.db.query("inventionRecords").withIndex("by_inventionId", (q: any) => q.eq("inventionId", args.inventionId)).unique(),
       ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q: any) => q.eq("inventionId", args.inventionId)).collect(),

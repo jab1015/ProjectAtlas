@@ -212,10 +212,12 @@ export const claimNextWork = internalMutation({
 });
 
 export const getWorkContext = internalQuery({
-  args: { workItemId: v.id("atlasWorkItems") },
-  handler: async (ctx, { workItemId }) => {
+  args: { workItemId: v.id("atlasWorkItems"), attemptNumber: v.number(), now: v.number() },
+  handler: async (ctx, { workItemId, attemptNumber, now }) => {
     const workItem = await ctx.db.get(workItemId);
     if (!workItem) throw new ConvexError("Work item not found");
+    if (workItem.status !== "running" || workItem.attemptCount !== attemptNumber) throw new ConvexError("Work attempt is no longer current");
+    if (workItem.leaseExpiresAt && workItem.leaseExpiresAt <= now) throw new ConvexError("Work attempt lease expired before provider execution");
     const invention = await ctx.db.get(workItem.inventionId);
     if (!invention) throw new ConvexError("Invention not found");
     const [record, sources, findings, deliverables] = await Promise.all([
