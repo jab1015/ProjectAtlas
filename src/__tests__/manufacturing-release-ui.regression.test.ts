@@ -70,7 +70,11 @@ describe("manufacturing release UI", () => {
     expect(actionSource).toContain("No external action was performed");
   });
 
-  it("shows actual CAD maturity instead of hard-coding every native artifact as preliminary", () => {
+  it("shows actual newest-generation CAD maturity and never falls back to older clean artifacts", () => {
+    expect(designSource).toContain("const latestCadGeneration = selectCurrentSynchronizedCadGeneration(cadArtifacts) ?? [];");
+    expect(designSource).not.toContain("cadArtifacts.filter((artifact) => !artifact.staleReason)");
+    expect(designSource).toContain('artifact.staleReason ? "Refresh needed" : maturityLabel(artifact.artifactMaturity)');
+    expect(designSource).toContain("a newer stale or incomplete revision cannot fall back to older clean CAD");
     expect(designSource).toContain("maturityLabel(artifact.artifactMaturity)");
     expect(designSource).toContain('maturity === "engineering_reviewed"');
     expect(designSource).toContain('maturity === "manufacturing_released"');
