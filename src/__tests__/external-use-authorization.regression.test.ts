@@ -85,7 +85,7 @@ describe("exact-revision external-use authorization", () => {
     authState.userId = "owner1";
   });
 
-  it("authorizes the latest fresh artifact and records the exact revision and actor", async () => {
+  it("authorizes the latest fresh artifact, records the exact revision and actor, and does not claim external execution", async () => {
     const current = deliverable();
     const { ctx, patches, inserts } = fakeCtx({ invention: invention(), deliverables: [current] });
 
@@ -110,10 +110,12 @@ describe("exact-revision external-use authorization", () => {
           deliverableId: "del1",
           deliverableKind: "market_analysis",
           deliverableVersion: 2,
+          externalActionExecuted: false,
           authorizedByUserId: "owner1",
         },
       },
     });
+    expect(String(inserts[0].value.summary)).toMatch(/no external action was executed/i);
   });
 
   it("rejects an older revision without database side effects", async () => {
