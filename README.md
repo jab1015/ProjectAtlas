@@ -1,37 +1,64 @@
 # InventSmith — The Inventor OS
 
-InventSmith is the Modern Methods inventor operating system for moving an idea through structured research, feasibility, evidence review, invention development, and IP-readiness preparation with bounded autonomous assistance.
+InventSmith is the Modern Methods inventor operating system for moving an idea through evidence, validation, market and prior-art research, product development, commercialization, launch, and growth with bounded autonomous assistance.
 
 **Product:** InventSmith  
 **Descriptor:** The Inventor OS  
 **Publisher:** Modern Methods  
 **Core promise:** You invent. InventSmith does the work.
 
-## Current release target
+## Product destination
 
-Controlled pilot: **Idea to Feasibility and IP Readiness**.
+The product destination is the complete evidence-backed idea-to-market journey defined in `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`:
 
-The current implementation includes the canonical invention workspace and ledgers, autonomous dependency orchestration, evidence verification and trust controls, feasibility-package generation, concept visualization, PDF/DOCX export, Ask InventSmith, representative-pilot tooling, subscription/entitlement enforcement, privacy export and deletion controls, operational health checks, CI, and deployment verification tooling.
+Idea → Evidence → Validation → Market Research → Prior Art / Patent Readiness → Product Design → applicable Engineering/CAD or Software Development → Prototype/Test → Manufacturing or Release Preparation → Branding → IP/Legal Preparation → Pricing → Marketing → Sales → Funding → Launch → Growth.
 
-## Repository status
+The older feasibility/IP-readiness pilot is a historical foundation milestone, not the definition of the finished product and not an overall completion percentage.
 
-Repository-level implementation and verification are complete for the current handoff baseline. Remaining acceptance work requires the MadeThis-managed runtime so that the existing Convex database/auth population, Vercel project, domain, storage, environment bindings, secrets, subscription lifecycle, and live production data can be preserved and validated.
+## Naming and repository history
 
-Do not recreate or wipe the existing managed environment during synchronization.
+The current product name is **InventSmith — The Inventor OS**. Historical records may use the former Atlas / ProjectAtlas working name. Preserve that wording only where it is part of an exact historical record, repository path, compatibility identifier, commit/workflow name, quotation, exhibit, or third-party evidence.
+
+The GitHub repository currently retains the historical slug `jab1015/ProjectAtlas`. Renaming that repository is a separate compatibility-sensitive operation and is not required for the customer-facing product to be InventSmith.
+
+## Repository and hosting direction
+
+Source of truth is this GitHub repository. Active implementation continues on `inventsmith/full-product-build` in draft PR #24 until the owner explicitly approves a merge.
+
+The future owner-controlled runtime is:
+
+- **GitHub** — source control and automated verification.
+- **Vercel (Modern Methods-owned account)** — Next.js website/application hosting.
+- **Convex (Modern Methods-owned account)** — database, authentication, storage, scheduled/backend work.
+
+The previous MadeThis-managed Convex/Vercel environment is not a migration dependency. Its test data is disposable. Do not deploy to, modify, delete, synchronize, or require access to the MadeThis environment for repository development.
+
+Live Vercel/Convex provisioning and production acceptance are intentionally deferred until the owner-controlled accounts and credentials are available. Repository work must continue independently wherever technically possible.
+
+## Current repository capabilities
+
+The full-product branch contains material implementation across the canonical invention record, Evidence Locker, validation/research, Market Research, Patent Readiness, Ask InventSmith, dependency-aware autonomous work, physical Product Design/native CAD foundations, software-product routing, prototype/manufacturing evidence gates, branding, IP/legal preparation, pricing, marketing, sales, funding artifacts, launch/growth work, organization authorization, entitlement/usage controls, privacy, exports, and operational tooling.
+
+Capability status is tracked independently as planned, implemented, automated verification passed, deployed, live functionally verified, and professional review required/completed. Repository implementation must not be described as deployed or production-accepted until live acceptance actually occurs.
 
 ## Primary documents
 
-- `docs/BRAND_IDENTITY.md` — InventSmith brand identity and rename policy.
-- `docs/ATLAS_PRODUCT_RESET_V1.md` — authoritative controlled-pilot product scope and safety boundary (legacy filename retained for continuity).
-- `docs/ATLAS_BUILD_PROGRESS.md` — living build/readiness tracker.
-- `docs/ATLAS_DEPLOYMENT_RUNBOOK.md` — deployment and acceptance runbook.
-- `docs/MADETHIS_SYNC_HANDOFF_2026-08-15.md` — MadeThis Coding Worker synchronization handoff.
+- `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md` — authoritative product destination.
+- `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md` — current continuation plan and implementation history.
+- `docs/INVENTSMITH_BUILD_PROGRESS.md` — living build/readiness tracker.
+- `docs/INVENTSMITH_CAPABILITY_MATRIX.md` — evidence-based capability and verification matrix.
+- `docs/INVENTSMITH_DEPLOYMENT_RUNBOOK.md` — fresh owner-controlled Convex/Vercel deployment and acceptance runbook.
+- `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md` — naming, precedence, and supersession rules.
+- `docs/MADETHIS_SYNC_HANDOFF_2026-08-15.md` — historical MadeThis handoff, explicitly retired and not an active deployment instruction.
 
-## Verification
+## Local and CI verification
 
-The repository CI gate verifies:
+Inspect `package.json` and the repository's CI workflow before changing verification commands. The workflow file currently retains a historical compatibility filename; that internal filename does not define the product identity. The current CI gate installs from the lockfile and verifies:
 
 ```text
+npm ci
+node --check scripts/check-deployment-readiness.mjs
+node --check scripts/verify-live-deployment.mjs
 npx tsc --noEmit
 npx tsc -p convex --noEmit
 npm test
@@ -39,8 +66,14 @@ npm audit --omit=dev --audit-level=high
 npx next build
 ```
 
-A permanent branding regression check prevents current customer-facing Atlas identity from being reintroduced. Legacy `Atlas`/`ATLAS_*` technical identifiers may remain where changing them would create deployment, data, webhook, environment, or compatibility risk.
+Mocks belong only in explicit test/development paths. Missing live providers in production must be reported as unavailable rather than silently replaced with mock results.
 
-## Managed-environment acceptance
+## Configuration rules
 
-After MadeThis synchronizes the verified GitHub baseline into its managed source, acceptance requires live health/auth verification, representative invention/model/image testing, subscription-webhook validation, rendered document QA, deletion/restoration testing, and operational monitoring/backups.
+Never commit credentials or print secret values. Server credentials belong in Convex/Vercel secret configuration. Browser-exposed `NEXT_PUBLIC_*` values must contain only intentionally public configuration.
+
+Historical internal `Atlas` / `ATLAS_*` technical identifiers may remain where changing them would create stored-data, route, webhook, environment, or compatibility risk. Customer-facing identity and current documentation are **InventSmith — The Inventor OS by Modern Methods**.
+
+## Release boundary
+
+Repository-green is necessary but is not deployment or product acceptance. Production claims require an owner-controlled deployment plus live checks for authentication, authorization/isolation, evidence ingestion, autonomous execution, billing/webhooks, privacy/deletion, artifact quality, representative complete journeys, and any genuine professional/physical/market evidence gates applicable to the invention.

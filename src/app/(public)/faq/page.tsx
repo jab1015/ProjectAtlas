@@ -13,57 +13,77 @@ const FAQ_ITEMS = [
   {
     question: "What is InventSmith?",
     answer:
-      "InventSmith is The Inventor OS from Modern Methods. It is an autonomous invention-development system designed to research, organize evidence, prepare work, and advance an invention while escalating only the genuine human decisions, authorizations, professional reviews, payments, private inputs, or physical-world actions it cannot safely complete itself.",
+      "InventSmith is The Inventor OS from Modern Methods. It is an autonomous invention-development system designed to research, organize evidence, prepare work, generate appropriate deliverables, and advance an invention from idea toward market while escalating only genuine human decisions, authorizations, professional reviews, payments, private inputs, or physical-world actions it cannot safely complete itself.",
   },
   {
     question: "Who is InventSmith for?",
     answer:
-      "InventSmith is for independent inventors, entrepreneurs, and anyone with an idea they want to develop seriously. You do not need a technical background or prior invention experience. You bring the invention; InventSmith becomes the workshop around it.",
+      "InventSmith is for independent inventors, entrepreneurs, product teams, and professional invention practices. A solo inventor works in a one-person InventSmith organization; company and Studio plans can support multiple users and multiple invention workspaces without changing the underlying project model.",
   },
   {
     question: "How does InventSmith work?",
     answer:
-      "You capture the invention once. InventSmith creates a structured record, runs useful work in dependency order, shows its evidence and limitations, and keeps going until a real human gate is reached. If InventSmith can safely do the work, it should do the work instead of turning it into an inventor task.",
+      "You capture the invention once. InventSmith creates a persistent invention record, runs useful work in dependency order, keeps evidence and limitations attached to conclusions, and advances through a 15-stage journey from Idea through Growth. When a real-world evidence, professional, legal, financial, authorization, or physical gate is reached, InventSmith stops at that boundary instead of inventing completion.",
   },
   {
     question: "Is my invention private?",
     answer:
-      "InventSmith uses authenticated, owner-scoped workspaces and does not authorize external sharing without your approval. Like any hosted service, approved infrastructure and AI processors may handle data to provide the service; final privacy terms and the pilot data-processing review must be completed before public launch.",
+      "InventSmith uses authenticated, organization-aware and invention-level access controls and does not authorize external sharing without the applicable approval. Approved hosting, AI, and research infrastructure may process the project context needed to provide the service. The Privacy Notice explains current handling, export, deletion, retention, and professional-disclosure boundaries.",
   },
   {
     question: "Who owns my invention?",
     answer:
-      "You do. Always. InventSmith makes no claim of ownership over anything you create, share, or develop using the platform. The human remains the inventor; your invention remains yours.",
+      "InventSmith makes no claim of ownership over anything you create, share, or develop using the platform. Organization and invention permissions control who can work with a project inside InventSmith; they do not transfer inventorship or intellectual-property ownership.",
   },
   {
     question: "Do I need a patent before using InventSmith?",
     answer:
-      "No. InventSmith can prepare a preliminary prior-art landscape and an organized patent-professional handoff. It does not determine patentability, freedom to operate, validity, or infringement, and it does not replace a patent professional.",
+      "No. InventSmith can research prior art, compare invention features, identify potentially distinguishing hypotheses and design constraints, and prepare a patent-professional handoff. It does not determine patentability, freedom to operate, validity, infringement, or legal clearance, and it does not replace qualified patent counsel.",
   },
   {
     question: "What does the Explorer plan include?",
     answer:
-      "Explorer is free for one active invention and includes a limited feasibility preview, 25 autonomous cost units per day, and 30 Ask InventSmith questions per day. Research remains draft until it passes the applicable evidence checks.",
+      "Explorer is free for 1 active invention and 1 user. It is designed to let you explore InventSmith and build the core invention record, evidence foundation, early validation, competitor research, market feasibility, preliminary prior-art work, and Ask InventSmith experience. AI and other resource-intensive work remains bounded behind the scenes.",
   },
   {
-    question: "What is the Inventor plan?",
+    question: "What does the Inventor plan include?",
     answer:
-      "The current Inventor pricing hypothesis is $39/month for 3 active inventions, 125 autonomous cost units per day, 100 Ask InventSmith questions per day, and the feasibility/IP-readiness workspace. Pricing remains subject to controlled-pilot validation.",
+      "Inventor is $39/month for 1 active invention and 1 user. It is for serious feasibility and readiness work before the full build path, including deeper technical, material, manufacturing, regulatory and market feasibility, IP readiness, feature/prior-art comparison, product requirements, preliminary BOM/cost, development-risk, evidence-verification, and feasibility work.",
   },
   {
-    question: "What do Pro and Enterprise add?",
+    question: "What does Pro add?",
     answer:
-      "The current Pro and Enterprise hypotheses provide larger but bounded research budgets, more active inventions, deeper preparation, and professional collaboration as those capabilities are released. Professional services are separately authorized and priced. No plan includes unlimited expensive AI work, automatic legal approval, or production-ready CAD by default.",
+      "Pro is $99/month for 1 active invention and 1 user. Pro unlocks the complete InventSmith work system for an individual inventor, including Product Design + CAD and the downstream Prototype, Manufacturing, Branding, Intellectual Property / Legal, Pricing, Marketing, Sales, Funding, Launch, and Growth departments.",
   },
   {
-    question: "Can I cancel anytime?",
+    question: "What do Enterprise and Studio add?",
     answer:
-      "Yes. There are no long-term commitments. You can cancel your subscription at any time from your account settings.",
+      "Enterprise is $199/month for 2 active inventions and 3 users, with the complete Pro journey plus organization collaboration and shared subscription capacity. Studio is designed for professional invention work: Studio 3 is $299/month for 3 active inventions and 5 users, and Studio 6 is $399/month for 6 active inventions and 8 users. Larger Studio capacity will be custom-priced rather than advertised as unlimited.",
+  },
+  {
+    question: "What counts as an active invention?",
+    answer:
+      "An active invention occupies one of the organization’s purchased invention slots and can continue through InventSmith’s autonomous workflow. A completed or paused invention can be archived to free that slot without deleting its evidence, research, CAD, documents, decisions, or history.",
+  },
+  {
+    question: "Do extra users get separate AI or CAD allowances?",
+    answer:
+      "No. Team members share the organization’s subscription and resource allowance. Adding users does not multiply the company’s AI, research, CAD, rendering, or document-generation budget. InventSmith meters expensive work at the organization level so collaboration does not create uncontrolled cost.",
+  },
+  {
+    question: "Does a paid plan remove professional or real-world gates?",
+    answer:
+      "No. A higher plan changes capacity and which InventSmith work can run; it does not turn estimates into facts. Patent/legal conclusions still require qualified counsel where applicable, consequential engineering still requires appropriate review and prototype evidence, manufacturer quote comparison waits for real quotes, and launch-performance analysis waits for actual market evidence.",
+  },
+  {
+    question: "How do I change my subscription?",
+    answer:
+      "Subscription and billing controls belong to the applicable InventSmith organization. Current plan information and available changes appear in the authenticated account/workspace experience. A paid plan is not treated as active until the billing event is confirmed, and access follows the recorded subscription status and paid period.",
   },
   {
     question: "What happens after Patent Readiness?",
     answer:
-      "The feasibility and IP-readiness package ends with a transparent proceed, revise, pause, or do-not-invest-yet recommendation. Product design, prototyping, professional IP work, manufacturing, funding, and launch remain later roadmap capabilities and require additional human or professional involvement.",
+      "For eligible plans, Patent Readiness feeds its prior-art findings, distinguishing hypotheses, uncertainty, and design constraints directly into Product Design + CAD. InventSmith then develops and scores design candidates, prepares preliminary CAD and engineering artifacts for supported products, and continues into prototype and manufacturing work as evidence and required gates permit.",
   },
 ];
 
@@ -107,7 +127,7 @@ export default function FaqPage() {
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button asChild variant="outline">
-            <a href="mailto:team@atlas.madethis.app">Contact Us</a>
+            <a href="mailto:support@madethis.com">Contact Us</a>
           </Button>
           <Button asChild>
             <Link href="/sign-up">Start Your Invention</Link>

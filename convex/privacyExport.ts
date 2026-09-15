@@ -15,75 +15,95 @@ function requireWithinLimit<T>(rows: T[], limit: number, label: string): T[] {
   return rows;
 }
 
-async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
+async function personalExportScope(ctx: QueryCtx, userId: Id<"users">) {
   const user = await ctx.db.get(userId);
   if (!user) throw new ConvexError("User profile not found");
 
-  const inventions = requireWithinLimit(
-    await ctx.db.query("inventions").withIndex("by_userId", (q) => q.eq("userId", userId)).take(INVENTION_LIMIT + 1),
-    INVENTION_LIMIT,
-    "invention count",
-  );
-
-  const inventionBundles = [];
-  for (const invention of inventions) {
-    const [records, sources, findings, assumptions, decisions, approvals, workItems, executionEvents, deliverables, dependencies, reviews, stageProgress, conversations, messages, documents, validationResearch] = await Promise.all([
-      ctx.db.query("inventionRecords").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(2),
-      ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
-      ctx.db.query("evidenceFindings").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
-      ctx.db.query("inventionAssumptions").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
-      ctx.db.query("inventionDecisions").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
-      ctx.db.query("approvalRequests").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
-      ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
-      ctx.db.query("atlasExecutionEvents").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(EVENT_LIMIT + 1),
-      ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
-      ctx.db.query("deliverableDependencies").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(EVENT_LIMIT + 1),
-      ctx.db.query("professionalReviews").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
-      ctx.db.query("stageProgress").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(50),
-      ctx.db.query("conversations").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
-      ctx.db.query("conversationMessages").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(EVENT_LIMIT + 1),
-      ctx.db.query("documents").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
-      ctx.db.query("validationResearch").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
-    ]);
-
-    if (records.length > 1) throw new ConvexError("Invention has multiple canonical records; InventSmith must reconcile the data before export.");
-    const bounded = {
-      sources: requireWithinLimit(sources, ROW_LIMIT, "evidence source count"),
-      findings: requireWithinLimit(findings, ROW_LIMIT, "evidence finding count"),
-      assumptions: requireWithinLimit(assumptions, ROW_LIMIT, "assumption count"),
-      decisions: requireWithinLimit(decisions, ROW_LIMIT, "decision count"),
-      approvals: requireWithinLimit(approvals, ROW_LIMIT, "approval count"),
-      workItems: requireWithinLimit(workItems, ROW_LIMIT, "work-item count"),
-      executionEvents: requireWithinLimit(executionEvents, EVENT_LIMIT, "execution-event count"),
-      deliverables: requireWithinLimit(deliverables, ROW_LIMIT, "deliverable count"),
-      dependencies: requireWithinLimit(dependencies, EVENT_LIMIT, "dependency count"),
-      reviews: requireWithinLimit(reviews, ROW_LIMIT, "professional-review count"),
-      conversations: requireWithinLimit(conversations, ROW_LIMIT, "conversation count"),
-      messages: requireWithinLimit(messages, EVENT_LIMIT, "conversation-message count"),
-      documents: requireWithinLimit(documents, ROW_LIMIT, "document count"),
-      validationResearch: requireWithinLimit(validationResearch, ROW_LIMIT, "validation-research count"),
-    };
-
-    inventionBundles.push({
-      invention,
-      canonicalRecord: records[0] ?? null,
-      evidenceSources: bounded.sources,
-      evidenceFindings: bounded.findings,
-      assumptions: bounded.assumptions,
-      decisions: bounded.decisions,
-      approvalRequests: bounded.approvals,
-      workItems: bounded.workItems,
-      executionEvents: bounded.executionEvents,
-      deliverables: bounded.deliverables,
-      deliverableDependencies: bounded.dependencies,
-      professionalReviews: bounded.reviews,
-      stageProgress,
-      conversations: bounded.conversations,
-      conversationMessages: bounded.messages,
-      documents: bounded.documents.map((document) => ({ _id: document._id, _creationTime: document._creationTime, inventionId: document.inventionId, fileName: document.fileName, createdAt: document.createdAt, binaryContentIncluded: false })),
-      validationResearch: bounded.validationResearch,
-    });
+  const memberships = await ctx.db.query("organizationMemberships").withIndex("by_userId", (q) => q.eq("userId", userId)).collect();
+  const personalOrganizationIds = new Set<string>();
+  const personalOrganizationIdValues: Id<"organizations">[] = [];
+  const organizationAffiliations = [];
+  for (const membership of memberships) {
+    if (membership.status === "removed") continue;
+    const organization = await ctx.db.get(membership.organizationId);
+    if (!organization) continue;
+    if (membership.role === "owner" && organization.kind === "personal") {
+      personalOrganizationIds.add(String(organization._id));
+      personalOrganizationIdValues.push(organization._id);
+    }
+    organizationAffiliations.push({ organizationId: organization._id, name: organization.name, kind: organization.kind, role: membership.role, membershipStatus: membership.status });
   }
+
+  const creatorInventions = await ctx.db.query("inventions").withIndex("by_userId", (q) => q.eq("userId", userId)).collect();
+  const inventions = creatorInventions.filter((invention) => !invention.organizationId || personalOrganizationIds.has(String(invention.organizationId)));
+  return { user, inventions, organizationAffiliations, personalOrganizationIdValues };
+}
+
+async function buildInventionBundle(ctx: QueryCtx, invention: any) {
+  const [records, sources, findings, assumptions, decisions, approvals, workItems, executionEvents, deliverables, dependencies, reviews, stageProgress, conversations, messages, documents, validationResearch] = await Promise.all([
+    ctx.db.query("inventionRecords").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(2),
+    ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
+    ctx.db.query("evidenceFindings").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
+    ctx.db.query("inventionAssumptions").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
+    ctx.db.query("inventionDecisions").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
+    ctx.db.query("approvalRequests").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
+    ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
+    ctx.db.query("atlasExecutionEvents").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(EVENT_LIMIT + 1),
+    ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
+    ctx.db.query("deliverableDependencies").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(EVENT_LIMIT + 1),
+    ctx.db.query("professionalReviews").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
+    ctx.db.query("stageProgress").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(50),
+    ctx.db.query("conversations").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
+    ctx.db.query("conversationMessages").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(EVENT_LIMIT + 1),
+    ctx.db.query("documents").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
+    ctx.db.query("validationResearch").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).take(ROW_LIMIT + 1),
+  ]);
+
+  if (records.length > 1) throw new ConvexError("Invention has multiple canonical records; InventSmith must reconcile the data before export.");
+  return {
+    invention,
+    canonicalRecord: records[0] ?? null,
+    evidenceSources: requireWithinLimit(sources, ROW_LIMIT, "evidence source count"),
+    evidenceFindings: requireWithinLimit(findings, ROW_LIMIT, "evidence finding count"),
+    assumptions: requireWithinLimit(assumptions, ROW_LIMIT, "assumption count"),
+    decisions: requireWithinLimit(decisions, ROW_LIMIT, "decision count"),
+    approvalRequests: requireWithinLimit(approvals, ROW_LIMIT, "approval count"),
+    workItems: requireWithinLimit(workItems, ROW_LIMIT, "work-item count"),
+    executionEvents: requireWithinLimit(executionEvents, EVENT_LIMIT, "execution-event count"),
+    deliverables: requireWithinLimit(deliverables, ROW_LIMIT, "deliverable count"),
+    deliverableDependencies: requireWithinLimit(dependencies, EVENT_LIMIT, "dependency count"),
+    professionalReviews: requireWithinLimit(reviews, ROW_LIMIT, "professional-review count"),
+    stageProgress,
+    conversations: requireWithinLimit(conversations, ROW_LIMIT, "conversation count"),
+    conversationMessages: requireWithinLimit(messages, EVENT_LIMIT, "conversation-message count"),
+    documents: requireWithinLimit(documents, ROW_LIMIT, "document count").map((document) => ({ _id: document._id, _creationTime: document._creationTime, inventionId: document.inventionId, fileName: document.fileName, createdAt: document.createdAt, binaryContentIncluded: false })),
+    validationResearch: requireWithinLimit(validationResearch, ROW_LIMIT, "validation-research count"),
+  };
+}
+
+async function invitationRowsForEmail(ctx: QueryCtx, email: string) {
+  const statuses = ["pending", "accepted", "revoked", "expired"] as const;
+  const rows = [];
+  for (const status of statuses) {
+    rows.push(...await ctx.db.query("organizationInvitations").withIndex("by_email_status", (q) => q.eq("email", email).eq("status", status)).take(ROW_LIMIT + 1));
+    if (rows.length > ROW_LIMIT) break;
+  }
+  return requireWithinLimit(rows, ROW_LIMIT, "organization-invitation count");
+}
+
+async function invitationRowsForAccount(ctx: QueryCtx, userId: Id<"users">) {
+  // Stable pending-invitation account binding reuses acceptedByUserId. Status is
+  // the consent truth. Include account-bound rows even after an email change so
+  // the user's personal export remains complete.
+  const rows = await ctx.db.query("organizationInvitations").take(ROW_LIMIT + 1);
+  return requireWithinLimit(rows.filter((row) => row.acceptedByUserId === userId), ROW_LIMIT, "account-bound organization-invitation count");
+}
+
+async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
+  const { user, inventions: scopedInventions, organizationAffiliations, personalOrganizationIdValues } = await personalExportScope(ctx, userId);
+  const inventions = requireWithinLimit(scopedInventions, INVENTION_LIMIT, "personal invention count");
+  const inventionBundles = [];
+  for (const invention of inventions) inventionBundles.push(await buildInventionBundle(ctx, invention));
 
   const [usage, notifications, privacyRequests, purchases] = await Promise.all([
     ctx.db.query("atlasDailyUsage").withIndex("by_userId", (q) => q.eq("userId", userId)).take(EVENT_LIMIT + 1),
@@ -92,14 +112,45 @@ async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
     ctx.db.query("purchases").withIndex("by_userId", (q) => q.eq("userId", userId)).take(ROW_LIMIT + 1),
   ]);
 
-  const subscriptionEvents = user.email
+  const personalOrganizationUsage = [];
+  for (const organizationId of personalOrganizationIdValues) {
+    const rows = await ctx.db.query("organizationDailyUsage").withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId)).take(EVENT_LIMIT + 1);
+    personalOrganizationUsage.push(...requireWithinLimit(rows, EVENT_LIMIT, "personal organization usage-history count"));
+    if (personalOrganizationUsage.length > EVENT_LIMIT) throw new ConvexError("Your personal organization usage history exceeds the self-service export limit. Submit a formal data-export request for a coordinated complete package.");
+  }
+
+  const matchingSubscriptionEvents = user.email
     ? await ctx.db.query("subscriptionEvents").withIndex("by_customerEmail", (q) => q.eq("customerEmail", user.email!)).take(ROW_LIMIT + 1)
     : [];
+  const personalOrganizationIdSet = new Set(personalOrganizationIdValues.map(String));
+  const subscriptionEvents = matchingSubscriptionEvents.filter((event) => {
+    const belongsToUser = event.appliedUserId === userId;
+    const belongsToPersonalOrganization = Boolean(event.appliedOrganizationId && personalOrganizationIdSet.has(String(event.appliedOrganizationId)));
+    if (!belongsToUser && !belongsToPersonalOrganization) return false;
+    if (event.appliedOrganizationId && !belongsToPersonalOrganization) return false;
+    return true;
+  });
+
+  const normalizedEmail = user.email?.trim().toLowerCase();
+  const usersForEmail = normalizedEmail
+    ? await ctx.db.query("users").withIndex("email", (q) => q.eq("email", normalizedEmail)).collect()
+    : [];
+  const emailUniquelyBelongsToUser = usersForEmail.length === 1 && usersForEmail[0]._id === userId;
+  const [emailInvitationRows, accountInvitationRows] = await Promise.all([
+    emailUniquelyBelongsToUser && normalizedEmail
+      ? invitationRowsForEmail(ctx, normalizedEmail).then((rows) => rows.filter((row) => !row.acceptedByUserId || row.acceptedByUserId === userId))
+      : Promise.resolve([]),
+    invitationRowsForAccount(ctx, userId),
+  ]);
+  const organizationInvitationsById = new Map<string, (typeof accountInvitationRows)[number]>();
+  for (const row of emailInvitationRows) organizationInvitationsById.set(String(row._id), row);
+  for (const row of accountInvitationRows) organizationInvitationsById.set(String(row._id), row);
+  const organizationInvitations = requireWithinLimit([...organizationInvitationsById.values()], ROW_LIMIT, "organization-invitation count");
 
   return {
-    exportVersion: 1,
+    exportVersion: 5,
     generatedAt: Date.now(),
-    scope: "InventSmith structured account data. Uploaded/generated binary file bytes are not embedded in this JSON; use the invention work library or a formal coordinated export for binary files.",
+    scope: "InventSmith personal account data. Company/studio invention, usage, and organization billing data is excluded from this personal export even if this user originally created the invention or paid for the organization. Invitations addressed or securely account-bound to this account are included because they are personal access records. Invitation status, not the presence of an account-binding field, is the source of truth for consent. Organization-authorized exports are handled separately. Uploaded/generated binary file bytes are not embedded in this JSON.",
     profile: {
       _id: user._id,
       _creationTime: user._creationTime,
@@ -117,8 +168,11 @@ async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
       subscriptionCurrentPeriodEnd: user.subscriptionCurrentPeriodEnd,
       subscriptionUpdatedAt: user.subscriptionUpdatedAt,
     },
+    organizationAffiliations,
+    organizationInvitations,
     inventions: inventionBundles,
     dailyUsage: requireWithinLimit(usage, EVENT_LIMIT, "usage-history count"),
+    personalOrganizationDailyUsage: personalOrganizationUsage,
     notifications: requireWithinLimit(notifications, EVENT_LIMIT, "notification count"),
     privacyRequests: requireWithinLimit(privacyRequests, ROW_LIMIT, "privacy-request count"),
     purchases: requireWithinLimit(purchases, ROW_LIMIT, "purchase count").map((purchase) => ({
@@ -141,19 +195,13 @@ async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
   };
 }
 
-export const getMyStructuredExport = query({
-  args: {},
-  handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new ConvexError("Not authenticated");
-    return buildStructuredExport(ctx, userId);
-  },
-});
+export const getMyStructuredExport = query({ args: {}, handler: async (ctx) => {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) throw new ConvexError("Not authenticated");
+  return buildStructuredExport(ctx, userId);
+} });
 
-export const getStructuredExportForUser = query({
-  args: { userId: v.id("users") },
-  handler: async (ctx, { userId }) => {
-    await requireAdmin(ctx);
-    return buildStructuredExport(ctx, userId);
-  },
-});
+export const getStructuredExportForUser = query({ args: { userId: v.id("users") }, handler: async (ctx, { userId }) => {
+  await requireAdmin(ctx);
+  return buildStructuredExport(ctx, userId);
+} });

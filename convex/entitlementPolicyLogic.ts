@@ -1,4 +1,5 @@
 import { normalizeAtlasTier, type AtlasTier } from "./usagePolicyLogic";
+import { FULL_JOURNEY_PRO_WORK_KINDS } from "./lifecycleWorkKinds";
 
 const FREE_WORK = new Set([
   "idea_capture",
@@ -24,12 +25,38 @@ const INVENTOR_WORK = new Set([
   "feasibility_recommendation",
 ]);
 
+const SOFTWARE_PRO_WORK = [
+  "software_product_specification",
+  "software_ux_flow_design",
+  "software_architecture",
+  "software_data_model",
+  "software_security_privacy_review",
+  "software_prototype_plan",
+  "software_implementation_plan",
+  "software_qa_test_plan",
+  "software_beta_release_readiness",
+  "software_distribution_release_plan",
+] as const;
+
 const PRO_WORK = new Set([
   ...INVENTOR_WORK,
   "design_directions",
   "concept_image_generation",
   "engineering_handoff",
   "package_assembly",
+  "patent_design_handoff",
+  "design_candidate_generation",
+  "design_candidate_scoring",
+  "product_design_specification",
+  "cad_model_specification",
+  "exploded_view_specification",
+  "manufacturing_drawing_specification",
+  "native_cad_generation",
+  "product_render_generation",
+  "professional_service_plan",
+  "professional_provider_research",
+  ...SOFTWARE_PRO_WORK,
+  ...FULL_JOURNEY_PRO_WORK_KINDS,
 ]);
 
 export function canTierRunWorkKind(tier: unknown, kind: string | undefined): boolean {

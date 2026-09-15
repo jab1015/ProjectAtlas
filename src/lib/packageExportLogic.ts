@@ -25,3 +25,39 @@ export function validatePackageExportSize(deliverables: Array<{ content: string 
   }
   return null;
 }
+
+export interface PackageExportSafetyDeliverable {
+  title: string;
+  trustState: string;
+  staleReason?: string;
+}
+
+/**
+ * Package export is a consequential external-use boundary, not merely a file
+ * formatter. Fail closed if the newest artifact for any included kind is stale
+ * or has not reached explicit authorized-use trust state. Draft/review artifacts
+ * remain readable and individually downloadable inside InventSmith.
+ */
+export function validatePackageExportSafety(
+  deliverables: PackageExportSafetyDeliverable[],
+  qualityPassed: boolean,
+  qualityBlockers: string[] = [],
+): string | null {
+  if (!deliverables.length) return "Package has no deliverables to export.";
+  if (!qualityPassed) {
+    return qualityBlockers.length
+      ? `Package quality checks have not passed: ${qualityBlockers.join("; ")}`
+      : "Package quality checks have not passed.";
+  }
+
+  const stale = deliverables.filter((deliverable) => Boolean(deliverable.staleReason));
+  if (stale.length) {
+    return `Package contains ${stale.length} stale deliverable(s). Refresh them before external export.`;
+  }
+
+  const unauthorized = deliverables.filter((deliverable) => deliverable.trustState !== "ready_for_authorized_use");
+  if (unauthorized.length) {
+    return `Package contains ${unauthorized.length} deliverable(s) that are not ready for authorized external use.`;
+  }
+  return null;
+}

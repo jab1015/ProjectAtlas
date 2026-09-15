@@ -8,13 +8,13 @@
 Execute the commercial launch of the invention — activating all marketing, sales, and operational systems simultaneously and converting months of preparation into initial revenue.
 
 **Why this stage exists:**
-Launch is the day the invention meets the market. Every prior stage has been preparation. This stage is execution. A well-executed launch generates initial revenue, captures the first customer reviews, creates momentum, and proves the market thesis that Atlas and the inventor have been building toward since Stage 1. A poorly executed launch — one where marketing fires before inventory is available, or inventory arrives before the website is live, or the sales infrastructure isn't set up — squanders the pre-launch investment, burns the marketing budget without results, and leaves the inventor demoralized. Atlas coordinates the launch so that every system is ready at the same time and every action on launch day is planned, not improvised.
+Launch is the day the invention meets the market. Every prior stage has been preparation. This stage is execution. A well-executed launch generates initial revenue, captures the first customer reviews, creates momentum, and proves the market thesis that InventSmith and the inventor have been building toward since Stage 1. A poorly executed launch — one where marketing fires before inventory is available, or inventory arrives before the website is live, or the sales infrastructure isn't set up — squanders the pre-launch investment, burns the marketing budget without results, and leaves the inventor demoralized. InventSmith coordinates the launch so that every system is ready at the same time and every action on launch day is planned, not improvised.
 
 **Primary objective:**
 Execute a coordinated commercial launch that achieves the first-month revenue target, captures the first customer reviews, and establishes the sales and operational baseline that will drive Stage 15 (Growth).
 
 **Success definition:**
-Atlas considers this stage successful when commercial sales have begun, the first customer reviews or feedback have been received and documented, and the Launch Performance Report provides an honest accounting of actual results vs. the plan.
+InventSmith considers this stage successful when commercial sales have begun, the first customer reviews or feedback have been received and documented, and the Launch Performance Report provides an honest accounting of actual results vs. the plan.
 
 ---
 
@@ -28,25 +28,25 @@ Atlas considers this stage successful when commercial sales have begun, the firs
 
 ---
 
-## Atlas Responsibilities
+## InventSmith Responsibilities
 
-**How Atlas guides the inventor:**
-Atlas builds and tracks the Launch Readiness Checklist — every task that must be complete before the launch date, organized by domain and critical path. It sequences the launch activities across the pre-launch window: 30 days out, 14 days out, 7 days out, launch day, and the first week post-launch. On launch day, Atlas provides the specific execution playbook. In the days that follow, Atlas structures the first customer feedback loop and sets up the Week 1 review. At the end of the launch period, Atlas produces the Launch Performance Report.
+**How InventSmith guides the inventor:**
+InventSmith builds and tracks the Launch Readiness Checklist — every task that must be complete before the launch date, organized by domain and critical path. It sequences the launch activities across the pre-launch window: 30 days out, 14 days out, 7 days out, launch day, and the first week post-launch. On launch day, InventSmith provides the specific execution playbook. In the days that follow, InventSmith structures the first customer feedback loop and sets up the Week 1 review. At the end of the launch period, InventSmith produces the Launch Performance Report.
 
-**What Atlas analyzes:**
+**What InventSmith analyzes:**
 - Pre-Launch Marketing Calendar from Stage 11 — the complete task inventory that becomes the launch readiness baseline
 - Sales infrastructure from Stage 12 — storefront, listings, and operational readiness
 - Manufacturing Plan from Stage 7 — inventory availability and reorder lead times
 - Launch capital from Stage 13 — the budget available for launch marketing spend
 - First customer feedback and sales data — for the Week 1 review and Launch Performance Report
 
-**What Atlas recommends:**
+**What InventSmith recommends:**
 - The critical path for the pre-launch window — which tasks must complete on time to avoid blocking everything downstream
 - The sequencing of launch day activities — what to activate first and in what order
 - The most important metrics to monitor in the first week
 - The top priorities for the first 30 days based on launch data
 
-**What Atlas tracks:**
+**What InventSmith tracks:**
 - Pre-launch task completion against the Launch Readiness Checklist
 - Critical path items at risk — tasks with dependencies that are behind schedule
 - First-week sales, traffic, and conversion performance
@@ -66,22 +66,22 @@ Atlas builds and tracks the Launch Readiness Checklist — every task that must 
 
 ---
 
-## Atlas Guidance
+## InventSmith Guidance
 
-Atlas opens Stage 14 by converting the Pre-Launch Marketing Calendar from Stage 11 into the Launch Readiness Checklist — a cross-domain task tracker that covers operations, marketing, sales, legal, and customer support. Every task that must be complete before launch day is itemized, assigned to an owner, and given a deadline. Atlas maps the critical path: which tasks, if delayed, directly block the launch date.
+InventSmith opens Stage 14 by converting the Pre-Launch Marketing Calendar from Stage 11 into the Launch Readiness Checklist — a cross-domain task tracker that covers operations, marketing, sales, legal, and customer support. Every task that must be complete before launch day is itemized, assigned to an owner, and given a deadline. InventSmith maps the critical path: which tasks, if delayed, directly block the launch date.
 
-Atlas sequences the pre-launch window explicitly:
+InventSmith sequences the pre-launch window explicitly:
 - **30 days out**: all marketing assets in production; sales infrastructure set up and tested; inventory confirmed and in transit
 - **14 days out**: all assets finalized and approved; pre-launch email list warm-up begins; press outreach sent
 - **7 days out**: final checklist review; all systems tested end-to-end; launch day playbook finalized
 - **Launch day**: specific, sequenced execution — what to publish first, when, and in what channels; first customer communications ready; monitoring dashboards active
 - **Week 1 post-launch**: daily sales and performance review; first customer feedback collection; reorder status confirmed
 
-The Launch Day Playbook is specific — not a philosophy but an hour-level plan. What happens at 9am, what at 12pm, what by end of day. Atlas builds this plan with the inventor so that launch day has no ambiguity: the inventor knows exactly what to do and in what order.
+The Launch Day Playbook is specific — not a philosophy but an hour-level plan. What happens at 9am, what at 12pm, what by end of day. InventSmith builds this plan with the inventor so that launch day has no ambiguity: the inventor knows exactly what to do and in what order.
 
-Atlas designs the first-week customer feedback loop: how to collect feedback from first customers, how to organize it, and how to distinguish signal from noise. Early feedback is valuable precisely because it is unfiltered. Atlas structures it so the inventor can act on it quickly rather than being overwhelmed by it.
+InventSmith designs the first-week customer feedback loop: how to collect feedback from first customers, how to organize it, and how to distinguish signal from noise. Early feedback is valuable precisely because it is unfiltered. InventSmith structures it so the inventor can act on it quickly rather than being overwhelmed by it.
 
-At the end of the launch period — typically 30 days — Atlas guides a structured review. Actual revenue vs. projection. Traffic and conversion vs. benchmark. Customer feedback themes. Inventory status. What the data says to do more of and what to stop. This review produces the Launch Performance Report and the Post-Launch Priority List — the two documents that open Stage 15.
+At the end of the launch period — typically 30 days — InventSmith guides a structured review. Actual revenue vs. projection. Traffic and conversion vs. benchmark. Customer feedback themes. Inventory status. What the data says to do more of and what to stop. This review produces the Launch Performance Report and the Post-Launch Priority List — the two documents that open Stage 15.
 
 ---
 
@@ -118,7 +118,7 @@ At the end of the launch period — typically 30 days — Atlas guides a structu
 
 ## Readiness Evaluation
 
-Atlas evaluates the inventor's readiness using three states only. No numeric scores.
+InventSmith evaluates the inventor's readiness using three states only. No numeric scores.
 
 **Not Ready:**
 - Launch Readiness Checklist is not complete and significant pre-launch tasks remain unaddressed
@@ -159,7 +159,7 @@ Atlas evaluates the inventor's readiness using three states only. No numeric sco
 The following information moves from Stage 14 into Stage 15 (Growth):
 
 - **Launch Performance Report** — the actual revenue, traffic, conversion, and customer satisfaction data becomes the performance baseline for Stage 15
-- **Post-Launch Priority List** — the opening agenda for the first Stage 15 growth planning session; everything Atlas recommends working on first in Growth comes from this list
+- **Post-Launch Priority List** — the opening agenda for the first Stage 15 growth planning session; everything InventSmith recommends working on first in Growth comes from this list
 - **Week 1 Customer Feedback Summary** — the product iteration and messaging refinement input for Stage 15; what real customers say about the product in actual use is the most valuable signal for what to emphasize, fix, or change
 - **Sales and inventory status** — actual first-week sales volume and inventory trajectory inform Stage 15 growth planning and Manufacturing Plan revision
 - **Active sales and marketing infrastructure** — the storefront, marketplace listings, email list, and social channels built and activated during Stage 14 are the growth foundations for Stage 15
@@ -168,10 +168,10 @@ The following information moves from Stage 14 into Stage 15 (Growth):
 
 ## Future Integrations
 
-- **Real-time sales dashboard integration** (Shopify webhook, WooCommerce) — live sales data flowing into Atlas's launch view so the inventor can monitor launch performance without switching platforms
+- **Real-time sales dashboard integration** (Shopify webhook, WooCommerce) — live sales data flowing into InventSmith's launch view so the inventor can monitor launch performance without switching platforms
 - **Web analytics integration** (Google Analytics 4) — traffic and conversion data displayed alongside sales data in the launch performance view
 - **Amazon marketplace monitoring** (Amazon Seller Central API) — for Amazon-channel launches, sales rank, review count, and competitor price monitoring in real time
-- **PR distribution** (PR Newswire, Cision) — distribute a press release on launch day from within Atlas, with tracking of pickup and coverage
+- **PR distribution** (PR Newswire, Cision) — distribute a press release on launch day from within InventSmith, with tracking of pickup and coverage
 - **Multi-platform review monitoring** (Trustpilot, Yotpo) — aggregate early customer reviews from all sales channels into the Week 1 Customer Feedback Summary automatically
 
 ---

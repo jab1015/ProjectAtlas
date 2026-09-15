@@ -21,7 +21,7 @@ interface ReviewQueue {
 
 const getReviewQueue = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, ReviewQueue>("inventionWorkspace:getReviewQueue");
 const resolveDecision = makeFunctionReference<"mutation", { decisionId: Id<"inventionDecisions">; selectedOptionKey: string; rationale?: string }, { success: boolean }>("inventionWorkspace:resolveDecision");
-const resolveApprovalRequest = makeFunctionReference<"mutation", { approvalRequestId: Id<"approvalRequests">; approved: boolean }, { success: boolean }>("inventionWorkspace:resolveApprovalRequest");
+const resolveApprovalRequest = makeFunctionReference<"mutation", { approvalRequestId: Id<"approvalRequests">; approved: boolean }, { success: boolean }>("consequentialApprovalMutation:resolveConsequentialApproval");
 const respondToBlockedWork = makeFunctionReference<"mutation", { workItemId: Id<"atlasWorkItems">; response: string }, { success: boolean }>("inventionWorkspace:respondToBlockedWork");
 
 interface DecisionOption { key: string; label: string; description: string; }
@@ -59,6 +59,7 @@ export default function InventionReviewPage() {
   const currentDecision = queue?.decisions[0];
   const currentApproval = queue?.approvals[0];
   const currentBlockedWork = queue?.blockedWork[0];
+  const canSupplyTextInput = currentBlockedWork?.humanGateType === "private_information";
   const options = useMemo(() => readDecisionOptions(currentDecision?.options ?? []), [currentDecision]);
 
   useEffect(() => {
@@ -84,7 +85,7 @@ export default function InventionReviewPage() {
   };
 
   const handleBlockedWork = async () => {
-    if (!currentBlockedWork || !humanResponse.trim()) return;
+    if (!currentBlockedWork || !canSupplyTextInput || !humanResponse.trim()) return;
     setSubmitting(true); setError(null);
     try { await respond({ workItemId: currentBlockedWork._id, response: humanResponse.trim() }); setHumanResponse(""); }
     catch (reason) { setError(reason instanceof Error ? reason.message : "InventSmith could not record this input."); }
@@ -104,7 +105,7 @@ export default function InventionReviewPage() {
           <header className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Inventor review</p>
             <h1 className="text-3xl font-bold sm:text-4xl">{queue.invention.title}</h1>
-            <p className="text-muted-foreground">InventSmith pauses here because this step requires your judgment or authorization.</p>
+            <p className="text-muted-foreground">InventSmith pauses here because this step requires your judgment, evidence, professional review, or authorization.</p>
           </header>
 
           {currentDecision ? (
@@ -116,16 +117,15 @@ export default function InventionReviewPage() {
             </section>
           ) : currentApproval ? (
             <section className="rounded-2xl border border-primary/20 bg-card p-6 shadow-sm sm:p-8" aria-labelledby="approval-title">
-              <div className="flex items-start gap-4"><div className="rounded-full bg-accent p-3"><ShieldCheck className="h-6 w-6 text-primary" aria-hidden="true" /></div><div className="space-y-2"><p className="text-xs font-semibold uppercase tracking-widest text-primary">Authorization required</p><h2 id="approval-title" className="text-2xl font-semibold">Review before InventSmith proceeds</h2><p className="leading-relaxed text-foreground">{currentApproval.summary}</p></div></div>
+              <div className="flex items-start gap-4"><div className="rounded-full bg-accent p-3"><ShieldCheck className="h-6 w-6 text-primary" aria-hidden="true" /></div><div className="space-y-2"><p className="text-xs font-semibold uppercase tracking-widest text-primary">Authorization required</p><h2 id="approval-title" className="text-2xl font-semibold">Review permission for a future action</h2><p className="leading-relaxed text-foreground">{currentApproval.summary}</p></div></div>
               {currentApproval.consequences.length > 0 && <div className="mt-6 rounded-xl border border-warning/30 bg-warning/5 p-4"><div className="flex items-center gap-2 text-sm font-medium"><AlertTriangle className="h-4 w-4 text-warning" aria-hidden="true" />What approval allows</div><ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-muted-foreground">{currentApproval.consequences.map((consequence) => <li key={consequence}>{consequence}</li>)}</ul></div>}
-              <p className="mt-5 text-xs leading-relaxed text-muted-foreground">Approval records your authorization. InventSmith will still log the resulting action separately; it does not imply professional approval or guarantee an outcome.</p>
-              {error && <p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}<div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"><Button variant="outline" onClick={() => handleApproval(false)} disabled={submitting}>Decline</Button><Button onClick={() => handleApproval(true)} disabled={submitting}>{submitting ? "Recording…" : "Approve action"}</Button></div>
+              <p className="mt-5 text-xs leading-relaxed text-muted-foreground">Approval only records your authorization. It does not contact a third party, share a file, make a purchase or payment, place an order, submit or file anything, or publish anything. Any future external action must pass its own current authorization checks and be logged separately.</p>
+              {error && <p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}<div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"><Button variant="outline" onClick={() => handleApproval(false)} disabled={submitting}>Decline</Button><Button onClick={() => handleApproval(true)} disabled={submitting}>{submitting ? "Recording…" : "Authorize request"}</Button></div>
             </section>
           ) : currentBlockedWork ? (
             <section className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8" aria-labelledby="blocked-work-title">
-              <p className="text-xs font-semibold uppercase tracking-widest text-primary">Minimum input needed</p><h2 id="blocked-work-title" className="mt-2 text-2xl font-semibold">{currentBlockedWork.title}</h2><p className="mt-3 leading-relaxed text-muted-foreground">{currentBlockedWork.blockedReason}</p><p className="mt-2 text-xs capitalize text-muted-foreground">Gate type: {(currentBlockedWork.humanGateType ?? "decision").replaceAll("_", " ")}</p>
-              <div className="mt-6 space-y-2"><label htmlFor="blocked-work-response" className="text-sm font-medium">Your response</label><Textarea id="blocked-work-response" value={humanResponse} onChange={(event) => setHumanResponse(event.target.value)} maxLength={4000} rows={5} placeholder="Provide only the information or decision InventSmith requested…" /></div><p className="mt-3 text-xs text-muted-foreground">After you submit, InventSmith will resume this work automatically.</p>
-              {error && <p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}<div className="mt-6 flex justify-end"><Button onClick={handleBlockedWork} disabled={!humanResponse.trim() || submitting}>{submitting ? "Resuming…" : "Submit and resume InventSmith"}</Button></div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary">{canSupplyTextInput ? "Minimum input needed" : "Verified gate required"}</p><h2 id="blocked-work-title" className="mt-2 text-2xl font-semibold">{currentBlockedWork.title}</h2><p className="mt-3 leading-relaxed text-muted-foreground">{currentBlockedWork.blockedReason}</p><p className="mt-2 text-xs capitalize text-muted-foreground">Gate type: {(currentBlockedWork.humanGateType ?? "decision").replaceAll("_", " ")}</p>
+              {canSupplyTextInput ? <><div className="mt-6 space-y-2"><label htmlFor="blocked-work-response" className="text-sm font-medium">Your response</label><Textarea id="blocked-work-response" value={humanResponse} onChange={(event) => setHumanResponse(event.target.value)} maxLength={4000} rows={5} placeholder="Provide only the information InventSmith requested…" /></div><p className="mt-3 text-xs text-muted-foreground">After you submit the requested information, InventSmith will resume this work automatically.</p>{error && <p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}<div className="mt-6 flex justify-end"><Button onClick={handleBlockedWork} disabled={!humanResponse.trim() || submitting}>{submitting ? "Resuming…" : "Submit information and resume"}</Button></div></> : <div className="mt-6 rounded-xl border border-warning/30 bg-warning/5 p-4"><div className="flex items-center gap-2 text-sm font-medium"><AlertTriangle className="h-4 w-4 text-warning" aria-hidden="true" />This gate cannot be cleared with a typed response.</div><p className="mt-2 text-sm leading-relaxed text-muted-foreground">InventSmith will keep this work blocked until the required decision, explicit authorization, qualified professional review, payment action, or real physical evidence is recorded through its dedicated workflow. Text entered here cannot substitute for that proof.</p></div>}
             </section>
           ) : (
             <section className="rounded-2xl border border-success/25 bg-success/5 p-8 text-center"><CheckCircle2 className="mx-auto h-10 w-10 text-success" aria-hidden="true" /><h2 className="mt-4 text-2xl font-semibold">You are all caught up</h2><p className="mt-2 text-muted-foreground">InventSmith does not need another decision or authorization right now.</p><Button asChild className="mt-6"><Link href="/dashboard">Return to briefing</Link></Button></section>

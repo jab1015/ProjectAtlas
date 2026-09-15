@@ -14,8 +14,19 @@ const LIMITS: Record<AtlasTier, DailyUsageLimits> = {
   enterprise: { autonomousCostUnits: 600, chatQuestions: 300 },
 };
 
+/**
+ * Compatibility normalization for the existing daily safety caps.
+ * Organization-native plan economics are intentionally NOT finalized here;
+ * Studio plans temporarily inherit the existing enterprise safety ceiling
+ * until measured cost-to-serve supports dedicated organization allowances.
+ */
 export function normalizeAtlasTier(value: unknown): AtlasTier {
-  if (value === "enterprise") return "enterprise";
+  if (
+    value === "enterprise" ||
+    value === "studio_3" ||
+    value === "studio_6" ||
+    value === "studio_custom"
+  ) return "enterprise";
   if (value === "pro" || value === "inventor_pro") return "pro";
   if (value === "inventor" || value === "starter") return "inventor";
   return "free";

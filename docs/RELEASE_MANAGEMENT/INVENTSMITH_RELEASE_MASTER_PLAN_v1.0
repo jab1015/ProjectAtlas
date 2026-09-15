@@ -1,0 +1,1916 @@
+====================================================================
+INVENTSMITH_RELEASE_MASTER_PLAN_v1.0
+====================================================================
+
+Status: Active Development
+
+Project: Project InventSmith
+
+Product: InventSmith — Autonomous AI Operating System for Inventors
+
+Owner: Jerry Brown
+
+Primary Platform: MadeThis
+
+Primary Backend: Convex
+
+Primary Deployment: Vercel
+
+Document Purpose:
+
+This document is the authoritative source of truth for Project InventSmith.
+
+It records the current state of the platform, completed milestones,
+active development priorities, engineering directives, product
+principles, and long-term roadmap.
+
+Every new development session must begin by reading this document in
+its entirety.
+
+When conflicts exist between this document and any previous discussion,
+planning note, roadmap, specification, or design document, this
+document takes precedence.
+
+====================================================================
+====================================================================
+PURPOSE
+====================================================================
+
+INVENTSMITH_RELEASE_MASTER_PLAN_v1.0 is the authoritative governing document
+for Project InventSmith.
+
+It serves as the single source of truth for the project's current state,
+product vision, engineering direction, completed milestones, active
+development priorities, architectural decisions, and long-term roadmap.
+
+This document exists to ensure that every development session begins
+with an accurate understanding of where InventSmith is today, what has already
+been completed, and what should be built next.
+
+This document eliminates the need to reconstruct project history across
+multiple conversations.
+
+--------------------------------------------------------------------
+
+PRIMARY OBJECTIVES
+
+This document shall:
+
+• Record the current production state of InventSmith.
+
+• Document completed milestones and major architectural decisions.
+
+• Define the current active development milestone.
+
+• Establish engineering directives and product principles.
+
+• Preserve long-term architectural consistency.
+
+• Provide continuity between development sessions.
+
+• Prevent duplicate work and contradictory implementation.
+
+--------------------------------------------------------------------
+
+SOURCE OF TRUTH
+
+This document is the authoritative reference for all future Project
+InventSmith development.
+
+When conflicting information exists in previous conversations,
+specifications, planning notes, or historical documents, this document
+takes precedence.
+
+Historical documents remain valuable for reference but shall not
+override the decisions recorded here.
+
+--------------------------------------------------------------------
+
+DOCUMENT MAINTENANCE
+
+This document is intended to evolve throughout the life of Project
+InventSmith.
+
+It shall be updated whenever:
+
+• A development milestone is completed.
+
+• A significant architectural decision is made.
+
+• Product direction changes.
+
+• Founder validation identifies new priorities.
+
+• A new development milestone becomes active.
+
+The document should always reflect the current state of the platform,
+not historical plans that have already been completed or superseded.
+
+====================================================================
+====================================================================
+PRODUCT VISION
+====================================================================
+
+InventSmith is an Autonomous AI Operating System built specifically for
+inventors.
+
+Its purpose is to transform the invention journey from a fragmented,
+manual process into a coordinated, intelligent, and increasingly
+autonomous experience.
+
+Rather than functioning as a traditional software application, InventSmith
+acts as an experienced executive team that continuously works on behalf
+of the founder.
+
+InventSmith coordinates every stage of the invention lifecycle, including:
+
+• Idea Development
+
+• Validation
+
+• Market Research
+
+• Engineering
+
+• Patent Strategy
+
+• Manufacturing
+
+• Branding
+
+• Financial Planning
+
+• Licensing
+
+• Investor Readiness
+
+• Commercialization
+
+• Product Launch
+
+Through natural conversation, InventSmith understands founder objectives,
+coordinates specialized executive departments, executes authorized work,
+maintains institutional knowledge, and provides evidence-based
+recommendations.
+
+--------------------------------------------------------------------
+
+PRODUCT MISSION
+
+InventSmith exists to help inventors build successful products and businesses
+by reducing complexity, increasing execution speed, and minimizing the
+administrative burden placed on founders.
+
+The founder should spend their time making important business decisions,
+while InventSmith performs as much operational work as possible.
+
+--------------------------------------------------------------------
+
+LONG-TERM VISION
+
+The long-term objective is for InventSmith to become the world's most capable
+AI Operating System for inventors.
+
+Every release should make InventSmith:
+
+• More autonomous
+
+• More knowledgeable
+
+• More trustworthy
+
+• More connected
+
+• More capable
+
+• Easier to use
+
+InventSmith should continuously evolve toward behaving like an experienced
+Chief Executive Officer capable of coordinating an entire company through
+natural conversation.
+
+====================================================================
+====================================================================
+PRODUCT PRINCIPLES
+====================================================================
+
+The following principles govern every product, engineering, and design
+decision made for Project InventSmith.
+
+These principles are permanent unless explicitly amended in a future
+revision of this Release Master Plan.
+
+--------------------------------------------------------------------
+
+1. FOUNDER FIRST
+
+Every decision shall prioritize founder success.
+
+Features, architecture, and user experience exist to reduce founder
+effort, increase execution speed, and improve business outcomes.
+
+If a decision benefits the software but increases founder complexity,
+the implementation should be reconsidered.
+
+--------------------------------------------------------------------
+
+2. CONVERSATION IS THE OPERATING SYSTEM
+
+Natural conversation is the primary interface to InventSmith.
+
+The founder communicates objectives.
+
+InventSmith determines strategy, coordinates departments, executes work, and
+returns meaningful results.
+
+Departments, workflows, and internal systems are implementation details
+that should remain largely invisible to the founder.
+
+--------------------------------------------------------------------
+
+3. EXECUTION BEFORE RECOMMENDATION
+
+InventSmith shall execute work whenever it possesses the authority,
+information, and capability to do so.
+
+Recommendations should be reserved for situations where execution is not
+possible or where founder judgment is required.
+
+--------------------------------------------------------------------
+
+4. AUTONOMOUS BY DEFAULT
+
+InventSmith should continuously advance work without unnecessary founder
+interaction.
+
+Every milestone should increase InventSmith' ability to operate
+independently while maintaining transparency and trust.
+
+--------------------------------------------------------------------
+
+5. TRUTH ABOVE EVERYTHING
+
+InventSmith shall never fabricate:
+
+• Research
+
+• Evidence
+
+• Execution
+
+• Progress
+
+• External actions
+
+• Confidence
+
+When uncertainty exists, InventSmith must clearly communicate what is known,
+what is inferred, and what remains unknown.
+
+--------------------------------------------------------------------
+
+6. SINGLE SOURCE OF TRUTH
+
+Each domain within InventSmith shall have one authoritative source of truth.
+
+Knowledge should never be duplicated across departments.
+
+Departments collaborate by sharing verified information rather than
+maintaining separate copies of the same knowledge.
+
+--------------------------------------------------------------------
+
+7. PROGRESSIVE DISCLOSURE
+
+The founder should see only the information necessary to make the next
+business decision.
+
+Advanced implementation details should remain available when requested
+but should not clutter the default experience.
+
+--------------------------------------------------------------------
+
+8. ARCHITECTURAL STABILITY
+
+Stable systems should be extended rather than replaced.
+
+Existing architecture should be preserved whenever practical.
+
+Large-scale rewrites require compelling technical justification and a
+clear founder benefit.
+
+--------------------------------------------------------------------
+
+9. CONTINUOUS LEARNING
+
+Every interaction, document, decision, and execution should strengthen
+InventSmith' institutional knowledge.
+
+InventSmith should become more capable over time through accumulated evidence
+and experience.
+
+--------------------------------------------------------------------
+
+10. MEASURABLE FOUNDER VALUE
+
+Every milestone shall deliver measurable value to founders.
+
+Infrastructure exists to enable visible product improvements.
+
+No feature should be implemented solely because it is technically
+interesting.
+
+Every implementation should answer one question:
+
+"Does this help founders move their inventions forward more effectively?"
+
+====================================================================
+====================================================================
+INVENTSMITH CONSTITUTION
+====================================================================
+
+The InventSmith Constitution establishes the permanent governing laws of
+Project InventSmith.
+
+These Articles supersede individual implementation preferences and guide
+every architectural, engineering, product, and design decision.
+
+Unless formally amended in a future Release Master Plan, these Articles
+are permanent.
+
+====================================================================
+
+ARTICLE I
+Founder Success Is The Mission
+
+InventSmith exists to help inventors build successful businesses.
+
+Artificial intelligence is not the product.
+
+Software is not the product.
+
+Founder success is the product.
+
+Every engineering decision shall increase founder success while reducing
+founder effort.
+
+====================================================================
+
+ARTICLE II
+InventSmith Is An Autonomous Operating System
+
+InventSmith is not a collection of disconnected tools.
+
+InventSmith is one unified operating system that continuously coordinates
+every stage of the invention journey.
+
+All departments operate together toward a single objective:
+
+Advance the founder's invention.
+
+====================================================================
+
+ARTICLE III
+Conversation Is The Interface
+
+Conversation is the primary operating interface.
+
+Founders should describe objectives.
+
+InventSmith determines:
+
+• Strategy
+
+• Departments
+
+• Execution
+
+• Dependencies
+
+• Deliverables
+
+• Recommendations
+
+The founder should not be required to understand InventSmith' internal
+architecture.
+
+====================================================================
+
+ARTICLE IV
+Execution Is The Default Behavior
+
+Whenever InventSmith possesses:
+
+• sufficient information
+
+• sufficient authority
+
+• sufficient capability
+
+it shall execute work automatically.
+
+InventSmith should recommend work only when execution is not possible.
+
+====================================================================
+
+ARTICLE V
+Authority Boundaries
+
+Founder approval is required only when an action:
+
+• spends money
+
+• creates a legal obligation
+
+• files official documents
+
+• signs agreements or contracts
+
+• performs irreversible external actions
+
+• requires permissions InventSmith does not possess
+
+All other work should continue autonomously.
+
+====================================================================
+
+ARTICLE VI
+Truth Above Everything
+
+InventSmith shall never fabricate:
+
+• research
+
+• evidence
+
+• execution
+
+• progress
+
+• citations
+
+• external actions
+
+• confidence
+
+InventSmith shall clearly distinguish:
+
+Verified Information
+
+Reasoned Inference
+
+Assumptions
+
+Unknown Information
+
+Trust is InventSmith' most valuable asset.
+
+====================================================================
+
+ARTICLE VII
+Knowledge Compounds
+
+Every conversation,
+
+every document,
+
+every decision,
+
+every report,
+
+every engineering package,
+
+every survey,
+
+every analysis,
+
+and every execution
+
+should strengthen InventSmith' institutional knowledge.
+
+Knowledge is cumulative.
+
+InventSmith should become more capable over time.
+
+====================================================================
+
+ARTICLE VIII
+The Founder Experience Comes First
+
+The founder should experience InventSmith as one experienced executive.
+
+Departments,
+
+workflows,
+
+queues,
+
+execution engines,
+
+orchestration,
+
+and implementation details
+
+exist behind the scenes.
+
+InventSmith should present:
+
+Completed
+
+Working On
+
+Waiting
+
+Recommended
+
+Needs Your Approval
+
+Nothing more should be required by default.
+
+====================================================================
+
+ARTICLE IX
+Architecture Must Evolve, Not Restart
+
+Stable systems should be extended rather than replaced.
+
+Large architectural rewrites require compelling technical justification
+and measurable founder benefit.
+
+Backward compatibility should be preserved whenever practical.
+
+====================================================================
+
+ARTICLE X
+Every Release Must Increase Capability
+
+Each release should make InventSmith:
+
+More autonomous.
+
+More intelligent.
+
+More connected.
+
+More trustworthy.
+
+More capable.
+
+Simpler to use.
+
+Every milestone should move InventSmith closer to becoming the world's leading
+AI Operating System for inventors.
+
+====================================================================
+====================================================================
+CURRENT PROJECT STATUS
+====================================================================
+
+Project Status
+
+Active Development
+
+Project Phase
+
+Phase 3 — Autonomous Founder Operating System
+
+Current Platform Status
+
+InventSmith has evolved from a proof of concept into a production architecture
+capable of coordinating autonomous executive departments, maintaining
+persistent knowledge, and executing inventor workflows through natural
+conversation.
+
+The core operating system has been established.
+
+Current development is focused on expanding capabilities, improving the
+founder experience, and increasing autonomous execution.
+
+--------------------------------------------------------------------
+
+CURRENT IMPLEMENTATION STATUS
+
+The following core platform capabilities are operational:
+
+✓ Founder Authentication
+
+✓ Inventor Workspace
+
+✓ Journey Engine
+
+✓ Executive Dashboard
+
+✓ CEO Command Center
+
+✓ Conversation Interface
+
+✓ Executive Intelligence
+
+✓ Evidence Intelligence
+
+✓ Document Intelligence
+
+✓ Autonomous Execution Engine
+
+✓ Delegation Engine
+
+✓ Mission Control
+
+✓ Founder Approval Engine
+
+✓ Unified Action Queue
+
+✓ Cross-Department Coordination
+
+✓ Persistent Institutional Knowledge
+
+✓ Engineering Intelligence Foundation
+
+✓ Native CAD Foundation
+
+✓ Manufacturing Intelligence Foundation
+
+✓ Patent Intelligence Foundation
+
+--------------------------------------------------------------------
+
+CURRENT DEVELOPMENT FOCUS
+
+The platform architecture is now sufficiently mature that future
+development should focus on expanding InventSmith' real-world capabilities
+rather than redesigning existing systems.
+
+Primary development priorities are:
+
+• Simplifying the founder experience.
+
+• Increasing autonomous execution.
+
+• Expanding department intelligence.
+
+• Connecting InventSmith to external services.
+
+• Reducing founder interruptions.
+
+--------------------------------------------------------------------
+
+CURRENT PRODUCT OBJECTIVE
+
+InventSmith should behave as an experienced Chief Executive Officer that
+coordinates the inventor's company through natural conversation.
+
+The founder should focus on making business decisions while InventSmith
+performs as much operational work as possible within its authority.
+
+--------------------------------------------------------------------
+
+PROJECT DIRECTION
+
+Future development should preserve the existing architecture while
+continuously improving:
+
+• Intelligence
+
+• Automation
+
+• Accuracy
+
+• Explainability
+
+• Founder Experience
+
+• Commercial Readiness
+
+Every completed milestone should move InventSmith closer to becoming a fully
+autonomous operating system for inventors.
+
+====================================================================
+====================================================================
+ARCHITECTURE OVERVIEW
+====================================================================
+
+InventSmith is designed as a modular, conversation-first Autonomous AI
+Operating System.
+
+Each major platform component has a clearly defined responsibility while
+working together through a unified execution model.
+
+No subsystem should operate independently of the overall InventSmith
+architecture.
+
+====================================================================
+
+FOUNDATION LAYER
+
+Provides the core infrastructure required for all InventSmith capabilities.
+
+Primary Components
+
+• Authentication
+
+• Inventor Workspace
+
+• Journey Engine
+
+• Persistent Data Model
+
+• Conversation Interface
+
+• Document Storage
+
+• Executive Dashboard
+
+====================================================================
+
+INTELLIGENCE LAYER
+
+Transforms inventor information into structured business knowledge.
+
+Primary Components
+
+• Executive Intelligence
+
+• Evidence Intelligence
+
+• Document Intelligence
+
+• Engineering Intelligence
+
+• Manufacturing Intelligence
+
+• Patent Intelligence
+
+Each intelligence system maintains a single authoritative knowledge
+domain while sharing verified information with the rest of the platform.
+
+====================================================================
+
+EXECUTION LAYER
+
+Coordinates autonomous work throughout InventSmith.
+
+Primary Components
+
+• Autonomous Execution Engine
+
+• Delegation Engine
+
+• Conversation Orchestrator
+
+• Founder Approval Engine
+
+• Unified Action Queue
+
+• Mission Control
+
+The Execution Layer determines what work should occur, coordinates
+departments, tracks execution progress, and advances work automatically
+whenever authority permits.
+
+====================================================================
+
+KNOWLEDGE LAYER
+
+InventSmith continuously builds institutional knowledge.
+
+Knowledge sources include:
+
+• Founder conversations
+
+• Uploaded documents
+
+• Generated packages
+
+• Engineering data
+
+• Market research
+
+• Validation results
+
+• Executive decisions
+
+Knowledge is persistent, reusable, evidence-backed, and continuously
+improves future decision making.
+
+====================================================================
+
+FOUNDER EXPERIENCE LAYER
+
+The founder interacts with InventSmith through a single unified executive
+experience.
+
+Primary Surfaces
+
+• Conversation
+
+• CEO Command Center
+
+• Executive Dashboard
+
+• Mission Control
+
+• Executive Briefings
+
+Internal execution details remain hidden unless explicitly requested.
+
+====================================================================
+
+ARCHITECTURAL PRINCIPLES
+
+Every future capability shall:
+
+• Extend the existing architecture.
+
+• Preserve modularity.
+
+• Maintain a single source of truth.
+
+• Reuse existing execution infrastructure.
+
+• Integrate with Executive Intelligence.
+
+• Improve founder outcomes.
+
+Architectural consistency takes precedence over short-term convenience.
+
+====================================================================
+====================================================================
+COMPLETED MILESTONES
+====================================================================
+
+The following milestones have been completed and are considered part of
+the production architecture.
+
+Completed milestones shall not be redesigned unless required by a future
+architectural decision documented in this Release Master Plan.
+
+====================================================================
+
+AT-001
+Foundation
+
+STATUS
+
+Completed
+
+Summary
+
+Established the foundational InventSmith architecture, project structure, core
+development standards, and long-term product direction.
+
+Major Outcomes
+
+• Initial platform architecture
+
+• Development standards
+
+• Core project structure
+
+--------------------------------------------------------------------
+
+AT-002
+Core Platform
+
+STATUS
+
+Completed
+
+Summary
+
+Implemented the foundational platform required to support inventor
+workspaces and future autonomous capabilities.
+
+Major Outcomes
+
+• Authentication
+
+• Persistent user data
+
+• Core platform services
+
+--------------------------------------------------------------------
+
+AT-003
+Inventor Journey
+
+STATUS
+
+Completed
+
+Summary
+
+Implemented the structured invention journey and stage progression model.
+
+Major Outcomes
+
+• Journey Engine
+
+• Stage progression
+
+• Workspace organization
+
+--------------------------------------------------------------------
+
+AT-004
+Executive Foundation
+
+STATUS
+
+Completed
+
+Summary
+
+Established InventSmith' executive coordination model and departmental
+architecture.
+
+Major Outcomes
+
+• Executive departments
+
+• Department coordination
+
+• Executive reporting
+
+--------------------------------------------------------------------
+
+AT-005
+Document Intelligence
+
+STATUS
+
+Completed
+
+Summary
+
+Implemented persistent document management and document intelligence
+foundations.
+
+Major Outcomes
+
+• Document processing
+
+• Persistent document storage
+
+• Evidence extraction foundation
+
+--------------------------------------------------------------------
+
+AT-006
+Autonomous Execution Foundation
+
+STATUS
+
+Completed
+
+Summary
+
+Established the autonomous execution framework that coordinates work
+across departments.
+
+Major Outcomes
+
+• Autonomous orchestration
+
+• Dependency management
+
+• Execution scheduling
+
+• Cross-department coordination
+
+--------------------------------------------------------------------
+
+AT-007 through Current Release
+
+STATUS
+
+Completed
+
+Summary
+
+The engineering, intelligence, executive, evidence, conversation, and
+autonomous operating system capabilities have been implemented through
+successive milestones, resulting in the current InventSmith Operating System
+architecture documented within this Release Master Plan.
+
+These milestones collectively introduced capabilities including:
+
+• Engineering Intelligence
+
+• Native CAD Foundation
+
+• Manufacturing Intelligence
+
+• Patent Intelligence
+
+• Executive Intelligence
+
+• Evidence Intelligence
+
+• Delegation Engine
+
+• Conversation Orchestrator
+
+• CEO Command Interface
+
+• Founder Approval Engine
+
+• Mission Control
+
+• Unified Action Queue
+
+• Cross-department autonomous execution
+
+• Persistent institutional knowledge
+
+The detailed implementation history for these milestones is maintained
+within the project repository and release history.
+
+====================================================================
+
+COMPLETED ARCHITECTURAL OBJECTIVES
+
+InventSmith now possesses:
+
+✓ Stable modular architecture
+
+✓ Persistent knowledge model
+
+✓ Executive coordination
+
+✓ Autonomous execution
+
+✓ Department collaboration
+
+✓ Conversation-first interaction
+
+✓ Evidence-backed decision making
+
+✓ Founder approval boundaries
+
+✓ Unified execution tracking
+
+✓ Extensible platform architecture
+
+Future milestones should extend these capabilities rather than replace
+them.
+
+====================================================================
+====================================================================
+CURRENT ACTIVE MILESTONE
+====================================================================
+
+Current Milestone
+
+AT-018 — Founder Experience Simplification
+
+Status
+
+ACTIVE DEVELOPMENT
+
+Priority
+
+Highest
+
+====================================================================
+
+MISSION
+
+Transform InventSmith from an engineering-driven platform into a founder-first
+operating system.
+
+The underlying architecture is now sufficiently mature that future
+development should focus on improving the founder experience rather than
+building additional infrastructure.
+
+InventSmith should feel like hiring an experienced CEO—not operating a complex
+software platform.
+
+====================================================================
+
+PRIMARY OBJECTIVES
+
+The AT-018 milestone shall focus on the following objectives.
+
+1. Simplify the Founder Experience
+
+Reduce unnecessary complexity throughout the application.
+
+Every screen should communicate only the information required for the
+founder's next business decision.
+
+--------------------------------------------------------------------
+
+2. Hide Implementation Details
+
+Execution engines,
+
+queues,
+
+workers,
+
+internal orchestration,
+
+dependency graphs,
+
+execution contracts,
+
+and technical implementation details should remain behind the scenes.
+
+InventSmith should communicate business outcomes rather than internal system
+activity.
+
+--------------------------------------------------------------------
+
+3. Improve Executive Communication
+
+Replace technical status messages with executive language.
+
+Instead of describing what the software is doing internally, InventSmith
+should communicate:
+
+• Completed
+
+• Currently Working On
+
+• Waiting
+
+• Recommended Next Step
+
+• Requires Founder Approval
+
+--------------------------------------------------------------------
+
+4. Reduce Founder Interruptions
+
+InventSmith should continue executing work whenever authority permits.
+
+Founder interaction should occur only when required by the Authority
+Boundaries defined within this Release Master Plan.
+
+--------------------------------------------------------------------
+
+5. Progressive Disclosure
+
+Present information in layers.
+
+The default experience should remain simple.
+
+Additional technical detail should be available only when explicitly
+requested.
+
+--------------------------------------------------------------------
+
+6. Create A CEO Experience
+
+Every interaction should reinforce the feeling that InventSmith is operating
+the inventor's business rather than waiting for instructions.
+
+====================================================================
+
+SUCCESS CRITERIA
+
+AT-018 will be considered complete when:
+
+✓ The founder dashboard is significantly simplified.
+
+✓ Duplicate executive messaging has been eliminated.
+
+✓ Internal implementation terminology is hidden.
+
+✓ Executive communication focuses on outcomes rather than processes.
+
+✓ Founder interruptions are minimized.
+
+✓ InventSmith consistently behaves like an experienced executive.
+
+====================================================================
+
+NEXT MILESTONE
+
+After successful completion of AT-018, development shall continue with
+the next milestone defined in the Future Roadmap section of this
+document.
+
+====================================================================
+====================================================================
+FUTURE ROADMAP
+====================================================================
+
+The following milestones represent the planned evolution of InventSmith after
+completion of the current active milestone.
+
+The roadmap is intended to guide development priorities while remaining
+flexible enough to incorporate founder validation, technological
+advancements, and strategic business decisions.
+
+Future milestones may be expanded, reordered, or refined, but should
+always preserve the architectural principles established within this
+Release Master Plan.
+
+====================================================================
+
+AT-019
+Autonomous Authority Expansion
+
+Objective
+
+Expand InventSmith' ability to execute work independently while minimizing
+founder interruptions.
+
+Primary Goals
+
+• Increase autonomous execution.
+
+• Reduce unnecessary approval requests.
+
+• Improve decision automation.
+
+• Expand execution authority within defined boundaries.
+
+• Continue work automatically whenever possible.
+
+--------------------------------------------------------------------
+
+AT-020
+Patent Intelligence Expansion
+
+Objective
+
+Expand Patent Intelligence into a comprehensive intellectual property
+assistant capable of assisting throughout the patent lifecycle.
+
+Primary Goals
+
+• Prior-art analysis
+
+• Novelty assessment
+
+• Claim comparison
+
+• Design-around recommendations
+
+• Patent monitoring
+
+• Patent strategy support
+
+--------------------------------------------------------------------
+
+AT-021
+Validation & Market Intelligence
+
+Objective
+
+Increase InventSmith' ability to validate inventions using real-world market
+data and customer feedback.
+
+Primary Goals
+
+• Market research automation
+
+• Customer validation
+
+• Competitive analysis
+
+• Survey analysis
+
+• Landing page analytics
+
+• Product-market fit assessment
+
+--------------------------------------------------------------------
+
+AT-022
+Native CAD Generation
+
+Objective
+
+Extend the existing CAD Foundation into a native engineering design
+system.
+
+Primary Goals
+
+• Parametric modeling
+
+• Geometry generation
+
+• Assembly management
+
+• STEP export
+
+• STL export
+
+• Engineering drawing generation
+
+--------------------------------------------------------------------
+
+AT-023
+Commercialization Platform
+
+Objective
+
+Coordinate the transition from invention to commercial success.
+
+Primary Goals
+
+• Manufacturing readiness
+
+• Supplier coordination
+
+• Licensing preparation
+
+• Retail readiness
+
+• Investor readiness
+
+• Launch planning
+
+--------------------------------------------------------------------
+
+LONG-TERM PLATFORM EVOLUTION
+
+Future releases should continue expanding InventSmith through additional
+executive intelligence, automation, external integrations, engineering
+capabilities, and commercialization support.
+
+Every future milestone should strengthen InventSmith' ability to operate as a
+trusted executive partner for inventors while preserving the stable
+architecture established by this Release Master Plan.
+
+====================================================================
+====================================================================
+ENGINEERING DIRECTIVES
+====================================================================
+
+The following directives govern all future engineering work on Project
+InventSmith.
+
+Every implementation shall comply with these directives unless
+superseded by a future revision of this Release Master Plan.
+
+====================================================================
+
+1. PRESERVE ARCHITECTURAL STABILITY
+
+The existing production architecture shall be extended rather than
+replaced.
+
+Avoid unnecessary rewrites.
+
+Favor incremental improvement over disruptive redesign.
+
+====================================================================
+
+2. CONVERSATION FIRST
+
+Conversation is InventSmith' primary operating interface.
+
+Every new capability should be accessible through natural conversation
+before introducing additional user interface complexity.
+
+User interface components should support conversation—not replace it.
+
+====================================================================
+
+3. EXECUTE BEFORE RECOMMENDING
+
+Whenever InventSmith possesses sufficient authority, information, and
+capability, it shall execute work automatically.
+
+Do not ask founders to perform work InventSmith can complete itself.
+
+====================================================================
+
+4. HONOR AUTHORITY BOUNDARIES
+
+InventSmith shall request founder approval only when an action:
+
+• Requires spending money
+
+• Creates a legal obligation
+
+• Files official government or legal documents
+
+• Signs agreements or contracts
+
+• Performs irreversible external actions
+
+• Requires permissions or credentials InventSmith does not possess
+
+All other work should continue autonomously.
+
+====================================================================
+
+5. MAINTAIN A SINGLE SOURCE OF TRUTH
+
+Every knowledge domain shall have one authoritative owner.
+
+Do not duplicate business logic or persistent knowledge across
+departments.
+
+Departments should exchange structured information rather than maintain
+independent copies.
+
+====================================================================
+
+6. EVIDENCE-BASED REASONING
+
+InventSmith shall distinguish between:
+
+• Verified Evidence
+
+• Evidence-Based Inference
+
+• Assumptions
+
+• Unknown Information
+
+Recommendations must always identify their supporting evidence.
+
+====================================================================
+
+7. MODULAR DEVELOPMENT
+
+Every new capability shall integrate with the existing InventSmith
+architecture through clearly defined interfaces.
+
+Avoid tightly coupled implementations.
+
+New systems should extend existing execution, intelligence, and
+knowledge layers whenever practical.
+
+====================================================================
+
+8. FOUNDER EXPERIENCE TAKES PRIORITY
+
+Engineering decisions shall prioritize founder experience over technical
+elegance.
+
+When multiple technically correct solutions exist, choose the one that:
+
+• Simplifies the founder experience
+
+• Reduces founder effort
+
+• Improves clarity
+
+• Increases autonomous execution
+
+====================================================================
+
+9. BUILD FOR LONG-TERM EVOLUTION
+
+Every implementation should remain maintainable, extensible, and
+compatible with future platform expansion.
+
+Temporary solutions should be avoided whenever a stable long-term
+solution is practical.
+
+====================================================================
+
+10. DELIVER MEASURABLE VALUE
+
+Every milestone shall produce meaningful improvements that founders can
+experience.
+
+Internal infrastructure should ultimately translate into visible product
+capabilities.
+
+Engineering progress should always result in founder progress.
+
+====================================================================
+====================================================================
+PRODUCT BOUNDARIES
+====================================================================
+
+The following boundaries define the intended scope of Project InventSmith.
+
+These boundaries ensure InventSmith remains focused on its mission and does
+not gradually evolve into a generic software platform.
+
+====================================================================
+
+INVENTSMITH IS
+
+InventSmith is an Autonomous AI Operating System for inventors.
+
+InventSmith coordinates the complete invention journey through intelligent
+planning, executive reasoning, persistent knowledge, and autonomous
+execution.
+
+InventSmith serves as an experienced executive team capable of helping
+founders move inventions from idea to commercialization.
+
+Conversation is the primary operating interface.
+
+Execution is the primary product capability.
+
+====================================================================
+
+INVENTSMITH IS NOT
+
+InventSmith is not:
+
+• A generic chatbot
+
+• A document editor
+
+• A project management application
+
+• A task management system
+
+• A note-taking application
+
+• A CRM
+
+• A file storage application
+
+• A workflow builder
+
+• A collection of disconnected AI tools
+
+Those capabilities may exist within InventSmith when they support the
+inventor journey, but they are not the product itself.
+
+====================================================================
+
+FOUNDER EXPERIENCE
+
+The founder should experience InventSmith as one intelligent executive.
+
+InventSmith should not require founders to understand:
+
+• Departments
+
+• Execution engines
+
+• Internal workflows
+
+• Queues
+
+• Schedulers
+
+• Background processes
+
+• System architecture
+
+Those implementation details exist to serve the founder—not become the
+founder's responsibility.
+
+====================================================================
+
+PRODUCT DECISION TEST
+
+Before implementing any new capability, ask:
+
+Does this help inventors move their invention forward?
+
+Does this reduce founder effort?
+
+Does this increase autonomous execution?
+
+Does this improve business outcomes?
+
+Does this strengthen founder trust?
+
+If the answer to any of these questions is "No," the implementation
+should be reconsidered.
+
+====================================================================
+
+LONG-TERM PRODUCT DIRECTION
+
+InventSmith should become progressively:
+
+• More Autonomous
+
+• More Intelligent
+
+• More Trustworthy
+
+• More Connected
+
+• More Accurate
+
+• More Capable
+
+• Simpler To Use
+
+Every release should increase InventSmith' ability to operate as a trusted
+executive partner while making the founder experience feel simpler—not
+more complicated.
+
+====================================================================
+====================================================================
+SUCCESS CRITERIA
+====================================================================
+
+Project InventSmith is successful only when it consistently helps founders
+make meaningful progress while reducing the complexity of the invention
+journey.
+
+Success shall be measured by founder outcomes rather than feature count.
+
+====================================================================
+
+FOUNDER EXPERIENCE
+
+InventSmith should feel like an experienced executive operating the founder's
+business.
+
+Success Indicators
+
+✓ Founders immediately understand what InventSmith has completed.
+
+✓ Founders immediately understand what InventSmith is currently doing.
+
+✓ Founders immediately understand what InventSmith recommends next.
+
+✓ Founders immediately know when their action is required.
+
+✓ Founders are not overwhelmed by technical implementation details.
+
+====================================================================
+
+AUTONOMOUS EXECUTION
+
+InventSmith should continuously advance work whenever authority permits.
+
+Success Indicators
+
+✓ InventSmith independently plans work.
+
+✓ InventSmith independently coordinates departments.
+
+✓ InventSmith independently resumes work after dependencies are resolved.
+
+✓ InventSmith minimizes unnecessary founder interruptions.
+
+✓ Founder approval is requested only at defined authority boundaries.
+
+====================================================================
+
+INTELLIGENCE
+
+InventSmith should provide trustworthy, evidence-based reasoning.
+
+Success Indicators
+
+✓ Recommendations are supported by evidence.
+
+✓ Confidence levels are clearly communicated.
+
+✓ Risks and opportunities are identified.
+
+✓ Executive reasoning considers cross-department impacts.
+
+✓ InventSmith clearly distinguishes verified information from inference.
+
+====================================================================
+
+KNOWLEDGE
+
+InventSmith should become more valuable with every interaction.
+
+Success Indicators
+
+✓ Uploaded documents become reusable institutional knowledge.
+
+✓ Knowledge is shared across departments.
+
+✓ Duplicate information is minimized.
+
+✓ Previous work improves future recommendations.
+
+====================================================================
+
+ENGINEERING
+
+InventSmith should remain stable while continuously expanding capabilities.
+
+Success Indicators
+
+✓ Existing functionality remains reliable.
+
+✓ New capabilities extend the current architecture.
+
+✓ Regression testing protects existing behavior.
+
+✓ Stable systems are enhanced rather than replaced.
+
+====================================================================
+
+FOUNDER TRUST
+
+Trust is InventSmith' most valuable asset.
+
+Success Indicators
+
+✓ InventSmith never fabricates execution.
+
+✓ InventSmith never fabricates evidence.
+
+✓ InventSmith clearly communicates uncertainty.
+
+✓ InventSmith accurately represents platform capabilities.
+
+✓ Founders can rely upon InventSmith' recommendations.
+
+====================================================================
+
+LONG-TERM SUCCESS
+
+InventSmith succeeds when inventors can move from idea to commercialization
+primarily through natural conversation while InventSmith coordinates,
+executes, and manages the operational work behind the scenes.
+
+The ultimate measure of success is that founders spend less time
+managing software and more time building successful businesses.
+
+====================================================================
+====================================================================
+RELEASE GOVERNANCE
+====================================================================
+
+This Release Master Plan is the authoritative governing document for
+Project InventSmith.
+
+It shall remain the single source of truth for the project's current
+state, architecture, development priorities, engineering directives,
+completed milestones, and long-term roadmap.
+
+All future development shall align with this document unless it is
+formally revised.
+
+====================================================================
+
+DOCUMENT AUTHORITY
+
+When conflicts exist between this Release Master Plan and:
+
+• Previous conversations
+
+• Planning notes
+
+• Brainstorming documents
+
+• Legacy specifications
+
+• Historical roadmaps
+
+• Individual implementation documents
+
+This Release Master Plan shall take precedence.
+
+====================================================================
+
+DOCUMENT MAINTENANCE
+
+This document shall be updated whenever:
+
+• A milestone is completed.
+
+• A new milestone becomes active.
+
+• A significant architectural decision is approved.
+
+• Founder validation changes product direction.
+
+• Engineering directives are amended.
+
+• Product principles or constitutional articles are revised.
+
+The Release Master Plan should always describe the current reality of
+Project InventSmith—not historical intentions.
+
+====================================================================
+
+DEVELOPMENT WORKFLOW
+
+Every new development session shall begin by reading this document in
+its entirety.
+
+Before proposing implementation work, development shall determine:
+
+• Current project status
+
+• Completed milestones
+
+• Active milestone
+
+• Engineering directives
+
+• Product principles
+
+• InventSmith Constitution
+
+• Future roadmap
+
+Development shall then continue from the current active milestone without
+repeating completed work or contradicting documented architectural
+decisions.
+
+====================================================================
+
+CHANGE MANAGEMENT
+
+Changes to this document should preserve continuity.
+
+Existing sections should be updated or replaced rather than duplicated.
+
+At any point in time there shall be only one authoritative statement for:
+
+• Current project status
+
+• Active milestone
+
+• Future roadmap
+
+• Engineering directives
+
+• Product principles
+
+• Success criteria
+
+The Release Master Plan must remain internally consistent so that any
+new development session can accurately resume work without requiring
+additional historical context.
+
+====================================================================
+====================================================================
+DOCUMENT COMPLETION
+====================================================================
+
+Document Name:
+INVENTSMITH_RELEASE_MASTER_PLAN_v1.0.md
+
+Project:
+Project InventSmith — Autonomous AI Operating System for Inventors
+
+Owner:
+Jerry Brown
+
+Status:
+Active Development
+
+Document Type:
+Living Master Release Plan
+
+Authority:
+Single Source of Truth
+
+====================================================================
+
+REVISION POLICY
+
+This document is intended to evolve throughout the lifetime of Project
+InventSmith.
+
+Future revisions shall update this document to reflect the current state
+of the platform while preserving internal consistency and architectural
+continuity.
+
+When changes are made:
+
+• Completed milestones shall move to the historical record.
+
+• The current active milestone shall be updated.
+
+• The future roadmap shall be revised as priorities evolve.
+
+• Engineering directives shall remain aligned with product principles.
+
+• Obsolete or conflicting information shall be removed rather than
+  duplicated.
+
+At all times, this document shall present one clear and authoritative
+view of Project InventSmith.
+
+====================================================================
+
+FINAL DECLARATION
+
+Project InventSmith exists to help inventors transform ideas into successful
+products through trusted executive intelligence, autonomous execution,
+and evidence-based decision making.
+
+Every release should make InventSmith:
+
+• More autonomous.
+
+• More intelligent.
+
+• More capable.
+
+• More trustworthy.
+
+• Simpler for founders to use.
+
+The success of Project InventSmith will be measured not by the number of
+features implemented, but by the measurable progress founders achieve
+using the platform.
+
+====================================================================
+
+END OF DOCUMENT
+
+====================================================================

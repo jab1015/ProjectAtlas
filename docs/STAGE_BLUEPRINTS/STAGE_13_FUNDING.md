@@ -8,13 +8,13 @@
 Prepare the inventor to seek external funding — from angels, venture capitalists, crowdfunding platforms, grants, or strategic partners — with a compelling pitch and a defensible financial model.
 
 **Why this stage exists:**
-Most inventions require capital to reach commercial scale. The inventor needs to manufacture inventory, fund marketing, and sustain operations through the early months before revenue exceeds expenses. The investor pitch is the highest-stakes communication moment in the inventor's journey — it must compress months of work into a 10–12 slide deck that answers every material question an investor will have. Atlas prepares the inventor not just with a slide template, but with the underlying analysis that makes each slide defensible: market sizing, financial projections, IP status, manufacturing economics, and validated demand. Inventors who reach this stage through Atlas have already done the work. Atlas turns it into a pitch.
+Most inventions require capital to reach commercial scale. The inventor needs to manufacture inventory, fund marketing, and sustain operations through the early months before revenue exceeds expenses. The investor pitch is the highest-stakes communication moment in the inventor's journey — it must compress months of work into a 10–12 slide deck that answers every material question an investor will have. InventSmith prepares the inventor not just with a slide template, but with the underlying analysis that makes each slide defensible: market sizing, financial projections, IP status, manufacturing economics, and validated demand. Inventors who reach this stage through InventSmith have already done the work. InventSmith turns it into a pitch.
 
 **Primary objective:**
 Produce a complete Investor-Ready Package: a pitch deck, a financial model, and a funding strategy that identifies the right sources of capital for this invention at this stage.
 
 **Success definition:**
-Atlas considers this stage successful when the inventor has a complete pitch deck with real data in every slide, a 3-year financial model grounded in the unit economics and sales projections built in prior stages, and a specific list of funding sources to approach — not a generic list of "types of investors," but specific programs, firms, or individuals appropriate for this invention.
+InventSmith considers this stage successful when the inventor has a complete pitch deck with real data in every slide, a 3-year financial model grounded in the unit economics and sales projections built in prior stages, and a specific list of funding sources to approach — not a generic list of "types of investors," but specific programs, firms, or individuals appropriate for this invention.
 
 ---
 
@@ -28,26 +28,26 @@ Atlas considers this stage successful when the inventor has a complete pitch dec
 
 ---
 
-## Atlas Responsibilities
+## InventSmith Responsibilities
 
-**How Atlas guides the inventor:**
-Atlas builds the funding strategy first — matching the invention's stage, capital needs, and equity preferences to the appropriate funding sources. It then constructs the pitch deck narrative, populates the financial model from prior stage outputs, prepares the investor FAQ, and identifies specific grant programs and investor targets. Atlas does not dress up an underprepared invention to look investor-ready — it helps the inventor become genuinely investor-ready by surfacing and resolving the gaps.
+**How InventSmith guides the inventor:**
+InventSmith builds the funding strategy first — matching the invention's stage, capital needs, and equity preferences to the appropriate funding sources. It then constructs the pitch deck narrative, populates the financial model from prior stage outputs, prepares the investor FAQ, and identifies specific grant programs and investor targets. InventSmith does not dress up an underprepared invention to look investor-ready — it helps the inventor become genuinely investor-ready by surfacing and resolving the gaps.
 
-**What Atlas analyzes:**
+**What InventSmith analyzes:**
 - All prior stage documents as the foundation for pitch content — the story is already built from Stages 1–12
 - The inventor's funding target and use of proceeds — for internal consistency with the financial model
 - The invention's current development stage — to match it to the appropriate funding sources
 - The business entity structure — incorporation is typically required before equity funding
 - IP status — a critical due diligence item for any investor
 
-**What Atlas recommends:**
+**What InventSmith recommends:**
 - The funding sources most appropriate for this invention at this stage
 - A pitch narrative structure and the data for each slide
 - Conservative vs. optimistic scenario framing for the financial model
 - Specific SBIR/STTR programs, angel networks, or seed funds to target
 - What must be resolved before the first investor introduction
 
-**What Atlas tracks:**
+**What InventSmith tracks:**
 - Pitch deck completion — all slides populated with real data
 - Financial model completeness — 3-year projection with revenue, COGS, and cash flow
 - Whether the funding target and use of proceeds are defined and internally consistent
@@ -67,11 +67,11 @@ Atlas builds the funding strategy first — matching the invention's stage, capi
 
 ---
 
-## Atlas Guidance
+## InventSmith Guidance
 
-Atlas opens Stage 13 with a funding landscape orientation. Most inventors know about venture capital and crowdfunding. Fewer know about SBIR/STTR grants, state innovation programs, revenue-based financing, strategic corporate partnerships, or the role of friends-and-family rounds. Atlas presents the full landscape with the honest truth about what each type of funding requires, what it costs in equity or obligation, and what stage of business it is appropriate for. This prevents inventors from pursuing the wrong funding type — a common and expensive mistake.
+InventSmith opens Stage 13 with a funding landscape orientation. Most inventors know about venture capital and crowdfunding. Fewer know about SBIR/STTR grants, state innovation programs, revenue-based financing, strategic corporate partnerships, or the role of friends-and-family rounds. InventSmith presents the full landscape with the honest truth about what each type of funding requires, what it costs in equity or obligation, and what stage of business it is appropriate for. This prevents inventors from pursuing the wrong funding type — a common and expensive mistake.
 
-Atlas builds the pitch deck narrative using the Sequoia Capital framework as a structural model: Company Purpose → Problem → Solution → Why Now → Market → Product → Business Model → Team → Financials → Ask. For each section, Atlas identifies exactly which prior stage documents supply the content:
+InventSmith builds the pitch deck narrative using the Sequoia Capital framework as a structural model: Company Purpose → Problem → Solution → Why Now → Market → Product → Business Model → Team → Financials → Ask. For each section, InventSmith identifies exactly which prior stage documents supply the content:
 - Company Purpose and Problem: Idea Brief and Validation Report
 - Market: Market Research Summary
 - Why Now: Market trend data from Stage 3
@@ -80,9 +80,9 @@ Atlas builds the pitch deck narrative using the Sequoia Capital framework as a s
 - Financials: First-Year Sales Projections and complete Unit Economics Model
 - Ask: Funding target and use of proceeds
 
-The financial model is built from real data already in the invention record. Atlas does not ask the inventor to project from a blank spreadsheet. It starts with the Unit Economics Model from Stage 7 and 10, applies the Sales Projections from Stage 12, and extends both into a 3-year model with documented assumptions for growth rate, operating expense scaling, and cash flow. The assumptions are conservative by default — Atlas helps the inventor distinguish between a plausible model and a credible one.
+The financial model is built from real data already in the invention record. InventSmith does not ask the inventor to project from a blank spreadsheet. It starts with the Unit Economics Model from Stage 7 and 10, applies the Sales Projections from Stage 12, and extends both into a 3-year model with documented assumptions for growth rate, operating expense scaling, and cash flow. The assumptions are conservative by default — InventSmith helps the inventor distinguish between a plausible model and a credible one.
 
-The Investor FAQ is one of the highest-value outputs of this stage. It is built from Atlas's analysis of the invention record: what questions will any skeptical investor ask, and what are the honest, factual, compelling answers? The FAQ covers market size, competitive differentiation, unit economics, IP defensibility, team capability, manufacturing risk, and the use of proceeds. Preparing these answers before the investor meeting is the difference between a confident presentation and a fumbling one.
+The Investor FAQ is one of the highest-value outputs of this stage. It is built from InventSmith's analysis of the invention record: what questions will any skeptical investor ask, and what are the honest, factual, compelling answers? The FAQ covers market size, competitive differentiation, unit economics, IP defensibility, team capability, manufacturing risk, and the use of proceeds. Preparing these answers before the investor meeting is the difference between a confident presentation and a fumbling one.
 
 ---
 
@@ -91,10 +91,10 @@ The Investor FAQ is one of the highest-value outputs of this stage. It is built 
 - Funding landscape analysis — matching invention stage, capital needs, and founder preferences to appropriate funding types and sources
 - Pitch deck narrative construction — identifying which prior stage documents supply the content for each slide
 - Financial model construction — 3-year projection from Stage 7/10 unit economics and Stage 12 sales projections
-- Investor FAQ generation — the top 20 investor questions with Atlas-drafted answers from the invention record
+- Investor FAQ generation — the top 20 investor questions with InventSmith-drafted answers from the invention record
 - SBIR/STTR and grant program identification — specific programs relevant to the invention's category and technology
 - Pitch Readiness Assessment — identifying what is investor-ready and what gaps must be resolved first
-- Pitch practice preparation — Atlas plays the skeptical investor, asking the likely hard questions
+- Pitch practice preparation — InventSmith plays the skeptical investor, asking the likely hard questions
 
 ---
 
@@ -103,7 +103,7 @@ The Investor FAQ is one of the highest-value outputs of this stage. It is built 
 - **Pitch Deck** — 10–12 slide investor presentation with real data in every slide
 - **Financial Model** — 3-year projection with revenue, COGS, gross margin, operating expenses, and cash flow
 - **Funding Strategy Document** — the recommended funding sources, target amounts, and sequencing
-- **Investor FAQ** — the 20 most common investor questions with Atlas-drafted answers
+- **Investor FAQ** — the 20 most common investor questions with InventSmith-drafted answers
 - **Funding Readiness Assessment** — a clear view of what is investor-ready and what still needs work
 
 ---
@@ -119,7 +119,7 @@ The Investor FAQ is one of the highest-value outputs of this stage. It is built 
 
 ## Readiness Evaluation
 
-Atlas evaluates the inventor's readiness using three states only. No numeric scores.
+InventSmith evaluates the inventor's readiness using three states only. No numeric scores.
 
 **Not Ready:**
 - Pitch deck has not been started or has placeholder content in key slides
@@ -153,7 +153,7 @@ Atlas evaluates the inventor's readiness using three states only. No numeric sco
 - At least 5 specific funding sources — investors, grants, or programs — are identified
 - Funding Readiness Assessment is complete
 - Business entity is formed or a formation decision is documented
-- Inventor has conducted at least one pitch practice session with Atlas feedback
+- Inventor has conducted at least one pitch practice session with InventSmith feedback
 
 ---
 
@@ -175,7 +175,7 @@ The following information moves from Stage 13 into Stage 14 (Launch):
 - **Investor databases** (AngelList, Crunchbase API) — identify angels and seed funds actively investing in the invention's category with recent deal history
 - **Pitch deck engagement tracking** (DocSend) — track which investors opened the deck, which slides they spent time on, and when they stopped reading
 - **Cap table management** (Carta, Pulley) — set up equity structure and cap table during fundraising preparation
-- **AI pitch coaching** — a simulated investor pitch practice session where the inventor presents and Atlas plays the skeptical investor, asking the hardest likely questions
+- **AI pitch coaching** — a simulated investor pitch practice session where the inventor presents and InventSmith plays the skeptical investor, asking the hardest likely questions
 
 ---
 
