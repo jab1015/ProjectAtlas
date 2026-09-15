@@ -21,11 +21,15 @@ export function canResolveApproval(status: string): boolean {
  * decisions use resolveDecision, authorizations use approval requests, professional
  * review is admin-recorded, physical work requires real evidence, and payment must
  * remain an explicit external action.
+ *
+ * The gate argument is optional only for compatibility with the older mutation
+ * caller. Omission deliberately fails closed; the caller must explicitly identify
+ * a private-information gate before free-form text can release work.
  */
 export function canRespondToBlockedWork(
   status: string,
   response: string,
-  humanGateType: string | undefined
+  humanGateType?: string
 ): boolean {
   const length = response.trim().length;
   return status === "blocked" && humanGateType === "private_information" && length > 0 && length <= 4000;
