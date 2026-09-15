@@ -29,7 +29,7 @@ describe("blocked autonomous work", () => {
     expect(canRespondToBlockedWork("blocked", "Use the 12-inch version.", "private_information")).toBe(true);
   });
 
-  it("reports input-size errors before gate release", () => {
+  it("reports input-size errors only after confirming the private-information gate", () => {
     expect(validateBlockedWorkResponse("blocked", "   ", "private_information")).toEqual({ valid: false, error: "Response must be between 1 and 4,000 characters" });
     expect(validateBlockedWorkResponse("blocked", "x".repeat(4001), "private_information")).toEqual({ valid: false, error: "Response must be between 1 and 4,000 characters" });
   });
@@ -39,6 +39,13 @@ describe("blocked autonomous work", () => {
       expect(validateBlockedWorkResponse("blocked", "I completed it.", gate)).toEqual({ valid: false, error: `Free-form text cannot satisfy the ${gate} gate` });
     }
     expect(validateBlockedWorkResponse("blocked", "I completed it.")).toEqual({ valid: false, error: "Free-form text cannot satisfy the unknown gate" });
+  });
+
+  it("keeps consequential gate errors even when submitted text is empty or oversized", () => {
+    for (const gate of ["decision", "authorization", "professional_review", "payment", "physical_work"]) {
+      expect(validateBlockedWorkResponse("blocked", "   ", gate)).toEqual({ valid: false, error: `Free-form text cannot satisfy the ${gate} gate` });
+      expect(validateBlockedWorkResponse("blocked", "x".repeat(4001), gate)).toEqual({ valid: false, error: `Free-form text cannot satisfy the ${gate} gate` });
+    }
   });
 
   it("rejects replay/non-blocked work before considering input", () => {
