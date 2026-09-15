@@ -1,23 +1,27 @@
 import { describe, expect, it } from "vitest";
 import { POST_CANONICAL_WORK_PLAN } from "@convex/fullProductWorkPlan";
 import { NATIVE_CAD_DELIVERABLE_KINDS } from "@convex/cadArtifactKinds";
-import { isManufacturingMaturityEligible, isProductionMatureCad } from "@convex/manufacturingMaturityLogic";
+import {
+  isManufacturingMaturityEligible,
+  isProductionMatureCad,
+  type ManufacturingMaturityDeliverable,
+} from "@convex/manufacturingMaturityLogic";
 import { requiredProfessionalReviews } from "@convex/professionalReviewPolicy";
 import { selectNextWorkItem } from "@convex/workOrchestratorLogic";
 
 const workByKind = new Map(POST_CANONICAL_WORK_PLAN.map((item) => [item.kind, item]));
 
-const reviewed = (kind: string, version = 1, artifactMaturity?: string) => ({
+const reviewed = (kind: string, version = 1, artifactMaturity?: string): ManufacturingMaturityDeliverable => ({
   kind,
   version,
   trustState: "professionally_reviewed",
   artifactMaturity,
 });
 
-const matureCadSet = (version = 1, maturity = "engineering_reviewed") =>
+const matureCadSet = (version = 1, maturity = "engineering_reviewed"): ManufacturingMaturityDeliverable[] =>
   NATIVE_CAD_DELIVERABLE_KINDS.map((kind) => reviewed(kind, version, maturity));
 
-const matureManufacturingArtifacts = () => [
+const matureManufacturingArtifacts = (): ManufacturingMaturityDeliverable[] => [
   reviewed("prototype_readiness_assessment"),
   reviewed("manufacturer_rfq_package"),
   reviewed("manufacturing_drawing_specification"),
