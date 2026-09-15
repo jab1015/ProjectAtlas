@@ -76,7 +76,7 @@ export const getJourneyCenter = query({
     if (pendingApprovalCount > 0) nextAction = `Review ${pendingApprovalCount} pending authorization${pendingApprovalCount === 1 ? "" : "s"}.`;
     else if (openDecisionCount > 0) nextAction = `Resolve ${openDecisionCount} inventor decision${openDecisionCount === 1 ? "" : "s"}.`;
     else if (blockedWorkCount > 0) nextAction = `Provide the smallest required input for ${blockedWorkCount} blocked work item${blockedWorkCount === 1 ? "" : "s"}.`;
-    else if (firstIncomplete.status === "professional_review") nextAction = `Professional review is required before ${firstIncomplete.name} can be treated as complete.`;
+    else if (firstIncomplete.status === "professional_review") nextAction = `Professional review is required before required stage work for ${firstIncomplete.name} can be treated as complete.`;
     else if (firstIncomplete.status === "needs_refresh") nextAction = `Refresh ${firstIncomplete.name} because upstream evidence or invention facts changed.`;
     else if (firstIncomplete.status === "failed") nextAction = `Retry or resolve failed ${firstIncomplete.name} work.`;
 
