@@ -16,8 +16,19 @@ describe("consequential approval UI routing", () => {
   it("routes inventor approval decisions through the exact-artifact guarded mutation", () => {
     expect(reviewPage).toContain("consequentialApprovalMutation:resolveConsequentialApproval");
     expect(reviewPage).not.toContain("inventionWorkspace:resolveApprovalRequest");
-    expect(reviewPage).toContain("Approve action");
+    expect(reviewPage).toContain("Authorize request");
     expect(reviewPage).toContain("Decline");
+  });
+
+  it("tells the inventor that approval records permission but does not execute an external action", () => {
+    expect(reviewPage).toContain("Review permission for a future action");
+    expect(reviewPage).toContain("Approval only records your authorization");
+    expect(reviewPage).toContain("It does not contact a third party");
+    expect(reviewPage).toContain("make a purchase or payment");
+    expect(reviewPage).toContain("place an order");
+    expect(reviewPage).toContain("submit or file anything");
+    expect(reviewPage).toContain("publish anything");
+    expect(reviewPage).toContain("future external action must pass its own current authorization checks");
   });
 
   it("keeps approval and execution fail-closed on current exact artifact scope", () => {
@@ -26,5 +37,6 @@ describe("consequential approval UI routing", () => {
     expect(guardedApprovalMutation).toContain("requireCurrentApprovedExternalAction");
     expect(guardedApprovalMutation).toContain("requireInventionManageAccess");
     expect(guardedApprovalMutation).toContain('deliverable.trustState !== "ready_for_authorized_use"');
+    expect(guardedApprovalMutation).toContain("externalActionExecuted: false");
   });
 });
