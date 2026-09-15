@@ -26,6 +26,7 @@ export interface ArtifactMaturityInput {
   deliverableKind: string;
   currentMaturity?: string;
   staleReason?: string;
+  isCurrentRevision?: boolean;
   reviews: readonly ArtifactMaturityReview[];
 }
 
@@ -39,9 +40,11 @@ export function deriveTrustStateFromProfessionalReviews(statuses: ProfessionalRe
 }
 
 /**
- * Engineering review can promote only the exact fresh native CAD artifact that
- * was reviewed, and only after every review required for that artifact is accepted.
- * If any required review is later rejected/changed or the artifact becomes stale,
+ * Engineering review can promote only the exact fresh current native CAD artifact
+ * that was reviewed, and only after every review required for that artifact is
+ * accepted. Historical revisions may retain already-earned engineering maturity,
+ * but accepting an old revision after a newer one exists cannot newly promote it.
+ * If a required review is later rejected/changed or the artifact becomes stale,
  * engineering maturity is invalidated back to preliminary CAD. Manufacturing
  * release remains a separate consequential authorization boundary.
  */
@@ -52,10 +55,11 @@ export function deriveArtifactMaturityFromProfessionalReviews(input: ArtifactMat
   const exactReviews = input.reviews.filter((review) => review.deliverableId === input.deliverableId);
   const allRequiredReviewsAccepted = exactReviews.length > 0 && exactReviews.every((review) => review.status === "accepted");
   const acceptedEngineeringReview = exactReviews.some((review) => review.specialty === "engineering" && review.status === "accepted");
-  const qualifies = !input.staleReason && allRequiredReviewsAccepted && acceptedEngineeringReview;
+  const reviewSetQualifies = !input.staleReason && allRequiredReviewsAccepted && acceptedEngineeringReview;
+  const mayPromoteCurrentRevision = input.isCurrentRevision !== false;
 
-  if (qualifies) return "engineering_reviewed";
-  if (input.currentMaturity === "engineering_reviewed") return "preliminary_cad";
+  if (reviewSetQualifies && mayPromoteCurrentRevision) return "engineering_reviewed";
+  if (input.currentMaturity === "engineering_reviewed" && !reviewSetQualifies) return "preliminary_cad";
   return input.currentMaturity;
 }
 
