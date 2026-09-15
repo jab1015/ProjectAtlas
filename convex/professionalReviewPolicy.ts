@@ -66,6 +66,7 @@ export function requiredProfessionalReviews(kind: string): RequiredProfessionalR
     "product_design_specification",
     "cad_model_specification",
     "manufacturing_drawing_specification",
+    "native_cad_package",
     "prototype_test_report",
     "prototype_to_spec_gap_analysis",
     "prototype_readiness_assessment",
