@@ -20,11 +20,23 @@ describe("explicit external-use authorization UI", () => {
     expect(workPage).toContain('deliverable.trustState !== "professional_review_required"');
   });
 
-  it("keeps the backend authority on current revision, staleness, management access, and required professional review", () => {
+  it("warns that external-use authorization records permission but does not execute consequential real-world actions", () => {
+    expect(workPage).toContain("This records your permission for this exact current revision");
+    expect(workPage).toContain("does not replace professional review");
+    expect(workPage).toContain("authorize spending");
+    expect(workPage).toContain("contact a third party");
+    expect(workPage).toContain("place a manufacturing order");
+    expect(workPage).toContain("file a legal submission");
+    expect(workPage).toContain("publish anything automatically");
+  });
+
+  it("keeps the backend authority on current revision, staleness, management access, required professional review, and non-execution semantics", () => {
     expect(mutationSource).toContain("requireInventionManageAccess");
     expect(mutationSource).toContain("latestRevisionIds.length !== 1");
     expect(mutationSource).toContain("deliverable.staleReason");
     expect(mutationSource).toContain("requiredProfessionalReviews(deliverable.kind)");
     expect(mutationSource).toContain('trustState: "ready_for_authorized_use"');
+    expect(mutationSource).toContain("externalActionExecuted: false");
+    expect(mutationSource).toContain("no external action was executed");
   });
 });
