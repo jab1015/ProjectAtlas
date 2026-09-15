@@ -14,7 +14,19 @@ export function canResolveApproval(status: string): boolean {
   return status === "pending";
 }
 
-export function canRespondToBlockedWork(status: string, response: string): boolean {
+/**
+ * Free-form collaborator text may satisfy only a private-information/input gate.
+ * Consequential gates have dedicated proof/authorization paths and must never be
+ * converted back to queued work merely because somebody typed a response:
+ * decisions use resolveDecision, authorizations use approval requests, professional
+ * review is admin-recorded, physical work requires real evidence, and payment must
+ * remain an explicit external action.
+ */
+export function canRespondToBlockedWork(
+  status: string,
+  response: string,
+  humanGateType: string | undefined
+): boolean {
   const length = response.trim().length;
-  return status === "blocked" && length > 0 && length <= 4000;
+  return status === "blocked" && humanGateType === "private_information" && length > 0 && length <= 4000;
 }
