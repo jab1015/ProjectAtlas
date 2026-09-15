@@ -95,7 +95,8 @@ describe("InventSmith complete idea-to-market repository acceptance contract", (
     const department = readFileSync(join(process.cwd(), "src/app/(app)/invention/[id]/department/[stageId]/page.tsx"), "utf8");
     const legacyGuard = readFileSync(join(process.cwd(), "src/app/(app)/invention/[id]/layout.tsx"), "utf8");
 
-    expect(dashboard).toContain("Complete InventSmith journey");
+    expect(dashboard).toContain("Full InventSmith journey");
+    expect(dashboard).toContain("Idea-to-market stage work");
     expect(dashboard).toContain("Open Journey Center");
     expect(journey).toContain("Inventor journey");
     expect(journey).toContain('complete: { label: "Stage work complete"');
