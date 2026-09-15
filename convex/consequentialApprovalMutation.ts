@@ -1,6 +1,6 @@
-import { ConvexError } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
-import type { MutationCtx } from "./_generated/server";
+import { internalMutation, mutation, type MutationCtx } from "./_generated/server";
 import { requireInventionManageAccess } from "./organizations";
 import { canResolveApproval } from "./reviewLogic";
 
@@ -264,3 +264,31 @@ export async function requireCurrentApprovedExternalAction(
   );
   return request;
 }
+
+export const requestConsequentialApproval = internalMutation({
+  args: {
+    inventionId: v.id("inventions"),
+    decisionId: v.optional(v.id("inventionDecisions")),
+    deliverableIds: v.optional(v.array(v.id("atlasDeliverables"))),
+    actionType: v.union(
+      v.literal("share_confidential_information"),
+      v.literal("contact_third_party"),
+      v.literal("publish_or_disclose"),
+      v.literal("purchase_or_fee"),
+      v.literal("submit_or_file"),
+      v.literal("external_use"),
+      v.literal("other"),
+    ),
+    summary: v.string(),
+    consequences: v.array(v.string()),
+  },
+  handler: requestApprovalHandler,
+});
+
+export const resolveConsequentialApproval = mutation({
+  args: {
+    approvalRequestId: v.id("approvalRequests"),
+    approved: v.boolean(),
+  },
+  handler: resolveApprovalRequestHandler,
+});
