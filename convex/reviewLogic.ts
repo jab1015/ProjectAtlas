@@ -16,9 +16,9 @@ export function canResolveApproval(status: string): boolean {
 
 export function validateBlockedWorkResponse(status: string, response: string, humanGateType?: string): { valid: true; cleaned: string } | { valid: false; error: string } {
   if (status !== "blocked") return { valid: false, error: "Work item is not waiting for input" };
+  if (humanGateType !== "private_information") return { valid: false, error: `Free-form text cannot satisfy the ${humanGateType ?? "unknown"} gate` };
   const cleaned = response.trim();
   if (cleaned.length === 0 || cleaned.length > 4000) return { valid: false, error: "Response must be between 1 and 4,000 characters" };
-  if (humanGateType !== "private_information") return { valid: false, error: `Free-form text cannot satisfy the ${humanGateType ?? "unknown"} gate` };
   return { valid: true, cleaned };
 }
 
