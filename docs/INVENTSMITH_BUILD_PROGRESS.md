@@ -1,136 +1,99 @@
 # InventSmith Build Progress
 
-**Last updated:** September 14, 2026  
+**Last updated:** September 15, 2026  
 **Product destination:** Complete Idea-to-Market Inventor OS  
 **Authoritative product specification:** `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`  
 **Current continuation checkpoint:** `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`  
 **Active build branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally unmerged
 
-## Product vision
+## Current completion snapshot
 
-InventSmith — The Inventor OS by Modern Methods — is an organization-native operating system that takes an inventor from a raw idea through an evidence-backed journey to market while hiding unnecessary process complexity from the inventor.
+Planning estimates, kept separate from release claims:
 
-The common destination remains:
+| Dimension | Estimate | Current truth |
+|---|---:|---|
+| Customer-facing InventSmith name conversion | **96%** | Canonical UI/docs use InventSmith; historical repo slug and tested compatibility identifiers remain intentionally |
+| Repository product implementation + hardening | **88%** | Complete journey is substantially implemented; remaining work is concentrated in consequential gate behavior, maturity transitions, deeper acceptance and cleanup |
+| Automated repository qualification | **85%** | Broad suite has repeatedly passed; newest corrected gate-hardening head still needs exact-head CI |
+| Owner-controlled deployment/live acceptance | **0%** | Modern Methods Vercel/Convex not provisioned yet |
+| Overall production-acceptance path | **72%** | Weighted planning estimate including repository work, deployment, live acceptance, billing/providers and genuine professional/real-world gates |
+
+The old controlled-pilot 80% figure is retired and is not an overall completion measure.
+
+## Product vision and routing
+
+InventSmith — The Inventor OS by Modern Methods — is an organization-native operating system that owns the applicable journey:
 
 **Idea → Evidence → Validation → Market Research → Prior Art / Patent Readiness → Product Design → CAD / Engineering where applicable → Prototype → Manufacturing or Software Delivery → Branding → IP / Legal Preparation → Pricing → Marketing → Sales → Funding → Launch → Growth.**
 
-The inventor should not have to manage departments or manually sequence the process. InventSmith owns routing, dependencies, evidence state, work status, human gates, and next actions.
+Physical, software, hybrid and regulated inventions route through applicable branches. Unsupported harmful/abusive concepts are refused. Ordinary business/service-only concepts are routed outside the invention workflow.
 
-The retired controlled-pilot 80% figure must never be used as overall InventSmith completion. No historical pre-InventSmith or controlled-pilot completion percentage should be treated as overall InventSmith completion.
+## Hosting/source boundary
 
-## Hosting and source-of-truth direction
+GitHub remains source/CI authority. The target runtime is a future Modern Methods-owned Vercel + Convex deployment. MadeThis is retired/historical and must not be used as a sync or deployment target. Repository-green is not equivalent to deployed or live verified.
 
-The active owner-controlled target is:
+## Implemented foundation
 
-- **GitHub:** `jab1015/ProjectAtlas` — historical repository slug and current source/CI authority. The repository slug may be renamed separately after compatibility review; the customer-facing product is InventSmith.
-- **Vercel:** future Modern Methods-owned Next.js deployment.
-- **Convex:** future Modern Methods-owned database/auth/storage/functions deployment.
+The branch contains organization-native ownership/membership/invention access; organization-scoped entitlements and usage accounting; active/archive capacity; consent-based invitations; privacy/export/deletion boundaries; complete journey routing; persistent invention records; evidence provenance/trust; autonomous work orchestration; partial validation/retry; worker lease/attempt safety; physical/software/hybrid/regulated classification; professional-review gates; real prototype/quote/launch evidence gates; versioned deliverables; package export; and representative acceptance coverage.
 
-The prior MadeThis-managed environment is retired from the implementation plan. Do not deploy to it, synchronize back to it, modify it, depend on it for repository development, migrate its test data, or copy its secrets. Live Vercel/Convex provisioning has not been performed yet. Repository-green is not the same as deployed or live-functionally-verified.
+## Major hardening completed
 
-## Organization architecture
+### Evidence and confidence
 
-Canonical hierarchy:
+Model prose cannot promote itself into trusted evidence. Provider-returned source records and normalized source/claim association are required where external research is claimed. Prototype, manufacturer quote and launch/sales evidence have scoped downstream invalidation. Evidence removal re-closes applicable gates.
 
-**User → Organization / Company → Memberships → Invention Workspaces**
+### Worker/resource safety
 
-Implemented repository foundations include organization-native invention creation/listing; active/archive capacity; Owner/Admin/Member/Viewer/Professional-or-Guest boundaries; invention-level sharing; organization-scoped entitlements and expensive-resource accounting; organization ownership continuity; consent-based invitations; privacy/export/deletion boundaries; and migration compatibility for legacy personal inventions.
+Attempts carry identity and bounded retry state. Stale/late workers cannot overwrite newer attempts. Known incurred usage survives completion/failure/human-gate settlement. Unknown provider usage remains explicitly unknown and is conservatively accounted rather than silently recorded as zero.
 
-## Product classification and dynamic routing
+### Engineering/manufacturing maturity
 
-Implemented classification supports physical, software, hybrid, and regulated inventions. Connected physical products with companion/mobile/cloud applications are classified/routed as hybrid when applicable. Pure software avoids irrelevant CAD, physical-prototype, and manufacturer-quote gates. Unsupported harmful/abusive concepts are rejected before normal workspace creation, and business-only concepts are routed outside the invention-product workflow when appropriate.
+Final manufacturing readiness is no longer a dependency-status-only result. Latest fresh reviewed prototype-readiness, RFQ and manufacturing-drawing artifacts are required, and the newest native CAD must be fresh, professionally reviewed and production-mature. Preliminary/stale/unreviewed newer CAD cannot be hidden by an older clean revision. Native CAD now requires engineering professional review.
 
-Stage 5+ root navigation routes into the complete Journey Center instead of trapping users in the retired four-stage workspace.
+A remaining acceptance item is to prove and, if necessary, implement the safe artifact-maturity promotion path from preliminary CAD to `engineering_reviewed` after accepted qualified engineering review. `manufacturing_released` must remain a stronger deliberate boundary rather than being inferred merely from review acceptance.
 
-## Phase 1 production-hardening checkpoint
+### Consequential security
 
-Phase 1 findings are tracked independently. Do not collapse these into one overall product-completion percentage.
+Direct authorization coverage protects privacy/deletion, targeted exports, organization member management, ownership transfer and billing-sensitive export. Raw billing attribution remains owner-only. Full package export requires current `ready_for_authorized_use` artifacts.
 
-| Area | Implemented state | Automated verification | Remaining boundary |
-|---|---|---|---|
-| **A — Journey after foundation** | Full 15-stage journey/routing exists; Stage 5+ root redirects to Journey Center | Route/journey regressions pass | Low-priority obsolete wording remains in unreachable legacy root-page branches |
-| **B — Partial validation** | Mixed results persist as partial; successful sections are preserved; failed-only retry exists; org-aware recovery state and edit-gated retry exist | Partial/orchestration/recovery tests pass | Live provider failure/retry acceptance remains |
-| **C — Confidence truth** | Context-only AI output uses conservative confidence; external-data sections are reduced without independent retrieval; prompt forbids invented evidence/research claims | Confidence regressions pass | Live independent-retrieval calibration remains |
-| **D — Evidence promotion** | Model labels alone fail closed; provider-returned source records and exact normalized source/claim association are required before promotion | Evidence-integrity, provider-retrieval, and full-suite regressions pass | Deployed live-provider acceptance/calibration remains |
-| **E — Usage accounting** | Attempt costs survive complete/fail/human-gate paths; known cost is not silently zeroed; unknown usage conservatively consumes reserved budget while remaining explicitly unknown | Usage-settlement, organization-usage, orchestration, and full-suite regressions pass | Deployed provider-interruption acceptance remains |
-| **F — Behavioral security** | Direct behavior tests cover unauthenticated, cross-user, organization membership, Viewer/Edit/Manage, entitlement, and auditable professional-review boundaries | Behavioral authorization and professional-review regressions pass | Expand destructive, billing, privacy, external-use, and organization-management behavior coverage |
-| **G — Worker reliability** | Central workers and Native CAD carry attempt identity; stale/late attempts cannot overwrite newer attempts; lease validity is rechecked before expensive execution; retries are bounded; CAD partial storage is cleaned | Worker lease, orchestration, CAD, and full-suite regressions pass | Deployed concurrency/lease-expiry soak remains |
+The latest blocked-work hardening prevents typed text from substituting for consequential authorization/professional-review/payment/decision/physical-evidence gates. CI #12 exposed a concrete implementation regression (`reviewArea` was referenced on a professional-review record even though the schema has no such field). That edit was corrected at `36ef66392a31a93573d4fb5a25697bd75c0b7927`. Exact-head CI for that corrected source checkpoint was pending when this progress document was refreshed.
 
-## Phase 2 representative acceptance progress
+## Artifact/package boundary
 
-Repository acceptance now goes beyond isolated subsystem wiring:
+Newest deliverable revision wins even when stale, preventing fallback to obsolete clean work. Full DOCX/PDF package export fails closed on package-quality failure, stale included output, or missing explicit external-use authorization. Draft/review artifacts remain available internally. Export metadata preserves maturity, trust, provenance, review records, limitations and external-use status.
 
-- representative physical, software, hybrid, and regulated work-plan journeys are exercised together;
-- acceptance exposed and fixed the connected-hardware + companion/mobile/cloud classifier blind spot;
-- direct persistence-level evidence behavior executes `applyInventorEvidenceChange` against a fake datastore and verifies canonical invention update, matching gate release, downstream invalidation/requeue, running/idea-capture protection, stale findings/deliverables, and execution history;
-- validation/decision → artifact handoff verifies physical Patent → candidate generation → candidate scoring → Product Design specification → Native CAD;
-- software-only acceptance preserves software specification/architecture/security paths without inventing physical CAD/manufacturing work;
-- hybrid acceptance preserves both applicable physical and software artifact branches;
-- regulated acceptance keeps consequential output behind professional-review trust gates;
-- package selection uses the newest deliverable version even when that revision is stale, preventing an older clean artifact from hiding newer invalidated work;
-- `completeWork` uses shared deliverable-persistence planning so new artifacts increment from the highest prior version and consequential output begins behind the applicable review gate;
-- professional-review recording requires auditable reviewer identity/reference, actionable notes for changes requested, and all required assigned reviews accepted before promotion;
-- direct real-world gate behavior verifies actual manufacturer quote/RFQ evidence releases only the manufacturer-quote gate, actual sales/launch evidence releases only the launch gate, and removed/mismatched evidence releases neither.
+## CI checkpoint truth
 
-The Phase 2 boundary is now primarily behavioral and maturity-oriented rather than broad feature wiring.
+A broad preceding qualified line, including InventSmith CI #10 at `c350b2d`, passed. Exact-head run #12 for `6ec9fe87f0643c6f4d664c48ab39f591b8f60947` failed Convex TypeScript because of the invalid `reviewArea` property reference. The corrected source head became `36ef66392a31a93573d4fb5a25697bd75c0b7927` before these documentation refresh commits.
 
-## Evidence, confidence, and maturity boundary
+Do not describe the corrected/new documentation head as fully verified until its own exact-head CI completes successfully.
 
-InventSmith differentiates inventor statements, sourced facts, estimates, and AI inference. Model prose cannot convert a source into trusted evidence. For web research, promotion requires provider-returned retrieval source records plus exact normalized URL/claim association; absent/mismatched retrieval remains fail-closed.
+PR #24 remains draft/open/unmerged. `main` remains untouched.
 
-Patent/prior-art material remains research/readiness, not a patentability, freedom-to-operate, or legal opinion. Generated CAD remains preliminary until applicable engineering/prototype evidence supports higher maturity. Software plans/specifications are not represented as implemented/tested/deployed software without real execution evidence. Professionally reviewed does not by itself mean authorized for external use.
+## Remaining work
 
-## Worker and resource-accounting boundary
+1. Restore exact-head green CI after the blocked-work correction.
+2. Finish the typed safe-input/private-information blocked-work path while keeping all consequential gates fail-closed.
+3. Prove/implement native-CAD engineering maturity promotion and preserve separate manufacturing release.
+4. Audit RFQ/manufacturer/external-contact paths for explicit inventor approval and current authorized artifacts.
+5. Expand behavioral authorization tests for destructive, billing, privacy, organization-management and external-use operations.
+6. Drive representative physical/hybrid/software/regulated cases farther through real state transitions rather than graph shape alone.
+7. Continue specialized artifact content and export-quality acceptance.
+8. Finish low-risk InventSmith naming cleanup without destabilizing historical/compatibility identifiers.
+9. Prepare fresh owner-controlled Vercel/Convex configuration and then perform live acceptance only after provisioning.
+10. Validate real billing/webhooks/providers/concurrency and calibrate commercial limits from measured economics.
 
-Autonomous work claims carry attempt identity. Completion, failure, and human-gate outcomes reject stale ownership. Known incurred model/image/CAD costs are carried into settlement. Unknown provider usage conservatively debits the reserved attempt budget while preserving `usageKnown: false`. Current-attempt identity and lease expiry are checked before provider context is released for general autonomous work and Native CAD.
+## Status boundaries
 
-## Dependency-security checkpoint
+- **Implemented** means code exists.
+- **Automated verification passed** means the exact implementation head passed the relevant CI/tests.
+- **Deployed** means the exact code/config is on Modern Methods-controlled infrastructure.
+- **Live functionally verified** means authenticated acceptance passed there.
+- **Professional/real-world evidence complete** means genuine qualifying records/evidence exist.
 
-Production dependencies remain on the patched lines established during hardening, including Next.js `^15.5.25`, Sharp override `0.35.4`, and fflate override `0.8.3`. The production dependency audit passed at the latest verified checkpoint.
-
-## Exact verified repository checkpoint
-
-**Verified clean documentation checkpoint:** `c76e209da0c1dd4266ee59157f740c4297048322`  
-**GitHub Actions:** workflow run **#586** / run ID `34907940666`  
-**Result:** **PASS**
-
-That exact PR head passed dependency installation, operational-script checks, web TypeScript, Convex TypeScript, the full regression suite, production dependency audit, and the Next.js production build.
-
-Run #586 verified the cleaned InventSmith documentation/naming head after the active-document filename conversions, Stage 1–15 blueprint normalization, release-plan renames, and removal of the first one-time documentation helper.
-
-PR #24 remains draft/open/unmerged. `main` remains untouched at this checkpoint.
-
-This status means repository verification is distinct from deployment, live functional verification, and professional review.
-
-## Deployment / live status
-
-- **Implemented:** substantial complete-journey product code, Phase 1 hardening, and expanding Phase 2 behavioral acceptance exist in the repository.
-- **Automated verification passed:** yes through exact clean documentation checkpoint `c76e209da0c1dd4266ee59157f740c4297048322` / workflow run #586. Later documentation-content corrections require their own live exact-head CI check.
-- **Deployed to owner-controlled Vercel/Convex:** no.
-- **Live functionally verified:** no.
-- **Professional review:** required for consequential legal, engineering, regulatory, manufacturing, and other gated outputs as applicable; completion must come from real qualified review, not AI inference.
-
-See `docs/INVENTSMITH_DEPLOYMENT_RUNBOOK.md` for the fresh owner-controlled deployment and acceptance procedure.
-
-## Next implementation priorities
-
-1. **Engineering/prototype/RFQ maturity enforcement.** Prove CAD and engineering artifacts cannot silently advance to production-ready without required engineering/prototype evidence; prove RFQ/quote evidence updates only applicable downstream readiness/costing; prove removed/replaced evidence invalidates dependent trusted output.
-2. **Consequential-operation behavioral security.** Add direct runtime tests for external-use authorization, destructive/privacy actions, billing-sensitive operations, and organization-management boundaries, including unauthenticated, cross-tenant, Viewer/Edit/Manage cases.
-3. **Artifact quality and packaging.** Verify documents, exports, financial packages, and CAD deliverables preserve newest revision, limitations, evidence provenance, stale state, maturity, review state, and external-use authorization.
-4. **Representative lifecycle acceptance.** Drive physical, software, hybrid, and regulated cases farther through actual lifecycle behavior. Prioritize physical/hybrid validation → design → CAD → prototype → RFQ → manufacturing readiness.
-5. **Prepare—not provision—the fresh runtime.** Keep owner-controlled Vercel/Convex environment-variable, auth, storage, provider, billing/webhook, and operational requirements current until the founder is ready for live provisioning.
-6. **Later live acceptance.** Run real authenticated multi-user/multi-invention, provider failure/retry, evidence extraction, concurrency, billing/webhook, professional-review, and representative lifecycle acceptance after deployment.
-7. **Low-priority cleanup.** Remove obsolete “coming soon” or overbroad readiness wording in unreachable legacy UI branches.
+These statuses must never be collapsed into a production-ready claim.
 
 ## New-chat handoff
 
-Read, in order:
-
-1. `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`
-2. `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`
-3. `docs/INVENTSMITH_BUILD_PROGRESS.md`
-4. `docs/INVENTSMITH_DEPLOYMENT_RUNBOOK.md`
-5. `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md`
-
-Then fetch live branch `inventsmith/full-product-build`, draft PR #24, and exact-head CI before changing anything. Trust the live branch over this document if it has advanced. Do not merge PR #24, do not restart completed organization/accounting/invitation/classification/artifact-handoff work, and do not reintroduce MadeThis synchronization. Immediate priority: engineering/prototype/RFQ maturity enforcement, followed by consequential-operation security and artifact-quality acceptance.
+Read `INVENTSMITH_MASTER_PRODUCT_SPEC.md`, `INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`, this file, `INVENTSMITH_DEPLOYMENT_RUNBOOK.md`, and `INVENTSMITH_DOCUMENT_AUTHORITY.md`; then fetch the live branch, draft PR #24 and exact-head CI. Trust live GitHub state over this document if newer.
