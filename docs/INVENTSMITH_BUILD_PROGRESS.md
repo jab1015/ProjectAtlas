@@ -27,13 +27,15 @@ GitHub remains source/CI authority. The target runtime is a future Modern Method
 
 ## Implemented foundation
 
-The branch contains organization-native ownership/membership/invention access; organization-scoped entitlements and usage accounting; active/archive capacity; consent-based invitations; privacy/export/deletion boundaries; complete journey routing; persistent invention records; evidence provenance/trust; autonomous work orchestration; partial validation/retry; worker lease/attempt safety; physical/software/hybrid/regulated classification; professional-review gates; real prototype/quote/launch evidence gates; versioned deliverables; explicit exact-revision external-use authorization; package export; and representative behavioral acceptance coverage.
+The branch contains organization-native ownership/membership/invention access; organization-scoped entitlements and usage accounting; active/archive capacity; consent-based invitations; privacy/export/deletion boundaries; complete journey routing; persistent invention records; evidence provenance/trust; autonomous work orchestration; partial validation/retry; worker lease/attempt safety; physical/software/hybrid/regulated classification; professional-review gates; real prototype/quote/launch evidence gates; versioned deliverables; explicit exact-revision external-use authorization; deliberate exact-generation manufacturing release; package export; and representative behavioral acceptance coverage.
 
 ## Major hardening completed
 
 ### Evidence and confidence
 
 Model prose cannot promote itself into trusted evidence. Provider-returned source records and normalized source/claim association are required where external research is claimed. Prototype, manufacturer quote and launch/sales evidence have scoped downstream invalidation. Evidence removal re-closes applicable gates.
+
+Direct behavior coverage verifies manufacturer-quote upload/removal and actual launch/sales upload/removal. Removing real launch evidence re-blocks `launch_actual_evidence`, clears stale completion/output/cost state, requeues dependent post-launch analysis, removes the evidence from the structured invention record, emits the blocked audit event, and leaves unrelated completed work untouched.
 
 ### Worker/resource safety
 
@@ -43,7 +45,9 @@ Attempts carry identity and bounded retry state. Stale/late workers cannot overw
 
 Final manufacturing readiness is no longer a dependency-status-only result. Latest fresh reviewed prototype-readiness, RFQ and manufacturing-drawing artifacts are required, and the newest concrete native-CAD generation must be fresh, professionally reviewed and production-mature. Preliminary/stale/unreviewed newer CAD cannot be hidden by an older clean revision. Native CAD requires engineering professional review.
 
-Accepted engineering review bound to the exact fresh current CAD revision can promote preliminary CAD to `engineering_reviewed`. Missing, rejected, changes-requested, stale, superseded, wrong-revision, or disqualifying sibling review state cannot. Reopened review invalidates engineering maturity and revokes `manufacturing_released` rather than preserving an obsolete production release. Engineering review never creates `manufacturing_released`; a deliberate release boundary remains separate work.
+Accepted engineering review bound to the exact fresh current CAD revision can promote preliminary CAD to `engineering_reviewed`. Missing, rejected, changes-requested, stale, superseded, wrong-revision, or disqualifying sibling review state cannot. Reopened review invalidates engineering maturity and revokes `manufacturing_released` rather than preserving an obsolete production release. Engineering review never creates `manufacturing_released`.
+
+A separate manager-authorized manufacturing-release mutation now releases one exact synchronized newest native-CAD generation only after the complete generation is fresh, `engineering_reviewed`, and backed by accepted auditable exact professional reviews. It is idempotent for the exact already-audited generation and fails closed on incomplete, ambiguous, stale, inconsistent, or insufficiently reviewed CAD. The transition is explicitly not supplier contact, disclosure, purchasing/payment, a production order, filing, or publication, and its audit metadata records `externalActionExecuted: false`.
 
 ### Consequential security
 
@@ -59,13 +63,17 @@ Professional review and inventor authorization are intentionally separate. Quali
 
 An exact replay of an accepted current/fresh professional review preserves an already-recorded external-use authorization. A material review change, staleness, supersession or maturity invalidation revokes that authorization state.
 
-The Work Library exposes an explicit **Authorize external use** action. Its confirmation states that this exact-revision authorization does not replace professional review and does not automatically contact a third party, spend money, place a manufacturing order, make a legal filing, or publish anything.
+The Work Library exposes an explicit **Authorize external use** action. Its confirmation states that this exact-revision authorization does not replace professional review and does not automatically contact a third party, spend money, place a manufacturing order, make a legal filing, or publish anything. The authorization audit records `externalActionExecuted: false`.
 
 ### Consequential external-action approval scope
 
-External disclosure/contact/file/publish approvals are now bound to explicit deliverable IDs rather than invention scope alone. Request creation fails closed unless each scoped artifact is the latest, fresh, exact authorized revision. Approval revalidates that scope, and the execution guard revalidates it again immediately before consequential execution. A stale or superseded artifact therefore cannot ride an older approved request into an external action.
+External disclosure/contact/file/publish approvals are bound to explicit deliverable IDs rather than invention scope alone. Request creation fails closed unless each scoped artifact is the latest, fresh, exact authorized revision. Approval revalidates that scope, and the execution guard revalidates it again immediately before consequential execution. A stale or superseded artifact therefore cannot ride an older approved request into an external action.
 
-Legacy/unscoped external requests cannot be approved or executed, but an authorized manager can still decline them safely. Payment approval remains a separate path and is not falsely forced into artifact-disclosure scope.
+Legacy/unscoped external requests cannot be approved or executed, but an authorized manager can still decline them safely. Payment approval remains a separate path and is not falsely forced into artifact-disclosure scope. Approval resolution itself is explicitly non-executing and records `externalActionExecuted: false`.
+
+### Inventor-facing completion semantics
+
+Inventor-facing status language now distinguishes InventSmith work state from external execution. Journey Center uses **Stage work complete** and explicitly states that stage completion does not mean supplier/professional contact, ordering/payment, filing, publication, or launch occurred. Department work uses **Work complete**; the dashboard uses **Idea-to-market stage work** and **Full InventSmith journey**; the status briefing uses **Recently completed work**. These semantics are regression-locked.
 
 ## Artifact/package boundary
 
@@ -77,26 +85,25 @@ Historical commit `d103d72b` produced a large textual change in `convex/inventio
 
 ## CI checkpoint truth
 
-InventSmith CI #78, run `34997848353`, passed at exact head `530b5757fe9e6c762f03967de60547ac383c12ff`. Dependency installation, operational-script checks, web TypeScript, Convex TypeScript, regression tests, production dependency audit and the Next production build all succeeded.
+InventSmith CI #106, run `35017774702`, passed at exact code head `11be8a28f240a03bb960b8410a9261262e26f07a`. Dependency installation, operational-script checks, web TypeScript, Convex TypeScript, regression tests, production dependency audit and the Next production build all succeeded.
 
-That exact verified head includes direct mutation tests for consequential approval artifact binding, stale/superseded revalidation, legacy denial, authorization failure, and execution-time stale-scope rejection.
+That exact verified head includes direct mutation tests for consequential approval artifact binding, stale/superseded revalidation, legacy denial, authorization failure, execution-time stale-scope rejection, manufacturing release, launch evidence removal, and the tightened inventor-facing completion semantics.
 
-Documentation commits after `530b5757` describe that verified checkpoint; they must receive their own exact-head CI result before being called automatically verified.
+Documentation commits after `11be8a28` describe that verified code checkpoint; the latest documentation head must receive its own exact-head CI result before the documentation head itself is called automatically verified.
 
 PR #24 remains draft/open/unmerged. `main` remains untouched.
 
 ## Remaining work
 
-1. Qualify the newest documentation/hardening head with exact-head CI and correct concrete failures without weakening controls.
-2. Finish migration of any remaining UI/callers from legacy approval resolution to the guarded exact-scope consequential approval path.
-3. Audit every RFQ/manufacturer/external-contact execution path so confidential disclosure or contact requires current approved exact artifacts at execution time.
-4. Implement and behavior-test a deliberate manufacturing-release transition distinct from engineering review, external-use authorization, payment, supplier contact and an actual manufacturing order.
-5. Expand direct behavioral security tests for destructive, privacy, billing, organization-management and external-use operations.
-6. Drive representative physical/hybrid/software/regulated cases farther through actual persisted state transitions, including replacement/removal invalidation and newest-revision behavior.
-7. Continue specialized artifact content and export-quality acceptance, including independent generated-format validation where feasible.
-8. Finish low-risk InventSmith naming cleanup without destabilizing historical/compatibility identifiers.
-9. Prepare fresh owner-controlled Vercel/Convex configuration and perform live acceptance only after provisioning.
-10. Validate real billing/webhooks/providers/concurrency and calibrate commercial limits from measured economics.
+1. Qualify the newest documentation head with exact-head CI and correct concrete failures without weakening controls.
+2. Finish migration of any remaining UI/callers from legacy approval resolution to the guarded exact-scope consequential approval path where such callers still exist.
+3. Continue auditing every RFQ/manufacturer/external-contact execution path so confidential disclosure or contact requires current approved exact artifacts at execution time and internal permission/release events cannot be mistaken for execution.
+4. Expand direct behavioral security tests for destructive, privacy, billing, organization-management and external-use operations.
+5. Drive representative physical/hybrid/software/regulated cases farther through actual persisted state transitions, including replacement/removal invalidation, newest-revision behavior, manufacturing release and subsequent external-action boundaries.
+6. Continue specialized artifact content and export-quality acceptance, including independent generated-format validation where feasible.
+7. Finish low-risk InventSmith naming cleanup without destabilizing historical/compatibility identifiers.
+8. Prepare fresh owner-controlled Vercel/Convex configuration and perform live acceptance only after provisioning.
+9. Validate real billing/webhooks/providers/concurrency and calibrate commercial limits from measured economics.
 
 ## Status boundaries
 
