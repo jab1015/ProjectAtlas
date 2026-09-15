@@ -21,7 +21,7 @@ interface ReviewQueue {
 
 const getReviewQueue = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, ReviewQueue>("inventionWorkspace:getReviewQueue");
 const resolveDecision = makeFunctionReference<"mutation", { decisionId: Id<"inventionDecisions">; selectedOptionKey: string; rationale?: string }, { success: boolean }>("inventionWorkspace:resolveDecision");
-const resolveApprovalRequest = makeFunctionReference<"mutation", { approvalRequestId: Id<"approvalRequests">; approved: boolean }, { success: boolean }>("inventionWorkspace:resolveApprovalRequest");
+const resolveApprovalRequest = makeFunctionReference<"mutation", { approvalRequestId: Id<"approvalRequests">; approved: boolean }, { success: boolean }>("consequentialApprovalMutation:resolveConsequentialApproval");
 const respondToBlockedWork = makeFunctionReference<"mutation", { workItemId: Id<"atlasWorkItems">; response: string }, { success: boolean }>("inventionWorkspace:respondToBlockedWork");
 
 interface DecisionOption { key: string; label: string; description: string; }
