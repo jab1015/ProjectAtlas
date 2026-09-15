@@ -1,3 +1,5 @@
+import { NATIVE_CAD_DELIVERABLE_KINDS } from "./cadArtifactKinds";
+
 export interface ManufacturingMaturityDeliverable {
   kind: string;
   version: number;
@@ -13,12 +15,11 @@ function latestDeliverable(
   deliverables: readonly ManufacturingMaturityDeliverable[],
   kind: string
 ): ManufacturingMaturityDeliverable | undefined {
-  return deliverables
-    .filter((deliverable) => deliverable.kind === kind)
-    .reduce<ManufacturingMaturityDeliverable | undefined>(
-      (latest, deliverable) => !latest || deliverable.version > latest.version ? deliverable : latest,
-      undefined
-    );
+  const candidates = deliverables.filter((deliverable) => deliverable.kind === kind);
+  if (candidates.length === 0) return undefined;
+  const maxVersion = candidates.reduce((highest, deliverable) => Math.max(highest, deliverable.version), Number.NEGATIVE_INFINITY);
+  const latest = candidates.filter((deliverable) => deliverable.version === maxVersion);
+  return latest.length === 1 ? latest[0] : undefined;
 }
 
 export function isFreshProfessionallyReviewedDeliverable(
@@ -36,13 +37,17 @@ export function isFreshProfessionallyReviewedDeliverable(
 export function isProductionMatureCad(
   deliverables: readonly ManufacturingMaturityDeliverable[]
 ): boolean {
-  const latest = latestDeliverable(deliverables, "native_cad_package");
-  return Boolean(
-    latest &&
-    !latest.staleReason &&
-    REVIEWED_TRUST_STATES.has(latest.trustState) &&
-    latest.artifactMaturity &&
-    PRODUCTION_CAD_MATURITY.has(latest.artifactMaturity)
+  const latestCad = NATIVE_CAD_DELIVERABLE_KINDS.map((kind) => latestDeliverable(deliverables, kind));
+  if (latestCad.some((deliverable) => !deliverable)) return false;
+
+  const concreteCad = latestCad as ManufacturingMaturityDeliverable[];
+  const revisionVersions = new Set(concreteCad.map((deliverable) => deliverable.version));
+  if (revisionVersions.size !== 1) return false;
+
+  return concreteCad.every((deliverable) =>
+    !deliverable.staleReason &&
+    REVIEWED_TRUST_STATES.has(deliverable.trustState) &&
+    Boolean(deliverable.artifactMaturity && PRODUCTION_CAD_MATURITY.has(deliverable.artifactMaturity))
   );
 }
 
@@ -53,10 +58,11 @@ export function isProductionMatureCad(
  * useful before prototype completion. The final manufacturing-readiness assessment,
  * however, may run only after the latest prototype-readiness assessment, manufacturer
  * RFQ package, and manufacturing drawing specification have passed engineering review,
- * remain fresh, and the newest native CAD package has reached engineering-reviewed or
- * manufacturing-released maturity. This prevents preliminary CAD, stale drawings, or
- * completed-but-unreviewed artifacts from silently advancing InventSmith toward a
- * production commitment.
+ * remain fresh, and every artifact in the newest concrete native-CAD generation pass
+ * (STEP, STL, DXF, editable source, orthographic views, and exploded view) has reached
+ * engineering-reviewed or manufacturing-released maturity. This prevents preliminary,
+ * stale, partially reviewed, duplicate-version, or mixed-generation CAD from silently
+ * advancing InventSmith toward a production commitment.
  */
 export function isManufacturingMaturityEligible(
   workKind: string | undefined,
