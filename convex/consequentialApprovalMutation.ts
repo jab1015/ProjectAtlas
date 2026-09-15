@@ -84,6 +84,7 @@ async function loadApprovalArtifactScope(
   inventionId: Id<"inventions">,
   approvalRequestId: Id<"approvalRequests">,
   actionType: ApprovalActionType,
+  allowMissing = false,
 ) {
   const events = await ctx.db
     .query("atlasExecutionEvents")
@@ -98,7 +99,7 @@ async function loadApprovalArtifactScope(
     throw new ConvexError("Approval has an ambiguous artifact authorization scope");
   }
   if (matches.length === 0) {
-    if (approvalActionRequiresAuthorizedArtifacts(actionType)) {
+    if (!allowMissing && approvalActionRequiresAuthorizedArtifacts(actionType)) {
       throw new ConvexError("Approval is missing its exact authorized artifact scope");
     }
     return [] as Id<"atlasDeliverables">[];
@@ -186,16 +187,16 @@ export async function resolveApprovalRequestHandler(
     throw new ConvexError("Approval request is not pending");
   }
 
+  // A manager must always be able to refuse an old or malformed request. Missing
+  // artifact scope blocks approval/execution, never denial.
   const scopedDeliverableIds = await loadApprovalArtifactScope(
     ctx,
     request.inventionId,
     args.approvalRequestId,
     request.actionType,
+    !args.approved,
   );
 
-  // Denial is always allowed for an authorized manager. Approval is fail-closed:
-  // re-check the exact artifact scope at decision time because evidence/revisions may
-  // have changed since the request was created.
   if (args.approved) {
     await validateExactAuthorizedArtifacts(
       ctx,
