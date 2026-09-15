@@ -6,25 +6,11 @@ import { makeFunctionReference } from "convex/server";
 import type { Id } from "@convex/_generated/dataModel";
 import { CheckCircle2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const NATIVE_CAD_KINDS = [
-  "native_cad_step",
-  "native_cad_stl",
-  "native_cad_dxf",
-  "native_cad_source",
-  "cad_orthographic_views",
-  "cad_exploded_view",
-] as const;
+import { selectCurrentSynchronizedCadGeneration, type ManufacturingReleaseCadArtifact } from "@/lib/manufacturing-release-ui-logic";
 
 type InventionAccess = "manage" | "edit" | "view" | "review" | null;
 
-type CadArtifact = {
-  _id: Id<"atlasDeliverables">;
-  kind: string;
-  version: number;
-  artifactMaturity?: string;
-  staleReason?: string;
-};
+type CadArtifact = ManufacturingReleaseCadArtifact<Id<"atlasDeliverables">>;
 
 type ReleaseResult = {
   success: true;
@@ -45,23 +31,6 @@ const releaseCadGenerationForManufacturing = makeFunctionReference<
   ReleaseResult
 >("manufacturingReleaseMutation:releaseCadGenerationForManufacturing");
 
-function currentSynchronizedGeneration(artifacts: CadArtifact[]): CadArtifact[] | null {
-  const latestByKind: CadArtifact[] = [];
-
-  for (const kind of NATIVE_CAD_KINDS) {
-    const matching = artifacts.filter((artifact) => artifact.kind === kind);
-    if (matching.length === 0) return null;
-    const latestVersion = Math.max(...matching.map((artifact) => artifact.version));
-    const latest = matching.filter((artifact) => artifact.version === latestVersion);
-    if (latest.length !== 1) return null;
-    latestByKind.push(latest[0]);
-  }
-
-  const versions = new Set(latestByKind.map((artifact) => artifact.version));
-  if (versions.size !== 1) return null;
-  return latestByKind;
-}
-
 export function ManufacturingReleaseAction({
   inventionId,
   artifacts,
@@ -77,7 +46,7 @@ export function ManufacturingReleaseAction({
 
   if (access !== "manage") return null;
 
-  const generation = currentSynchronizedGeneration(artifacts);
+  const generation = selectCurrentSynchronizedCadGeneration(artifacts);
   if (!generation) {
     return (
       <p className="mt-4 text-xs text-muted-foreground">
