@@ -151,6 +151,7 @@ export async function releaseCadGenerationForManufacturingHandler(
       changeType: "manufacturing_release",
       cadVersion: version,
       deliverableIds: releaseIds,
+      externalActionExecuted: false,
       releasedByUserId: String(userId),
     },
     createdAt: now,
