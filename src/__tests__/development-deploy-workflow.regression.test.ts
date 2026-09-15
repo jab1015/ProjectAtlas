@@ -2,13 +2,13 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const workflow = readFileSync(join(process.cwd(), ".github", "workflows", "atlas-convex-development-deploy.yml"), "utf8");
+const workflow = readFileSync(join(process.cwd(), ".github", "workflows", "inventsmith-convex-development-deploy.yml"), "utf8");
 
 describe("InventSmith Convex development deployment workflow", () => {
   it("is manual-only and requires explicit confirmation", () => {
     expect(workflow).toContain("workflow_dispatch:");
     expect(workflow).not.toMatch(/\npush:\s*$/m);
-    expect(workflow).toContain("DEPLOY ATLAS DEV");
+    expect(workflow).toContain("DEPLOY INVENTSMITH DEV");
   });
 
   it("rejects missing or non-development deploy keys", () => {
