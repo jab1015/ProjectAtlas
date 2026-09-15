@@ -40,6 +40,8 @@ describe("invention workspace operation contract", () => {
     expect(exportedFunctionBlock("recordProfessionalReview")).toContain("recordProfessionalReviewHandler");
 
     const approval = exportedFunctionBlock("requestApproval");
+    expect(approval).toContain('deliverableIds: v.optional(v.array(v.id("atlasDeliverables")))');
+    expect(approval).toContain("handler: requestApprovalHandler");
     for (const actionType of [
       "share_confidential_information",
       "contact_third_party",
@@ -53,11 +55,12 @@ describe("invention workspace operation contract", () => {
     }
   });
 
-  it("keeps organization-aware authorization on workspace reads and consequential resolutions", () => {
+  it("keeps organization-aware authorization on workspace reads and guarded consequential resolutions", () => {
     expect(exportedFunctionBlock("getWorkspaceState")).toContain("getAccessibleInvention");
     expect(exportedFunctionBlock("getReviewQueue")).toContain("getAccessibleInvention");
     expect(exportedFunctionBlock("getDeliverableLibrary")).toContain("getAccessibleInvention");
     expect(exportedFunctionBlock("resolveDecision")).toContain("requireInventionManageAccess");
-    expect(exportedFunctionBlock("resolveApprovalRequest")).toContain("requireInventionManageAccess");
+    expect(exportedFunctionBlock("resolveApprovalRequest")).toContain("handler: resolveApprovalRequestHandler");
+    expect(source).toContain('from "./consequentialApprovalMutation"');
   });
 });
