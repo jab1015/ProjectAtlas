@@ -55,7 +55,7 @@ export async function recordProfessionalReviewHandler(
     status: item._id === review._id ? status : item.status,
     deliverableId: String(item.deliverableId),
   }));
-  const trustState = deriveTrustStateFromProfessionalReviews(
+  const derivedTrustState = deriveTrustStateFromProfessionalReviews(
     effectiveReviews.map((item) => item.status)
   );
 
@@ -92,6 +92,21 @@ export async function recordProfessionalReviewHandler(
     review.reviewerName === validatedReview.reviewerName &&
     review.reviewerReference === validatedReview.reviewerReference &&
     sameOptionalText(review.notes, validatedReview.notes);
+
+  // External-use authorization is a separate inventor/manager decision. Replaying
+  // the exact same accepted professional review must not silently revoke it. Any
+  // material review change, stale artifact, superseded CAD revision, or maturity
+  // invalidation still falls back to the professional-review-derived trust state.
+  const preserveExternalUseAuthorization =
+    reviewAlreadyMatches &&
+    deliverable.trustState === "ready_for_authorized_use" &&
+    !deliverable.staleReason &&
+    isCurrentRevision &&
+    deliverable.artifactMaturity === artifactMaturity;
+  const trustState = preserveExternalUseAuthorization
+    ? "ready_for_authorized_use" as const
+    : derivedTrustState;
+
   const deliverableAlreadyMatches =
     deliverable.trustState === trustState &&
     deliverable.artifactMaturity === artifactMaturity;
@@ -132,6 +147,7 @@ export async function recordProfessionalReviewHandler(
       status,
       artifactMaturity,
       isCurrentRevision,
+      externalUseAuthorizationPreserved: preserveExternalUseAuthorization,
     },
     createdAt: now,
   });
