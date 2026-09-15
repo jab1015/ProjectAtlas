@@ -14,6 +14,7 @@ import {
   requireInventionReadAccess,
 } from "./organizations";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
+import { getOrganizationUsageSnapshot } from "./organizationDailyUsage";
 
 const runAvailableWork = makeFunctionReference<
   "action",
@@ -200,10 +201,12 @@ export const kickAutonomousWork = mutation({
     const usageScope = await resolveInventionUsageScope(ctx, inventionId);
     if (!usageScope) throw new ConvexError("Invention not found");
     const dateKey = utcDateKey(Date.now());
-    const usage = await ctx.db
-      .query("atlasDailyUsage")
-      .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey))
-      .unique();
+    const usage = usageScope.scope === "organization"
+      ? await getOrganizationUsageSnapshot(ctx, usageScope.organizationId, dateKey)
+      : await ctx.db
+          .query("atlasDailyUsage")
+          .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey))
+          .unique();
     const remaining = remainingAutonomousCostUnitsAfterReservations(
       usageScope.plan,
       usage?.autonomousCostUnits ?? 0,
@@ -305,10 +308,12 @@ export const respondToBlockedWork = mutation({
     const usageScope = await resolveInventionUsageScope(ctx, workItem.inventionId);
     if (!usageScope) throw new ConvexError("Invention not found");
     const dateKey = utcDateKey(now);
-    const usage = await ctx.db
-      .query("atlasDailyUsage")
-      .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey))
-      .unique();
+    const usage = usageScope.scope === "organization"
+      ? await getOrganizationUsageSnapshot(ctx, usageScope.organizationId, dateKey)
+      : await ctx.db
+          .query("atlasDailyUsage")
+          .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey))
+          .unique();
     const remaining = remainingAutonomousCostUnitsAfterReservations(
       usageScope.plan,
       usage?.autonomousCostUnits ?? 0,
