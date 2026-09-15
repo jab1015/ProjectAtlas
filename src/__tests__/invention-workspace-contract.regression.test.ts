@@ -51,7 +51,7 @@ describe("invention workspace operation contract", () => {
       "external_use",
       "other",
     ]) {
-      expect(approval).toContain(`v.literal(\"${actionType}\")`);
+      expect(approval).toContain(`v.literal("${actionType}")`);
     }
   });
 
