@@ -299,7 +299,13 @@ export const respondToBlockedWork = mutation({
     const { userId } = await requireInventionEditAccess(ctx, workItem.inventionId);
     if (workItem.status !== "blocked") throw new ConvexError("Work item is not waiting for input");
     const cleaned = response.trim();
-    if (!canRespondToBlockedWork(workItem.status, cleaned)) throw new ConvexError("Response must be between 1 and 4,000 characters");
+    if (!canRespondToBlockedWork(workItem.status, cleaned, workItem.humanGateType)) {
+      throw new ConvexError(
+        workItem.humanGateType === "private_information"
+          ? "Response must be between 1 and 4,000 characters"
+          : "This gate requires its dedicated decision, authorization, professional review, payment, or physical-evidence workflow"
+      );
+    }
     const now = Date.now();
     const usageScope = await resolveInventionUsageScope(ctx, workItem.inventionId);
     if (!usageScope) throw new ConvexError("Invention not found");
@@ -388,70 +394,17 @@ export const recordProfessionalReview = mutation({
       inventionId: review.inventionId,
       eventType: "professional_review_recorded",
       actorType: "system",
-      summary: `${review.specialty} professional review recorded as ${status}.`,
-      metadata: { reviewId: String(review._id), deliverableId: String(review.deliverableId), specialty: review.specialty, status },
+      summary: args.accepted ? "A qualified professional review was recorded as accepted." : "A qualified professional review requested changes.",
+      metadata: {
+        reviewId: String(review._id),
+        deliverableId: String(review.deliverableId),
+        reviewArea: review.reviewArea,
+        status,
+        reviewerName: validatedReview.reviewerName,
+        reviewerReference: validatedReview.reviewerReference,
+      },
       createdAt: now,
     });
-    return { success: true, trustState };
-  },
-});
-
-export const createDecision = internalMutation({
-  args: {
-    inventionId: v.id("inventions"),
-    title: v.string(),
-    question: v.string(),
-    options: v.array(v.object({ key: v.string(), label: v.string(), description: v.string() })),
-    recommendedOptionKey: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const invention = await ctx.db.get(args.inventionId);
-    if (!invention) throw new ConvexError("Invention not found");
-    if (
-      args.recommendedOptionKey &&
-      !args.options.some((option) => option.key === args.recommendedOptionKey)
-    ) {
-      throw new ConvexError("Recommended option is not in the option list");
-    }
-
-    const now = Date.now();
-    return ctx.db.insert("inventionDecisions", {
-      inventionId: args.inventionId,
-      title: args.title,
-      question: args.question,
-      options: args.options,
-      recommendedOptionKey: args.recommendedOptionKey,
-      status: "open",
-      createdAt: now,
-      updatedAt: now,
-    });
-  },
-});
-
-export const requestApproval = internalMutation({
-  args: {
-    inventionId: v.id("inventions"),
-    decisionId: v.optional(v.id("inventionDecisions")),
-    actionType: v.union(
-      v.literal("share_confidential_information"),
-      v.literal("contact_third_party"),
-      v.literal("publish_or_disclose"),
-      v.literal("purchase_or_fee"),
-      v.literal("submit_or_file"),
-      v.literal("external_use"),
-      v.literal("other")
-    ),
-    summary: v.string(),
-    consequences: v.array(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const invention = await ctx.db.get(args.inventionId);
-    if (!invention) throw new ConvexError("Invention not found");
-
-    return ctx.db.insert("approvalRequests", {
-      ...args,
-      status: "pending",
-      requestedAt: Date.now(),
-    });
+    return { success: true, status, trustState };
   },
 });
