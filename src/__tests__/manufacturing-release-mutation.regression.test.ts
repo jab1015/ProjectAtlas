@@ -119,7 +119,7 @@ describe("deliberate manufacturing release", () => {
     authState.userId = "owner1";
   });
 
-  it("atomically releases the complete exact current six-artifact CAD generation", async () => {
+  it("atomically releases the complete exact current six-artifact CAD generation without claiming an external action", async () => {
     const deliverables = generation();
     const { ctx, patches, inserts } = fakeCtx({
       deliverables,
@@ -145,6 +145,7 @@ describe("deliberate manufacturing release", () => {
         metadata: {
           changeType: "manufacturing_release",
           cadVersion: 3,
+          externalActionExecuted: false,
           releasedByUserId: "owner1",
         },
       },
@@ -233,7 +234,7 @@ describe("deliberate manufacturing release", () => {
       eventType: "invention_changed",
       actorType: "inventor",
       summary: "Released",
-      metadata: { changeType: "manufacturing_release", cadVersion: 3, deliverableIds: ids, releasedByUserId: "owner1" },
+      metadata: { changeType: "manufacturing_release", cadVersion: 3, deliverableIds: ids, externalActionExecuted: false, releasedByUserId: "owner1" },
       createdAt: 30,
     }];
     let state = fakeCtx({ deliverables, reviews: acceptedReviews(deliverables), events });
