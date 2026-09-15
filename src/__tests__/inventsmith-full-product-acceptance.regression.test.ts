@@ -97,7 +97,9 @@ describe("InventSmith complete idea-to-market repository acceptance contract", (
 
     expect(dashboard).toContain("Complete InventSmith journey");
     expect(dashboard).toContain("Open Journey Center");
-    expect(journey).toContain("Complete inventor journey");
+    expect(journey).toContain("Inventor journey");
+    expect(journey).toContain('complete: { label: "Stage work complete"');
+    expect(journey).toContain("Stage-work completion does not by itself represent an external real-world action");
     expect(journey).toContain("journey.stages.map");
     expect(journey).toContain("journey.totalStages");
     expect(department).toContain("Department deliverables");
