@@ -126,6 +126,16 @@ describe("exact-revision external-use authorization", () => {
     expect(inserts).toHaveLength(0);
   });
 
+  it("fails closed when multiple same-kind rows claim the same latest version", async () => {
+    const first = deliverable({ _id: "del1", version: 2 });
+    const duplicate = deliverable({ _id: "del2", version: 2 });
+    const { ctx, patches, inserts } = fakeCtx({ invention: invention(), deliverables: [first, duplicate] });
+
+    await expect(authorizeDeliverableExternalUseHandler(ctx, { deliverableId: "del1" as any })).rejects.toThrow(/one unambiguous latest deliverable revision/i);
+    expect(patches).toHaveLength(0);
+    expect(inserts).toHaveLength(0);
+  });
+
   it("rejects stale artifacts without database side effects", async () => {
     const current = deliverable({ staleReason: "Evidence changed" });
     const { ctx, patches, inserts } = fakeCtx({ invention: invention(), deliverables: [current] });
