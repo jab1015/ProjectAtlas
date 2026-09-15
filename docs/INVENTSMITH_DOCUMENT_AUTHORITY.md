@@ -1,6 +1,6 @@
 # InventSmith Document Authority
 
-**Updated:** September 14, 2026
+**Updated:** September 15, 2026
 
 This file defines documentation authority, naming, and historical-reference rules for InventSmith.
 
@@ -25,14 +25,17 @@ Read these first, in this order:
 1. `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md` — authoritative product destination and non-negotiable requirements.
 2. `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md` — authoritative implementation checkpoint and continuation order.
 3. `docs/INVENTSMITH_BUILD_PROGRESS.md` — concise repository progress and acceptance status.
-4. `docs/INVENTSMITH_DEPLOYMENT_RUNBOOK.md` — owner-controlled deployment and live-acceptance procedure.
-5. `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md` — document precedence, naming, and supersession rules.
+4. `docs/INVENTSMITH_CAPABILITY_MATRIX.md` — capability-by-capability implementation and acceptance evidence.
+5. `docs/INVENTSMITH_DEPLOYMENT_RUNBOOK.md` — owner-controlled deployment and live-acceptance procedure.
+6. `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md` — document precedence, naming, and supersession rules.
 
 ## Historical and specialized documents
 
 Older documents created under the former Atlas / ProjectAtlas working name remain historical/specialized source material. They may preserve the former name where it is part of the original historical record, but they do not define the current customer-facing name or override the authoritative InventSmith documents above.
 
 Any older statement that says or implies that only Stages 1–4 are the destination; Stages 5–15 are merely future scope; a controlled pilot equals overall completion; Product Design/CAD/manufacturing/funding/launch are outside the intended product; the customer-facing product uses the former working name; subscriptions are purely user-scoped; the architecture is inherently single-user/single-invention; the old $39/$79/$149 pricing ladder remains authoritative; organization seats multiply paid AI allowance; software/apps are outside InventSmith's invention scope; regulated inventions must be blanket-rejected rather than professionally gated; MadeThis remains the deployment target; or repository-green alone means production acceptance is superseded.
+
+The retired controlled-pilot 80% figure must never be used as overall InventSmith completion.
 
 ## Current locked product and architecture decisions
 
@@ -56,6 +59,8 @@ Any older statement that says or implies that only Stages 1–4 are the destinat
 - Studio direction begins with **Studio 3 $299 / 3 active inventions** and **Studio 6 $399 / 6 active inventions**; larger capacity remains economics-driven/custom.
 - Exact compute/storage/premium-generation allowances remain unlocked until measured cost-to-serve is sufficiently calibrated. Current daily usage ceilings are safety caps, not final commercial promises.
 - Internal cost economics are not customer-wide data; detailed provider/cost intelligence is restricted to authorized organization administration.
+- Professional review and external-use authorization are separate states. Review cannot implicitly grant disclosure, filing, publishing, supplier contact, ordering, or other consequential authorization.
+- Consequential external approvals must bind exact current authorized artifact revisions and be revalidated at execution time.
 - Repository CI success is necessary but not sufficient for live/physical/professional/billing acceptance.
 
 ## Hosting and deployment authority
@@ -72,9 +77,9 @@ The prior MadeThis-managed environment is retired from the implementation plan. 
 
 The active branch is `inventsmith/full-product-build`; draft PR #24 remains intentionally unmerged.
 
-Implemented repository foundations include organization-native architecture; organization-scoped entitlements and usage accounting; invention authorization/sharing; privacy/export/deletion behavior; consent-based invitations; complete journey wiring; physical/software/hybrid/regulated classification and routing; evidence and trust boundaries; partial validation/recovery; attempt/lease worker reliability; genuine prototype/quote/launch/professional evidence gates; versioned artifact persistence; professional-review state; representative physical/software/hybrid/regulated acceptance; and direct real-world evidence gate behavior.
+Implemented repository foundations include organization-native architecture; organization-scoped entitlements and usage accounting; invention authorization/sharing; privacy/export/deletion behavior; consent-based invitations; complete journey wiring; physical/software/hybrid/regulated classification and routing; evidence and trust boundaries; partial validation/recovery; attempt/lease worker reliability; genuine prototype/quote/launch/professional evidence gates; versioned artifact persistence; professional-review state; exact-revision external-use authorization; exact-artifact consequential approval scope; representative physical/software/hybrid/regulated acceptance; and direct real-world evidence gate behavior.
 
-The last fully verified clean checkpoint before the final documentation-content normalization was `c76e209da0c1dd4266ee59157f740c4297048322`, Atlas CI run #586 / run ID `34907940666`, PASS. Any later naming/documentation commit must receive its own exact-head CI result before being called fully verified.
+InventSmith CI #78, run `34997848353`, passed at exact head `530b5757fe9e6c762f03967de60547ac383c12ff`, including dependency installation, operational-script checks, web and Convex typechecking, regression tests, production dependency audit and the Next production build. Newer commits require their own exact-head verification before being described as automatically verified.
 
 ## Continuation rule
 

@@ -2,7 +2,7 @@
 
 **Status:** Repository implementation in progress; owner-controlled deployment not yet provisioned or live-verified  
 **Product:** InventSmith — The Inventor OS by Modern Methods  
-**Updated:** September 14, 2026
+**Updated:** September 15, 2026
 
 ## 1. Deployment authority and boundary
 
@@ -34,6 +34,8 @@ npm test
 npm audit --omit=dev --audit-level=high
 npx next build
 ```
+
+Latest documented verified repository checkpoint: InventSmith CI #78, run `34997848353`, PASS at exact head `530b5757fe9e6c762f03967de60547ac383c12ff`. Any newer deployment candidate must pass its own exact-head workflow.
 
 Do not suppress a failing gate, weaken a test, or downgrade a security check to obtain green CI.
 
@@ -144,11 +146,24 @@ Software cases should exercise software product design, UX/architecture/data/sec
 
 Across applicable product types review Validation, Market Research, Patent Readiness, Branding, IP/legal preparation, Pricing, Marketing, Sales, Funding, Launch and Growth artifacts.
 
-## 11. Genuine evidence and professional gates
+## 11. Genuine evidence, professional review, and consequential authorization
 
 AI/model output cannot satisfy real-world gates by assertion.
 
 Require real evidence for physical prototype results, manufacturer/supplier quotes, completed software tests/deployments, post-launch sales/analytics, and professional review. Patent/prior-art material remains research/readiness and must not be represented as a patentability/FTO/legal opinion. CAD/design work retains maturity states and cannot become Engineering Reviewed or Manufacturing Released without qualifying records.
+
+Professional review and external-use authorization must be tested as separate transitions. A professional review must not itself permit disclosure, filing, publishing, supplier contact, purchasing, ordering, or manufacturing.
+
+For every consequential external action involving an artifact:
+
+1. authorize the exact latest fresh deliverable revision for external use through the dedicated manager action;
+2. create the consequential request bound to the exact deliverable ID(s);
+3. verify stale, unauthorized, wrong-invention, superseded, duplicate-latest, or legacy-unscoped artifacts fail closed;
+4. resolve approval only as an authorized invention manager;
+5. revalidate exact current artifact scope at execution time immediately before any disclosure/contact/file/publish operation;
+6. verify denial remains possible for legacy/unscoped pending requests;
+7. verify an approval record alone cannot authorize a now-stale or superseded artifact;
+8. verify external-use authorization and approval do not create a purchase, payment, manufacturing order, filing, publication, or third-party contact unless that separate consequential operation is explicitly executed.
 
 ## 12. Billing and webhook migration boundary
 
