@@ -223,4 +223,93 @@ describe("inventor evidence impact behavior", () => {
     expect(quoteGate.status).toBe("blocked");
     expect(quoteGate.blockedReason).toBe("Real manufacturer quote required.");
   });
+
+  it("releases the manufacturer quote gate only for uploaded quote evidence and re-blocks it when that evidence is removed", async () => {
+    const { ctx, tables, inserts } = fakeContext({
+      inventions: [{ _id: "inv_3", updatedAt: 10 }],
+      inventionRecords: [{ _id: "record_3", inventionId: "inv_3", structuredBrief: {}, updatedAt: 10 }],
+      atlasWorkItems: [{
+        _id: "work_quote_gate",
+        inventionId: "inv_3",
+        kind: "manufacturer_quote_evidence",
+        status: "blocked",
+        attemptCount: 2,
+        completedAt: undefined,
+        blockedReason: "A current real manufacturer quote/RFQ response is required.",
+        humanGateType: "authorization",
+        reservedCostUnits: 5,
+        actualCostUnits: 3,
+        updatedAt: 10,
+      }],
+      evidenceFindings: [],
+      atlasDeliverables: [],
+      deliverableDependencies: [],
+      atlasExecutionEvents: [],
+    });
+
+    await applyInventorEvidenceChange(ctx, "inv_3" as any, {
+      action: "uploaded",
+      sourceId: "quote_source" as any,
+      label: "Manufacturer RFQ response",
+      evidenceKind: "manufacturer_quote",
+      extraction: {
+        supplier: "Fixture Manufacturer",
+        quotedAt: "2026-09-15",
+        notes: "Fixture evidence only; no supplier was contacted by InventSmith.",
+      },
+      now: 300,
+    });
+
+    const quoteGate = tables.atlasWorkItems[0];
+    expect(quoteGate.status).toBe("queued");
+    expect(quoteGate.attemptCount).toBe(0);
+    expect(quoteGate.blockedReason).toBeUndefined();
+    expect(quoteGate.humanGateType).toBeUndefined();
+    expect(quoteGate.reservedCostUnits).toBeUndefined();
+    expect(quoteGate.actualCostUnits).toBeUndefined();
+    expect(quoteGate.lastError).toMatch(/manufacturer quote\/RFQ evidence was supplied/i);
+    expect(tables.inventionRecords[0].structuredBrief.inventorEvidence).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        sourceId: "quote_source",
+        evidenceKind: "manufacturer_quote",
+        provenance: "inventor_upload",
+      }),
+    ]));
+    expect(inserts).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        table: "atlasExecutionEvents",
+        doc: expect.objectContaining({
+          eventType: "work_queued",
+          workItemId: "work_quote_gate",
+          summary: expect.stringMatching(/released the manufacturer quote-evidence gate/i),
+        }),
+      }),
+    ]));
+
+    await applyInventorEvidenceChange(ctx, "inv_3" as any, {
+      action: "removed",
+      sourceId: "quote_source" as any,
+      label: "Manufacturer RFQ response",
+      evidenceKind: "manufacturer_quote",
+      now: 400,
+    });
+
+    expect(quoteGate.status).toBe("blocked");
+    expect(quoteGate.humanGateType).toBe("authorization");
+    expect(quoteGate.blockedReason).toMatch(/current real manufacturer quote\/RFQ response is required/i);
+    expect(quoteGate.lastError).toMatch(/evidence was removed/i);
+    expect(tables.inventionRecords[0].structuredBrief.inventorEvidence).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({ sourceId: "quote_source" }),
+    ]));
+    expect(inserts).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        table: "atlasExecutionEvents",
+        doc: expect.objectContaining({
+          eventType: "work_blocked",
+          workItemId: "work_quote_gate",
+          summary: expect.stringMatching(/blocked the manufacturer quote-evidence gate/i),
+        }),
+      }),
+    ]));
+  });
 });
