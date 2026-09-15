@@ -298,8 +298,16 @@ export const respondToBlockedWork = mutation({
     if (!workItem) throw new ConvexError("Work item not found");
     const { userId } = await requireInventionEditAccess(ctx, workItem.inventionId);
     if (workItem.status !== "blocked") throw new ConvexError("Work item is not waiting for input");
+
     const cleaned = response.trim();
-    if (!canRespondToBlockedWork(workItem.status, cleaned)) throw new ConvexError("Response must be between 1 and 4,000 characters");
+    if (cleaned.length === 0 || cleaned.length > 4000) {
+      throw new ConvexError("Response must be between 1 and 4,000 characters");
+    }
+    if (!canRespondToBlockedWork(workItem.status, cleaned, workItem.humanGateType)) {
+      const gate = workItem.humanGateType ?? "unknown";
+      throw new ConvexError(`Free-form text cannot satisfy the ${gate} gate`);
+    }
+
     const now = Date.now();
     const usageScope = await resolveInventionUsageScope(ctx, workItem.inventionId);
     if (!usageScope) throw new ConvexError("Invention not found");
@@ -329,7 +337,7 @@ export const respondToBlockedWork = mutation({
       workItemId,
       eventType: "inventor_input_received",
       actorType: "inventor",
-      summary: "Authorized collaborator supplied the requested minimum input; work was requeued.",
+      summary: "Authorized collaborator supplied the requested private information; work was requeued.",
       metadata: {
         gateType: workItem.humanGateType,
         characterCount: cleaned.length,
