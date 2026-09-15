@@ -1,26 +1,30 @@
 # InventSmith Engineering Maturity Checkpoint
 
-**Date:** September 14, 2026  
+**Updated:** September 15, 2026  
 **Branch:** `inventsmith/full-product-build`  
-**Status:** implemented in repository; exact-head CI required before this checkpoint is called verified
+**Status:** manufacturing gate substantially hardened; final maturity-transition acceptance remains
 
 ## Manufacturing-readiness hardening
 
-InventSmith now distinguishes ordinary work dependency completion from consequential engineering maturity.
+InventSmith distinguishes dependency completion from consequential engineering maturity. Final `manufacturing_readiness` now requires the applicable dependency chain plus the latest fresh reviewed engineering artifacts rather than trusting status alone.
 
-The final `manufacturing_readiness` work item explicitly depends on `prototype_readiness` in addition to the manufacturer quote comparison and manufacturing agreement checklist. At runtime, the scheduler also fails closed unless the **latest** `prototype_readiness_assessment` and **latest** `manufacturer_rfq_package` deliverables are both fresh and have reached `professionally_reviewed` or `ready_for_authorized_use` trust state.
+Current final boundary requires:
 
-This intentionally does **not** block useful early manufacturing work such as process research, factory requirements, manufacturer sourcing, draft RFQ preparation, or uploading real manufacturer quote evidence. The stricter gate applies at the consequential readiness decision where preliminary or stale engineering material must not be silently treated as production-ready.
+- latest fresh professionally reviewed `prototype_readiness_assessment`;
+- latest fresh professionally reviewed `manufacturer_rfq_package`;
+- latest fresh professionally reviewed `manufacturing_drawing_specification`;
+- newest `native_cad_package` to be fresh, professionally reviewed/authorized, and at least `engineering_reviewed` artifact maturity.
 
-Regression coverage verifies:
+`native_cad_package` itself now requires engineering professional review. A newer preliminary, stale or unreviewed CAD revision defeats an older reviewed revision. Early manufacturing process research, factory requirements, sourcing, draft RFQ work and genuine quote evidence remain available before final readiness.
 
-- prototype readiness is an explicit manufacturing-readiness dependency;
-- missing or review-required engineering artifacts fail closed;
-- a newer stale RFQ revision defeats an older reviewed revision;
-- fresh professionally reviewed latest prototype/RFQ artifacts satisfy the maturity check;
-- early manufacturing preparation remains available;
-- dependency-complete manufacturing readiness remains unschedulable when maturity is not satisfied.
+## Remaining engineering-maturity work
+
+The next acceptance item is to verify that the required CAD maturity is actually reachable through a safe explicit transition. Professional-review acceptance currently changes trust state; it must not accidentally imply manufacturing release. If no existing path promotes an accepted reviewed native CAD from `preliminary_cad` to `engineering_reviewed`, implement that narrowly and test it. `manufacturing_released` remains a separate stronger boundary requiring deliberate qualifying evidence/action.
+
+Then verify the full physical/hybrid chain through actual state transitions:
+
+**design → drawings/CAD → prototype evidence → prototype readiness → RFQ → real quote → comparison/agreement → manufacturing readiness**.
 
 ## Safety boundary
 
-This checkpoint does not claim that InventSmith is deployed, live-functionally verified, professionally reviewed as a whole, or ready for manufacturing use. Real engineering/prototype evidence and qualified review remain external facts that repository automation cannot fabricate.
+This checkpoint does not claim deployment, live functional verification, actual engineering approval, physical prototype testing, manufacturer acceptance, or manufacturing release. Those require genuine external records/evidence.
