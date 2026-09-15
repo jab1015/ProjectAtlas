@@ -7,19 +7,11 @@
 **Active build branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally unmerged
 
-## Current completion snapshot
+## Current status snapshot
 
-Planning estimates, kept separate from release claims:
+InventSmith status is reported by capability and acceptance evidence rather than unsupported overall completion percentages. Repository implementation, automated verification, deployment, live functional verification, and professional/real-world evidence are separate states and must not be collapsed into one number.
 
-| Dimension | Estimate | Current truth |
-|---|---:|---|
-| Customer-facing InventSmith name conversion | **96%** | Canonical UI/docs use InventSmith; historical repo slug and tested compatibility identifiers remain intentionally |
-| Repository product implementation + hardening | **88%** | Complete journey is substantially implemented; remaining work is concentrated in consequential gate behavior, maturity transitions, deeper acceptance and cleanup |
-| Automated repository qualification | **85%** | Broad suite has repeatedly passed; newest corrected gate-hardening head still needs exact-head CI |
-| Owner-controlled deployment/live acceptance | **0%** | Modern Methods Vercel/Convex not provisioned yet |
-| Overall production-acceptance path | **72%** | Weighted planning estimate including repository work, deployment, live acceptance, billing/providers and genuine professional/real-world gates |
-
-The old controlled-pilot 80% figure is retired and is not an overall completion measure.
+The retired controlled-pilot 80% figure must never be used as overall InventSmith completion.
 
 ## Product vision and routing
 
@@ -57,7 +49,7 @@ A remaining acceptance item is to prove and, if necessary, implement the safe ar
 
 Direct authorization coverage protects privacy/deletion, targeted exports, organization member management, ownership transfer and billing-sensitive export. Raw billing attribution remains owner-only. Full package export requires current `ready_for_authorized_use` artifacts.
 
-The latest blocked-work hardening prevents typed text from substituting for consequential authorization/professional-review/payment/decision/physical-evidence gates. CI #12 exposed a concrete implementation regression (`reviewArea` was referenced on a professional-review record even though the schema has no such field). That edit was corrected at `36ef66392a31a93573d4fb5a25697bd75c0b7927`. Exact-head CI for that corrected source checkpoint was pending when this progress document was refreshed.
+The blocked-work helper correctly fails closed unless the stored gate is `private_information`, but the live mutation caller at the reviewed checkpoint omitted the stored gate argument. That integration defect rejects legitimate private-information responses and is the next source correction. Consequential decision, authorization, professional-review, payment and physical-work gates must remain on their dedicated paths.
 
 ## Artifact/package boundary
 
@@ -65,32 +57,33 @@ Newest deliverable revision wins even when stale, preventing fallback to obsolet
 
 ## CI checkpoint truth
 
-A broad preceding qualified line, including InventSmith CI #10 at `c350b2d`, passed. Exact-head run #12 for `6ec9fe87f0643c6f4d664c48ab39f591b8f60947` failed Convex TypeScript because of the invalid `reviewArea` property reference. The corrected source head became `36ef66392a31a93573d4fb5a25697bd75c0b7927` before these documentation refresh commits.
+At reviewed head `3bc3cd78e5054e3c6d2c283b88b19cc25c52b7e3`, InventSmith CI run #18 (`34923710934`) completed with failure. Web TypeScript and Convex TypeScript passed. The regression suite reported 442 passing tests and one failing assertion in `inventsmith-full-product-acceptance.regression.test.ts`, because this progress document did not contain the exact retired-pilot sentence required by the full-product contract. Production dependency audit and Next production build were skipped after the test failure.
 
-Do not describe the corrected/new documentation head as fully verified until its own exact-head CI completes successfully.
+This document restores that contract sentence. Do not describe a newer source/documentation head as fully verified until its own exact-head CI completes successfully.
 
 PR #24 remains draft/open/unmerged. `main` remains untouched.
 
 ## Remaining work
 
-1. Restore exact-head green CI after the blocked-work correction.
-2. Finish the typed safe-input/private-information blocked-work path while keeping all consequential gates fail-closed.
+1. Correct and behavior-test the actual `respondToBlockedWork` mutation caller so stored private-information gates can resume while consequential gates remain fail-closed.
+2. Restore exact-head green CI after that correction and this documentation contract repair.
 3. Prove/implement native-CAD engineering maturity promotion and preserve separate manufacturing release.
 4. Audit RFQ/manufacturer/external-contact paths for explicit inventor approval and current authorized artifacts.
-5. Expand behavioral authorization tests for destructive, billing, privacy, organization-management and external-use operations.
-6. Drive representative physical/hybrid/software/regulated cases farther through real state transitions rather than graph shape alone.
+5. Expand connected functional acceptance beyond graph/routing shape, including persistence, authorization, retries, usage settlement and invalidation.
+6. Drive representative physical/hybrid/software/regulated cases farther through real state transitions.
 7. Continue specialized artifact content and export-quality acceptance.
 8. Finish low-risk InventSmith naming cleanup without destabilizing historical/compatibility identifiers.
-9. Prepare fresh owner-controlled Vercel/Convex configuration and then perform live acceptance only after provisioning.
+9. Prepare fresh owner-controlled Vercel/Convex configuration and perform live acceptance only after provisioning.
 10. Validate real billing/webhooks/providers/concurrency and calibrate commercial limits from measured economics.
 
 ## Status boundaries
 
+- **Planned** means the capability is specified but not necessarily implemented.
 - **Implemented** means code exists.
 - **Automated verification passed** means the exact implementation head passed the relevant CI/tests.
 - **Deployed** means the exact code/config is on Modern Methods-controlled infrastructure.
 - **Live functionally verified** means authenticated acceptance passed there.
-- **Professional/real-world evidence complete** means genuine qualifying records/evidence exist.
+- **Professional review required/completed** records whether genuine qualifying review is still required or has actually occurred.
 
 These statuses must never be collapsed into a production-ready claim.
 
