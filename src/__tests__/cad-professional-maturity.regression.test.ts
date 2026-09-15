@@ -39,7 +39,10 @@ describe("native CAD professional-review maturity", () => {
   it("invalidates engineering maturity when another required review reopens", () => expect(maturity({ currentMaturity: "engineering_reviewed", reviews: [engineeringAccepted(), { specialty: "regulatory", status: "changes_requested", deliverableId: "cad-current" }] })).toBe("preliminary_cad"));
   it("invalidates engineering maturity when the artifact becomes stale", () => expect(maturity({ currentMaturity: "engineering_reviewed", staleReason: "evidence replaced" })).toBe("preliminary_cad"));
   it("never promotes engineering review into manufacturing release", () => expect(maturity({ currentMaturity: "engineering_reviewed" })).toBe("engineering_reviewed"));
-  it("preserves an explicit manufacturing release", () => expect(maturity({ currentMaturity: "manufacturing_released" })).toBe("manufacturing_released"));
+  it("preserves an explicit manufacturing release only while its review basis remains fresh and current", () => expect(maturity({ currentMaturity: "manufacturing_released", isCurrentRevision: true })).toBe("manufacturing_released"));
+  it("revokes manufacturing release when a required review requests changes", () => expect(maturity({ currentMaturity: "manufacturing_released", reviews: [engineeringAccepted({ status: "changes_requested" })] })).toBe("preliminary_cad"));
+  it("revokes manufacturing release when its evidence becomes stale", () => expect(maturity({ currentMaturity: "manufacturing_released", staleReason: "evidence replaced" })).toBe("preliminary_cad"));
+  it("revokes manufacturing release on supersession while preserving historical engineering maturity", () => expect(maturity({ currentMaturity: "manufacturing_released", isCurrentRevision: false })).toBe("engineering_reviewed"));
   it("does not treat the retired synthetic package kind as a generated CAD artifact", () => expect(maturity({ deliverableKind: "native_cad_package" })).toBe("preliminary_cad"));
   it("does not change maturity for non-CAD deliverables", () => expect(deriveArtifactMaturityFromProfessionalReviews({ deliverableId: "drawing-current", deliverableKind: "manufacturing_drawing_specification", currentMaturity: "draft", reviews: [engineeringAccepted({ deliverableId: "drawing-current" })] })).toBe("draft"));
 });
