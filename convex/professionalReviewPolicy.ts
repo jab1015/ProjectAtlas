@@ -1,3 +1,5 @@
+import { isNativeCadDeliverableKind } from "./cadArtifactKinds";
+
 export type ReviewSpecialty = "patent" | "contracts" | "engineering" | "regulatory" | "finance" | "other";
 
 export interface RequiredProfessionalReview {
@@ -59,7 +61,7 @@ export function requiredProfessionalReviews(kind: string): RequiredProfessionalR
     "manufacturing_agreement_checklist",
   ].includes(kind)) return [CONTRACTS_REVIEW];
 
-  if ([
+  if (isNativeCadDeliverableKind(kind) || [
     "technical_feasibility_assessment",
     "preliminary_bom_cost_range",
     "engineering_handoff_brief",
