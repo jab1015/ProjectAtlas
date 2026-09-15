@@ -6,8 +6,6 @@ import { buildStatusBriefing } from "./statusBriefingLogic";
 import { canResolveApproval, canResolveDecision } from "./reviewLogic";
 import { MAX_AUTONOMOUS_RUN_BUDGET, remainingAutonomousCostUnitsAfterReservations, utcDateKey } from "./usagePolicyLogic";
 import { evaluatePilotPackage } from "./pilotEvaluationLogic";
-import { isAdmin } from "./authHelpers";
-import { deriveArtifactMaturityFromProfessionalReviews, deriveTrustStateFromProfessionalReviews, validateProfessionalReviewRecord } from "./professionalReviewLogic";
 import {
   requireInventionEditAccess,
   requireInventionManageAccess,
@@ -16,6 +14,7 @@ import {
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { getOrganizationUsageSnapshot } from "./organizationDailyUsage";
 import { respondToBlockedWorkHandler } from "./blockedWorkResponseMutation";
+import { recordProfessionalReviewHandler } from "./professionalReviewMutation";
 
 const runAvailableWork = makeFunctionReference<
   "action",
@@ -309,68 +308,7 @@ export const recordProfessionalReview = mutation({
     notes: v.optional(v.string()),
     accepted: v.boolean(),
   },
-  handler: async (ctx, args) => {
-    if (!(await isAdmin(ctx))) {
-      throw new ConvexError("Administrator authorization is required to record a professional review");
-    }
-    const review = await ctx.db.get(args.reviewId);
-    if (!review) throw new ConvexError("Professional review not found");
-    const deliverable = await ctx.db.get(review.deliverableId);
-    if (!deliverable || deliverable.inventionId !== review.inventionId) {
-      throw new ConvexError("Reviewed deliverable is missing or does not belong to this invention");
-    }
-    const validatedReview = validateProfessionalReviewRecord(args);
-    if (!validatedReview.valid) throw new ConvexError(validatedReview.error);
-
-    const now = Date.now();
-    const status = args.accepted ? "accepted" as const : "changes_requested" as const;
-    await ctx.db.patch(review._id, {
-      status,
-      reviewerName: validatedReview.reviewerName,
-      reviewerReference: validatedReview.reviewerReference,
-      notes: validatedReview.notes,
-      reviewedAt: now,
-      updatedAt: now,
-    });
-
-    const siblingReviews = await ctx.db
-      .query("professionalReviews")
-      .withIndex("by_deliverableId", (q) => q.eq("deliverableId", review.deliverableId))
-      .collect();
-    const effectiveReviews = siblingReviews.map((item) => ({
-      specialty: item.specialty,
-      status: item._id === review._id ? status : item.status,
-      deliverableId: String(item.deliverableId),
-    }));
-    const trustState = deriveTrustStateFromProfessionalReviews(effectiveReviews.map((item) => item.status));
-    const artifactMaturity = deriveArtifactMaturityFromProfessionalReviews({
-      deliverableId: String(deliverable._id),
-      deliverableKind: deliverable.kind,
-      currentMaturity: deliverable.artifactMaturity,
-      staleReason: deliverable.staleReason,
-      reviews: effectiveReviews,
-    });
-    await ctx.db.patch(review.deliverableId, {
-      trustState,
-      artifactMaturity: artifactMaturity as typeof deliverable.artifactMaturity,
-      updatedAt: now,
-    });
-    await ctx.db.insert("atlasExecutionEvents", {
-      inventionId: review.inventionId,
-      eventType: "professional_review_recorded",
-      actorType: "system",
-      summary: `${review.specialty} professional review recorded as ${status}.`,
-      metadata: {
-        reviewId: String(review._id),
-        deliverableId: String(review.deliverableId),
-        specialty: review.specialty,
-        status,
-        artifactMaturity,
-      },
-      createdAt: now,
-    });
-    return { success: true, trustState, artifactMaturity };
-  },
+  handler: recordProfessionalReviewHandler,
 });
 
 export const createDecision = internalMutation({
