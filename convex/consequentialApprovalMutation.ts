@@ -79,6 +79,38 @@ async function validateExactAuthorizedArtifacts(
   return ids;
 }
 
+async function loadApprovalArtifactScope(
+  ctx: MutationCtx,
+  inventionId: Id<"inventions">,
+  approvalRequestId: Id<"approvalRequests">,
+  actionType: ApprovalActionType,
+) {
+  const events = await ctx.db
+    .query("atlasExecutionEvents")
+    .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
+    .collect();
+  const matches = events.filter((event) =>
+    event.metadata?.changeType === "approval_artifact_scope" &&
+    event.metadata?.approvalRequestId === String(approvalRequestId)
+  );
+
+  if (matches.length > 1) {
+    throw new ConvexError("Approval has an ambiguous artifact authorization scope");
+  }
+  if (matches.length === 0) {
+    if (approvalActionRequiresAuthorizedArtifacts(actionType)) {
+      throw new ConvexError("Approval is missing its exact authorized artifact scope");
+    }
+    return [] as Id<"atlasDeliverables">[];
+  }
+
+  const metadata = matches[0].metadata;
+  if (metadata?.actionType !== actionType || !Array.isArray(metadata?.deliverableIds)) {
+    throw new ConvexError("Approval artifact authorization scope is malformed");
+  }
+  return metadata.deliverableIds.map((id: unknown) => String(id) as Id<"atlasDeliverables">);
+}
+
 export type RequestApprovalArgs = {
   inventionId: Id<"inventions">;
   decisionId?: Id<"inventionDecisions">;
@@ -90,7 +122,9 @@ export type RequestApprovalArgs = {
 
 /**
  * Internal creation path for consequential approvals. External disclosure/contact/
- * filing/use requests are revision-bound before they can even enter the queue.
+ * filing/use requests are revision-bound before they can even enter the queue. The
+ * immutable binding is stored as a separate audit event so legacy approval rows stay
+ * schema-compatible while external-action executors can fail closed on missing scope.
  */
 export async function requestApprovalHandler(ctx: MutationCtx, args: RequestApprovalArgs) {
   const invention = await ctx.db.get(args.inventionId);
@@ -103,23 +137,41 @@ export async function requestApprovalHandler(ctx: MutationCtx, args: RequestAppr
     }
   }
 
-  await validateExactAuthorizedArtifacts(
+  const deliverableIds = await validateExactAuthorizedArtifacts(
     ctx,
     args.inventionId,
     args.actionType,
     args.deliverableIds,
   );
 
-  return ctx.db.insert("approvalRequests", {
+  const requestedAt = Date.now();
+  const approvalRequestId = await ctx.db.insert("approvalRequests", {
     inventionId: args.inventionId,
     decisionId: args.decisionId,
-    deliverableIds: args.deliverableIds,
     actionType: args.actionType,
     summary: args.summary,
     consequences: args.consequences,
     status: "pending",
-    requestedAt: Date.now(),
+    requestedAt,
   });
+
+  if (deliverableIds.length > 0) {
+    await ctx.db.insert("atlasExecutionEvents", {
+      inventionId: args.inventionId,
+      eventType: "invention_changed",
+      actorType: "system",
+      summary: "Bound consequential approval to exact authorized artifact revisions.",
+      metadata: {
+        changeType: "approval_artifact_scope",
+        approvalRequestId: String(approvalRequestId),
+        actionType: args.actionType,
+        deliverableIds: deliverableIds.map(String),
+      },
+      createdAt: requestedAt,
+    });
+  }
+
+  return approvalRequestId;
 }
 
 export async function resolveApprovalRequestHandler(
@@ -134,6 +186,13 @@ export async function resolveApprovalRequestHandler(
     throw new ConvexError("Approval request is not pending");
   }
 
+  const scopedDeliverableIds = await loadApprovalArtifactScope(
+    ctx,
+    request.inventionId,
+    args.approvalRequestId,
+    request.actionType,
+  );
+
   // Denial is always allowed for an authorized manager. Approval is fail-closed:
   // re-check the exact artifact scope at decision time because evidence/revisions may
   // have changed since the request was created.
@@ -142,7 +201,7 @@ export async function resolveApprovalRequestHandler(
       ctx,
       request.inventionId,
       request.actionType,
-      request.deliverableIds,
+      scopedDeliverableIds,
     );
   }
 
@@ -162,7 +221,7 @@ export async function resolveApprovalRequestHandler(
     metadata: {
       approvalRequestId: String(args.approvalRequestId),
       actionType: request.actionType,
-      deliverableIds: (request.deliverableIds ?? []).map(String),
+      deliverableIds: scopedDeliverableIds.map(String),
       approved: args.approved,
       resolvedByUserId: String(userId),
     },
@@ -191,11 +250,17 @@ export async function requireCurrentApprovedExternalAction(
     throw new ConvexError("Approved action type does not match the requested external operation");
   }
 
+  const scopedDeliverableIds = await loadApprovalArtifactScope(
+    ctx,
+    request.inventionId,
+    approvalRequestId,
+    request.actionType,
+  );
   await validateExactAuthorizedArtifacts(
     ctx,
     request.inventionId,
     request.actionType,
-    request.deliverableIds,
+    scopedDeliverableIds,
   );
   return request;
 }
