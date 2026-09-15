@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useConvexAuth, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import type { Doc, Id } from "@convex/_generated/dataModel";
-import { AlertTriangle, ArrowLeft, BookOpen, CheckCircle2, Download, ExternalLink, FileCheck2, ShieldAlert } from "lucide-react";
+import { AlertTriangle, ArrowLeft, BookOpen, CheckCircle2, Download, ExternalLink, FileCheck2, ShieldAlert, ShieldCheck } from "lucide-react";
 import { AppNav } from "@/components/atlas/app-nav";
 import { MadeThisBadge } from "@/components/atlas/made-this-badge";
 import { MarkdownContent } from "@/components/markdown-content";
@@ -25,6 +25,7 @@ interface DeliverableLibrary {
 const getDeliverableLibrary = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, DeliverableLibrary>("inventionWorkspace:getDeliverableLibrary");
 interface PilotEvaluation { score: number; passed: boolean; blockers: string[]; metrics: { requiredDeliverables: number; missingDeliverables: number; evidenceCheckedRatio: number }; }
 const getPilotEvaluation = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, PilotEvaluation>("inventionWorkspace:getPilotEvaluation");
+const authorizeDeliverableExternalUse = makeFunctionReference<"mutation", { deliverableId: Id<"atlasDeliverables"> }, { success: true; idempotent: boolean; deliverableId: Id<"atlasDeliverables">; version: number }>("externalUseAuthorization:authorizeDeliverableExternalUse");
 
 function WorkSkeleton() { return <div className="mx-auto max-w-4xl animate-pulse space-y-6 px-4 py-12 sm:px-6"><div className="h-5 w-32 rounded bg-muted" /><div className="h-11 w-2/3 rounded bg-muted" /><div className="h-64 rounded-2xl bg-muted" /></div>; }
 function isWebLocator(locator?: string): locator is string { return Boolean(locator && /^https?:\/\//i.test(locator)); }
@@ -36,7 +37,8 @@ function downloadMarkdown(title: string, version: number, content: string) {
 
 export default function InventionWorkPage() {
   const params = useParams(); const router = useRouter(); const inventionId = params.id as Id<"inventions">;
-  const { isAuthenticated, isLoading } = useConvexAuth(); const [exportError, setExportError] = useState<string | null>(null);
+  const { isAuthenticated, isLoading } = useConvexAuth(); const [exportError, setExportError] = useState<string | null>(null); const [authorizationError, setAuthorizationError] = useState<string | null>(null); const [authorizingId, setAuthorizingId] = useState<Id<"atlasDeliverables"> | null>(null);
+  const authorizeExternalUse = useMutation(authorizeDeliverableExternalUse);
   const library = useQuery(getDeliverableLibrary, isAuthenticated && inventionId ? { inventionId } : "skip");
   const evaluation = useQuery(getPilotEvaluation, isAuthenticated && inventionId ? { inventionId } : "skip");
   useEffect(() => { if (!isLoading && !isAuthenticated) router.push("/sign-in"); }, [isAuthenticated, isLoading, router]);
@@ -45,6 +47,7 @@ export default function InventionWorkPage() {
 
   const sourcesById = new Map(library.sources.map((source) => [String(source._id), source]));
   const latestDeliverables = selectLatestDeliverables(library.deliverables);
+  const latestDeliverableIds = new Set(latestDeliverables.map((deliverable) => String(deliverable._id)));
   const packageExport: AtlasPackageExport = {
     inventionTitle: library.invention.title, generatedAt: Date.now(), qualityPassed: evaluation.passed, qualityBlockers: evaluation.blockers,
     deliverables: latestDeliverables.map((deliverable) => ({
@@ -62,17 +65,27 @@ export default function InventionWorkPage() {
     try { const exporters = await import("@/lib/packageExport"); if (format === "docx") await exporters.exportAtlasPackageDocx(packageExport); else await exporters.exportAtlasPackagePdf(packageExport); }
     catch (error) { setExportError(error instanceof Error ? error.message : "InventSmith could not export this package."); }
   };
+  const authorizeArtifact = async (deliverable: Doc<"atlasDeliverables">) => {
+    const confirmed = window.confirm(`Authorize ${deliverable.title} version ${deliverable.version} for external use? This records your permission for this exact current revision. It does not replace professional review, authorize spending, contact a third party, place a manufacturing order, file a legal submission, or publish anything automatically.`);
+    if (!confirmed) return;
+    setAuthorizationError(null); setAuthorizingId(deliverable._id);
+    try { await authorizeExternalUse({ deliverableId: deliverable._id }); }
+    catch (error) { setAuthorizationError(error instanceof Error ? error.message : "InventSmith could not authorize this artifact for external use."); }
+    finally { setAuthorizingId(null); }
+  };
 
   return <div className="flex min-h-screen flex-col bg-background"><AppNav /><main className="flex-1"><div className="mx-auto max-w-4xl space-y-8 px-4 py-10 sm:px-6 sm:py-14">
     <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" aria-hidden="true" />Back to briefing</Link>
     <header className="space-y-4"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">InventSmith work library</p><h1 className="text-3xl font-bold sm:text-4xl">{library.invention.title}</h1><p className="max-w-2xl text-muted-foreground">Review completed work, supporting evidence, assumptions, limitations, revisions, and any professional review required before use.</p>
       {library.deliverables.length > 0 && <><div className="flex flex-wrap gap-2"><Button variant="outline" className="gap-2" disabled={Boolean(packageSafetyError)} onClick={() => void runExport("docx")}><Download className="h-4 w-4" />Export package .docx</Button><Button variant="outline" className="gap-2" disabled={Boolean(packageSafetyError)} onClick={() => void runExport("pdf")}><Download className="h-4 w-4" />Export package .pdf</Button></div>{packageSafetyError && <div className="flex max-w-2xl items-start gap-2 rounded-lg border border-warning/30 bg-warning/5 p-3 text-sm"><ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden="true" /><p><span className="font-medium">Package export locked:</span> {packageSafetyError} Draft deliverables remain available for review below.</p></div>}</>}
       {exportError && <p role="alert" className="text-sm text-destructive">{exportError}</p>}
+      {authorizationError && <p role="alert" className="text-sm text-destructive">{authorizationError}</p>}
     </header>
     {library.deliverables.length === 0 ? <section className="rounded-2xl border border-border bg-card p-8 text-center"><BookOpen className="mx-auto h-9 w-9 text-primary" aria-hidden="true" /><h2 className="mt-4 text-xl font-semibold">InventSmith is preparing the first deliverables</h2><p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">Finished work will appear here automatically. InventSmith will show its evidence and limitations rather than asking you to assemble the report.</p><Button asChild variant="outline" className="mt-6"><Link href="/dashboard">Return to briefing</Link></Button></section> : <div className="space-y-5">{library.deliverables.map((deliverable) => {
       const sources = deliverable.sourceIds.flatMap((sourceId) => { const source = sourcesById.get(String(sourceId)); return source ? [source] : []; });
-      const reviews = library.reviews.filter((review) => review.deliverableId === deliverable._id); const readyForUse = isDeliverableReadyForExternalUse(deliverable.trustState, deliverable.staleReason); const readableContent = contentToReadableText(deliverable.content);
-      return <article key={deliverable._id} className="rounded-2xl border border-border bg-card shadow-sm"><div className="space-y-4 p-6 sm:p-7"><div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{deliverable.kind.replaceAll("_", " ")} · Version {deliverable.version}</p><h2 className="mt-1 text-2xl font-semibold">{deliverable.title}</h2></div><div className="flex flex-wrap items-center gap-2">{readableContent && <Button variant="outline" size="sm" className="gap-2" onClick={() => downloadMarkdown(deliverable.title, deliverable.version, readableContent)}><Download className="h-4 w-4" />Export .md</Button>}<span className={`w-fit rounded-full px-3 py-1 text-xs font-medium ${readyForUse ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>{getDeliverableTrustLabel(deliverable.trustState)}</span></div></div>
+      const reviews = library.reviews.filter((review) => review.deliverableId === deliverable._id); const readyForUse = isDeliverableReadyForExternalUse(deliverable.trustState, deliverable.staleReason); const readableContent = contentToReadableText(deliverable.content); const isLatestRevision = latestDeliverableIds.has(String(deliverable._id)); const canRequestExternalAuthorization = isLatestRevision && !deliverable.staleReason && !readyForUse && deliverable.trustState !== "professional_review_required";
+      return <article key={deliverable._id} className="rounded-2xl border border-border bg-card shadow-sm"><div className="space-y-4 p-6 sm:p-7"><div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{deliverable.kind.replaceAll("_", " ")} · Version {deliverable.version}</p><h2 className="mt-1 text-2xl font-semibold">{deliverable.title}</h2></div><div className="flex flex-wrap items-center gap-2">{canRequestExternalAuthorization && <Button variant="outline" size="sm" className="gap-2" disabled={authorizingId === deliverable._id} onClick={() => void authorizeArtifact(deliverable)}><ShieldCheck className="h-4 w-4" />{authorizingId === deliverable._id ? "Authorizing…" : "Authorize external use"}</Button>}{readableContent && <Button variant="outline" size="sm" className="gap-2" onClick={() => downloadMarkdown(deliverable.title, deliverable.version, readableContent)}><Download className="h-4 w-4" />Export .md</Button>}<span className={`w-fit rounded-full px-3 py-1 text-xs font-medium ${readyForUse ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>{getDeliverableTrustLabel(deliverable.trustState)}</span></div></div>
+      {deliverable.trustState === "professional_review_required" && !deliverable.staleReason && isLatestRevision && <div className="flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/5 p-3 text-sm"><ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden="true" /><p><span className="font-medium">Professional review required:</span> external-use authorization stays locked until the required qualified review for this exact revision is accepted.</p></div>}
       {deliverable.staleReason && <div className="flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/5 p-3 text-sm"><ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden="true" /><p><span className="font-medium">Needs refresh:</span> {deliverable.staleReason}</p></div>}
       {deliverable.mediaUrl && <figure className="overflow-hidden rounded-xl border border-border bg-muted/30">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={deliverable.mediaUrl} alt={`${deliverable.title} — concept visualization`} className="h-auto w-full" /><figcaption className="flex flex-wrap items-center justify-between gap-2 border-t border-border px-4 py-3 text-xs text-muted-foreground"><span className="capitalize">{deliverable.artifactMaturity?.replaceAll("_", " ") ?? "Concept visualization"}</span><a href={deliverable.mediaUrl} download target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-medium text-primary"><Download className="h-3.5 w-3.5" />Download image</a></figcaption></figure>}
       {readableContent ? <MarkdownContent content={readableContent} className="text-sm" /> : <p className="text-sm text-muted-foreground">This deliverable has no readable content yet.</p>}
