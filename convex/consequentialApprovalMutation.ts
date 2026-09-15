@@ -217,13 +217,14 @@ export async function resolveApprovalRequestHandler(
     eventType: "approval_resolved",
     actorType: "inventor",
     summary: args.approved
-      ? "Authorized invention manager approved the requested action."
-      : "Authorized invention manager denied the requested action.",
+      ? "Authorized invention manager approved the requested action; no external action was executed."
+      : "Authorized invention manager denied the requested action; no external action was executed.",
     metadata: {
       approvalRequestId: String(args.approvalRequestId),
       actionType: request.actionType,
       deliverableIds: scopedDeliverableIds.map(String),
       approved: args.approved,
+      externalActionExecuted: false,
       resolvedByUserId: String(userId),
     },
     createdAt: now,
