@@ -1,30 +1,39 @@
 # InventSmith Naming and Rebrand Plan
 
-**Status:** canonical product rename approved; active documentation normalization complete, with historical/technical compatibility references preserved intentionally  
+**Updated:** September 15, 2026  
+**Status:** customer-facing rename substantially complete; compatibility/historical cleanup remains deliberately conservative  
 **Current customer-facing name:** InventSmith  
 **Descriptor:** The Inventor OS  
 **Publisher:** Modern Methods  
-**Former working name:** Atlas / ProjectAtlas — historical references only
+**Former working name:** Atlas / ProjectAtlas — historical references only  
+**Planning completion estimate:** **approximately 96%**
 
 ## Canonical naming rule
 
 Current customer-facing identity, active documentation, handoff instructions, generated product copy, and current-state descriptions use **InventSmith — The Inventor OS**.
 
-Former-name wording may remain only when it is necessary to preserve factual history or technical compatibility, including the current historical repository slug, exact commit/workflow/branch names, environment variables, code/database identifiers, quoted emails, exhibits, screenshots, third-party records, or chronology explicitly describing the former working name.
+Former-name wording may remain only when necessary for factual history or technical compatibility, including the historical repository slug, exact commit/workflow/branch names, environment variables, code/database identifiers, quoted records, screenshots, exhibits, or chronology describing the former working name.
 
-## Required customer-facing changes
+## Completed naming work
 
-1. Application metadata, browser titles, descriptions, Open Graph and other public metadata.
-2. Navigation, headers, authentication screens, onboarding, dashboard, settings, billing, privacy, admin and operational surfaces.
-3. Ask InventSmith is used wherever the assistant is shown to users.
-4. Customer-facing AI/system prompts identify the product as InventSmith.
-5. Generated PDF/DOCX/package titles, cover pages, footers and product attribution use InventSmith.
-6. Emails, subscription copy, privacy/export copy and user-visible error/help text use InventSmith.
-7. README and active product/deployment documentation use InventSmith-named canonical files.
-8. Representative-pilot and acceptance language uses InventSmith except where quoting exact historical evidence.
-9. Google Drive working/current documents use InventSmith; historical conception/evidence records may retain former-name references only where chronology or evidentiary accuracy requires them.
+- Canonical product identity is InventSmith — The Inventor OS by Modern Methods.
+- Active authoritative documentation uses `INVENTSMITH_*` filenames.
+- Current product/deployment/progress prose uses InventSmith terminology.
+- Ask InventSmith naming is established for the assistant-facing experience.
+- Current Google Drive legal/IP working documents were renamed to InventSmith while preserving historical provenance.
+- Former active Atlas-named build/deployment documentation has been retired from the active full-product branch.
+- MadeThis has been removed from the current deployment direction and survives only as historical context where necessary.
 
-## Active canonical documentation filenames
+## Remaining naming work
+
+The remaining ~4% is intentionally narrow:
+
+1. Continue auditing low-risk customer-facing strings for obsolete former-name or “coming soon” wording in legacy/unreachable UI branches.
+2. Preserve technical identifiers such as `atlas*`, `ATLAS_*`, existing Convex function/table names, exact workflow/branch names and stored identifiers unless a separately tested migration provides concrete value.
+3. Keep the historical repository slug `jab1015/ProjectAtlas` for now. A repository rename is a separate compatibility/redirect/CI/deployment decision and is not required for customer-facing branding completion.
+4. Re-run exact-head TypeScript/regression/audit/build qualification after any remaining source-level naming cleanup.
+
+## Active canonical documentation
 
 - `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`
 - `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`
@@ -32,32 +41,31 @@ Former-name wording may remain only when it is necessary to preserve factual his
 - `docs/INVENTSMITH_DEPLOYMENT_RUNBOOK.md`
 - `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md`
 - `docs/INVENTSMITH_CAPABILITY_MATRIX.md`
+- `docs/INVENTSMITH_REBRAND_PLAN.md`
 
-The former active `ATLAS_BUILD_PROGRESS.md` and `ATLAS_DEPLOYMENT_RUNBOOK.md` filenames have been retired from the active full-product branch.
-
-## Preserve until a separately tested migration is justified
+## Preserve until separately tested
 
 - Historical repository slug `jab1015/ProjectAtlas` and Git history.
 - Existing Convex table/function identifiers.
-- Existing environment-variable names such as compatibility-prefixed `ATLAS_*` variables.
+- Compatibility-prefixed `ATLAS_*` environment variables.
 - Existing database IDs and stored records.
-- Exact workflow/commit/branch names used as historical or CI evidence.
-- Historical release, email, exhibit, and conception records where changing the wording would falsify history.
-- The separately excluded `Atlas-fama` tree, which is not part of the active InventSmith product work and is intentionally left untouched.
-
-A repository rename can be evaluated separately after active documentation and code compatibility references are inventoried. It is not required for the product itself to be fully branded InventSmith.
+- Exact workflow/commit/branch names used as CI/history evidence.
+- Historical release/email/exhibit/conception records where changing wording would falsify history.
+- Separately excluded former-name trees/repositories that are not part of active InventSmith work.
 
 ## Safety rule
 
-Do not perform a blind former-name-to-InventSmith replacement. Review each occurrence. Rename current product identity and current documentation; preserve factual historical references and compatibility identifiers until their migration is independently tested.
+Do not perform blind global replacement. Rename customer-facing/current product identity; preserve historical truth and compatibility identifiers until migration is independently tested.
 
 ## Acceptance criteria
 
-- No current customer-facing page identifies the product by the former working name.
-- Ask InventSmith is used consistently.
-- InventSmith — The Inventor OS is used in primary branding.
-- Modern Methods remains the publisher/company identity.
-- All authoritative/current repository documents use InventSmith filenames and current InventSmith terminology.
-- Google Drive current/working documents use InventSmith terminology while preserving accurate historical evidence.
-- Historical compatibility identifiers are clearly described as compatibility/historical identifiers rather than current branding.
-- TypeScript, regression tests, production dependency audit and production build pass after naming/documentation changes.
+- No reachable current customer-facing page identifies the product by the former working name.
+- Ask InventSmith is consistent.
+- InventSmith — The Inventor OS is primary branding.
+- Modern Methods remains publisher/company identity.
+- Authoritative/current repository documents use InventSmith filenames and terminology.
+- Current Google Drive working documents use InventSmith terminology while historical evidence remains accurate.
+- Compatibility identifiers are understood as technical/historical, not current branding.
+- Exact source head passes TypeScript, regressions, production dependency audit and production build after final source-level naming changes.
+
+A repository rename may be evaluated later, but it is not counted as a blocker to customer-facing InventSmith completion.
