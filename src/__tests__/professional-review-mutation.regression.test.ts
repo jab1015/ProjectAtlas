@@ -42,7 +42,7 @@ const baseReview = (overrides: Partial<ReviewRow> = {}): ReviewRow => ({
 const baseCad = (overrides: Partial<DeliverableRow> = {}): DeliverableRow => ({
   _id: "cad-1",
   inventionId: "inv-1",
-  kind: "native_cad_package",
+  kind: "native_cad_step",
   version: 1,
   trustState: "professional_review_required",
   artifactMaturity: "preliminary_cad",
@@ -61,9 +61,10 @@ function makeContext(args?: {
   const cadRevisions = args?.cadRevisions ?? (deliverable ? [deliverable] : []);
   const patch = vi.fn(async (_id: string, _value: unknown) => undefined);
   const insert = vi.fn(async (_table: string, _value: unknown) => "event-1");
+  const indexEquals: Array<[string, string, unknown]> = [];
   const query = vi.fn((table: string) => ({
     withIndex: (_index: string, apply: (q: any) => unknown) => {
-      const q: any = { eq: vi.fn(() => q) };
+      const q: any = { eq: vi.fn((field: string, value: unknown) => { indexEquals.push([table, field, value]); return q; }) };
       apply(q);
       return {
         collect: vi.fn(async () => {
@@ -86,7 +87,7 @@ function makeContext(args?: {
       insert,
     },
   } as any;
-  return { ctx, patch, insert, query };
+  return { ctx, patch, insert, query, indexEquals };
 }
 
 const acceptedArgs = (overrides: Record<string, unknown> = {}) => ({
@@ -104,7 +105,7 @@ describe("recordProfessionalReview mutation handler", () => {
     authMocks.isAdmin.mockResolvedValue(true);
   });
 
-  it("promotes the exact newest fresh CAD after all required reviews are accepted", async () => {
+  it("promotes the exact newest fresh concrete CAD artifact after all required reviews are accepted", async () => {
     const state = makeContext();
     const result = await recordProfessionalReviewHandler(state.ctx, acceptedArgs());
 
@@ -115,6 +116,7 @@ describe("recordProfessionalReview mutation handler", () => {
       isCurrentRevision: true,
       idempotent: false,
     });
+    expect(state.indexEquals).toContainEqual(["atlasDeliverables", "kind", "native_cad_step"]);
     expect(state.patch).toHaveBeenCalledWith("review-1", expect.objectContaining({
       status: "accepted",
       reviewerName: "Dana Engineer",
@@ -136,7 +138,7 @@ describe("recordProfessionalReview mutation handler", () => {
     }));
   });
 
-  it("does not promote an older CAD revision after a newer revision exists", async () => {
+  it("does not promote an older same-kind CAD revision after a newer revision exists", async () => {
     const oldCad = baseCad({ _id: "cad-1", version: 1 });
     const newCad = baseCad({ _id: "cad-2", version: 2 });
     const state = makeContext({ deliverable: oldCad, cadRevisions: [oldCad, newCad] });
@@ -153,7 +155,7 @@ describe("recordProfessionalReview mutation handler", () => {
     }));
   });
 
-  it("fails closed when multiple CAD rows claim the same latest version", async () => {
+  it("fails closed when multiple same-kind CAD rows claim the same latest version", async () => {
     const first = baseCad({ _id: "cad-1", version: 2 });
     const duplicate = baseCad({ _id: "cad-2", version: 2 });
     const state = makeContext({ deliverable: first, cadRevisions: [first, duplicate] });
