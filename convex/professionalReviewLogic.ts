@@ -40,20 +40,21 @@ export function deriveTrustStateFromProfessionalReviews(statuses: ProfessionalRe
 
 /**
  * Engineering review can promote only the exact fresh native CAD artifact that
- * was reviewed. If the review is later rejected/changed or the artifact becomes
- * stale, engineering maturity is invalidated back to preliminary CAD. A separate
- * manufacturing release is never created or revoked here because it is its own
- * consequential authorization boundary.
+ * was reviewed, and only after every review required for that artifact is accepted.
+ * If any required review is later rejected/changed or the artifact becomes stale,
+ * engineering maturity is invalidated back to preliminary CAD. Manufacturing
+ * release remains a separate consequential authorization boundary.
  */
 export function deriveArtifactMaturityFromProfessionalReviews(input: ArtifactMaturityInput): string | undefined {
   if (input.deliverableKind !== "native_cad_package") return input.currentMaturity;
   if (input.currentMaturity === "manufacturing_released") return input.currentMaturity;
 
-  const acceptedEngineeringReview = !input.staleReason && input.reviews.some(
-    (review) => review.deliverableId === input.deliverableId && review.specialty === "engineering" && review.status === "accepted"
-  );
+  const exactReviews = input.reviews.filter((review) => review.deliverableId === input.deliverableId);
+  const allRequiredReviewsAccepted = exactReviews.length > 0 && exactReviews.every((review) => review.status === "accepted");
+  const acceptedEngineeringReview = exactReviews.some((review) => review.specialty === "engineering" && review.status === "accepted");
+  const qualifies = !input.staleReason && allRequiredReviewsAccepted && acceptedEngineeringReview;
 
-  if (acceptedEngineeringReview) return "engineering_reviewed";
+  if (qualifies) return "engineering_reviewed";
   if (input.currentMaturity === "engineering_reviewed") return "preliminary_cad";
   return input.currentMaturity;
 }
