@@ -3,7 +3,7 @@ import { internalMutation, mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { makeFunctionReference } from "convex/server";
 import { buildStatusBriefing } from "./statusBriefingLogic";
-import { canResolveApproval, canResolveDecision, validateBlockedWorkResponse } from "./reviewLogic";
+import { canResolveApproval, canResolveDecision } from "./reviewLogic";
 import { MAX_AUTONOMOUS_RUN_BUDGET, remainingAutonomousCostUnitsAfterReservations, utcDateKey } from "./usagePolicyLogic";
 import { evaluatePilotPackage } from "./pilotEvaluationLogic";
 import { isAdmin } from "./authHelpers";
@@ -15,6 +15,7 @@ import {
 } from "./organizations";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { getOrganizationUsageSnapshot } from "./organizationDailyUsage";
+import { respondToBlockedWorkHandler } from "./blockedWorkResponseMutation";
 
 const runAvailableWork = makeFunctionReference<
   "action",
@@ -296,62 +297,7 @@ export const respondToBlockedWork = mutation({
     workItemId: v.id("atlasWorkItems"),
     response: v.string(),
   },
-  handler: async (ctx, { workItemId, response }) => {
-    const workItem = await ctx.db.get(workItemId);
-    if (!workItem) throw new ConvexError("Work item not found");
-    const { userId } = await requireInventionEditAccess(ctx, workItem.inventionId);
-    const validation = validateBlockedWorkResponse(workItem.status, response, workItem.humanGateType);
-    if (!validation.valid) throw new ConvexError(validation.error);
-    const cleaned = validation.cleaned;
-
-    const now = Date.now();
-    const usageScope = await resolveInventionUsageScope(ctx, workItem.inventionId);
-    if (!usageScope) throw new ConvexError("Invention not found");
-    const dateKey = utcDateKey(now);
-    const usage = usageScope.scope === "organization"
-      ? await getOrganizationUsageSnapshot(ctx, usageScope.organizationId, dateKey)
-      : await ctx.db
-          .query("atlasDailyUsage")
-          .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey))
-          .unique();
-    const remaining = remainingAutonomousCostUnitsAfterReservations(
-      usageScope.plan,
-      usage?.autonomousCostUnits ?? 0,
-      usage?.reservedAutonomousCostUnits ?? 0
-    );
-    await ctx.db.patch(workItemId, {
-      status: "queued",
-      blockedReason: undefined,
-      humanGateType: undefined,
-      inputSnapshot: {
-        previous: workItem.inputSnapshot ?? null,
-        inventorResponse: cleaned,
-        receivedAt: now,
-      },
-      updatedAt: now,
-    });
-    await ctx.db.insert("atlasExecutionEvents", {
-      inventionId: workItem.inventionId,
-      workItemId,
-      eventType: "inventor_input_received",
-      actorType: "inventor",
-      summary: "Authorized collaborator supplied the requested private information; work was requeued.",
-      metadata: {
-        gateType: workItem.humanGateType,
-        characterCount: cleaned.length,
-        suppliedByUserId: String(userId),
-        usageScope: usageScope.scope,
-      },
-      createdAt: now,
-    });
-    if (remaining > 0) {
-      await ctx.scheduler.runAfter(0, runAvailableWork, {
-        inventionId: workItem.inventionId,
-        costBudgetUnits: Math.min(MAX_AUTONOMOUS_RUN_BUDGET, remaining),
-      });
-    }
-    return { success: true };
-  },
+  handler: respondToBlockedWorkHandler,
 });
 
 /** Records a real professional's review. Inventors cannot self-certify InventSmith drafts. */
