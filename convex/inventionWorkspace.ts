@@ -3,7 +3,7 @@ import { internalMutation, mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { makeFunctionReference } from "convex/server";
 import { buildStatusBriefing } from "./statusBriefingLogic";
-import { canResolveApproval, canResolveDecision } from "./reviewLogic";
+import { canResolveDecision } from "./reviewLogic";
 import { MAX_AUTONOMOUS_RUN_BUDGET, remainingAutonomousCostUnitsAfterReservations, utcDateKey } from "./usagePolicyLogic";
 import { evaluatePilotPackage } from "./pilotEvaluationLogic";
 import {
@@ -15,6 +15,10 @@ import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { getOrganizationUsageSnapshot } from "./organizationDailyUsage";
 import { respondToBlockedWorkHandler } from "./blockedWorkResponseMutation";
 import { recordProfessionalReviewHandler } from "./professionalReviewMutation";
+import {
+  requestApprovalHandler,
+  resolveApprovalRequestHandler,
+} from "./consequentialApprovalMutation";
 
 const runAvailableWork = makeFunctionReference<
   "action",
@@ -260,35 +264,13 @@ export const resolveDecision = mutation({
   },
 });
 
+/** Compatibility route retained for older callers; all behavior is delegated to the guarded exact-artifact handler. */
 export const resolveApprovalRequest = mutation({
   args: {
     approvalRequestId: v.id("approvalRequests"),
     approved: v.boolean(),
   },
-  handler: async (ctx, { approvalRequestId, approved }) => {
-    const request = await ctx.db.get(approvalRequestId);
-    if (!request) throw new ConvexError("Approval request not found");
-    const { userId } = await requireInventionManageAccess(ctx, request.inventionId);
-    if (!canResolveApproval(request.status)) {
-      throw new ConvexError("Approval request is not pending");
-    }
-
-    const now = Date.now();
-    await ctx.db.patch(approvalRequestId, {
-      status: approved ? "approved" : "denied",
-      resolvedAt: now,
-      resolvedByUserId: userId,
-    });
-    await ctx.db.insert("atlasExecutionEvents", {
-      inventionId: request.inventionId,
-      eventType: "approval_resolved",
-      actorType: "inventor",
-      summary: approved ? "Authorized invention manager approved the requested action." : "Authorized invention manager denied the requested action.",
-      metadata: { approvalRequestId: String(approvalRequestId), approved, resolvedByUserId: String(userId) },
-      createdAt: now,
-    });
-    return { success: true };
-  },
+  handler: resolveApprovalRequestHandler,
 });
 
 export const respondToBlockedWork = mutation({
@@ -343,10 +325,12 @@ export const createDecision = internalMutation({
   },
 });
 
+/** Compatibility route retained for older internal callers; artifact-bound actions now fail closed without exact scope. */
 export const requestApproval = internalMutation({
   args: {
     inventionId: v.id("inventions"),
     decisionId: v.optional(v.id("inventionDecisions")),
+    deliverableIds: v.optional(v.array(v.id("atlasDeliverables"))),
     actionType: v.union(
       v.literal("share_confidential_information"),
       v.literal("contact_third_party"),
@@ -359,14 +343,5 @@ export const requestApproval = internalMutation({
     summary: v.string(),
     consequences: v.array(v.string()),
   },
-  handler: async (ctx, args) => {
-    const invention = await ctx.db.get(args.inventionId);
-    if (!invention) throw new ConvexError("Invention not found");
-
-    return ctx.db.insert("approvalRequests", {
-      ...args,
-      status: "pending",
-      requestedAt: Date.now(),
-    });
-  },
+  handler: requestApprovalHandler,
 });
