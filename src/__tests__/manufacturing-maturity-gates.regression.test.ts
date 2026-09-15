@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { POST_CANONICAL_WORK_PLAN } from "@convex/fullProductWorkPlan";
+import { NATIVE_CAD_DELIVERABLE_KINDS } from "@convex/cadArtifactKinds";
 import { isManufacturingMaturityEligible, isProductionMatureCad } from "@convex/manufacturingMaturityLogic";
 import { requiredProfessionalReviews } from "@convex/professionalReviewPolicy";
 import { selectNextWorkItem } from "@convex/workOrchestratorLogic";
@@ -13,11 +14,14 @@ const reviewed = (kind: string, version = 1, artifactMaturity?: string) => ({
   artifactMaturity,
 });
 
+const matureCadSet = (version = 1, maturity = "engineering_reviewed") =>
+  NATIVE_CAD_DELIVERABLE_KINDS.map((kind) => reviewed(kind, version, maturity));
+
 const matureManufacturingArtifacts = () => [
   reviewed("prototype_readiness_assessment"),
   reviewed("manufacturer_rfq_package"),
   reviewed("manufacturing_drawing_specification"),
-  reviewed("native_cad_package", 1, "engineering_reviewed"),
+  ...matureCadSet(),
 ];
 
 describe("InventSmith manufacturing maturity enforcement", () => {
@@ -30,11 +34,11 @@ describe("InventSmith manufacturing maturity enforcement", () => {
     ]));
   });
 
-  it("requires qualified engineering review for native CAD packages", () => {
-    expect(requiredProfessionalReviews("native_cad_package").map((review) => review.specialty)).toContain("engineering");
+  it.each(NATIVE_CAD_DELIVERABLE_KINDS)("requires qualified engineering review for generated CAD kind %s", (kind) => {
+    expect(requiredProfessionalReviews(kind).map((review) => review.specialty)).toContain("engineering");
   });
 
-  it("fails closed until the latest prototype, RFQ, drawings and native CAD are fresh and professionally reviewed", () => {
+  it("fails closed until the latest prototype, RFQ, drawings and full concrete CAD set are fresh and professionally reviewed", () => {
     expect(isManufacturingMaturityEligible("manufacturing_readiness", [])).toBe(false);
 
     expect(isManufacturingMaturityEligible("manufacturing_readiness", [
@@ -50,19 +54,45 @@ describe("InventSmith manufacturing maturity enforcement", () => {
     expect(isManufacturingMaturityEligible("manufacturing_readiness", matureManufacturingArtifacts())).toBe(true);
   });
 
-  it("rejects preliminary, stale, or unreviewed CAD at the production-readiness boundary", () => {
-    expect(isProductionMatureCad([reviewed("native_cad_package", 1, "preliminary_cad")])).toBe(false);
-    expect(isProductionMatureCad([{ kind: "native_cad_package", version: 1, trustState: "professional_review_required", artifactMaturity: "engineering_reviewed" }])).toBe(false);
-    expect(isProductionMatureCad([{ ...reviewed("native_cad_package", 1, "engineering_reviewed"), staleReason: "Prototype changed" }])).toBe(false);
-    expect(isProductionMatureCad([reviewed("native_cad_package", 1, "engineering_reviewed")])).toBe(true);
-    expect(isProductionMatureCad([reviewed("native_cad_package", 1, "manufacturing_released")])).toBe(true);
+  it("rejects a missing, preliminary, stale, or unreviewed member of the concrete CAD set", () => {
+    expect(isProductionMatureCad(matureCadSet().slice(1))).toBe(false);
+
+    const preliminary = matureCadSet();
+    preliminary[0] = reviewed(preliminary[0].kind, 1, "preliminary_cad");
+    expect(isProductionMatureCad(preliminary)).toBe(false);
+
+    const unreviewed = matureCadSet();
+    unreviewed[1] = { ...unreviewed[1], trustState: "professional_review_required" };
+    expect(isProductionMatureCad(unreviewed)).toBe(false);
+
+    const stale = matureCadSet();
+    stale[2] = { ...stale[2], staleReason: "Prototype changed" };
+    expect(isProductionMatureCad(stale)).toBe(false);
+
+    expect(isProductionMatureCad(matureCadSet())).toBe(true);
+    expect(isProductionMatureCad(matureCadSet(1, "manufacturing_released"))).toBe(true);
   });
 
-  it("uses the newest CAD revision so an older reviewed package cannot mask a newer preliminary revision", () => {
+  it("uses each newest concrete CAD revision so an older reviewed artifact cannot mask a newer preliminary revision", () => {
     expect(isProductionMatureCad([
-      reviewed("native_cad_package", 1, "engineering_reviewed"),
-      { kind: "native_cad_package", version: 2, trustState: "professional_review_required", artifactMaturity: "preliminary_cad" },
+      ...matureCadSet(1),
+      { kind: "native_cad_step", version: 2, trustState: "professional_review_required", artifactMaturity: "preliminary_cad" },
     ])).toBe(false);
+  });
+
+  it("fails closed on mixed generation versions or duplicate latest versions", () => {
+    const mixed = matureCadSet(2);
+    mixed[0] = reviewed(mixed[0].kind, 1, "engineering_reviewed");
+    expect(isProductionMatureCad(mixed)).toBe(false);
+
+    expect(isProductionMatureCad([
+      ...matureCadSet(2),
+      reviewed("native_cad_step", 2, "engineering_reviewed"),
+    ])).toBe(false);
+  });
+
+  it("does not allow the retired synthetic native_cad_package kind to satisfy production CAD maturity", () => {
+    expect(isProductionMatureCad([reviewed("native_cad_package", 1, "engineering_reviewed")])).toBe(false);
   });
 
   it("does not over-block early manufacturing preparation", () => {
