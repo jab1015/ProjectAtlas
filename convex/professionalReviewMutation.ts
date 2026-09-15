@@ -2,6 +2,7 @@ import { ConvexError } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
 import { isAdmin } from "./authHelpers";
+import { isNativeCadDeliverableKind } from "./cadArtifactKinds";
 import {
   deriveArtifactMaturityFromProfessionalReviews,
   deriveTrustStateFromProfessionalReviews,
@@ -22,8 +23,9 @@ function sameOptionalText(left: string | undefined, right: string | undefined) {
 
 /**
  * Actual handler used by the public recordProfessionalReview mutation.
- * It binds CAD promotion to the newest exact revision, keeps manufacturing release
- * separate, records auditable reviewer evidence, and makes exact replays idempotent.
+ * It binds CAD promotion to the newest exact same-kind revision, keeps manufacturing
+ * release separate, records auditable reviewer evidence, and makes exact replays
+ * idempotent.
  */
 export async function recordProfessionalReviewHandler(
   ctx: MutationCtx,
@@ -58,11 +60,11 @@ export async function recordProfessionalReviewHandler(
   );
 
   let isCurrentRevision = true;
-  if (deliverable.kind === "native_cad_package") {
+  if (isNativeCadDeliverableKind(deliverable.kind)) {
     const cadRevisions = await ctx.db
       .query("atlasDeliverables")
       .withIndex("by_inventionId_kind", (q) =>
-        q.eq("inventionId", review.inventionId).eq("kind", "native_cad_package")
+        q.eq("inventionId", review.inventionId).eq("kind", deliverable.kind)
       )
       .collect();
     const maxVersion = cadRevisions.reduce(
