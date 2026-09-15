@@ -37,9 +37,17 @@ describe("inventor approval safety", () => {
 });
 
 describe("blocked autonomous work", () => {
-  it("accepts meaningful inventor input only while work is blocked", () => {
-    expect(canRespondToBlockedWork("blocked", "Use the 12-inch version.")).toBe(true);
-    expect(canRespondToBlockedWork("queued", "Use the 12-inch version.")).toBe(false);
-    expect(canRespondToBlockedWork("blocked", "   ")).toBe(false);
+  it("accepts bounded free-form input only for an explicitly identified private-information gate", () => {
+    expect(canRespondToBlockedWork("blocked", "Use the 12-inch version.", "private_information")).toBe(true);
+    expect(canRespondToBlockedWork("queued", "Use the 12-inch version.", "private_information")).toBe(false);
+    expect(canRespondToBlockedWork("blocked", "   ", "private_information")).toBe(false);
+    expect(canRespondToBlockedWork("blocked", "x".repeat(4001), "private_information")).toBe(false);
+  });
+
+  it("fails closed when the gate type is omitted and cannot bypass consequential gates with text", () => {
+    expect(canRespondToBlockedWork("blocked", "done")).toBe(false);
+    for (const gate of ["decision", "authorization", "professional_review", "payment", "physical_work"]) {
+      expect(canRespondToBlockedWork("blocked", "I completed it.", gate), gate).toBe(false);
+    }
   });
 });
