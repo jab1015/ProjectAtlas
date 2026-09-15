@@ -40,9 +40,9 @@ function makeContext(workItem: WorkItem, personalUsage: { autonomousCostUnits: n
       },
     };
   });
-  const patch = vi.fn(async () => undefined);
-  const insert = vi.fn(async () => "event-1");
-  const runAfter = vi.fn(async () => undefined);
+  const patch = vi.fn(async (_id: string, _value: unknown) => undefined);
+  const insert = vi.fn(async (_table: string, _value: unknown) => "event-1");
+  const runAfter = vi.fn(async (..._args: unknown[]) => undefined);
   const ctx = {
     db: {
       get: vi.fn(async (id: string) => (id === workItem._id ? workItem : null)),
@@ -190,7 +190,9 @@ describe("respondToBlockedWork mutation handler", () => {
   it("touches only the target work item plus its audit event, leaving unrelated approvals and evidence untouched", async () => {
     const state = makeContext(privateWorkItem());
     await respondToBlockedWorkHandler(state.ctx, { workItemId: "work-1" as any, response: "private value" });
-    expect(state.patch.mock.calls.map(([id]) => id)).toEqual(["work-1"]);
-    expect(state.insert.mock.calls.map(([table]) => table)).toEqual(["atlasExecutionEvents"]);
+    expect(state.patch).toHaveBeenCalledTimes(1);
+    expect(state.patch).toHaveBeenCalledWith("work-1", expect.any(Object));
+    expect(state.insert).toHaveBeenCalledTimes(1);
+    expect(state.insert).toHaveBeenCalledWith("atlasExecutionEvents", expect.any(Object));
   });
 });
