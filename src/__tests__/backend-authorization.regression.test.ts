@@ -102,6 +102,7 @@ describe("backend authorization boundaries", () => {
   it("uses organization-aware access for the primary invention workspace", () => {
     const file = source("inventionWorkspace.ts");
     const blockedWorkHandler = source("blockedWorkResponseMutation.ts");
+    const consequentialApprovalHandler = source("consequentialApprovalMutation.ts");
     expect(file).not.toContain("invention.userId !== userId");
     for (const name of ["getWorkspaceState", "getStatusBriefing", "getReviewQueue", "getDeliverableLibrary", "getPilotEvaluation"]) {
       expect(exportedFunctionBlock(file, name)).toMatch(/requireInventionReadAccess|getAccessibleInvention/);
@@ -111,7 +112,8 @@ describe("backend authorization boundaries", () => {
     expect(exportedFunctionBlock(file, "respondToBlockedWork")).toContain("respondToBlockedWorkHandler");
     expect(blockedWorkHandler).toContain("requireInventionEditAccess(ctx, workItem.inventionId)");
     expect(exportedFunctionBlock(file, "resolveDecision")).toContain("requireInventionManageAccess");
-    expect(exportedFunctionBlock(file, "resolveApprovalRequest")).toContain("requireInventionManageAccess");
+    expect(exportedFunctionBlock(file, "resolveApprovalRequest")).toContain("resolveApprovalRequestHandler");
+    expect(consequentialApprovalHandler).toContain("requireInventionManageAccess(ctx, request.inventionId)");
   });
 
   it("uses organization-aware access for Ask InventSmith", () => {
