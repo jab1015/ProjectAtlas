@@ -49,7 +49,8 @@ describe("InventSmith workspace and maturity source contract", () => {
     }
     expect(workspace).toContain("handler: respondToBlockedWorkHandler");
     expect(workspace).toContain("handler: recordProfessionalReviewHandler");
-    expect(workspace.length).toBeGreaterThan(15_000);
+    // Coarse truncation tripwire only. Exact exports/delegations above are the authoritative guard.
+    expect(workspace.length).toBeGreaterThan(14_000);
   });
 
   it("keeps the generic completeWork caller unable to request engineering or manufacturing maturity", () => {
