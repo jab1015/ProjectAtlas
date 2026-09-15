@@ -39,7 +39,7 @@ interface JourneyCenterState {
 const getJourneyCenter = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, JourneyCenterState>("journeyCenter:getJourneyCenter");
 
 const STATUS: Record<JourneyStageRow["status"], { label: string; className: string }> = {
-  complete: { label: "Complete", className: "bg-success/10 text-success" },
+  complete: { label: "Stage work complete", className: "bg-success/10 text-success" },
   professional_review: { label: "Professional review", className: "bg-warning/10 text-warning" },
   blocked: { label: "Needs action", className: "bg-warning/10 text-warning" },
   working: { label: "In progress", className: "bg-primary/10 text-primary" },
@@ -91,6 +91,7 @@ export default function JourneyCenterPage() {
               <div><h1 className="text-3xl font-bold sm:text-4xl">{journey.invention.title}: idea to market</h1><p className="mt-2 max-w-3xl text-muted-foreground">You do not need to know the invention process. InventSmith tracks the evidence, work, design, professional gates, physical steps, documents, and dependencies and tells you what matters next.</p></div>
               <Button asChild size="lg"><Link href={journey.currentStage.href}>{journey.currentStage.status === "complete" ? "Open journey" : `Continue ${journey.currentStage.name}`}</Link></Button>
             </div>
+            <p className="max-w-4xl rounded-xl border border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground">“Stage work complete” means InventSmith’s required work for that stage is complete. It does not mean InventSmith contacted a supplier or professional, placed an order or payment, submitted a filing, published anything, or launched a product.</p>
           </header>
 
           <section className="rounded-2xl border border-primary/20 bg-primary/5 p-6 sm:p-7">
@@ -100,7 +101,7 @@ export default function JourneyCenterPage() {
           </section>
 
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Journey</p><p className="mt-2 text-2xl font-semibold">{journey.completedStages}/{journey.totalStages}</p><div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary" style={{ width: `${completion}%` }} /></div></div>
+            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Journey stage work</p><p className="mt-2 text-2xl font-semibold">{journey.completedStages}/{journey.totalStages}</p><div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary" style={{ width: `${completion}%` }} /></div></div>
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Inventor evidence</p><p className="mt-2 text-2xl font-semibold">{journey.evidence.inventorProvided}</p><p className="mt-1 text-xs text-muted-foreground">{journey.evidence.verified} verified / {journey.evidence.total} total</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Needs your attention</p><p className="mt-2 text-2xl font-semibold">{journey.attention.pendingApprovals + journey.attention.openDecisions + journey.attention.blockedWork}</p><p className="mt-1 text-xs text-muted-foreground">approvals, decisions, blocked work</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Professional review</p><p className="mt-2 text-2xl font-semibold">{journey.attention.pendingProfessionalReviews}</p><p className="mt-1 text-xs text-muted-foreground">open review requirements</p></div>
@@ -111,7 +112,7 @@ export default function JourneyCenterPage() {
           </section>
 
           <section className="space-y-4">
-            <div><h2 className="text-xl font-semibold">Complete inventor journey</h2><p className="mt-1 text-sm text-muted-foreground">Stages remain visible from the first day. You can inspect future departments, but their work will not be treated as ready until the required upstream evidence and gates exist.</p></div>
+            <div><h2 className="text-xl font-semibold">Inventor journey</h2><p className="mt-1 text-sm text-muted-foreground">Stages remain visible from the first day. You can inspect future departments, but their work will not be treated as ready until the required upstream evidence and gates exist. Stage-work completion does not by itself represent an external real-world action.</p></div>
             <div className="space-y-3">
               {journey.stages.map((stage) => {
                 const Icon = stageIcon(stage.status);
