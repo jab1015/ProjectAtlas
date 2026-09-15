@@ -192,7 +192,7 @@ describe("recordProfessionalReview mutation handler", () => {
     }));
   });
 
-  it("preserves explicit manufacturing release while trust state still reflects reopened review", async () => {
+  it("revokes manufacturing release when its professional review is reopened", async () => {
     const review = baseReview({ status: "accepted", reviewerName: "Dana Engineer", reviewerReference: "PE-12345" });
     const cad = baseCad({ trustState: "professionally_reviewed", artifactMaturity: "manufacturing_released" });
     const state = makeContext({ review, deliverable: cad, siblingReviews: [review], cadRevisions: [cad] });
@@ -201,8 +201,12 @@ describe("recordProfessionalReview mutation handler", () => {
 
     expect(result).toMatchObject({
       trustState: "professional_review_required",
-      artifactMaturity: "manufacturing_released",
+      artifactMaturity: "preliminary_cad",
     });
+    expect(state.patch).toHaveBeenCalledWith("cad-1", expect.objectContaining({
+      trustState: "professional_review_required",
+      artifactMaturity: "preliminary_cad",
+    }));
   });
 
   it("makes an exact accepted-review replay idempotent with no duplicate patches or audit event", async () => {
