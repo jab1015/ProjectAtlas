@@ -9,6 +9,7 @@ import type { Doc, Id } from "@convex/_generated/dataModel";
 import { ArrowLeft, Box, CheckCircle2, Download, FileUp, Play, RefreshCw, ShieldAlert, Sparkles, Wrench } from "lucide-react";
 import { AppNav } from "@/components/atlas/app-nav";
 import { MadeThisBadge } from "@/components/atlas/made-this-badge";
+import { ManufacturingReleaseAction } from "@/components/atlas/manufacturing-release-action";
 import { MarkdownContent } from "@/components/markdown-content";
 import { Button } from "@/components/ui/button";
 
@@ -46,7 +47,7 @@ const STATUS_LABELS: Record<string, string> = {
   running: "InventSmith working",
   blocked: "Needs input",
   awaiting_approval: "Awaiting approval",
-  completed: "Complete",
+  completed: "Work complete",
   failed: "Retry needed",
   cancelled: "Cancelled",
   stale: "Refresh needed",
@@ -67,6 +68,12 @@ function artifactLabel(kind: string) {
   if (kind === "cad_orthographic_views") return "Orthographic views";
   if (kind === "cad_exploded_view") return "Exploded assembly view";
   return kind.replaceAll("_", " ");
+}
+
+function maturityLabel(maturity?: NativeCadArtifact["artifactMaturity"]) {
+  if (maturity === "manufacturing_released") return "Manufacturing Released";
+  if (maturity === "engineering_reviewed") return "Engineering Reviewed";
+  return "Preliminary CAD";
 }
 
 export default function ProductDesignStudioPage() {
@@ -180,9 +187,10 @@ export default function ProductDesignStudioPage() {
               <Button onClick={() => void generateCad()} disabled={generatingCad || cadRunning} className="gap-2"><Box className="h-4 w-4" />{generatingCad || cadRunning ? "Generating CAD…" : currentCadArtifacts.length ? "Regenerate CAD" : "Generate native CAD"}</Button>
             </div>
             {currentCadArtifacts.length > 0 && <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{currentCadArtifacts.map((artifact) => (
-              <div key={artifact._id} className="rounded-xl border border-border bg-background p-4"><p className="text-xs font-semibold uppercase tracking-wider text-primary">{artifactLabel(artifact.kind)}</p><p className="mt-1 text-sm font-medium">v{artifact.version} · Preliminary CAD</p>{artifact.downloadUrl && <Button asChild variant="outline" size="sm" className="mt-3 w-full gap-2"><a href={artifact.downloadUrl} download target="_blank" rel="noreferrer"><Download className="h-4 w-4" />Download</a></Button>}</div>
+              <div key={artifact._id} className="rounded-xl border border-border bg-background p-4"><p className="text-xs font-semibold uppercase tracking-wider text-primary">{artifactLabel(artifact.kind)}</p><p className="mt-1 text-sm font-medium">v{artifact.version} · {maturityLabel(artifact.artifactMaturity)}</p>{artifact.downloadUrl && <Button asChild variant="outline" size="sm" className="mt-3 w-full gap-2"><a href={artifact.downloadUrl} download target="_blank" rel="noreferrer"><Download className="h-4 w-4" />Download</a></Button>}</div>
             ))}</div>}
-            <p className="mt-4 text-xs text-muted-foreground">Native files are real CAD geometry, but remain <strong>Preliminary CAD</strong>. Relevant engineering review, tolerance/dimension confirmation, manufacturability review, and prototype testing are required before InventSmith may promote them to Manufacturing Released.</p>
+            <p className="mt-4 text-xs text-muted-foreground">Newly generated native files begin as <strong>Preliminary CAD</strong>. Relevant engineering review, tolerance/dimension confirmation, manufacturability review, and prototype testing are required before a manager may deliberately promote the exact current generation to Manufacturing Released.</p>
+            <ManufacturingReleaseAction inventionId={inventionId} artifacts={cadArtifacts} />
           </section>
 
           <section className="space-y-4">
