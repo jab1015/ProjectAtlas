@@ -1,3 +1,5 @@
+import { isNativeCadDeliverableKind } from "./cadArtifactKinds";
+
 export type ProfessionalReviewStatus =
   | "required"
   | "requested"
@@ -40,16 +42,16 @@ export function deriveTrustStateFromProfessionalReviews(statuses: ProfessionalRe
 }
 
 /**
- * Engineering review can promote only the exact fresh current native CAD artifact
- * that was reviewed, and only after every review required for that artifact is
- * accepted. Historical revisions may retain already-earned engineering maturity,
- * but accepting an old revision after a newer one exists cannot newly promote it.
- * If a required review is later rejected/changed or the artifact becomes stale,
- * engineering maturity is invalidated back to preliminary CAD. Manufacturing
+ * Engineering review can promote only the exact fresh current concrete native CAD
+ * artifact that was reviewed, and only after every review required for that artifact
+ * is accepted. Historical revisions may retain already-earned engineering maturity,
+ * but accepting an old revision after a newer same-kind artifact exists cannot newly
+ * promote it. If a required review is later rejected/changed or the artifact becomes
+ * stale, engineering maturity is invalidated back to preliminary CAD. Manufacturing
  * release remains a separate consequential authorization boundary.
  */
 export function deriveArtifactMaturityFromProfessionalReviews(input: ArtifactMaturityInput): string | undefined {
-  if (input.deliverableKind !== "native_cad_package") return input.currentMaturity;
+  if (!isNativeCadDeliverableKind(input.deliverableKind)) return input.currentMaturity;
   if (input.currentMaturity === "manufacturing_released") return input.currentMaturity;
 
   const exactReviews = input.reviews.filter((review) => review.deliverableId === input.deliverableId);
