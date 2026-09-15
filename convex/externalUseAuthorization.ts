@@ -39,9 +39,16 @@ export async function authorizeDeliverableExternalUseHandler(
     (highest, item) => Math.max(highest, item.version),
     deliverable.version
   );
+  const latestRevisionIds = sameKind
+    .filter((item) => item.version === latestVersion)
+    .map((item) => String(item._id));
 
-  if (deliverable.version !== latestVersion) {
-    throw new ConvexError("Only the latest deliverable revision can be authorized for external use");
+  if (
+    deliverable.version !== latestVersion ||
+    latestRevisionIds.length !== 1 ||
+    latestRevisionIds[0] !== String(deliverable._id)
+  ) {
+    throw new ConvexError("Only one unambiguous latest deliverable revision can be authorized for external use");
   }
   if (deliverable.staleReason) {
     throw new ConvexError("Stale deliverables must be refreshed before external-use authorization");
