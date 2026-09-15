@@ -48,19 +48,25 @@ export function deriveTrustStateFromProfessionalReviews(statuses: ProfessionalRe
  * but accepting an old revision after a newer same-kind artifact exists cannot newly
  * promote it. If a required review is later rejected/changed or the artifact becomes
  * stale, engineering maturity is invalidated back to preliminary CAD. Manufacturing
- * release remains a separate consequential authorization boundary.
+ * release remains a separate consequential authorization boundary and is revoked when
+ * its professional-review basis becomes invalid or the released revision is superseded.
  */
 export function deriveArtifactMaturityFromProfessionalReviews(input: ArtifactMaturityInput): string | undefined {
   if (!isNativeCadDeliverableKind(input.deliverableKind)) return input.currentMaturity;
-  if (input.currentMaturity === "manufacturing_released") return input.currentMaturity;
 
   const exactReviews = input.reviews.filter((review) => review.deliverableId === input.deliverableId);
   const allRequiredReviewsAccepted = exactReviews.length > 0 && exactReviews.every((review) => review.status === "accepted");
   const acceptedEngineeringReview = exactReviews.some((review) => review.specialty === "engineering" && review.status === "accepted");
   const reviewSetQualifies = !input.staleReason && allRequiredReviewsAccepted && acceptedEngineeringReview;
-  const mayPromoteCurrentRevision = input.isCurrentRevision !== false;
+  const isCurrentRevision = input.isCurrentRevision !== false;
 
-  if (reviewSetQualifies && mayPromoteCurrentRevision) return "engineering_reviewed";
+  if (input.currentMaturity === "manufacturing_released") {
+    if (!reviewSetQualifies) return "preliminary_cad";
+    if (!isCurrentRevision) return "engineering_reviewed";
+    return "manufacturing_released";
+  }
+
+  if (reviewSetQualifies && isCurrentRevision) return "engineering_reviewed";
   if (input.currentMaturity === "engineering_reviewed" && !reviewSetQualifies) return "preliminary_cad";
   return input.currentMaturity;
 }
