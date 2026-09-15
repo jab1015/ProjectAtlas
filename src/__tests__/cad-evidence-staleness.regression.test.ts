@@ -1,9 +1,21 @@
 import { describe, expect, it } from "vitest";
 import { NATIVE_CAD_DELIVERABLE_KINDS } from "@convex/cadArtifactKinds";
 import { applyInventorEvidenceChange } from "@convex/evidenceImpact";
-import { isProductionMatureCad } from "@convex/manufacturingMaturityLogic";
+import {
+  isProductionMatureCad,
+  type ManufacturingMaturityDeliverable,
+} from "@convex/manufacturingMaturityLogic";
 
 type Row = Record<string, any> & { _id: string };
+
+type CadFixture = Row & ManufacturingMaturityDeliverable & {
+  inventionId: string;
+  workItemId: string;
+  sourceIds: string[];
+  assumptions: string[];
+  limitations: string[];
+  updatedAt: number;
+};
 
 function fakeContext(initial: Record<string, Row[]>) {
   const tables = Object.fromEntries(
@@ -43,7 +55,7 @@ function fakeContext(initial: Record<string, Row[]>) {
 
 describe("CAD readiness after inventor-evidence removal", () => {
   it("makes a previously reviewed concrete CAD set ineligible when supporting evidence is removed", async () => {
-    const cadDeliverables = NATIVE_CAD_DELIVERABLE_KINDS.map((kind, index) => ({
+    const cadDeliverables: CadFixture[] = NATIVE_CAD_DELIVERABLE_KINDS.map((kind, index) => ({
       _id: `cad_${index}`,
       inventionId: "inv_1",
       workItemId: "cad_work",
@@ -90,7 +102,7 @@ describe("CAD readiness after inventor-evidence removal", () => {
       now: 100,
     });
 
-    const changedCad = tables.atlasDeliverables;
+    const changedCad = tables.atlasDeliverables as CadFixture[];
     expect(changedCad).toHaveLength(NATIVE_CAD_DELIVERABLE_KINDS.length);
     for (const deliverable of changedCad) {
       expect(deliverable.sourceIds).toEqual([]);
