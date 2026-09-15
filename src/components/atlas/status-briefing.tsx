@@ -98,7 +98,7 @@ export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
         <article className="rounded-xl border border-border bg-card p-5 shadow-sm">
           <div className="mb-4 flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-success" aria-hidden="true" />
-            <h3 className="text-base font-semibold">Recently completed</h3>
+            <h3 className="text-base font-semibold">Recently completed work</h3>
           </div>
           {briefing.completed.length > 0 ? (
             <ul className="space-y-3">
