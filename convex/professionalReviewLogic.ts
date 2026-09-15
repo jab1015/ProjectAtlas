@@ -15,6 +15,20 @@ export interface ProfessionalReviewRecordInput {
   accepted: boolean;
 }
 
+export interface ArtifactMaturityReview {
+  specialty: string;
+  status: ProfessionalReviewStatus;
+  deliverableId: string;
+}
+
+export interface ArtifactMaturityInput {
+  deliverableId: string;
+  deliverableKind: string;
+  currentMaturity?: string;
+  staleReason?: string;
+  reviews: readonly ArtifactMaturityReview[];
+}
+
 export type ProfessionalReviewRecordValidation =
   | {
       valid: true;
@@ -34,6 +48,29 @@ export function deriveTrustStateFromProfessionalReviews(
     return "professionally_reviewed";
   }
   return "professional_review_required";
+}
+
+/**
+ * Engineering review can promote only the exact fresh native CAD artifact that
+ * was reviewed. It deliberately stops at engineering_reviewed: manufacturing
+ * release remains a separate consequential authorization boundary.
+ */
+export function deriveArtifactMaturityFromProfessionalReviews(
+  input: ArtifactMaturityInput
+): string | undefined {
+  if (input.deliverableKind !== "native_cad_package") return input.currentMaturity;
+  if (input.currentMaturity === "manufacturing_released") return input.currentMaturity;
+  if (input.staleReason) return input.currentMaturity;
+
+  const acceptedEngineeringReview = input.reviews.some(
+    (review) =>
+      review.deliverableId === input.deliverableId &&
+      review.specialty === "engineering" &&
+      review.status === "accepted"
+  );
+
+  if (!acceptedEngineeringReview) return input.currentMaturity;
+  return "engineering_reviewed";
 }
 
 /**
