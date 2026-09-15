@@ -50,7 +50,7 @@ const STATUS_LABELS: Record<string, string> = {
   running: "InventSmith working",
   blocked: "Needs inventor/professional input",
   awaiting_approval: "Awaiting approval",
-  completed: "Complete",
+  completed: "Work complete",
   failed: "Retry needed",
   cancelled: "Cancelled",
   stale: "Refresh needed",
