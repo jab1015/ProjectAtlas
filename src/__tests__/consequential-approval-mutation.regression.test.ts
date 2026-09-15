@@ -185,7 +185,7 @@ describe("consequential approval artifact binding", () => {
     }
   });
 
-  it("revalidates the exact artifact when a manager approves and records the bound scope", async () => {
+  it("revalidates the exact artifact when a manager approves, records the bound scope, and does not claim execution", async () => {
     const state = buildState({
       deliverables: [artifact()],
       approvals: [approval()],
@@ -202,8 +202,18 @@ describe("consequential approval artifact binding", () => {
     expect(state.patches[0]).toMatchObject({ id: "approval-1", value: { status: "approved", resolvedByUserId: "owner1" } });
     expect(state.inserts.at(-1)).toMatchObject({
       table: "atlasExecutionEvents",
-      value: { eventType: "approval_resolved", metadata: { actionType: "contact_third_party", deliverableIds: ["del1"], approved: true } },
+      value: {
+        eventType: "approval_resolved",
+        metadata: {
+          actionType: "contact_third_party",
+          deliverableIds: ["del1"],
+          approved: true,
+          externalActionExecuted: false,
+        },
+      },
     });
+    expect(state.inserts.at(-1)?.value.summary).toMatch(/no external action was executed/i);
+    expect(state.inserts.filter((entry) => entry.table !== "atlasExecutionEvents")).toHaveLength(0);
   });
 
   it("rejects approval when a scoped artifact became stale or superseded after the request, with no resolution side effects", async () => {
@@ -231,13 +241,18 @@ describe("consequential approval artifact binding", () => {
     expect(state.inserts).toHaveLength(0);
   });
 
-  it("still lets an authorized manager decline a legacy unscoped external request", async () => {
+  it("still lets an authorized manager decline a legacy unscoped external request without claiming execution", async () => {
     const state = buildState({ approvals: [approval()] });
     await expect(resolveApprovalRequestHandler(state.ctx, {
       approvalRequestId: "approval-1" as any,
       approved: false,
     })).resolves.toEqual({ success: true });
     expect(state.patches[0]).toMatchObject({ id: "approval-1", value: { status: "denied" } });
+    expect(state.inserts.at(-1)).toMatchObject({
+      table: "atlasExecutionEvents",
+      value: { metadata: { approved: false, externalActionExecuted: false } },
+    });
+    expect(state.inserts.at(-1)?.value.summary).toMatch(/no external action was executed/i);
   });
 
   it("rejects resolution before writes when manager authorization fails", async () => {
