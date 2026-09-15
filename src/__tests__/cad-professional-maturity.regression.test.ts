@@ -5,7 +5,7 @@ const engineeringAccepted = (overrides: Partial<ArtifactMaturityReview> = {}): A
 const maturity = (overrides: Record<string, unknown> = {}) => deriveArtifactMaturityFromProfessionalReviews({ deliverableId: "cad-current", deliverableKind: "native_cad_package", currentMaturity: "preliminary_cad", reviews: [engineeringAccepted()], ...overrides });
 
 describe("native CAD professional-review maturity", () => {
-  it("advances only the exact fresh native CAD revision after accepted engineering review", () => expect(maturity()).toBe("engineering_reviewed"));
+  it("advances only the exact fresh current native CAD revision after accepted engineering review", () => expect(maturity({ isCurrentRevision: true })).toBe("engineering_reviewed"));
 
   it.each([
     { name: "missing review", reviews: [] },
@@ -13,6 +13,14 @@ describe("native CAD professional-review maturity", () => {
     { name: "wrong specialty", reviews: [engineeringAccepted({ specialty: "patent" })] },
     { name: "wrong revision", reviews: [engineeringAccepted({ deliverableId: "cad-old" })] },
   ])("does not advance for $name", ({ reviews }) => expect(maturity({ reviews })).toBe("preliminary_cad"));
+
+  it("does not newly promote a superseded CAD revision even when its review is accepted", () => {
+    expect(maturity({ isCurrentRevision: false })).toBe("preliminary_cad");
+  });
+
+  it("preserves historical engineering maturity on an older revision when its accepted review remains valid", () => {
+    expect(maturity({ currentMaturity: "engineering_reviewed", isCurrentRevision: false })).toBe("engineering_reviewed");
+  });
 
   it("requires every review attached to the exact CAD revision to be accepted", () => {
     expect(maturity({ reviews: [engineeringAccepted(), { specialty: "regulatory", status: "in_review", deliverableId: "cad-current" }] })).toBe("preliminary_cad");
