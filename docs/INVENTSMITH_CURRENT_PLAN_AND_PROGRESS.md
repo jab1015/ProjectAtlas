@@ -1,6 +1,6 @@
 # InventSmith Current Plan and Progress
 
-**Updated:** September 14, 2026  
+**Updated:** September 15, 2026  
 **Product:** InventSmith — The Inventor OS  
 **Company:** Modern Methods  
 **Repository:** `jab1015/ProjectAtlas` (historical repository slug)  
@@ -9,59 +9,77 @@
 
 ## Product destination
 
-InventSmith owns the invention journey from raw idea through evidence, validation, market research, prior-art/patent readiness, product design, applicable CAD/engineering, prototype, manufacturing or software delivery, branding, IP/legal preparation, pricing, marketing, sales, funding, launch, and growth. Physical, software, hybrid, and regulated inventions route differently while preserving the same evidence and human-gate truth model.
+InventSmith owns the invention journey from raw idea through evidence, validation, market research, prior-art/patent readiness, product design, applicable CAD/engineering, prototype, manufacturing or software delivery, branding, IP/legal preparation, pricing, marketing, sales, funding, launch, and growth. Physical, software, hybrid, and regulated inventions route differently while preserving the same evidence, maturity, authorization, and human-gate truth model.
 
-No single overall completion percentage is authoritative. The retired controlled-pilot 80% figure must never be used as overall InventSmith completion.
+## Completion estimate
+
+For planning purposes, the current best estimate is:
+
+- **Repository product implementation + hardening: approximately 88% complete.**
+- **Name-change/customer-facing InventSmith conversion: approximately 96% complete.** Remaining former-name references are primarily the historical repository slug and compatibility identifiers that should not be renamed casually.
+- **Automated repository qualification: approximately 85% complete.** The broad suite has repeatedly passed, but the newest gate-hardening checkpoint exposed a Convex TypeScript regression that has been corrected and still requires a fresh exact-head CI pass.
+- **Owner-controlled deployment/live acceptance: 0% complete by design.** Modern Methods-owned Vercel/Convex have not yet been provisioned or live-tested.
+- **Overall path to production acceptance: approximately 72% complete.** This weighted estimate includes repository implementation, hardening, naming, automated acceptance, deployment, live functional acceptance, billing/provider acceptance, and genuine external/professional evidence gates. It is a planning estimate, not a release-readiness claim.
+
+The retired controlled-pilot 80% figure is not an overall InventSmith completion figure.
 
 ## Source, hosting, and deployment boundary
 
 GitHub is the current source/CI authority. The future runtime remains a Modern Methods-owned Vercel deployment plus a Modern Methods-owned Convex deployment. MadeThis is historical only and must not be used as a deployment or synchronization target. Repository-green does not mean deployed or live-functionally-verified.
 
-## Verified hardening state
+## Implemented hardening state
 
-Phase 1 production-hardening foundations remain in place: partial validation/retry, conservative confidence, fail-closed evidence promotion, attempt-aware usage settlement, authorization boundaries, and worker lease/attempt protection.
-
-Phase 2 acceptance now includes representative physical/software/hybrid/regulated routing, versioned artifact handoff, professional-review records, real prototype/manufacturer/sales evidence gates, scoped evidence invalidation, manufacturing-maturity enforcement, consequential privacy/billing authorization, and package-export safety.
+Production-hardening foundations include partial validation/retry, conservative confidence, fail-closed evidence promotion, attempt-aware usage settlement, organization/invention authorization boundaries, worker lease/attempt protection, genuine evidence gates, professional-review records, scoped evidence invalidation, manufacturing maturity, consequential privacy/billing authorization, and package-export safety.
 
 ### Engineering / prototype / RFQ maturity
 
-Final manufacturing readiness cannot be unlocked from preliminary CAD and quotes alone. The scheduler requires completed prototype readiness plus the latest fresh, professionally reviewed prototype-readiness and RFQ artifacts. Early sourcing and draft RFQ preparation remain available. Prototype/quote evidence changes refresh only their real downstream dependency chain rather than staling unrelated project evidence.
+Final manufacturing readiness is fail-closed. The latest physical/hybrid hardening requires fresh reviewed prototype readiness, RFQ and manufacturing-drawing artifacts plus production-mature native CAD. Native CAD itself is assigned engineering professional review. Preliminary, stale, superseded, or unreviewed CAD cannot silently satisfy final manufacturing readiness. Early research, sourcing and draft RFQ preparation remain available.
+
+### Evidence invalidation
+
+Prototype-test, manufacturer-quote, and sales evidence changes invalidate only their applicable transitive downstream graph. Removing required real-world evidence re-closes the corresponding gate. Newer stale/preliminary revisions defeat older clean revisions rather than allowing fallback to obsolete work.
 
 ### Consequential-operation security
 
-Direct regression coverage now protects account deletion execution, targeted privacy export, authenticated self-service privacy actions, organization member management, ownership transfer, and billing-sensitive organization export. Organization admins retain authorized project export access, but raw subscription-event billing attribution is owner-only, matching the existing owner-only billing policy.
+Account deletion, targeted privacy export, authenticated self-service privacy actions, organization member management, ownership transfer, billing-sensitive export, decisions and approvals have server-side authorization boundaries. Organization admins may export authorized project data, while raw billing attribution remains owner-only.
+
+The latest blocked-work hardening also prevents ordinary typed responses from being treated as substitutes for consequential authorization, professional review, payment, decision, or physical-evidence gates. A CI failure at head `6ec9fe87f0643c6f4d664c48ab39f591b8f60947` identified an invalid Convex review-field reference. That edit was corrected at `36ef66392a31a93573d4fb5a25697bd75c0b7927`; exact-head CI for the corrected checkpoint was not yet available when this document was updated.
 
 ### Artifact quality and package export
 
-Package export is now an explicit external-use boundary rather than a file-format convenience. The newest deliverable revision is selected per kind. Full DOCX/PDF package export fails closed when automated package quality has not passed, when any included newest deliverable is stale, or when any included deliverable has not reached `ready_for_authorized_use`. Draft/review artifacts remain visible and individually downloadable inside InventSmith. Authorized packages record trust state, artifact maturity, evidence provenance, review records, limitations, and explicit current external-use status.
+Full DOCX/PDF package export is an external-use boundary. It fails closed when package quality has not passed, any newest included deliverable is stale, or any included deliverable has not reached `ready_for_authorized_use`. Draft/review artifacts remain visible and individually downloadable inside InventSmith. Authorized packages preserve trust state, maturity, provenance, review records, limitations, and external-use status.
 
-## Latest verified repository checkpoint
+## CI truth
 
-**Verified clean head:** `81eae51584feb0cdf3d38f8d20c44009aa63b0e1`  
-**GitHub Actions:** workflow run **#620**, run ID `34911131075`  
-**Result:** **PASS**
+The latest known broad successful checkpoint before the newest blocked-work edit was the preceding qualified line, including successful InventSmith CI #10 at `c350b2d` as recorded during continuation. The subsequent exact-head run #12 for `6ec9fe87f0643c6f4d664c48ab39f591b8f60947` failed Convex TypeScript because `professionalReviews` has no `reviewArea` field. The branch was corrected to `36ef66392a31a93573d4fb5a25697bd75c0b7927`.
 
-That exact head passed dependency installation, operational-script checks, web TypeScript, Convex TypeScript, the full regression suite, production dependency audit, and the Next.js production build.
+**Do not call `36ef66392a31a93573d4fb5a25697bd75c0b7927` fully verified until exact-head CI runs and passes.**
 
 PR #24 remains draft/open/unmerged and `main` remains untouched.
 
-## Current implementation order
+## Remaining implementation order
 
-1. **Representative lifecycle acceptance.** Drive physical, software, hybrid, and regulated scenarios farther through actual lifecycle behavior. Prioritize physical/hybrid validation → design → CAD → prototype → RFQ → manufacturing readiness because truth/maturity mistakes there have the highest consequence.
-2. **Expand consequential behavioral security where runtime coverage is still source-shape-only.** Preserve unauthenticated, cross-tenant, Viewer/Edit/Manage, owner/admin, privacy, billing, destructive, and external-use boundaries.
-3. **Artifact/package depth.** Continue improving generated artifact content quality and specialized handoff packaging while preserving the new fail-closed export authorization boundary.
-4. **Prepare the fresh owner-controlled runtime.** Keep Vercel/Convex environment variables, auth, storage, billing/webhooks, provider configuration, and acceptance procedures documented without provisioning paid/live services until the founder is ready.
-5. **Live deployment and acceptance later.** After owner-controlled infrastructure exists, run real authenticated multi-user/multi-invention acceptance, provider failure/retry, evidence extraction, usage concurrency, billing/webhooks, physical/software/hybrid journeys, professional review, and live functional verification.
-6. **Commercial calibration later.** Lock final seats/storage/premium-work allowances only after representative measured provider/runtime economics support sustainable limits.
+1. Obtain and verify exact-head CI for the corrected gate-hardening checkpoint; repair any concrete failure without weakening controls.
+2. Finish blocked-work gate behavior so safe inventor-information responses can resume only the intended private-information/input gate while consequential gates remain impossible to bypass.
+3. Complete physical/hybrid maturity acceptance, including the native-CAD maturity transition after accepted qualified engineering review and a separate stronger manufacturing-release boundary.
+4. Audit every potential third-party/RFQ/external-sharing path so confidential information or manufacturer contact requires current authorized artifacts plus explicit inventor approval.
+5. Expand direct behavioral security tests beyond source-shape assertions for destructive, billing, privacy, organization-management and external-use operations.
+6. Continue representative physical, software, hybrid and regulated lifecycle acceptance through actual state transitions.
+7. Continue artifact/package depth and specialized handoff quality.
+8. Finish low-risk customer-facing naming cleanup while preserving historical repository and compatibility identifiers until a separately tested migration is justified.
+9. Prepare the fresh owner-controlled Vercel/Convex runtime configuration and acceptance checklist without claiming deployment.
+10. After owner-controlled infrastructure exists, perform live authenticated multi-user/multi-invention, provider failure/retry, evidence extraction, concurrency, billing/webhook, professional-review and representative lifecycle acceptance.
+11. Calibrate final commercial limits from measured provider/runtime economics.
 
 ## Deployment / acceptance state
 
-- **Planned product destination:** defined in `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`.
-- **Implemented:** substantial end-to-end journey, organization architecture, classification, evidence, autonomous work, artifacts, physical/software/hybrid routing, professional gates, engineering maturity, consequential security, and package-export hardening exist in the repository.
-- **Automated verification:** PASS through exact clean head `81eae51584feb0cdf3d38f8d20c44009aa63b0e1` / workflow run #620.
+- **Product destination:** defined and locked in `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`.
+- **Repository implementation:** substantial complete journey and hardening implemented; planning estimate ~88%.
+- **Name conversion:** customer-facing InventSmith conversion substantially complete; planning estimate ~96%.
+- **Newest corrected source head:** `36ef66392a31a93573d4fb5a25697bd75c0b7927`; exact-head CI pending at document update time.
 - **Deployed to owner-controlled Vercel/Convex:** no.
 - **Live functionally verified:** no.
-- **Professional review completed:** only when a real qualified review is actually recorded; never infer this from repository-green or AI output.
+- **Professional review completed:** only when a real qualified review is actually recorded; never infer it from repository-green or AI output.
 
 ## New-chat start instruction
 
@@ -73,4 +91,4 @@ Read, in order:
 4. `docs/INVENTSMITH_DEPLOYMENT_RUNBOOK.md`
 5. `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md`
 
-Then fetch the live `inventsmith/full-product-build` branch, draft PR #24, and exact-head CI. Trust the live repository over this document if the branch has advanced. Do not restart completed work, do not merge PR #24, and do not reintroduce MadeThis synchronization. The immediate implementation priority is representative lifecycle acceptance followed by deeper runtime authorization and artifact-quality acceptance.
+Then fetch the live `inventsmith/full-product-build` branch, draft PR #24, and exact-head CI. Trust the live repository over this document if the branch has advanced. Do not restart completed work, do not merge PR #24, and do not reintroduce MadeThis synchronization.
