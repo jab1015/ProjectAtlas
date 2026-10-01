@@ -4,12 +4,25 @@ export function buildAtlasPackageFilename(title: string, extension: "docx" | "pd
 }
 
 export function selectLatestDeliverables<T extends { kind: string; version: number }>(deliverables: T[]): T[] {
+  return selectLatestDeliverablesWithAmbiguity(deliverables).deliverables;
+}
+
+export function selectLatestDeliverablesWithAmbiguity<T extends { kind: string; version: number }>(
+  deliverables: T[],
+): { deliverables: T[]; ambiguousKinds: string[] } {
   const latest = new Map<string, T>();
-  for (const deliverable of deliverables) {
-    const prior = latest.get(deliverable.kind);
-    if (!prior || deliverable.version > prior.version) latest.set(deliverable.kind, deliverable);
+  const ambiguousKinds: string[] = [];
+  for (const kind of new Set(deliverables.map((deliverable) => deliverable.kind))) {
+    const matching = deliverables.filter((deliverable) => deliverable.kind === kind);
+    const highestVersion = Math.max(...matching.map((deliverable) => deliverable.version));
+    const newest = matching.filter((deliverable) => deliverable.version === highestVersion);
+    if (newest.length !== 1) {
+      ambiguousKinds.push(kind);
+      continue;
+    }
+    latest.set(kind, newest[0]);
   }
-  return [...latest.values()];
+  return { deliverables: [...latest.values()], ambiguousKinds: ambiguousKinds.sort() };
 }
 
 export const MAX_PACKAGE_EXPORT_DELIVERABLES = 50;
@@ -30,6 +43,7 @@ export interface PackageExportSafetyDeliverable {
   title: string;
   trustState: string;
   staleReason?: string;
+  content?: string;
 }
 
 /**
@@ -48,6 +62,13 @@ export function validatePackageExportSafety(
     return qualityBlockers.length
       ? `Package quality checks have not passed: ${qualityBlockers.join("; ")}`
       : "Package quality checks have not passed.";
+  }
+
+  const empty = deliverables.filter((deliverable) =>
+    !deliverable.title.trim() || (deliverable.content !== undefined && !deliverable.content.trim())
+  );
+  if (empty.length) {
+    return `Package contains ${empty.length} deliverable(s) with missing title or readable content.`;
   }
 
   const stale = deliverables.filter((deliverable) => Boolean(deliverable.staleReason));

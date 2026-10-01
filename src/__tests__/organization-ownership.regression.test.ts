@@ -7,7 +7,7 @@ const page = readFileSync(join(process.cwd(), "src/app/(app)/organizations/page.
 
 describe("organization ownership transfer", () => {
   it("requires the current owner and an existing active member", () => {
-    expect(source).toContain('requireOrganizationRole(\n      ctx,\n      args.organizationId,\n      ["owner"]');
+    expect(source).toMatch(/requireOrganizationRole\(\s*ctx,\s*args\.organizationId,\s*\["owner"\]/);
     expect(source).toContain("targetMembership.status !== \"active\"");
     expect(source).toContain("The new owner must already be an active organization member");
   });

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { buildAtlasPackageFilename, selectLatestDeliverables, validatePackageExportSafety, validatePackageExportSize } from "@/lib/packageExportLogic";
+import { buildAtlasPackageFilename, selectLatestDeliverables, selectLatestDeliverablesWithAmbiguity, validatePackageExportSafety, validatePackageExportSize } from "@/lib/packageExportLogic";
 import { exportAtlasPackageDocx, exportAtlasPackagePdf, type AtlasPackageExport } from "@/lib/packageExport";
 
 const representativePackage: AtlasPackageExport = {
@@ -33,6 +33,19 @@ describe("InventSmith package export", () => {
     const selected = selectLatestDeliverables([{ kind: "brief", version: 1, value: "old" }, { kind: "market", version: 1, value: "market" }, { kind: "brief", version: 2, value: "new" }]);
     expect(selected).toHaveLength(2); expect(selected.find((item) => item.kind === "brief")?.value).toBe("new");
   });
+  it("fails closed instead of choosing arbitrarily between duplicate newest revisions", () => {
+    const selection = selectLatestDeliverablesWithAmbiguity([
+      { kind: "brief", version: 2, value: "duplicate-a" },
+      { kind: "brief", version: 2, value: "duplicate-b" },
+      { kind: "market", version: 1, value: "unambiguous" },
+    ]);
+    expect(selection.ambiguousKinds).toEqual(["brief"]);
+    expect(selection.deliverables).toEqual([{ kind: "market", version: 1, value: "unambiguous" }]);
+    expect(selectLatestDeliverables([
+      { kind: "brief", version: 2, value: "duplicate-a" },
+      { kind: "brief", version: 2, value: "duplicate-b" },
+    ])).toEqual([]);
+  });
   it("fails closed before an oversized package can exhaust the browser", () => {
     expect(validatePackageExportSize([{ content: "x".repeat(1_000_001) }])).toMatch(/too large/i);
     expect(validatePackageExportSize(Array.from({ length: 51 }, () => ({ content: "ok" })))).toMatch(/50 deliverables/i);
@@ -45,6 +58,13 @@ describe("InventSmith package export", () => {
     expect(validatePackageExportSafety([{ title: "Stale", trustState: "ready_for_authorized_use", staleReason: "Evidence changed" }], true)).toMatch(/stale deliverable/i);
     expect(validatePackageExportSafety([{ title: "Reviewed", trustState: "professionally_reviewed" }], true)).toMatch(/not ready for authorized external use/i);
     expect(validatePackageExportSafety([{ title: "Authorized", trustState: "ready_for_authorized_use" }], true)).toBeNull();
+  });
+  it("blocks an authorized package artifact whose exported content is empty", () => {
+    expect(validatePackageExportSafety([{
+      title: "Authorized but empty",
+      trustState: "ready_for_authorized_use",
+      content: "  \n ",
+    }], true)).toMatch(/missing title or readable content/i);
   });
   it("generates a structurally valid DOCX archive only for an authorized package", async () => {
     const capture = installDownloadCapture(); try { await exportAtlasPackageDocx(representativePackage); expect(capture.blobs).toHaveLength(1); expect(capture.filenames[0]).toBe("adjustable-produce-rinsing-rack-inventsmith-feasibility-package.docx"); const bytes = new Uint8Array(await capture.blobs[0].arrayBuffer()); expect(bytes.length).toBeGreaterThan(2_000); expect(String.fromCharCode(bytes[0], bytes[1])).toBe("PK"); } finally { capture.restore(); }

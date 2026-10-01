@@ -12,7 +12,7 @@ import { MadeThisBadge } from "@/components/atlas/made-this-badge";
 import { MarkdownContent } from "@/components/markdown-content";
 import { Button } from "@/components/ui/button";
 import { contentToReadableText, getDeliverableTrustLabel, isDeliverableReadyForExternalUse } from "@convex/deliverableLogic";
-import { selectLatestDeliverables, validatePackageExportSafety } from "@/lib/packageExportLogic";
+import { selectLatestDeliverablesWithAmbiguity, validatePackageExportSafety } from "@/lib/packageExportLogic";
 import type { AtlasPackageExport } from "@/lib/packageExport";
 
 interface DeliverableLibrary {
@@ -46,10 +46,17 @@ export default function InventionWorkPage() {
   if (!library) return null;
 
   const sourcesById = new Map(library.sources.map((source) => [String(source._id), source]));
-  const latestDeliverables = selectLatestDeliverables(library.deliverables);
+  const latestSelection = selectLatestDeliverablesWithAmbiguity(library.deliverables);
+  const latestDeliverables = latestSelection.deliverables;
   const latestDeliverableIds = new Set(latestDeliverables.map((deliverable) => String(deliverable._id)));
+  const revisionBlockers = latestSelection.ambiguousKinds.map((kind) =>
+    `Ambiguous newest revision for ${kind.replaceAll("_", " ")}; resolve the duplicate before export or external-use authorization.`
+  );
   const packageExport: AtlasPackageExport = {
-    inventionTitle: library.invention.title, generatedAt: Date.now(), qualityPassed: evaluation.passed, qualityBlockers: evaluation.blockers,
+    inventionTitle: library.invention.title,
+    generatedAt: Date.now(),
+    qualityPassed: evaluation.passed && revisionBlockers.length === 0,
+    qualityBlockers: [...evaluation.blockers, ...revisionBlockers],
     deliverables: latestDeliverables.map((deliverable) => ({
       kind: deliverable.kind, title: deliverable.title, version: deliverable.version, trustState: deliverable.trustState,
       trustLabel: getDeliverableTrustLabel(deliverable.trustState), content: contentToReadableText(deliverable.content), sourceCoverage: deliverable.sourceCoverage,
