@@ -1,6 +1,6 @@
 # InventSmith Build Progress
 
-**Last updated:** September 15, 2026  
+**Last updated:** October 1, 2026
 **Product destination:** Complete Idea-to-Market Inventor OS  
 **Authoritative product specification:** `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`  
 **Current continuation checkpoint:** `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`  
@@ -71,13 +71,15 @@ External disclosure/contact/file/publish approvals are bound to explicit deliver
 
 Legacy/unscoped external requests cannot be approved or executed, but an authorized manager can still decline them safely. Payment approval remains a separate path and is not falsely forced into artifact-disclosure scope. Approval resolution itself is explicitly non-executing and records `externalActionExecuted: false`.
 
+The October 1 repository audit found no current executor that sends an RFQ, contacts a supplier/manufacturer, discloses invention artifacts, places an order/payment, files, or publishes for the inventor. Current RFQ/manufacturer work is internal preparation plus genuine response ingestion. The active Review UI and compatibility workspace mutation both resolve through the guarded consequential-approval handler. Future executors must use the execution-time guard and record outside-world execution separately.
+
 ### Inventor-facing completion semantics
 
 Inventor-facing status language now distinguishes InventSmith work state from external execution. Journey Center uses **Stage work complete** and explicitly states that stage completion does not mean supplier/professional contact, ordering/payment, filing, publication, or launch occurred. Department work uses **Work complete**; the dashboard uses **Idea-to-market stage work** and **Full InventSmith journey**; the status briefing uses **Recently completed work**. These semantics are regression-locked.
 
 ## Artifact/package boundary
 
-Newest deliverable revision wins even when stale, preventing fallback to obsolete clean work. Full DOCX/PDF package export fails closed on package-quality failure, stale included output, or missing explicit external-use authorization. Draft/review artifacts remain available internally. Export metadata preserves maturity, trust, provenance, review records, limitations and external-use status.
+Newest deliverable revision wins even when stale, preventing fallback to obsolete clean work. Duplicate newest revisions now fail closed rather than selecting one arbitrarily: ambiguous kinds are excluded from authorization controls/package selection and create an explicit package blocker. Full DOCX/PDF package export also fails closed on package-quality failure, stale included output, missing/empty readable content, or missing explicit external-use authorization. Draft/review artifacts remain available internally. Export metadata preserves maturity, trust, provenance, review records, limitations and external-use status.
 
 ## Reconstruction guard
 
@@ -85,25 +87,24 @@ Historical commit `d103d72b` produced a large textual change in `convex/inventio
 
 ## CI checkpoint truth
 
-InventSmith CI #106, run `35017774702`, passed at exact code head `11be8a28f240a03bb960b8410a9261262e26f07a`. Dependency installation, operational-script checks, web TypeScript, Convex TypeScript, regression tests, production dependency audit and the Next production build all succeeded.
+InventSmith CI #117, run `36930923481`, passed at exact code head `2263c17faae24ceb237ae29b23376f86761cb0e5`. Dependency installation, operational-script checks, web TypeScript, Convex TypeScript, all 561 regression tests, production dependency audit and the Next production build all succeeded.
 
 That exact verified head includes direct mutation tests for consequential approval artifact binding, stale/superseded revalidation, legacy denial, authorization failure, execution-time stale-scope rejection, manufacturing release, launch evidence removal, and the tightened inventor-facing completion semantics.
 
-Documentation commits after `11be8a28` describe that verified code checkpoint; the latest documentation head must receive its own exact-head CI result before the documentation head itself is called automatically verified.
+The latest documentation head must receive its own exact-head CI result before the documentation head itself is called automatically verified.
 
 PR #24 remains draft/open/unmerged. `main` remains untouched.
 
 ## Remaining work
 
 1. Qualify the newest documentation head with exact-head CI and correct concrete failures without weakening controls.
-2. Finish migration of any remaining UI/callers from legacy approval resolution to the guarded exact-scope consequential approval path where such callers still exist.
-3. Continue auditing every RFQ/manufacturer/external-contact execution path so confidential disclosure or contact requires current approved exact artifacts at execution time and internal permission/release events cannot be mistaken for execution.
-4. Expand direct behavioral security tests for destructive, privacy, billing, organization-management and external-use operations.
-5. Drive representative physical/hybrid/software/regulated cases farther through actual persisted state transitions, including replacement/removal invalidation, newest-revision behavior, manufacturing release and subsequent external-action boundaries.
-6. Continue specialized artifact content and export-quality acceptance, including independent generated-format validation where feasible.
-7. Finish low-risk InventSmith naming cleanup without destabilizing historical/compatibility identifiers.
-8. Prepare fresh owner-controlled Vercel/Convex configuration and perform live acceptance only after provisioning.
-9. Validate real billing/webhooks/providers/concurrency and calibrate commercial limits from measured economics.
+2. Expand direct behavioral security tests for destructive, privacy, billing, organization-management and external-use operations where only source-contract coverage remains.
+3. Drive representative physical/hybrid/software/regulated cases farther through actual persisted state transitions, including replacement/removal invalidation, newest-revision behavior, manufacturing release and subsequent external-action boundaries.
+4. Continue specialized artifact content, rendered export and generated-format quality acceptance.
+5. Preserve the audited no-executor boundary; any future outside-world executor must revalidate exact scope at execution time and record execution separately from permission.
+6. Finish low-risk InventSmith naming cleanup without destabilizing historical/compatibility identifiers or inventing owner-unconfirmed support/platform replacements.
+7. Prepare fresh owner-controlled Vercel/Convex configuration and perform live acceptance only after provisioning.
+8. Validate real billing/webhooks/providers/concurrency and calibrate commercial limits from measured economics.
 
 ## Status boundaries
 

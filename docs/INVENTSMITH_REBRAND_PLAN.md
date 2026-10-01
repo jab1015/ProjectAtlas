@@ -1,12 +1,12 @@
 # InventSmith Naming and Rebrand Plan
 
-**Updated:** September 15, 2026  
+**Updated:** October 1, 2026
 **Status:** customer-facing rename substantially complete; compatibility/historical cleanup remains deliberately conservative  
 **Current customer-facing name:** InventSmith  
 **Descriptor:** The Inventor OS  
 **Publisher:** Modern Methods  
 **Former working name:** Atlas / ProjectAtlas — historical references only  
-**Planning completion estimate:** **approximately 96%**
+**Planning state:** customer-facing naming is substantially complete; no overall product-completion percentage is inferred from naming work
 
 ## Canonical naming rule
 
@@ -28,7 +28,7 @@ Former-name wording may remain only when necessary for factual history or techni
 
 The remaining ~4% is intentionally narrow:
 
-1. Continue auditing low-risk customer-facing strings for obsolete former-name or “coming soon” wording in legacy/unreachable UI branches.
+1. Continue auditing low-risk customer-facing strings for obsolete former-name or “coming soon” wording in legacy/unreachable UI branches. Current MadeThis badge/support/platform-host strings are not Atlas product branding: they remain managed-platform attribution, active support routing, or compatibility configuration until owner-controlled replacements are confirmed and tested.
 2. Preserve technical identifiers such as `atlas*`, `ATLAS_*`, existing Convex function/table names, exact workflow/branch names and stored identifiers unless a separately tested migration provides concrete value.
 3. Keep the historical repository slug `jab1015/ProjectAtlas` for now. A repository rename is a separate compatibility/redirect/CI/deployment decision and is not required for customer-facing branding completion.
 4. Re-run exact-head TypeScript/regression/audit/build qualification after any remaining source-level naming cleanup.

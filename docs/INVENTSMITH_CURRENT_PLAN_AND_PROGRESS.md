@@ -1,6 +1,6 @@
 # InventSmith Current Plan and Progress
 
-**Updated:** September 15, 2026  
+**Updated:** October 1, 2026
 **Product:** InventSmith — The Inventor OS  
 **Company:** Modern Methods  
 **Repository:** `jab1015/ProjectAtlas` (historical repository slug)  
@@ -55,6 +55,12 @@ Approval resolution repeats that verification. Execution repeats it again throug
 
 Direct mutation tests for exact artifact binding, stale/superseded revalidation, legacy denial, authorization failure, and execution-time stale-scope rejection are included in the current verified branch history.
 
+The October 1 execution-path audit found no repository path that actually sends an RFQ, contacts a manufacturer or supplier, discloses an invention artifact, places a manufacturing order, pays a supplier, files a submission, or publishes on the inventor's behalf. Current RFQ/manufacturer work prepares internal artifacts and ingests genuine outside responses. The only approval-resolution UI calls the guarded `consequentialApprovalMutation`; the legacy workspace export delegates to the same handler. Any future external executor must call `requireCurrentApprovedExternalAction` immediately before its side effect and record execution separately from permission.
+
+### Package/export integrity
+
+The Work Library now fails closed when a deliverable kind has more than one newest revision. Ambiguous candidates are excluded from both external-use authorization controls and package selection, and the package reports an explicit blocker instead of choosing one arbitrarily. Authorized packages also reject artifacts with missing titles or empty readable content before DOCX/PDF generation.
+
 ### Inventor-facing completion semantics
 
 Journey Center, dashboard, department work, and status briefing now distinguish internal InventSmith work completion from external real-world execution. Completed journey stages are labeled **Stage work complete**, department items use **Work complete**, the dashboard reports **Idea-to-market stage work**, and the briefing says **Recently completed work**. Journey Center explicitly states that stage-work completion does not mean InventSmith contacted a supplier or professional, placed an order or payment, submitted a filing, published anything, or launched a product.
@@ -65,30 +71,29 @@ Historical commit `d103d72b` had an unusually large textual diff in `convex/inve
 
 ## CI truth
 
-InventSmith CI #106, run `35017774702`, passed at exact head `11be8a28f240a03bb960b8410a9261262e26f07a`. The run completed dependency installation, operational-script checks, web TypeScript, Convex TypeScript, regression tests, production dependency audit, and the Next production build successfully.
+InventSmith CI #117, run `36930923481`, passed at exact head `2263c17faae24ceb237ae29b23376f86761cb0e5`. The run completed dependency installation, operational-script checks, web TypeScript, Convex TypeScript, 561 regression tests, production dependency audit, and the Next production build successfully. That checkpoint includes the deliberate manufacturing-release UI, fail-closed newest synchronized CAD-generation display semantics, and package duplicate-newest/content hardening.
 
-That exact verified checkpoint includes the Journey/dashboard/department/status completion-semantics hardening and direct launch-evidence-removal behavior coverage. Documentation commits after that code checkpoint must receive their own exact-head green CI before the documentation head itself is called automatically verified.
+Documentation commits after that verified code checkpoint must receive their own exact-head green CI before the documentation head itself is called automatically verified.
 
 PR #24 remains draft/open/unmerged and `main` remains untouched.
 
 ## Remaining implementation order
 
 1. Qualify the newest documentation head with the full InventSmith CI workflow and fix any concrete failure without weakening controls.
-2. Finish migration of any remaining legacy UI/caller approval resolution to `consequentialApprovalMutation` where such callers still exist, so the guarded exact-artifact path remains the real user path.
-3. Continue auditing every potential third-party/RFQ/external-sharing execution path so confidential information or manufacturer contact requires current authorized artifacts plus current explicit approval at the moment of execution; internal authorization/release state must never be treated as execution evidence.
-4. Expand direct behavioral security tests for destructive, billing, privacy, organization-management and external-use operations.
-5. Continue representative physical, software, hybrid and regulated lifecycle acceptance through actual persisted state transitions, including evidence replacement/removal, newest-revision behavior, deliberate manufacturing release, and subsequent external-action boundaries.
-6. Continue artifact/package depth and specialized handoff quality, including independent validation of generated CAD formats where feasible.
-7. Finish low-risk customer-facing naming cleanup while preserving historical repository and compatibility identifiers until a separately tested migration is justified.
-8. Prepare fresh owner-controlled Vercel/Convex runtime configuration and acceptance checklist without claiming deployment.
-9. After owner-controlled infrastructure exists, perform live authenticated multi-user/multi-invention, provider failure/retry, evidence extraction, concurrency, billing/webhook, professional-review and representative lifecycle acceptance.
-10. Calibrate commercial limits from measured provider/runtime economics.
+2. Preserve the audited no-executor boundary: every future third-party/RFQ/disclosure/filing/publishing executor must use exact current artifact scope, revalidate approval at execution time, and create separate execution evidence.
+3. Expand direct behavioral security tests for destructive, billing, privacy, organization-management and external-use operations where only source-contract coverage remains.
+4. Continue representative physical, software, hybrid and regulated lifecycle acceptance through persisted state transitions, especially evidence replacement/removal, cross-kind newest-revision invalidation, deliberate manufacturing release, and later external-action boundaries.
+5. Continue artifact/package depth and specialized handoff quality, including independent validation of generated CAD formats where feasible and rendered DOCX/PDF review.
+6. Finish low-risk customer-facing naming cleanup while preserving historical repository, managed-platform attribution, active support routing, and compatibility identifiers until replacements are owner-confirmed and tested.
+7. Prepare fresh owner-controlled Vercel/Convex runtime configuration and acceptance checklist without claiming deployment.
+8. After owner-controlled infrastructure exists, perform live authenticated multi-user/multi-invention, provider failure/retry, evidence extraction, concurrency, billing/webhook, professional-review and representative lifecycle acceptance.
+9. Calibrate commercial limits from measured provider/runtime economics.
 
 ## Deployment / acceptance state
 
 - **Product destination:** defined and locked in `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`.
 - **Repository implementation:** active and continuing on this branch.
-- **Automated verification:** full CI passed at exact code head `11be8a28f240a03bb960b8410a9261262e26f07a`; this documentation commit requires its own exact-head result before being called automatically verified.
+- **Automated verification:** full CI passed at exact code head `2263c17faae24ceb237ae29b23376f86761cb0e5`; this documentation head requires its own exact-head result before it is called automatically verified.
 - **Deployed to owner-controlled Vercel/Convex:** no.
 - **Live functionally verified:** no.
 - **Professional review completed:** only when a real qualified review is actually recorded; never infer it from repository-green or AI output.

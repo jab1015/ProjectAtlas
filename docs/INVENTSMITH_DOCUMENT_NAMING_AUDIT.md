@@ -1,6 +1,6 @@
 # InventSmith Documentation Naming Audit
 
-**Audit date:** September 14, 2026  
+**Audit date:** October 1, 2026
 **Canonical product:** **InventSmith — The Inventor OS**  
 **Publisher:** **Modern Methods**  
 **Active branch:** `inventsmith/full-product-build`  
@@ -11,6 +11,8 @@
 Active/current InventSmith documentation has been normalized to the InventSmith product name. Active Atlas-prefixed documentation filenames were retired in favor of InventSmith-prefixed filenames, the Stage 1–15 blueprints use InventSmith product prose, the release-management plans use InventSmith filenames/prose, and the active InventSmith Bible/document directories use InventSmith naming.
 
 Google Drive current/working InventSmith legal/IP records were also reviewed and corrected where current-state wording or hosting direction was stale. Exact former-name wording remains only where preserving chronology, provenance, repository evidence, or a historical quotation requires it.
+
+The October 1 source audit found no reachable quoted `Atlas` product name outside two explicitly tested compatibility protocol strings (`/checkout/atlas/` and `X-Atlas-Subscription-Signature`). Lowercase `atlas*` module/table/function identifiers remain compatibility-sensitive. MadeThis badge, support, file-host and middleware strings are managed-platform attribution/routing or compatibility behavior rather than the customer-facing product name; they remain until owner-controlled replacements are confirmed and tested.
 
 ## Intentionally retained former-name / compatibility references
 

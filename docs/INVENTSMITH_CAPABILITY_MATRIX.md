@@ -1,6 +1,6 @@
 # InventSmith Capability Matrix
 
-**Updated:** September 15, 2026  
+**Updated:** October 1, 2026
 **Branch:** `inventsmith/full-product-build`  
 **Purpose:** Track implementation and acceptance dimensions independently from deployment and professional/real-world evidence.
 
@@ -41,9 +41,9 @@ Customer-facing product: **InventSmith — The Inventor OS** by **Modern Methods
 | Privacy/deletion authorization | implemented | expanded backend authorization coverage | not deployed | live destructive acceptance |
 | Organization ownership/member controls | implemented | expanded authorization coverage | not deployed | live multi-user acceptance |
 | Billing-sensitive organization export | implemented | owner-only raw billing attribution enforced | not deployed | owner billing integration acceptance |
-| Package external-use safety | implemented | stale/quality/exact authorization fail-closed tests established | not deployed | rendered artifact QA |
+| Package external-use safety | implemented | stale/quality/exact authorization, duplicate-newest ambiguity, and empty-content fail-closed tests established | not deployed | rendered artifact QA |
 | Exact-revision external-use authorization | implemented | manager authorization, duplicate-latest rejection, idempotency, Work Library UI and non-execution audit covered | not deployed | live multi-user acceptance |
-| Consequential external approval scope | implemented | exact artifact request/approval/execution revalidation plus non-execution approval audit passed by exact-head CI | not deployed | audit remaining real execution paths and callers |
+| Consequential external approval scope | implemented | exact artifact request/approval/execution revalidation plus non-execution approval audit passed by exact-head CI; all current resolution callers converge on guarded handler | not deployed | no external executor exists; guard and separately audit any future executor |
 | Blocked-work private-information resume | implemented | mutation-level authorization, gate, replay, usage and side-effect tests passed | not deployed | live persisted acceptance |
 | Fresh owner-controlled deployment path | documented | readiness scripts/build checks exist | not provisioned | create owner Vercel/Convex and execute runbook |
 | Billing/webhooks | backend foundation exists | security/idempotency foundations reviewed | not owner-live | select/configure owner billing provider and test real events |
@@ -51,20 +51,19 @@ Customer-facing product: **InventSmith — The Inventor OS** by **Modern Methods
 
 ## Latest CI truth
 
-InventSmith CI #106, run `35017774702`, passed at exact code head `11be8a28f240a03bb960b8410a9261262e26f07a`: dependency installation, operational-script checks, web TypeScript, Convex TypeScript, regression tests, production dependency audit, and Next production build all passed.
+InventSmith CI #117, run `36930923481`, passed at exact code head `2263c17faae24ceb237ae29b23376f86761cb0e5`: dependency installation, operational-script checks, web TypeScript, Convex TypeScript, all 561 regression tests, production dependency audit, and Next production build all passed.
 
 That verified code checkpoint includes deliberate manufacturing release, explicit non-execution audit semantics across approval/external-use/manufacturing-release transitions, launch-evidence-removal behavior, and tightened Journey/dashboard/department/status completion language. Documentation commits newer than that checkpoint require their own exact-head CI before the documentation head itself can be called automatically verified.
 
 ## Immediate tracker
 
 1. Exact-head CI for the newest documentation head.
-2. Finish migration of any remaining legacy approval UI/callers to the guarded consequential approval mutation where such callers still exist.
-3. Continue auditing RFQ/manufacturer/external-sharing execution for exact current artifact scope, approval revalidation and a hard permission-versus-execution distinction.
-4. Deeper behavioral authorization and cross-organization tests.
-5. Representative lifecycle state-transition acceptance, including manufacturing release and subsequent external-action boundaries.
-6. Artifact/rendered export and generated-format quality.
-7. Remaining low-risk customer-facing naming cleanup.
-8. Owner-controlled deployment preparation, then live acceptance.
-9. Billing/provider/concurrency and commercial calibration.
+2. Deeper behavioral destructive/privacy/billing/organization and cross-organization tests.
+3. Representative persisted lifecycle acceptance, including replacement/removal, newest-revision invalidation, manufacturing release and subsequent external-action boundaries.
+4. Artifact/rendered export and generated-format quality.
+5. Guard and separately audit any future external-action executor; none exists in the current repository.
+6. Remaining low-risk customer-facing naming cleanup.
+7. Owner-controlled deployment preparation, then live acceptance.
+8. Billing/provider/concurrency and commercial calibration.
 
 PR #24 remains draft/open/unmerged; `main` remains untouched.

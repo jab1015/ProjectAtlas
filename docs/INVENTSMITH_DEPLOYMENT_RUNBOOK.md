@@ -2,7 +2,7 @@
 
 **Status:** Repository implementation in progress; owner-controlled deployment not yet provisioned or live-verified  
 **Product:** InventSmith — The Inventor OS by Modern Methods  
-**Updated:** September 15, 2026
+**Updated:** October 1, 2026
 
 ## 1. Deployment authority and boundary
 
@@ -35,7 +35,7 @@ npm audit --omit=dev --audit-level=high
 npx next build
 ```
 
-Latest documented verified repository checkpoint: InventSmith CI #78, run `34997848353`, PASS at exact head `530b5757fe9e6c762f03967de60547ac383c12ff`. Any newer deployment candidate must pass its own exact-head workflow.
+Latest documented verified repository checkpoint: InventSmith CI #117, run `36930923481`, PASS at exact head `2263c17faae24ceb237ae29b23376f86761cb0e5`. Any newer deployment candidate must pass its own exact-head workflow.
 
 Do not suppress a failing gate, weaken a test, or downgrade a security check to obtain green CI.
 

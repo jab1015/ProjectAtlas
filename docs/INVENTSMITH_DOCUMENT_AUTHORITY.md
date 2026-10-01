@@ -1,6 +1,6 @@
 # InventSmith Document Authority
 
-**Updated:** September 15, 2026
+**Updated:** October 1, 2026
 
 This file defines documentation authority, naming, and historical-reference rules for InventSmith.
 
@@ -79,7 +79,7 @@ The active branch is `inventsmith/full-product-build`; draft PR #24 remains inte
 
 Implemented repository foundations include organization-native architecture; organization-scoped entitlements and usage accounting; invention authorization/sharing; privacy/export/deletion behavior; consent-based invitations; complete journey wiring; physical/software/hybrid/regulated classification and routing; evidence and trust boundaries; partial validation/recovery; attempt/lease worker reliability; genuine prototype/quote/launch/professional evidence gates; versioned artifact persistence; professional-review state; exact-revision external-use authorization; exact-artifact consequential approval scope; representative physical/software/hybrid/regulated acceptance; and direct real-world evidence gate behavior.
 
-InventSmith CI #78, run `34997848353`, passed at exact head `530b5757fe9e6c762f03967de60547ac383c12ff`, including dependency installation, operational-script checks, web and Convex typechecking, regression tests, production dependency audit and the Next production build. Newer commits require their own exact-head verification before being described as automatically verified.
+InventSmith CI #117, run `36930923481`, passed at exact head `2263c17faae24ceb237ae29b23376f86761cb0e5`, including dependency installation, operational-script checks, web and Convex typechecking, 561 regression tests, production dependency audit and the Next production build. Newer commits require their own exact-head verification before being described as automatically verified.
 
 ## Continuation rule
 

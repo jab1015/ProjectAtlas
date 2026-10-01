@@ -1,8 +1,8 @@
 # InventSmith Consequential Security Checkpoint
 
-**Date:** September 14, 2026  
+**Date:** October 1, 2026
 **Branch:** `inventsmith/full-product-build`  
-**Status:** security hardening implemented; exact-head CI required before this checkpoint is called verified
+**Status:** security hardening implemented; current external-action surface audited; newest documentation head requires exact-head CI
 
 ## Authorization coverage strengthened
 
@@ -29,3 +29,9 @@ This keeps organization administration separate from billing authority without r
 - No deployment state changed.
 - No secrets were added or exposed.
 - PR #24 remains draft/unmerged; `main` is not modified.
+
+## External-action execution audit
+
+The repository currently has no executor that sends an RFQ, contacts a supplier/manufacturer, discloses invention artifacts, places an order or payment, files a submission, or publishes for the inventor. RFQ and manufacturer work is internal preparation plus ingestion of genuine outside evidence. The Review UI resolves through `consequentialApprovalMutation:resolveConsequentialApproval`; the compatibility workspace mutation delegates to that same guarded handler. Approval, external-use authorization, professional review, and manufacturing release all record non-execution semantics.
+
+Any future executor must call `requireCurrentApprovedExternalAction` immediately before the external side effect, with the expected action type, and must record separate execution evidence. Permission records must never be reused as proof that outside-world action occurred.
