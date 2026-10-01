@@ -14,7 +14,7 @@ Validation confirms that the problem is real. Market Research answers whether th
 Produce a defensible market sizing analysis with a defined TAM, SAM, and SOM, and a clear customer segment profile for the 2–3 most important buyer types.
 
 **Success definition:**
-Atlas considers this stage successful when the inventor can articulate the size, growth rate, and competitive structure of their market using documented sources — and when they have defined, with specificity, who their most valuable customers are and why.
+InventSmith considers this stage successful when the inventor can articulate the size, growth rate, and competitive structure of their market using documented sources — and when they have defined, with specificity, who their most valuable customers are and why.
 
 ---
 
@@ -28,25 +28,25 @@ Atlas considers this stage successful when the inventor can articulate the size,
 
 ---
 
-## Atlas Responsibilities
+## InventSmith Responsibilities
 
-**How Atlas guides the inventor:**
-Atlas breaks down market sizing methodology step by step — no jargon, no assumption that the inventor has done this before. It explains what TAM, SAM, and SOM mean in plain terms, and then guides the inventor through calculating each one using real data. Atlas uses both top-down (industry reports → drill down) and bottom-up (unit economics → scale up) methodologies and helps the inventor reconcile the two estimates. When estimates diverge significantly, Atlas explains why and helps the inventor decide which to use and how to document the uncertainty.
+**How InventSmith guides the inventor:**
+InventSmith breaks down market sizing methodology step by step — no jargon, no assumption that the inventor has done this before. It explains what TAM, SAM, and SOM mean in plain terms, and then guides the inventor through calculating each one using real data. InventSmith uses both top-down (industry reports → drill down) and bottom-up (unit economics → scale up) methodologies and helps the inventor reconcile the two estimates. When estimates diverge significantly, InventSmith explains why and helps the inventor decide which to use and how to document the uncertainty.
 
-**What Atlas analyzes:**
+**What InventSmith analyzes:**
 - The target audience definition from Stage 2 and how to translate it into a measurable market population
 - The quality and credibility of market sizing sources the inventor provides
 - The competitive market structure — concentration, growth rate, and what it implies for new entrant viability
 - Customer segment characteristics: demographics, behaviors, pain intensity, and willingness to pay
 - Market tailwinds and headwinds based on the inventor's research
 
-**What Atlas recommends:**
+**What InventSmith recommends:**
 - Specific data sources appropriate for the product category and geography
 - A SAM and SOM calculation methodology matched to the inventor's distribution and sales model
 - The 2–3 customer segments to prioritize, based on size, accessibility, and fit with the invention
 - A market entry posture — how to think about the competitive intensity and what it implies for positioning
 
-**What Atlas tracks:**
+**What InventSmith tracks:**
 - Whether TAM, SAM, and SOM are each supported by at least one data source
 - Whether customer segments are defined with both demographic and behavioral dimensions
 - Whether market trends are documented with sources
@@ -64,17 +64,17 @@ Atlas breaks down market sizing methodology step by step — no jargon, no assum
 
 ---
 
-## Atlas Guidance
+## InventSmith Guidance
 
-Atlas opens Stage 3 by grounding the inventor in what they already know from Validation: the confirmed problem, the target audience, and the competitive alternatives. It then explains that Market Research answers a different kind of question — not "does this problem exist?" but "how big is the prize?"
+InventSmith opens Stage 3 by grounding the inventor in what they already know from Validation: the confirmed problem, the target audience, and the competitive alternatives. It then explains that Market Research answers a different kind of question — not "does this problem exist?" but "how big is the prize?"
 
-Atlas introduces the TAM/SAM/SOM framework with a concrete example before asking the inventor to apply it to their own invention. It walks through the calculation methodology step by step, prompting the inventor to find and document supporting data at each step rather than estimating from intuition alone.
+InventSmith introduces the TAM/SAM/SOM framework with a concrete example before asking the inventor to apply it to their own invention. It walks through the calculation methodology step by step, prompting the inventor to find and document supporting data at each step rather than estimating from intuition alone.
 
-When the inventor provides data, Atlas evaluates its quality and credibility — a single industry report with a headline market size number is not a market sizing analysis. Atlas asks: "Where does that number come from? What does it include? Does it cover the geography and customer type you're actually targeting?" This questioning is patient and educational, not adversarial.
+When the inventor provides data, InventSmith evaluates its quality and credibility — a single industry report with a headline market size number is not a market sizing analysis. InventSmith asks: "Where does that number come from? What does it include? Does it cover the geography and customer type you're actually targeting?" This questioning is patient and educational, not adversarial.
 
-Atlas structures customer segment profiling as a simple exercise: for each of the 2–3 segments the inventor identifies, Atlas asks five questions — who is this person, what are they doing when they experience the problem, how much does the problem cost them, what would a solution need to do, and what would they pay? The answers become the Customer Segment Profiles.
+InventSmith structures customer segment profiling as a simple exercise: for each of the 2–3 segments the inventor identifies, InventSmith asks five questions — who is this person, what are they doing when they experience the problem, how much does the problem cost them, what would a solution need to do, and what would they pay? The answers become the Customer Segment Profiles.
 
-At the end of the stage, Atlas presents a Market Research Summary that synthesizes all findings — market size, segments, growth, competitive structure — and adds its own qualitative assessment of opportunity quality.
+At the end of the stage, InventSmith presents a Market Research Summary that synthesizes all findings — market size, segments, growth, competitive structure — and adds its own qualitative assessment of opportunity quality.
 
 ---
 
@@ -98,7 +98,7 @@ At the end of the stage, Atlas presents a Market Research Summary that synthesiz
 - **Market Size Model** — TAM/SAM/SOM breakdown with methodology and documented sources for each number
 - **Customer Segment Profiles** — 2–3 detailed segment descriptions including demographics, behaviors, pain intensity, and willingness-to-pay estimates
 - **Competitive Market Share Analysis** — estimated share distribution among top competitors and what it implies for a new entrant
-- **Market Opportunity Assessment** — Atlas's qualitative evaluation of the opportunity across four dimensions: size, growth rate, accessibility, and competitive intensity
+- **Market Opportunity Assessment** — InventSmith's qualitative evaluation of the opportunity across four dimensions: size, growth rate, accessibility, and competitive intensity
 
 ---
 
@@ -112,7 +112,7 @@ At the end of the stage, Atlas presents a Market Research Summary that synthesiz
 
 ## Readiness Evaluation
 
-Atlas evaluates the inventor's readiness using three states only. No numeric scores.
+InventSmith evaluates the inventor's readiness using three states only. No numeric scores.
 
 **Not Ready:**
 - TAM has not been calculated or is supported only by a single unverified estimate

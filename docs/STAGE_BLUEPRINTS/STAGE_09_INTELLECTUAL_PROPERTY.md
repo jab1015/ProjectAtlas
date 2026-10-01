@@ -5,16 +5,16 @@
 ## Stage Overview
 
 **Purpose:**
-Secure the intellectual property rights that protect the invention — filing patents, registering trademarks, and structuring trade secrets — with professional legal guidance engaged and Atlas managing the preparation work.
+Secure the intellectual property rights that protect the invention — filing patents, registering trademarks, and structuring trade secrets — with professional legal guidance engaged and InventSmith managing the preparation work.
 
 **Why this stage exists:**
-Stage 4 (Patent Readiness) assessed whether the invention could be protected. This stage is where that protection is actually secured. IP protection is one of the highest-stakes and highest-cost activities in the inventor's journey. A poorly filed patent — or one filed too late — can mean the difference between owning a defensible market position and watching a competitor copy the invention without legal consequence. Most inventors approach IP counsel underprepared, paying attorney rates to explain basics that could have been handled in advance. Atlas prepares the inventor to arrive at their attorney meeting as a knowledgeable, organized client — with the prior art research done, the novel elements articulated, and the filing strategy already considered.
+Stage 4 (Patent Readiness) assessed whether the invention could be protected. This stage is where that protection is actually secured. IP protection is one of the highest-stakes and highest-cost activities in the inventor's journey. A poorly filed patent — or one filed too late — can mean the difference between owning a defensible market position and watching a competitor copy the invention without legal consequence. Most inventors approach IP counsel underprepared, paying attorney rates to explain basics that could have been handled in advance. InventSmith prepares the inventor to arrive at their attorney meeting as a knowledgeable, organized client — with the prior art research done, the novel elements articulated, and the filing strategy already considered.
 
 **Primary objective:**
-File the appropriate intellectual property protections for the invention — provisional or utility patent, trademark, and trade secret documentation — with professional legal counsel engaged and Atlas managing the preparation and tracking work.
+File the appropriate intellectual property protections for the invention — provisional or utility patent, trademark, and trade secret documentation — with professional legal counsel engaged and InventSmith managing the preparation and tracking work.
 
 **Success definition:**
-Atlas considers this stage successful when at least one IP protection action has been initiated with professional counsel — a patent filing, a trademark application, or formal trade secret documentation — and the IP Status Tracker reflects an accurate, current picture of all IP assets.
+InventSmith considers this stage successful when at least one IP protection action has been initiated with professional counsel — a patent filing, a trademark application, or formal trade secret documentation — and the IP Status Tracker reflects an accurate, current picture of all IP assets.
 
 ---
 
@@ -28,24 +28,24 @@ Atlas considers this stage successful when at least one IP protection action has
 
 ---
 
-## Atlas Responsibilities
+## InventSmith Responsibilities
 
-**How Atlas guides the inventor:**
-Atlas builds the IP Brief — a structured document organized specifically for an attorney engagement — so the inventor arrives at the first meeting with research done and questions formed. Atlas explains the different IP protection types in plain language, builds the IP Filing Checklist, guides trademark registration preparation, helps document trade secrets, and tracks all filing status and deadlines. Atlas manages the preparation; the attorney manages the legal work.
+**How InventSmith guides the inventor:**
+InventSmith builds the IP Brief — a structured document organized specifically for an attorney engagement — so the inventor arrives at the first meeting with research done and questions formed. InventSmith explains the different IP protection types in plain language, builds the IP Filing Checklist, guides trademark registration preparation, helps document trade secrets, and tracks all filing status and deadlines. InventSmith manages the preparation; the attorney manages the legal work.
 
-**What Atlas analyzes:**
+**What InventSmith analyzes:**
 - Patent Readiness Report from Stage 4 — the prior art summary and novel elements that are the foundation of the patent filing
 - Brand Identity System from Stage 8 — the brand name and trademark information needed for registration
 - The inventor's IP budget and timeline — to sequence IP actions appropriately
 - Third-party relationships (manufacturers, contractors, collaborators) — to ensure appropriate NDAs are in place
 
-**What Atlas recommends:**
+**What InventSmith recommends:**
 - The most appropriate patent filing type and timing based on the invention's development stage and competitive context
 - The appropriate International Classes for trademark registration
 - Which information qualifies for trade secret protection and how to document it
 - A sequenced IP Filing Checklist that respects the inventor's budget and timeline
 
-**What Atlas tracks:**
+**What InventSmith tracks:**
 - IP attorney engagement status
 - Filing actions initiated and their current status
 - Key IP deadlines — particularly the 12-month provisional-to-utility conversion window
@@ -64,20 +64,20 @@ Atlas builds the IP Brief — a structured document organized specifically for a
 
 ---
 
-## Atlas Guidance
+## InventSmith Guidance
 
-Atlas opens Stage 9 by building the IP Brief. This document is the centerpiece of the attorney engagement — it compiles the inventor's invention description, the Prior Art Summary from Stage 4, the novel element statements, the IP strategy intentions, and the brand name for trademark registration. The IP Brief is organized to answer, in advance, the questions any competent IP attorney will ask in the first meeting. This preparation is one of the highest-leverage things Atlas can do: it turns a $400/hour attorney orientation into a $400/hour strategic conversation.
+InventSmith opens Stage 9 by building the IP Brief. This document is the centerpiece of the attorney engagement — it compiles the inventor's invention description, the Prior Art Summary from Stage 4, the novel element statements, the IP strategy intentions, and the brand name for trademark registration. The IP Brief is organized to answer, in advance, the questions any competent IP attorney will ask in the first meeting. This preparation is one of the highest-leverage things InventSmith can do: it turns a $400/hour attorney orientation into a $400/hour strategic conversation.
 
-Atlas explains the three primary IP protection types with decision criteria:
+InventSmith explains the three primary IP protection types with decision criteria:
 - **Provisional patent application**: lower cost, 12-month placeholder, establishes "patent pending" status; appropriate when the invention is still evolving and a utility patent filing would be premature
 - **Utility patent**: the full patent; expensive and time-consuming, but grants up to 20 years of protection; appropriate when the design is stable and the novel elements are clearly defined
 - **Design patent**: protects the ornamental appearance of the product, not its function; complementary to a utility patent when the product's distinctive look is a meaningful competitive asset
 
-Atlas guides trademark registration preparation: it walks the inventor through a systematic search of the USPTO TESS database, identifies the appropriate International Classes for the product category, and prepares the application information for attorney review. Atlas makes clear that trademark registration is not the same as trademark ownership — use-based rights exist, but registration provides meaningful legal advantages.
+InventSmith guides trademark registration preparation: it walks the inventor through a systematic search of the USPTO TESS database, identifies the appropriate International Classes for the product category, and prepares the application information for attorney review. InventSmith makes clear that trademark registration is not the same as trademark ownership — use-based rights exist, but registration provides meaningful legal advantages.
 
-For trade secret documentation, Atlas helps the inventor identify what information qualifies — manufacturing processes, formulations, supplier relationships, algorithms — and how to document it as a formal trade secret. It provides NDA template guidance for use with manufacturers, contractors, and other third parties.
+For trade secret documentation, InventSmith helps the inventor identify what information qualifies — manufacturing processes, formulations, supplier relationships, algorithms — and how to document it as a formal trade secret. It provides NDA template guidance for use with manufacturers, contractors, and other third parties.
 
-Atlas maintains the IP Status Tracker as a living document. It records every filing, its current status, and all relevant deadlines — with reminders built in for the most critical one: the 12-month window to convert a provisional patent to a utility patent.
+InventSmith maintains the IP Status Tracker as a living document. It records every filing, its current status, and all relevant deadlines — with reminders built in for the most critical one: the 12-month window to convert a provisional patent to a utility patent.
 
 ---
 
@@ -116,7 +116,7 @@ Atlas maintains the IP Status Tracker as a living document. It records every fil
 
 ## Readiness Evaluation
 
-Atlas evaluates the inventor's readiness using three states only. No numeric scores.
+InventSmith evaluates the inventor's readiness using three states only. No numeric scores.
 
 **Not Ready:**
 - No IP attorney has been engaged or contacted
@@ -167,9 +167,9 @@ The IP Status Tracker is a living document. It does not conclude at this stage �
 
 ## Future Integrations
 
-- **USPTO TESS API** — automated trademark clearance search directly within Atlas; results integrated into the name evaluation and trademark application preparation
+- **USPTO TESS API** — automated trademark clearance search directly within InventSmith; results integrated into the name evaluation and trademark application preparation
 - **USPTO Patent Center integration** — track patent application status via the official USPTO API, with status updates flowing automatically into the IP Status Tracker
-- **IP attorney marketplace** — connect inventors with vetted IP attorneys who have been briefed on the Atlas IP Brief format, reducing onboarding friction
+- **IP attorney marketplace** — connect inventors with vetted IP attorneys who have been briefed on the InventSmith IP Brief format, reducing onboarding friction
 - **Patent monitoring and competitive alerts** — automated alerts when a competitor files a patent in the invention's technology area
 - **International IP filing guidance** (PCT application, EPO) — guidance on when and whether to pursue international protection based on market expansion goals
 

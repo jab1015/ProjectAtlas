@@ -20,29 +20,33 @@ export function selectNextWorkItem<T extends SchedulableWorkItem>(
   items: T[],
   availableCostUnits: number,
   now: number,
-  canRunKind: (kind: string | undefined) => boolean = () => true
+  canRunKind: (kind: string | undefined) => boolean = () => true,
+  isMaturityEligible: (kind: string | undefined) => boolean = () => true
 ): WorkSelectionResult<T> {
   const activelyRunning = items.some(
     (item) => item.status === "running" && (!item.leaseExpiresAt || item.leaseExpiresAt > now)
   );
   if (activelyRunning) return { selected: null, reason: "already_running" };
 
+  const completedKinds = new Set(
+    items.filter((candidate) => candidate.status === "completed").map((candidate) => candidate.kind)
+  );
+
   const dependencyEligible = items
     .filter((item) => {
       const attemptsRemain = item.attemptCount < (item.maxAttempts ?? 3);
       const queued = item.status === "queued";
       const expiredLease = item.status === "running" && Boolean(item.leaseExpiresAt && item.leaseExpiresAt <= now);
-      const completedKinds = new Set(
-        items.filter((candidate) => candidate.status === "completed").map((candidate) => candidate.kind)
-      );
       const dependenciesComplete = (item.dependsOnKinds ?? []).every((kind) => completedKinds.has(kind));
       return attemptsRemain && dependenciesComplete && (queued || expiredLease);
     });
-  const eligible = dependencyEligible
+
+  const maturityEligible = dependencyEligible.filter((item) => isMaturityEligible(item.kind));
+  const eligible = maturityEligible
     .filter((item) => canRunKind(item.kind))
     .sort((a, b) => b.priority - a.priority || a.createdAt - b.createdAt);
 
-  if (!eligible.length && dependencyEligible.length > 0) {
+  if (!eligible.length && maturityEligible.length > 0) {
     return { selected: null, reason: "entitlement_required" };
   }
 

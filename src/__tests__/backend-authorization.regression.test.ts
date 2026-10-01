@@ -23,9 +23,64 @@ describe("backend authorization boundaries", () => {
     ["productFiles.ts", "remove"], ["productFiles.ts", "updateSortOrder"],
     ["products.ts", "listAll"], ["products.ts", "getById"],
     ["purchases.ts", "getByEmail"], ["purchases.ts", "getRecent"], ["purchases.ts", "listAll"], ["purchases.ts", "getStats"],
-    ["privacyRequests.ts", "listPending"], ["privacyRequests.ts", "resolve"],
+    ["privacyRequests.ts", "listPending"], ["privacyRequests.ts", "resolve"], ["privacyRequests.ts", "executeAccountDeletion"],
+    ["privacyExport.ts", "getStructuredExportForUser"],
   ])("requires administrator authorization in %s:%s", (file, name) => {
     expect(exportedFunctionBlock(source(file), name)).toContain("await requireAdmin(ctx)");
+  });
+
+  it("binds self-service privacy operations to the authenticated account instead of accepting a target user ID", () => {
+    const requests = source("privacyRequests.ts");
+    const exportSource = source("privacyExport.ts");
+    const requestBlock = exportedFunctionBlock(requests, "request");
+    const listMineBlock = exportedFunctionBlock(requests, "listMine");
+    const selfExportBlock = exportedFunctionBlock(exportSource, "getMyStructuredExport");
+
+    for (const block of [requestBlock, listMineBlock, selfExportBlock]) {
+      expect(block).toContain("getAuthUserId(ctx)");
+      expect(block).not.toContain('args: { userId: v.id("users") }');
+    }
+    expect(requestBlock).toContain('q.eq("userId", userId)');
+    expect(listMineBlock).toContain('q.eq("userId", userId)');
+    expect(selfExportBlock).toContain("buildStructuredExport(ctx, userId)");
+  });
+
+  it("keeps account deletion behind admin execution and target-account safety checks", () => {
+    const requests = source("privacyRequests.ts");
+    const deletion = source("accountDeletion.ts");
+    const execute = exportedFunctionBlock(requests, "executeAccountDeletion");
+
+    expect(execute).toContain("await requireAdmin(ctx)");
+    expect(execute).toContain('request.requestType !== "account_deletion"');
+    expect(execute).toContain('request.status === "completed" || request.status === "declined"');
+    expect(execute).toContain('user.role === "admin"');
+    expect(execute).toContain("requiresExternalBillingResolution");
+    expect(execute).toContain("await deleteAccountData(ctx, request.userId)");
+
+    expect(deletion).toContain('membership.role === "owner" && organization.kind !== "personal"');
+    expect(deletion).toContain("Transfer or close company/studio ownership before deleting this account");
+  });
+
+  it("requires owner/admin authority for organization member management and owner-only authority for ownership transfer", () => {
+    const organizations = source("organizations.ts");
+    const ownership = source("organizationOwnership.ts");
+
+    for (const name of ["updateMemberRole", "removeMember", "addMemberByEmail"]) {
+      expect(exportedFunctionBlock(organizations, name)).toContain('requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"])');
+    }
+    expect(exportedFunctionBlock(organizations, "updateMemberRole")).toContain('membership.role === "owner"');
+    expect(exportedFunctionBlock(organizations, "removeMember")).toContain('membership.role === "owner"');
+    expect(exportedFunctionBlock(ownership, "transferOwnership")).toContain('["owner"]');
+    expect(exportedFunctionBlock(ownership, "transferOwnership")).toContain("The new owner must already be an active organization member");
+  });
+
+  it("keeps raw organization billing attribution owner-only even though admins may export project data", () => {
+    const exportSource = source("organizationExport.ts");
+    const block = exportedFunctionBlock(exportSource, "getOrganizationStructuredExport");
+    expect(block).toContain('requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"])');
+    expect(block).toContain("canManageBilling(membership.role)");
+    expect(block).toContain("includeBillingAttribution");
+    expect(block).toContain(': Promise.resolve([])');
   });
 
   it("binds file access to a fulfilled purchase token and product", () => {
@@ -35,11 +90,63 @@ describe("backend authorization boundaries", () => {
     expect(block).toContain("purchase.productId");
   });
 
-  it("requires ownership for every legacy validation-research write", () => {
+  it("requires organization-aware edit access for every validation-research write", () => {
     const file = source("validationResearchMutations.ts");
+    expect(file).toContain("requireInventionEditAccess");
     expect(exportedFunctionBlock(file, "triggerValidationResearch")).toContain("requireOwnedInvention");
     for (const name of ["approveValidationSection", "editValidationSection", "refreshValidationSection"]) {
       expect(exportedFunctionBlock(file, name)).toContain("requireOwnedResearch");
     }
+  });
+
+  it("uses organization-aware access for the primary invention workspace", () => {
+    const file = source("inventionWorkspace.ts");
+    const blockedWorkHandler = source("blockedWorkResponseMutation.ts");
+    const consequentialApprovalHandler = source("consequentialApprovalMutation.ts");
+    expect(file).not.toContain("invention.userId !== userId");
+    for (const name of ["getWorkspaceState", "getStatusBriefing", "getReviewQueue", "getDeliverableLibrary", "getPilotEvaluation"]) {
+      expect(exportedFunctionBlock(file, name)).toMatch(/requireInventionReadAccess|getAccessibleInvention/);
+    }
+    expect(exportedFunctionBlock(file, "ensureInventionRecord")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "kickAutonomousWork")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "respondToBlockedWork")).toContain("respondToBlockedWorkHandler");
+    expect(blockedWorkHandler).toContain("requireInventionEditAccess(ctx, workItem.inventionId)");
+    expect(exportedFunctionBlock(file, "resolveDecision")).toContain("requireInventionManageAccess");
+    expect(exportedFunctionBlock(file, "resolveApprovalRequest")).toContain("resolveApprovalRequestHandler");
+    expect(consequentialApprovalHandler).toContain("requireInventionManageAccess(ctx, request.inventionId)");
+  });
+
+  it("uses organization-aware access for Ask InventSmith", () => {
+    const file = source("atlasChat.ts");
+    expect(file).not.toContain("invention.userId !== userId");
+    expect(exportedFunctionBlock(file, "getConversation")).toContain("requireInventionReadAccess");
+    expect(exportedFunctionBlock(file, "ask")).toContain("requireInventionEditAccess");
+  });
+
+  it("uses organization-aware access for the invention evidence locker", () => {
+    const file = source("files.ts");
+    expect(file).not.toContain("invention.userId !== userId");
+    expect(exportedFunctionBlock(file, "generateInventionEvidenceUploadUrl")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "registerInventionEvidence")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "listInventionEvidence")).toContain("requireInventionReadAccess");
+    expect(exportedFunctionBlock(file, "removeInventionEvidence")).toContain("requireInventionManageAccess");
+  });
+
+  it("uses organization-aware edit access for evidence extraction retries", () => {
+    const file = source("evidenceExtractionControl.ts");
+    const block = exportedFunctionBlock(file, "retryEvidenceExtraction");
+    expect(file).not.toContain("invention.userId !== userId");
+    expect(block).toContain("requireInventionEditAccess");
+  });
+
+  it("uses organization-aware authorization across the legacy journey engine surfaces", () => {
+    const file = source("journeyEngine.ts");
+    expect(exportedFunctionBlock(file, "getInventionState")).toContain("resolveInventionAccess");
+    expect(exportedFunctionBlock(file, "updateStageProgress")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "updateInventionField")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "advanceStage")).toContain("requireInventionEditAccess");
+    expect(exportedFunctionBlock(file, "deleteInvention")).toContain("requireInventionManageAccess");
+    expect(exportedFunctionBlock(file, "deleteInvention")).toContain("resolveInventionUsageScope");
+    expect(exportedFunctionBlock(file, "deleteInvention")).toContain("ensureOrganizationDailyUsage");
   });
 });

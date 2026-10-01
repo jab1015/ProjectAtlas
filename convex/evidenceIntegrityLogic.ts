@@ -46,7 +46,32 @@ export function normalizeFinding(finding: RawFinding): RawFinding {
 
 export type VerificationStatus = "verified_primary" | "verified_authoritative_secondary" | "verified_secondary" | "unverified" | "disputed";
 
-export function reliabilityFromVerificationStatus(status: VerificationStatus) {
+export interface TraceableVerificationEvidence {
+  /** Timestamp from a recorded retrieval/tool execution, not model prose. */
+  retrievalRecordedAt?: number;
+  /** The exact normalized URL recorded by that retrieval. */
+  retrievalSourceUrl?: string;
+  /** Claim-level support captured from retrieved content by a trusted retrieval layer. */
+  claimSupportExcerpt?: string;
+}
+
+/**
+ * A model-provided verification label alone must never change source reliability.
+ * Callers may request trusted reliability only when an independent retrieval
+ * record and non-empty claim-support excerpt accompany the classification.
+ */
+export function reliabilityFromVerificationStatus(
+  status: VerificationStatus,
+  evidence?: TraceableVerificationEvidence
+) {
+  const hasTraceableSupport = Boolean(
+    evidence?.retrievalRecordedAt &&
+      evidence.retrievalRecordedAt > 0 &&
+      evidence.retrievalSourceUrl &&
+      sanitizeSourceUrls([evidence.retrievalSourceUrl]).length === 1 &&
+      evidence.claimSupportExcerpt?.trim()
+  );
+  if (!hasTraceableSupport) return "unverified" as const;
   if (status === "verified_primary") return "primary" as const;
   if (status === "verified_authoritative_secondary") return "authoritative_secondary" as const;
   if (status === "verified_secondary") return "secondary" as const;
@@ -63,8 +88,18 @@ export function isSourceEligibleForPromotion(
   if (source.reliability === "unverified") return false;
   const metadata = source.metadata && typeof source.metadata === "object" ? source.metadata as Record<string, unknown> : {};
   const verifiedAt = typeof metadata.verifiedAt === "number" ? metadata.verifiedAt : undefined;
+  const retrievalRecordedAt = typeof metadata.retrievalRecordedAt === "number" ? metadata.retrievalRecordedAt : undefined;
+  const retrievalSourceUrl = typeof metadata.retrievalSourceUrl === "string" ? metadata.retrievalSourceUrl : undefined;
+  const claimSupportExcerpt = typeof metadata.claimSupportExcerpt === "string" ? metadata.claimSupportExcerpt.trim() : "";
+
   if (!verifiedAt || verifiedAt > now || now - verifiedAt > SOURCE_VERIFICATION_MAX_AGE_MS) return false;
-  if (source.locator && sanitizeSourceUrls([source.locator]).length !== 1) return false;
+  if (!retrievalRecordedAt || retrievalRecordedAt > now || now - retrievalRecordedAt > SOURCE_VERIFICATION_MAX_AGE_MS) return false;
+  if (!claimSupportExcerpt) return false;
+  if (!source.locator) return false;
+
+  const normalizedLocator = sanitizeSourceUrls([source.locator])[0];
+  const normalizedRetrieved = retrievalSourceUrl ? sanitizeSourceUrls([retrievalSourceUrl])[0] : undefined;
+  if (!normalizedLocator || !normalizedRetrieved || normalizedLocator !== normalizedRetrieved) return false;
   return true;
 }
 

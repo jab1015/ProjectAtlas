@@ -67,7 +67,7 @@ export function StoreFooter({
               ))}
               <li>
                 <a
-                  href="mailto:team@atlas.madethis.app"
+                  href="mailto:support@madethis.com"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Contact

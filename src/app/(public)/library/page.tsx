@@ -1,20 +1,11 @@
-import { BookOpen } from "lucide-react";
-import { EmptyState } from "@/components/empty-state";
+import { redirect } from "next/navigation";
 
 /**
- * Library page — legacy digital-downloads route.
- * InventSmith does not use digital-download purchases; redirect to products.
+ * Legacy digital-download library route. InventSmith stores invention
+ * deliverables inside each authenticated invention workspace, so old library
+ * URLs are routed into the current product rather than showing retired
+ * storefront/account copy.
  */
 export default function LibraryPage() {
-  return (
-    <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
-      <EmptyState
-        icon={BookOpen}
-        title="Account Features Coming Soon"
-        description="Download library and account management are not yet available. Use the download links from your purchase confirmation emails to access your files."
-        ctaText="Browse Products"
-        ctaLink="/products"
-      />
-    </div>
-  );
+  redirect("/sign-in");
 }

@@ -8,13 +8,13 @@
 Transform the validated concept into a defined product specification — form, function, materials, and user experience — ready for prototyping.
 
 **Why this stage exists:**
-The gap between "I have an idea" and "I have a product" is bridged at this stage. Product Design is where the invention stops being abstract and becomes concrete: what does it look like, how does a user interact with it, what are its physical or digital specifications, and how does every design decision serve the target customer? Inventors who skip structured design work end up with prototypes that need to be rebuilt from scratch, because they discover in physical form that assumptions made in their head were wrong. Those rebuilds are expensive — in time, money, and momentum. Atlas guides the inventor through design decisions systematically, surfacing trade-offs before they become costly mistakes.
+The gap between "I have an idea" and "I have a product" is bridged at this stage. Product Design is where the invention stops being abstract and becomes concrete: what does it look like, how does a user interact with it, what are its physical or digital specifications, and how does every design decision serve the target customer? Inventors who skip structured design work end up with prototypes that need to be rebuilt from scratch, because they discover in physical form that assumptions made in their head were wrong. Those rebuilds are expensive — in time, money, and momentum. InventSmith guides the inventor through design decisions systematically, surfacing trade-offs before they become costly mistakes.
 
 **Primary objective:**
 Produce a Product Design Specification detailed enough for a prototyper, industrial designer, or engineering firm to begin work without needing to ask foundational questions.
 
 **Success definition:**
-Atlas considers this stage successful when the Product Design Specification is complete enough to hand to a skilled prototyper — and that prototyper can begin work without coming back with questions about what the product is supposed to do, who it's for, or what materials it should use.
+InventSmith considers this stage successful when the Product Design Specification is complete enough to hand to a skilled prototyper — and that prototyper can begin work without coming back with questions about what the product is supposed to do, who it's for, or what materials it should use.
 
 ---
 
@@ -28,24 +28,24 @@ Atlas considers this stage successful when the Product Design Specification is c
 
 ---
 
-## Atlas Responsibilities
+## InventSmith Responsibilities
 
-**How Atlas guides the inventor:**
-Atlas structures design work into three layers — Functional, Physical, and User Experience — and walks the inventor through each one sequentially. At each decision point, Atlas presents structured options rather than open-ended questions. It surfaces the manufacturing implications of design choices in real time, connecting design decisions to their downstream cost and complexity consequences before the inventor commits. Atlas identifies when a decision requires professional expertise — materials engineering, electrical design, regulatory compliance — and flags those for specialist engagement rather than letting the inventor guess.
+**How InventSmith guides the inventor:**
+InventSmith structures design work into three layers — Functional, Physical, and User Experience — and walks the inventor through each one sequentially. At each decision point, InventSmith presents structured options rather than open-ended questions. It surfaces the manufacturing implications of design choices in real time, connecting design decisions to their downstream cost and complexity consequences before the inventor commits. InventSmith identifies when a decision requires professional expertise — materials engineering, electrical design, regulatory compliance — and flags those for specialist engagement rather than letting the inventor guess.
 
-**What Atlas analyzes:**
+**What InventSmith analyzes:**
 - The Idea Brief and Patent Readiness Report — for which mechanisms must be precisely specified vs. where flexibility exists
 - Customer Segment Profiles from Stage 3 — for how the target user will interact with the product in context
 - The inventor's stated constraints: price point, materials preferences, size requirements, and regulatory environment
 - Each design decision for its manufacturing implications — cost, minimum order quantities, tooling, and lead time
 
-**What Atlas recommends:**
+**What InventSmith recommends:**
 - Design options at each decision point, with the trade-offs made explicit
 - Which design decisions to resolve now vs. which to defer to prototyping
 - Specific specialist roles or firms to engage based on the design's technical complexity
 - A design approach that is manufacturable, not just conceptually coherent
 
-**What Atlas tracks:**
+**What InventSmith tracks:**
 - Design specification completeness across all three layers: Functional, Physical, and User Experience
 - Open design decisions that must be resolved before the prototyper can begin
 - Design decisions that require specialist expertise
@@ -64,17 +64,17 @@ Atlas structures design work into three layers — Functional, Physical, and Use
 
 ---
 
-## Atlas Guidance
+## InventSmith Guidance
 
-Atlas opens Stage 5 by orienting the inventor to the three-layer design framework: what the product does (Functional), what it is (Physical), and how it feels to use (User Experience). It explains that each layer must be defined before prototyping begins — not because design must be perfect, but because an underdefined specification produces an undirected prototype that answers the wrong questions.
+InventSmith opens Stage 5 by orienting the inventor to the three-layer design framework: what the product does (Functional), what it is (Physical), and how it feels to use (User Experience). It explains that each layer must be defined before prototyping begins — not because design must be perfect, but because an underdefined specification produces an undirected prototype that answers the wrong questions.
 
-Atlas works through each layer with structured, binary or constrained-option questions rather than open prompts. "Should this product prioritize durability or portability? These are often in tension at this price point, and optimizing for both usually means doing neither well." The inventor makes explicit choices; Atlas records them and their rationale in the Design Decision Log.
+InventSmith works through each layer with structured, binary or constrained-option questions rather than open prompts. "Should this product prioritize durability or portability? These are often in tension at this price point, and optimizing for both usually means doing neither well." The inventor makes explicit choices; InventSmith records them and their rationale in the Design Decision Log.
 
-When a design decision has manufacturing implications, Atlas surfaces them immediately and concisely. Not as a warning or a barrier — as information: "Choosing injection-molded ABS for the housing implies tooling costs of $3,000–$8,000 and a minimum order of approximately 1,000 units. Is that consistent with your initial production scale target?" This lets the inventor make connected decisions rather than designing in isolation from their business model.
+When a design decision has manufacturing implications, InventSmith surfaces them immediately and concisely. Not as a warning or a barrier — as information: "Choosing injection-molded ABS for the housing implies tooling costs of $3,000–$8,000 and a minimum order of approximately 1,000 units. Is that consistent with your initial production scale target?" This lets the inventor make connected decisions rather than designing in isolation from their business model.
 
-Atlas identifies points in the specification where professional expertise is required — structural engineering, electronic circuit design, food-contact material certification, medical device regulatory pathway — and documents these as Specialist Engagement Flags. Atlas is clear: it can help the inventor frame the design question, but it cannot replace the specialist's judgment.
+InventSmith identifies points in the specification where professional expertise is required — structural engineering, electronic circuit design, food-contact material certification, medical device regulatory pathway — and documents these as Specialist Engagement Flags. InventSmith is clear: it can help the inventor frame the design question, but it cannot replace the specialist's judgment.
 
-The stage concludes with Atlas presenting the complete Product Design Specification, a Design Decision Log of every major choice and its rationale, and a prioritized list of Open Design Questions — decisions the prototyper will need to resolve in physical form.
+The stage concludes with InventSmith presenting the complete Product Design Specification, a Design Decision Log of every major choice and its rationale, and a prioritized list of Open Design Questions — decisions the prototyper will need to resolve in physical form.
 
 ---
 
@@ -110,7 +110,7 @@ The stage concludes with Atlas presenting the complete Product Design Specificat
 
 ## Readiness Evaluation
 
-Atlas evaluates the inventor's readiness using three states only. No numeric scores.
+InventSmith evaluates the inventor's readiness using three states only. No numeric scores.
 
 **Not Ready:**
 - Functional specification is incomplete — core product functions have not been defined with success criteria

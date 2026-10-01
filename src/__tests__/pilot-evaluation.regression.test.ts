@@ -2,7 +2,17 @@ import { describe, expect, it } from "vitest";
 import { evaluatePilotPackage, REQUIRED_PILOT_DELIVERABLE_KINDS } from "@convex/pilotEvaluationLogic";
 
 const evaluatedAt = Date.UTC(2026, 7, 14);
-const trustedSources = [{ _id: "source-1", reliability: "primary", locator: "https://example.com/source", metadata: { verifiedAt: evaluatedAt } }];
+const trustedSources = [{
+  _id: "source-1",
+  reliability: "primary",
+  locator: "https://example.com/source",
+  metadata: {
+    verifiedAt: evaluatedAt,
+    retrievalRecordedAt: evaluatedAt,
+    retrievalSourceUrl: "https://example.com/source",
+    claimSupportExcerpt: "Retrieved source content directly supports the representative claim used by this controlled fixture.",
+  },
+}];
 
 function completeDeliverables() {
   return REQUIRED_PILOT_DELIVERABLE_KINDS.map((kind) => ({
@@ -59,7 +69,17 @@ describe("controlled-pilot evaluation", () => {
     const result = evaluatePilotPackage({
       deliverables: completeDeliverables(),
       findings: [{ kind: "sourced_fact", status: "evidence_checked", sourceIds: ["source-1"] }],
-      sources: [{ _id: "source-1", reliability: "primary", metadata: { verifiedAt: 1 } }],
+      sources: [{
+        _id: "source-1",
+        reliability: "primary",
+        locator: "https://example.com/source",
+        metadata: {
+          verifiedAt: 1,
+          retrievalRecordedAt: 1,
+          retrievalSourceUrl: "https://example.com/source",
+          claimSupportExcerpt: "Historically retrieved support that is now outside the allowed freshness window.",
+        },
+      }],
       workItems: [{ status: "completed" }],
     }, evaluatedAt);
     expect(result.passed).toBe(false);

@@ -8,13 +8,13 @@
 Build and test a physical or digital representation of the product to validate the design before committing to manufacturing tooling and investment.
 
 **Why this stage exists:**
-A prototype is the first time the invention exists in the physical world. It exposes design flaws that no amount of specification review can catch: ergonomics that feel wrong in hand, mechanisms that fail under real use, dimensions that seemed reasonable on paper but don't work in practice. Prototyping is not cheap — but it is far cheaper than discovering these problems after $50,000 of tooling has been cut. Atlas helps inventors plan prototyping efficiently: what type of prototype to build, what questions it must answer, how to document findings, and how to decide whether the prototype is good enough to move forward.
+A prototype is the first time the invention exists in the physical world. It exposes design flaws that no amount of specification review can catch: ergonomics that feel wrong in hand, mechanisms that fail under real use, dimensions that seemed reasonable on paper but don't work in practice. Prototyping is not cheap — but it is far cheaper than discovering these problems after $50,000 of tooling has been cut. InventSmith helps inventors plan prototyping efficiently: what type of prototype to build, what questions it must answer, how to document findings, and how to decide whether the prototype is good enough to move forward.
 
 **Primary objective:**
 Produce a tested prototype with documented learnings that either confirms the Product Design Specification or produces a revised specification incorporating what was discovered.
 
 **Success definition:**
-Atlas considers this stage successful when at least one prototype has been built and tested, all Open Design Questions from Stage 5 have been addressed, and the inventor has made a documented decision — based on prototype evidence, not assumption — to proceed to manufacturing.
+InventSmith considers this stage successful when at least one prototype has been built and tested, all Open Design Questions from Stage 5 have been addressed, and the inventor has made a documented decision — based on prototype evidence, not assumption — to proceed to manufacturing.
 
 ---
 
@@ -28,24 +28,24 @@ Atlas considers this stage successful when at least one prototype has been built
 
 ---
 
-## Atlas Responsibilities
+## InventSmith Responsibilities
 
-**How Atlas guides the inventor:**
-Atlas helps the inventor choose the right type of prototype for this moment — concept, functional, looks-like, or works-like — based on what questions still need answers. It then guides prototype test design: for each Open Design Question from Stage 5, Atlas defines a specific test protocol. After testing, Atlas guides structured documentation of findings. It holds the inventor accountable to documenting what failed, not just what worked — because the failures are the most valuable data.
+**How InventSmith guides the inventor:**
+InventSmith helps the inventor choose the right type of prototype for this moment — concept, functional, looks-like, or works-like — based on what questions still need answers. It then guides prototype test design: for each Open Design Question from Stage 5, InventSmith defines a specific test protocol. After testing, InventSmith guides structured documentation of findings. It holds the inventor accountable to documenting what failed, not just what worked — because the failures are the most valuable data.
 
-**What Atlas analyzes:**
+**What InventSmith analyzes:**
 - The Open Design Questions from Stage 5 — to determine the minimum prototype requirement
 - The inventor's prototyping resources: skills, equipment access, budget, and timeline
 - Prototype test results — for pass/fail outcomes against the defined criteria
 - The gap between what the design specified and what the prototype revealed
 
-**What Atlas recommends:**
+**What InventSmith recommends:**
 - The most appropriate prototype type for the current questions and resources
 - Specific prototyping methods for each component in the design specification
 - Test protocols with measurable pass/fail criteria for each Open Design Question
 - Whether the prototype results support proceeding to manufacturing or require a design revision
 
-**What Atlas tracks:**
+**What InventSmith tracks:**
 - Whether all Open Design Questions from Stage 5 have been addressed
 - Pass/fail outcomes for each prototype test
 - Design changes required by prototype findings
@@ -63,21 +63,21 @@ Atlas helps the inventor choose the right type of prototype for this moment — 
 
 ---
 
-## Atlas Guidance
+## InventSmith Guidance
 
-Atlas opens Stage 6 by reviewing the Open Design Questions from Stage 5 and helping the inventor define the single most important thing the first prototype must prove. This focus matters: a prototype that tries to answer every question at once often answers none of them well. Atlas recommends building the simplest prototype that answers the most critical question — and then iterating.
+InventSmith opens Stage 6 by reviewing the Open Design Questions from Stage 5 and helping the inventor define the single most important thing the first prototype must prove. This focus matters: a prototype that tries to answer every question at once often answers none of them well. InventSmith recommends building the simplest prototype that answers the most critical question — and then iterating.
 
-Atlas introduces the four prototype types with concrete descriptions of when each is appropriate:
+InventSmith introduces the four prototype types with concrete descriptions of when each is appropriate:
 - **Concept prototype**: communicates what the product is, not how it works. Appropriate when the inventor needs to demonstrate the idea to partners or get early feedback on the concept.
 - **Functional prototype**: tests whether the mechanism works. Appropriate when the core engineering question — "will this actually do what I think it will?" — is still unresolved.
 - **Looks-like prototype**: tests form, aesthetics, and ergonomics. Appropriate when the design decisions from Stage 5 need physical validation.
 - **Works-like prototype**: tests core engineering in a form close to the final product. Appropriate when the design is largely resolved and the inventor is approaching manufacturing conversations.
 
-For each Open Design Question, Atlas defines a test protocol: what to build, what to measure, and what result constitutes a pass. This prevents the common failure mode of prototyping without a testing plan — building something and then deciding, after the fact, whether it "seems fine."
+For each Open Design Question, InventSmith defines a test protocol: what to build, what to measure, and what result constitutes a pass. This prevents the common failure mode of prototyping without a testing plan — building something and then deciding, after the fact, whether it "seems fine."
 
-After testing, Atlas guides structured documentation of findings. It asks targeted questions: "What did the prototype do that the design specification predicted? What did it do that was unexpected? What does the prototype reveal about what needs to change?" Honest documentation here is the entire point — the prototype is only useful if its lessons are recorded.
+After testing, InventSmith guides structured documentation of findings. It asks targeted questions: "What did the prototype do that the design specification predicted? What did it do that was unexpected? What does the prototype reveal about what needs to change?" Honest documentation here is the entire point — the prototype is only useful if its lessons are recorded.
 
-If the prototype requires design changes, Atlas helps the inventor update the Product Design Specification — producing a revised, versioned document before moving to manufacturing. Atlas never lets an inventor proceed with a known design flaw undocumented.
+If the prototype requires design changes, InventSmith helps the inventor update the Product Design Specification — producing a revised, versioned document before moving to manufacturing. InventSmith never lets an inventor proceed with a known design flaw undocumented.
 
 ---
 
@@ -99,7 +99,7 @@ If the prototype requires design changes, Atlas helps the inventor update the Pr
 - **Prototype Test Report** — documented results of prototype testing, with pass/fail outcomes for each test and key observations
 - **Prototype-to-Spec Gap Analysis** — the documented delta between what the design specified and what the prototype revealed
 - **Revised Product Design Specification** — if prototype findings require design changes, a versioned revision of the specification incorporating those changes
-- **Prototype Readiness Assessment** — Atlas's judgment on whether the prototype results support proceeding to manufacturing
+- **Prototype Readiness Assessment** — InventSmith's judgment on whether the prototype results support proceeding to manufacturing
 
 ---
 
@@ -113,7 +113,7 @@ If the prototype requires design changes, Atlas helps the inventor update the Pr
 
 ## Readiness Evaluation
 
-Atlas evaluates the inventor's readiness using three states only. No numeric scores.
+InventSmith evaluates the inventor's readiness using three states only. No numeric scores.
 
 **Not Ready:**
 - No prototype has been built
@@ -163,11 +163,11 @@ Nothing from the prototype record is discarded. The Prototype Test Report become
 
 ## Future Integrations
 
-- **3D printing service APIs** (Hubs, Xometry, Shapeways) — request quotes for prototype components directly from Atlas without leaving the platform
+- **3D printing service APIs** (Hubs, Xometry, Shapeways) — request quotes for prototype components directly from InventSmith without leaving the platform
 - **PCB prototyping integration** (PCBWay, OSH Park) — for electronic products, design and order prototype circuit boards in-platform
 - **Prototype video and photo documentation** — allow inventors to attach prototype demonstration videos and photos to the test report as permanent records
 - **AI prototype analysis** — upload photos of prototype issues and receive AI analysis of likely root cause and suggested design remediation options
-- **User testing panel** — recruit qualified target-audience users to test prototypes and submit structured feedback through Atlas
+- **User testing panel** — recruit qualified target-audience users to test prototypes and submit structured feedback through InventSmith
 
 ---
 

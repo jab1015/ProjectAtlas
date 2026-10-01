@@ -1,46 +1,44 @@
 /**
  * InventSmith Validation Research — Session Mutations
  *
- * Internal mutations that manage the validation research session lifecycle.
- * These run in Convex's default V8 runtime (no "use node").
- *
- * Exported for use by validationResearchOrchestration.ts (the Node.js action).
+ * Internal mutations manage the validation research session lifecycle while
+ * public mutations enforce invention edit access before scheduling work.
  */
 
 import { internalMutation, mutation } from "./_generated/server";
 import { v } from "convex/values";
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { internal } from "./_generated/api";
+import { requireInventionEditAccess } from "./organizations";
 
-// Provider version written into new research rows (must match OpenAIValidationResearchProvider.VERSION)
-const PROVIDER_VERSION = "openai-gpt4o-mini-1.2.0";
+// Must match OpenAIValidationResearchProvider.VERSION. A version change prevents
+// older confidence/research semantics from being silently reused by the 24h cache.
+const PROVIDER_VERSION = "openai-gpt4o-context-only-1.3.0";
 
-// ── forceRegenerateValidation ─────────────────────────────────────────────────
+const VALIDATION_SECTION_KEYS = new Set([
+  "validationPlan",
+  "customerSegments",
+  "competitorAnalysis",
+  "marketSizing",
+  "validationMethods",
+  "timeline",
+  "surveyQuestions",
+  "landingPageDraft",
+  "interviewQuestions",
+  "riskAssessment",
+  "recommendations",
+]);
 
-/**
- * Public mutation called by the "Rebuild Validation" button in the UI.
- *
- * Marks all existing research rows for this invention as stale (researchStatus="stale"),
- * then schedules a fresh runValidationResearchOrchestration action.
- * Auth-gated: only the owning user can trigger regeneration.
- */
+function sectionStatus(value: unknown): string | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const status = (value as Record<string, unknown>).sectionStatus;
+  return typeof status === "string" ? status : undefined;
+}
+
 export const forceRegenerateValidation = mutation({
-  args: {
-    inventionId: v.id("inventions"),
-  },
+  args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-
-    const invention = await ctx.db.get(inventionId);
-    if (!invention || invention.userId !== userId) {
-      throw new Error("Invention not found or access denied");
-    }
-
+    await requireInventionEditAccess(ctx, inventionId);
     const now = Date.now();
-
-    // Mark all existing research rows for this invention as stale so the
-    // 24h cache is bypassed on the next orchestration run.
     const existingRows = await ctx.db
       .query("validationResearch")
       .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
@@ -54,7 +52,6 @@ export const forceRegenerateValidation = mutation({
       });
     }
 
-    // Schedule fresh orchestration (bypasses 24h cache since rows are now stale)
     await ctx.scheduler.runAfter(
       0,
       internal.validationResearchOrchestration.runValidationResearchOrchestration,
@@ -65,17 +62,53 @@ export const forceRegenerateValidation = mutation({
   },
 });
 
-// ── initValidationResearchSession ─────────────────────────────────────────────
+/**
+ * Retry only failed sections in the latest validation row. Successful sections
+ * are kept in place and remain the source of truth for the retry run.
+ */
+export const retryFailedValidationSections = mutation({
+  args: { inventionId: v.id("inventions") },
+  handler: async (ctx, { inventionId }) => {
+    await requireInventionEditAccess(ctx, inventionId);
+    const latest = await ctx.db
+      .query("validationResearch")
+      .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
+      .order("desc")
+      .first();
+    if (!latest) throw new Error("No validation research exists to retry");
+
+    const sections = (latest.sections as Record<string, unknown> | undefined) ?? {};
+    const failedSectionKeys = Object.entries(sections)
+      .filter(([key, value]) => VALIDATION_SECTION_KEYS.has(key) && sectionStatus(value) === "FAILED")
+      .map(([key]) => key);
+
+    if (failedSectionKeys.length === 0) {
+      return { queued: false, failedSectionCount: 0 };
+    }
+
+    const now = Date.now();
+    await ctx.db.patch(latest._id, {
+      researchStatus: "running",
+      overallStatus: "IN_PROGRESS",
+      error: undefined,
+      completedAt: undefined,
+      updatedAt: now,
+    });
+
+    await ctx.scheduler.runAfter(
+      0,
+      internal.validationResearchOrchestration.retryFailedValidationResearchSections,
+      { inventionId, researchId: latest._id }
+    );
+
+    return { queued: true, failedSectionCount: failedSectionKeys.length };
+  },
+});
 
 export const initValidationResearchSession = internalMutation({
-  args: {
-    inventionId: v.id("inventions"),
-  },
+  args: { inventionId: v.id("inventions") },
   returns: v.union(
-    v.object({
-      status: v.literal("existing"),
-      researchId: v.id("validationResearch"),
-    }),
+    v.object({ status: v.literal("existing"), researchId: v.id("validationResearch") }),
     v.object({
       status: v.literal("created"),
       researchId: v.id("validationResearch"),
@@ -87,11 +120,9 @@ export const initValidationResearchSession = internalMutation({
   handler: async (ctx, { inventionId }) => {
     const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
     const now = Date.now();
-
     const invention = await ctx.db.get(inventionId);
     if (!invention) throw new Error("Invention not found");
 
-    // 24h cache: reuse COMPLETED research within the last 24 hours
     const existing = await ctx.db
       .query("validationResearch")
       .withIndex("by_inventionId_status", (q) =>
@@ -104,14 +135,12 @@ export const initValidationResearchSession = internalMutation({
       existing &&
       existing.completedAt !== undefined &&
       existing.completedAt >= now - TWENTY_FOUR_HOURS_MS &&
-      // Only reuse rows generated by the current OpenAI provider — not legacy mock or error-content rows
       existing.providerVersion === PROVIDER_VERSION
     ) {
       console.log(`[Stage2] Cached record reused: researchId=${existing._id} inventionId=${inventionId} completedAt=${existing.completedAt}`);
       return { status: "existing" as const, researchId: existing._id };
     }
 
-    // Create a new PENDING research row
     const researchId = await ctx.db.insert("validationResearch", {
       inventionId,
       stageId: "2",
@@ -126,7 +155,6 @@ export const initValidationResearchSession = internalMutation({
       researchVersion: 1,
     });
 
-    console.log(`[Stage2] Research record created: researchId=${researchId} inventionId=${inventionId}`);
     return {
       status: "created" as const,
       researchId,
@@ -137,7 +165,46 @@ export const initValidationResearchSession = internalMutation({
   },
 });
 
-// ── patchValidationSection ────────────────────────────────────────────────────
+/** Prepare a failed-only retry and return the canonical context/counts. */
+export const prepareValidationResearchRetry = internalMutation({
+  args: {
+    inventionId: v.id("inventions"),
+    researchId: v.id("validationResearch"),
+  },
+  handler: async (ctx, { inventionId, researchId }) => {
+    const [invention, research] = await Promise.all([
+      ctx.db.get(inventionId),
+      ctx.db.get(researchId),
+    ]);
+    if (!invention) throw new Error("Invention not found");
+    if (!research || research.inventionId !== inventionId) {
+      throw new Error("Validation research not found for invention");
+    }
+
+    const sections = (research.sections as Record<string, unknown> | undefined) ?? {};
+    const failedSectionKeys = Object.entries(sections)
+      .filter(([key, value]) => VALIDATION_SECTION_KEYS.has(key) && sectionStatus(value) === "FAILED")
+      .map(([key]) => key);
+    const completedSectionCount = Object.entries(sections)
+      .filter(([key, value]) => VALIDATION_SECTION_KEYS.has(key) && sectionStatus(value) === "COMPLETED")
+      .length;
+
+    await ctx.db.patch(researchId, {
+      researchStatus: "running",
+      overallStatus: "IN_PROGRESS",
+      completedSectionCount,
+      updatedAt: Date.now(),
+    });
+
+    return {
+      failedSectionKeys,
+      completedSectionCount,
+      inventionTitle: invention.title,
+      problemStatement: invention.problemStatement ?? "",
+      inventionDescription: invention.solutionDescription ?? "",
+    };
+  },
+});
 
 export const patchValidationSection = internalMutation({
   args: {
@@ -149,48 +216,22 @@ export const patchValidationSection = internalMutation({
     overallStatus: v.string(),
     updatedAt: v.number(),
   },
-  handler: async (
-    ctx,
-    {
-      researchId,
-      sectionKey,
-      sectionEntry,
-      completedSectionCount,
-      lastCompletedSection,
-      overallStatus,
-      updatedAt,
-    }
-  ) => {
-    const record = await ctx.db.get(researchId);
-    if (!record) {
-      throw new Error(`Validation research row not found: ${researchId}`);
-    }
-
-    const currentSections: Record<string, unknown> =
-      (record.sections as Record<string, unknown>) ?? {};
-
-    const updatedSections = {
-      ...currentSections,
-      [sectionKey]: sectionEntry,
-    };
-
-    await ctx.db.patch(researchId, {
-      sections: updatedSections,
-      completedSectionCount,
-      lastCompletedSection,
-      overallStatus,
-      updatedAt,
+  handler: async (ctx, args) => {
+    const record = await ctx.db.get(args.researchId);
+    if (!record) throw new Error(`Validation research row not found: ${args.researchId}`);
+    const currentSections = (record.sections as Record<string, unknown>) ?? {};
+    await ctx.db.patch(args.researchId, {
+      sections: { ...currentSections, [args.sectionKey]: args.sectionEntry },
+      completedSectionCount: args.completedSectionCount,
+      lastCompletedSection: args.lastCompletedSection,
+      overallStatus: args.overallStatus,
+      updatedAt: args.updatedAt,
     });
   },
 });
 
-// ── markValidationResearchInProgress ─────────────────────────────────────────
-
 export const markValidationResearchInProgress = internalMutation({
-  args: {
-    researchId: v.id("validationResearch"),
-    updatedAt: v.number(),
-  },
+  args: { researchId: v.id("validationResearch"), updatedAt: v.number() },
   handler: async (ctx, { researchId, updatedAt }) => {
     await ctx.db.patch(researchId, {
       overallStatus: "IN_PROGRESS",
@@ -199,8 +240,6 @@ export const markValidationResearchInProgress = internalMutation({
     });
   },
 });
-
-// ── finaliseValidationResearch ────────────────────────────────────────────────
 
 export const finaliseValidationResearch = internalMutation({
   args: {
@@ -218,8 +257,6 @@ export const finaliseValidationResearch = internalMutation({
     });
   },
 });
-
-// ── recordValidationResearchFailure ──────────────────────────────────────────
 
 export const recordValidationResearchFailure = internalMutation({
   args: {
@@ -241,9 +278,7 @@ export const recordValidationResearchFailure = internalMutation({
     }
 
     const invention = await ctx.db.get(inventionId);
-    if (!invention) {
-      throw new Error(`Invention not found while recording validation failure: ${inventionId}`);
-    }
+    if (!invention) throw new Error(`Invention not found while recording validation failure: ${inventionId}`);
 
     return await ctx.db.insert("validationResearch", {
       inventionId,

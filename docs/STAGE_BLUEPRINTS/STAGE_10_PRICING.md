@@ -8,13 +8,13 @@
 Establish a pricing strategy that reflects the product's value to the customer, fits their willingness to pay, and supports a viable business model.
 
 **Why this stage exists:**
-Pricing is simultaneously the highest-leverage and most underinvested decision most inventors make. First-time inventors default to cost-plus pricing: add up the unit cost and apply a margin. This approach systematically underprices innovative products because it ignores value. A product that saves a customer $500 per year in labor or frustration can command a premium far above its $12 unit manufacturing cost — but only if the inventor has the framework to see and claim that value. Setting the wrong price at launch is not a minor error. Price too low and the margin never supports sustainable operations. Price too high and the market never develops. Atlas guides inventors to the right price through a structured, evidence-based process — not guesswork.
+Pricing is simultaneously the highest-leverage and most underinvested decision most inventors make. First-time inventors default to cost-plus pricing: add up the unit cost and apply a margin. This approach systematically underprices innovative products because it ignores value. A product that saves a customer $500 per year in labor or frustration can command a premium far above its $12 unit manufacturing cost — but only if the inventor has the framework to see and claim that value. Setting the wrong price at launch is not a minor error. Price too low and the margin never supports sustainable operations. Price too high and the market never develops. InventSmith guides inventors to the right price through a structured, evidence-based process — not guesswork.
 
 **Primary objective:**
 Produce a Pricing Strategy with a recommended retail price, unit economics at target volume, gross margin analysis, and a pricing rationale grounded in customer value — not just cost.
 
 **Success definition:**
-Atlas considers this stage successful when the inventor has applied three pricing frameworks, understands the resulting price floor and ceiling, has selected a retail price with documented rationale, and has confirmed that the gross margin at that price supports the business model they intend to build.
+InventSmith considers this stage successful when the inventor has applied three pricing frameworks, understands the resulting price floor and ceiling, has selected a retail price with documented rationale, and has confirmed that the gross margin at that price supports the business model they intend to build.
 
 ---
 
@@ -28,12 +28,12 @@ Atlas considers this stage successful when the inventor has applied three pricin
 
 ---
 
-## Atlas Responsibilities
+## InventSmith Responsibilities
 
-**How Atlas guides the inventor:**
-Atlas introduces and applies three pricing frameworks in sequence: Cost-Plus (the floor), Competitive Benchmarking (the market context), and Value-Based (the ceiling). It builds the unit economics cascade from the Stage 7 cost data, models the impact of different price points on margin and market penetration, and presents the trade-offs clearly. Atlas recommends a price — not just a range — and explains its reasoning. The inventor reviews the analysis and makes the final pricing decision, which is recorded in the Pricing Strategy Document.
+**How InventSmith guides the inventor:**
+InventSmith introduces and applies three pricing frameworks in sequence: Cost-Plus (the floor), Competitive Benchmarking (the market context), and Value-Based (the ceiling). It builds the unit economics cascade from the Stage 7 cost data, models the impact of different price points on margin and market penetration, and presents the trade-offs clearly. InventSmith recommends a price — not just a range — and explains its reasoning. The inventor reviews the analysis and makes the final pricing decision, which is recorded in the Pricing Strategy Document.
 
-**What Atlas analyzes:**
+**What InventSmith analyzes:**
 - Unit Economics Model from Stage 7 — the cost-per-unit at target production volume
 - Customer Segment Profiles from Stage 3 — the willingness-to-pay signals from validation interviews
 - Competitive Landscape from Stage 2 — competitor pricing as market context
@@ -41,13 +41,13 @@ Atlas introduces and applies three pricing frameworks in sequence: Cost-Plus (th
 - The break-even volume at different price points
 - Gross margin implications of the chosen price at initial and scale production volumes
 
-**What Atlas recommends:**
+**What InventSmith recommends:**
 - A recommended retail price with explicit reasoning
 - A pricing architecture: single price, tiered, subscription, or freemium — based on the product category and customer behavior
 - A gross margin target and whether the recommended price achieves it
 - A minimum viable production volume at the recommended price
 
-**What Atlas tracks:**
+**What InventSmith tracks:**
 - Whether all three pricing frameworks have been applied
 - Whether the recommended price achieves the gross margin target
 - Whether the break-even analysis is complete
@@ -67,21 +67,21 @@ Atlas introduces and applies three pricing frameworks in sequence: Cost-Plus (th
 
 ---
 
-## Atlas Guidance
+## InventSmith Guidance
 
-Atlas opens Stage 10 by returning to a simple truth: the right price is not the cost plus a margin — it is the price a willing customer will pay for the value they receive. That price may be far above cost, or it may be constrained by the competitive environment. Atlas's job is to help the inventor find it through evidence, not intuition.
+InventSmith opens Stage 10 by returning to a simple truth: the right price is not the cost plus a margin — it is the price a willing customer will pay for the value they receive. That price may be far above cost, or it may be constrained by the competitive environment. InventSmith's job is to help the inventor find it through evidence, not intuition.
 
-Atlas applies the three frameworks in sequence and presents the results clearly:
+InventSmith applies the three frameworks in sequence and presents the results clearly:
 
-**Cost-Plus floor**: Starting from the Stage 7 Unit Economics Model, Atlas calculates the minimum price that covers production cost, distributor and retailer margins (if applicable), and achieves the inventor's minimum acceptable gross margin. This is the floor — selling below this price means the business cannot sustain itself at scale.
+**Cost-Plus floor**: Starting from the Stage 7 Unit Economics Model, InventSmith calculates the minimum price that covers production cost, distributor and retailer margins (if applicable), and achieves the inventor's minimum acceptable gross margin. This is the floor — selling below this price means the business cannot sustain itself at scale.
 
-**Competitive Benchmarking context**: Atlas maps the competitor pricing from Stage 2 and identifies where the invention's proposed price falls relative to the market. This is not the ceiling — it is context. An innovative product that delivers meaningfully more value than competitors can price above the market. An undifferentiated product must match or beat it.
+**Competitive Benchmarking context**: InventSmith maps the competitor pricing from Stage 2 and identifies where the invention's proposed price falls relative to the market. This is not the ceiling — it is context. An innovative product that delivers meaningfully more value than competitors can price above the market. An undifferentiated product must match or beat it.
 
-**Value-Based ceiling**: Atlas calculates the value delivered by the invention in terms the customer understands — dollars saved, time recovered, frustration eliminated, outcomes improved. It converts that value into a price ceiling: the maximum a rational customer would pay before the economics no longer make sense for them. The actual recommended price sits within the range defined by the floor and the ceiling, calibrated by the competitive context and the brand positioning.
+**Value-Based ceiling**: InventSmith calculates the value delivered by the invention in terms the customer understands — dollars saved, time recovered, frustration eliminated, outcomes improved. It converts that value into a price ceiling: the maximum a rational customer would pay before the economics no longer make sense for them. The actual recommended price sits within the range defined by the floor and the ceiling, calibrated by the competitive context and the brand positioning.
 
-Atlas then builds the unit economics cascade: revenue per unit → COGS → gross margin → channel margin (if applicable) → net margin. It presents the cascade at the recommended price so the inventor can see how the business model works at a unit level. Break-even volume is calculated — the minimum units per year needed for the business to cover its fixed costs at the chosen price.
+InventSmith then builds the unit economics cascade: revenue per unit → COGS → gross margin → channel margin (if applicable) → net margin. It presents the cascade at the recommended price so the inventor can see how the business model works at a unit level. Break-even volume is calculated — the minimum units per year needed for the business to cover its fixed costs at the chosen price.
 
-Atlas models three price scenarios (lower, recommended, higher) with the gross margin, break-even volume, and market penetration implications of each. The inventor selects a price with full visibility into the trade-offs.
+InventSmith models three price scenarios (lower, recommended, higher) with the gross margin, break-even volume, and market penetration implications of each. The inventor selects a price with full visibility into the trade-offs.
 
 ---
 
@@ -104,7 +104,7 @@ Atlas models three price scenarios (lower, recommended, higher) with the gross m
 - **Unit Economics Model (Complete)** — the Stage 7 cost model extended with revenue and margin at the recommended price
 - **Break-Even Analysis** — the minimum viable production volume at the recommended price to reach profitability
 - **Pricing Scenario Analysis** — sensitivity analysis across three price points with gross margin and break-even implications of each
-- **Pricing Recommendation** — Atlas's recommended price with explicit reasoning
+- **Pricing Recommendation** — InventSmith's recommended price with explicit reasoning
 
 ---
 
@@ -117,7 +117,7 @@ Atlas models three price scenarios (lower, recommended, higher) with the gross m
 
 ## Readiness Evaluation
 
-Atlas evaluates the inventor's readiness using three states only. No numeric scores.
+InventSmith evaluates the inventor's readiness using three states only. No numeric scores.
 
 **Not Ready:**
 - Unit Economics Model from Stage 7 has not been completed or is based on estimates without supplier quotes

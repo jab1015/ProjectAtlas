@@ -8,13 +8,13 @@
 Build the go-to-market strategy and core marketing assets that will create awareness, generate demand, and drive trial for the invention at launch.
 
 **Why this stage exists:**
-A brilliant invention with no marketing is a secret. But marketing is not simply "getting the word out" — that framing is what leads inventors to spend their budget on unfocused activity with no measurable outcome. Marketing is the discipline of reaching exactly the right people, in exactly the right place, with exactly the right message, and driving them to a specific action. Atlas helps inventors build a marketing strategy that is specific and executable: not "we'll use social media" but "we will reach this specific segment through these specific channels with this specific message and drive them to this specific action." Specificity is what separates marketing that produces results from marketing that exhausts the budget without them.
+A brilliant invention with no marketing is a secret. But marketing is not simply "getting the word out" — that framing is what leads inventors to spend their budget on unfocused activity with no measurable outcome. Marketing is the discipline of reaching exactly the right people, in exactly the right place, with exactly the right message, and driving them to a specific action. InventSmith helps inventors build a marketing strategy that is specific and executable: not "we'll use social media" but "we will reach this specific segment through these specific channels with this specific message and drive them to this specific action." Specificity is what separates marketing that produces results from marketing that exhausts the budget without them.
 
 **Primary objective:**
 Produce a Go-to-Market Marketing Plan with defined target segments, channel strategy, core messaging, content strategy, and launch marketing assets — ready to execute at Stage 14 (Launch).
 
 **Success definition:**
-Atlas considers this stage successful when the inventor has a complete marketing plan they can hand to any marketing contributor — a freelancer, an agency, or a co-founder — and that person can begin executing without needing to ask foundational strategic questions. The plan covers who to reach, where to reach them, what to say, and what to ask them to do.
+InventSmith considers this stage successful when the inventor has a complete marketing plan they can hand to any marketing contributor — a freelancer, an agency, or a co-founder — and that person can begin executing without needing to ask foundational strategic questions. The plan covers who to reach, where to reach them, what to say, and what to ask them to do.
 
 ---
 
@@ -28,26 +28,26 @@ Atlas considers this stage successful when the inventor has a complete marketing
 
 ---
 
-## Atlas Responsibilities
+## InventSmith Responsibilities
 
-**How Atlas guides the inventor:**
-Atlas guides the inventor from audience (who to reach) to channel (where to reach them) to message (what to say) to asset (what to create). It evaluates marketing channel options systematically — not based on what is trendy but based on what is most efficient for this specific product, audience, and budget. It builds the messaging architecture by connecting the value-based pricing rationale from Stage 10 to a customer-facing message that makes the value undeniable. It then turns that message into a content strategy and a pre-launch calendar with real deadlines.
+**How InventSmith guides the inventor:**
+InventSmith guides the inventor from audience (who to reach) to channel (where to reach them) to message (what to say) to asset (what to create). It evaluates marketing channel options systematically — not based on what is trendy but based on what is most efficient for this specific product, audience, and budget. It builds the messaging architecture by connecting the value-based pricing rationale from Stage 10 to a customer-facing message that makes the value undeniable. It then turns that message into a content strategy and a pre-launch calendar with real deadlines.
 
-**What Atlas analyzes:**
+**What InventSmith analyzes:**
 - Customer Segment Profiles from Stage 3 — where each segment spends attention, what messages resonate, and how they make purchase decisions
 - Brand Identity System from Stage 8 — the brand voice and positioning that govern all marketing communications
 - Pricing Strategy from Stage 10 — the value proposition that marketing must communicate
 - Competitive Landscape from Stage 2 — what competitors are saying and where they are active
 - The inventor's marketing budget and available resources
 
-**What Atlas recommends:**
+**What InventSmith recommends:**
 - The 2–3 highest-leverage marketing channels given the audience, budget, and product category
 - A messaging architecture: headline value proposition, 3 supporting proof points, and objection handling for the top 3 customer hesitations
 - A content strategy with types, cadence, and calls to action for each channel
 - A pre-launch marketing calendar with all activities, owners, and deadlines
 - Core marketing asset briefs: landing page, product description, social bio, elevator pitch, email subject lines
 
-**What Atlas tracks:**
+**What InventSmith tracks:**
 - Whether target segments are confirmed from Stage 3 with any refinements documented
 - Whether primary and secondary channels are selected with explicit rationale
 - Whether the Messaging Architecture is complete across all three layers
@@ -67,17 +67,17 @@ Atlas guides the inventor from audience (who to reach) to channel (where to reac
 
 ---
 
-## Atlas Guidance
+## InventSmith Guidance
 
-Atlas opens Stage 11 by anchoring marketing to the work already done. The Customer Segment Profiles describe exactly who needs to be reached. The Brand Voice Guide governs how every message is written. The Pricing Strategy's value rationale is the foundation of the value proposition. Most of the raw material for a strong marketing strategy already exists in the invention record — Atlas's job is to synthesize it into a plan.
+InventSmith opens Stage 11 by anchoring marketing to the work already done. The Customer Segment Profiles describe exactly who needs to be reached. The Brand Voice Guide governs how every message is written. The Pricing Strategy's value rationale is the foundation of the value proposition. Most of the raw material for a strong marketing strategy already exists in the invention record — InventSmith's job is to synthesize it into a plan.
 
-Atlas evaluates marketing channel options systematically for the specific product and audience. For each channel — organic social, paid social, SEO and content, email, influencer, retail placement, PR, trade shows — Atlas presents the expected reach, cost, conversion pattern, and time-to-results for this specific product category. It recommends the 2–3 channels that offer the highest expected return at the inventor's budget level and explains why the others are lower priority for now.
+InventSmith evaluates marketing channel options systematically for the specific product and audience. For each channel — organic social, paid social, SEO and content, email, influencer, retail placement, PR, trade shows — InventSmith presents the expected reach, cost, conversion pattern, and time-to-results for this specific product category. It recommends the 2–3 channels that offer the highest expected return at the inventor's budget level and explains why the others are lower priority for now.
 
-The messaging architecture is built from the inside out. Atlas starts with the headline value proposition — a single statement that describes who this product is for and what problem it solves, in the customer's own language. It then builds 3 supporting proof points that validate the headline claim. Finally, it develops objection handling for the top 3 hesitations a potential customer will have: too expensive, I don't know if I need this, or I'm already solving this another way.
+The messaging architecture is built from the inside out. InventSmith starts with the headline value proposition — a single statement that describes who this product is for and what problem it solves, in the customer's own language. It then builds 3 supporting proof points that validate the headline claim. Finally, it develops objection handling for the top 3 hesitations a potential customer will have: too expensive, I don't know if I need this, or I'm already solving this another way.
 
-The content strategy is specific and executable: what types of content, at what cadence, for which channels, with what call to action. Atlas builds a content calendar for the first 90 days post-launch — not a blank template, but a populated plan with specific content types and timing.
+The content strategy is specific and executable: what types of content, at what cadence, for which channels, with what call to action. InventSmith builds a content calendar for the first 90 days post-launch — not a blank template, but a populated plan with specific content types and timing.
 
-The pre-launch marketing calendar works backwards from the launch date. Every marketing activity that must be completed before launch is listed with an owner, a deadline, and a dependency map. Atlas flags the critical path items — the ones where a delay blocks everything downstream.
+The pre-launch marketing calendar works backwards from the launch date. Every marketing activity that must be completed before launch is listed with an owner, a deadline, and a dependency map. InventSmith flags the critical path items — the ones where a delay blocks everything downstream.
 
 ---
 
@@ -114,7 +114,7 @@ The pre-launch marketing calendar works backwards from the launch date. Every ma
 
 ## Readiness Evaluation
 
-Atlas evaluates the inventor's readiness using three states only. No numeric scores.
+InventSmith evaluates the inventor's readiness using three states only. No numeric scores.
 
 **Not Ready:**
 - Target segments have not been confirmed from Stage 3
@@ -166,7 +166,7 @@ The following information moves from Stage 11 into Stage 12 (Sales) and Stage 14
 
 - **SEO research tools** (Semrush, Ahrefs API) — keyword volume and difficulty data integrated directly into the content strategy
 - **Paid media audience estimation** (Meta Ads Manager, Google Ads) — audience size estimates and cost-per-click benchmarks by segment for paid channel planning
-- **Email platform integration** (Mailchimp, Klaviyo) — pre-launch email list building infrastructure set up directly from Atlas, with list growth tracked through launch
+- **Email platform integration** (Mailchimp, Klaviyo) — pre-launch email list building infrastructure set up directly from InventSmith, with list growth tracked through launch
 - **Social listening tools** (Brandwatch, Mention) — pre-launch monitoring for the invention's category keywords to surface organic demand and inform messaging
 - **AI ad creative generation** — draft social media ad variants from the Messaging Architecture for A/B testing at launch
 
