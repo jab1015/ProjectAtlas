@@ -138,13 +138,16 @@ describe("fulfillment replay behavior", () => {
 
   it("keeps sales counting conditional and builds response links from the authoritative token", () => {
     const http = readFileSync(join(process.cwd(), "convex/http.ts"), "utf8");
+    const webhook = readFileSync(join(process.cwd(), "convex/fulfillmentWebhook.ts"), "utf8");
     const mutation = readFileSync(join(process.cwd(), "convex/purchasesMutations.ts"), "utf8");
 
-    expect(http).toContain("createFromFulfillmentWithStatus");
-    expect(http).toContain("if (fulfillment.created)");
-    expect(http).toContain("internal.productsMutations.incrementSales");
-    expect(http).toContain("token=${fulfillment.downloadToken}");
-    expect(http).not.toContain("token=${proposedDownloadToken}");
+    expect(http).toContain('import { fulfillmentWebhookHandler } from "./fulfillmentWebhook"');
+    expect(http).toContain("fulfillmentWebhookHandler(ctx, request)");
+    expect(webhook).toContain("createFromFulfillmentWithStatus");
+    expect(webhook).toContain("if (fulfillment.created)");
+    expect(webhook).toContain("internal.productsMutations.incrementSales");
+    expect(webhook).toContain("token=${fulfillment.downloadToken}");
+    expect(webhook).not.toContain("token=${proposedDownloadToken}");
     expect(mutation).toContain("downloadToken: existing.downloadToken");
     expect(mutation).toContain("downloadToken: args.downloadToken");
   });
