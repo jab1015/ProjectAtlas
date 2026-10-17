@@ -1,10 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const requireAdmin = vi.fn(async () => ({ userId: "admin-user" }));
-const deleteAccountData = vi.fn();
+const mocks = vi.hoisted(() => ({
+  requireAdmin: vi.fn(async () => ({ userId: "admin-user" })),
+  deleteAccountData: vi.fn(),
+}));
 
-vi.mock("../../convex/authHelpers", () => ({ requireAdmin }));
-vi.mock("../../convex/accountDeletion", () => ({ deleteAccountData }));
+vi.mock("../../convex/authHelpers", () => ({ requireAdmin: mocks.requireAdmin }));
+vi.mock("../../convex/accountDeletion", () => ({ deleteAccountData: mocks.deleteAccountData }));
 
 import {
   executeAccountDeletionHandler,
@@ -31,8 +33,8 @@ function buildCtx(rows: Row[]) {
 
 describe("privacy request execution behavior", () => {
   beforeEach(() => {
-    requireAdmin.mockClear();
-    deleteAccountData.mockReset();
+    mocks.requireAdmin.mockClear();
+    mocks.deleteAccountData.mockReset();
   });
 
   it("refuses to complete an account-deletion request through generic resolution with zero writes", async () => {
@@ -44,7 +46,7 @@ describe("privacy request execution behavior", () => {
       resolutionNotes: "Deletion was reviewed and completed.",
     })).rejects.toThrow(/must be completed through executeAccountDeletion/i);
 
-    expect(requireAdmin).toHaveBeenCalledTimes(1);
+    expect(mocks.requireAdmin).toHaveBeenCalledTimes(1);
     expect(state.patches).toEqual([]);
   });
 
@@ -72,7 +74,7 @@ describe("privacy request execution behavior", () => {
       resolutionNotes: "Audited deletion resolution notes.",
     })).rejects.toThrow(/already terminal/i);
 
-    expect(deleteAccountData).not.toHaveBeenCalled();
+    expect(mocks.deleteAccountData).not.toHaveBeenCalled();
     expect(state.patches).toEqual([]);
   });
 
@@ -88,7 +90,7 @@ describe("privacy request execution behavior", () => {
       resolutionNotes: "Audited administrator deletion attempt.",
     })).rejects.toThrow(/Administrator accounts cannot be deleted/i);
 
-    expect(deleteAccountData).not.toHaveBeenCalled();
+    expect(mocks.deleteAccountData).not.toHaveBeenCalled();
     expect(state.patches).toEqual([]);
   });
 
@@ -97,7 +99,7 @@ describe("privacy request execution behavior", () => {
       { _id: "req-5", requestType: "account_deletion", status: "pending", userId: "user-5" },
       { _id: "user-5", role: "user", subscriptionTier: "free", subscriptionStatus: "inactive" },
     ]);
-    deleteAccountData.mockResolvedValue({ deletedRows: 12 });
+    mocks.deleteAccountData.mockResolvedValue({ deletedRows: 12 });
 
     const result = await executeAccountDeletionHandler(state.ctx, {
       requestId: "req-5" as any,
@@ -106,8 +108,8 @@ describe("privacy request execution behavior", () => {
     });
 
     expect(result).toEqual({ success: true, summary: { deletedRows: 12 } });
-    expect(deleteAccountData).toHaveBeenCalledTimes(1);
-    expect(deleteAccountData).toHaveBeenCalledWith(state.ctx, "user-5");
+    expect(mocks.deleteAccountData).toHaveBeenCalledTimes(1);
+    expect(mocks.deleteAccountData).toHaveBeenCalledWith(state.ctx, "user-5");
     expect(state.patches).toHaveLength(2);
     expect(state.patches[0]).toMatchObject({ id: "req-5", value: { status: "in_progress" } });
     expect(state.patches[1].id).toBe("req-5");
