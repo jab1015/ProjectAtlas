@@ -1,12 +1,12 @@
 # InventSmith Current Plan and Progress
 
-**Updated:** October 16, 2026 (America/New_York)  
+**Updated:** October 17, 2026 (America/New_York)  
 **Product:** InventSmith — The Inventor OS  
 **Company:** Modern Methods  
 **Repository:** `jab1015/ProjectAtlas` (historical repository slug)  
 **Active branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified code checkpoint before this documentation refresh:** `d01b845b489ec8a7591980fa81d69b915c82d4fc`
+**Latest verified code checkpoint before this documentation refresh:** `93744db1fdf2772925f96dbc4d33ed1823192f86`
 
 ## Product destination
 
@@ -16,7 +16,7 @@ Do not publish one overall completion percentage. Repository implementation, aut
 
 ## Exact verified repository checkpoint
 
-InventSmith CI **#210** (run `38999026644`) passed against exact branch head `d01b845b489ec8a7591980fa81d69b915c82d4fc`.
+InventSmith CI **#226** (run `39016181734`) passed against exact branch head `93744db1fdf2772925f96dbc4d33ed1823192f86`.
 
 The successful exact-head workflow passed:
 
@@ -25,7 +25,7 @@ The successful exact-head workflow passed:
 - operational script syntax checks;
 - web TypeScript;
 - Convex TypeScript;
-- **114 test files / 650 tests**;
+- **116 test files / 660 tests**;
 - production dependency audit with **0 vulnerabilities**;
 - bounded development-dependency audit;
 - Next.js **15.5.27** production build with **32/32** static pages generated.
@@ -40,7 +40,7 @@ GitHub remains source/CI authority. Convex is a core InventSmith backend, not an
 
 That does **not** mean the current code head is deployed or live accepted. Current truth remains:
 
-- repository/CI: verified through exact code head `d01b845b...`;
+- repository/CI: verified through exact code head `93744db1...`;
 - Convex development infrastructure: previously configured/health-checked;
 - newest branch head on Convex: not claimed deployed;
 - Modern Methods-owned Vercel/frontend deployment: not yet verified complete;
@@ -56,7 +56,7 @@ The active branch includes organization-native invention workspaces, scoped acce
 
 Seventeen stable department-agent profiles cover common physical/hybrid work plus software-specific product, engineering, prototype, and release paths. Missing or unknown department routing fails closed before model execution.
 
-### Direct security and billing behavior coverage through the verified checkpoint
+### Direct security, billing, fulfillment, and checkout behavior coverage
 
 Executable behavior tests now directly cover:
 
@@ -65,11 +65,14 @@ Executable behavior tests now directly cover:
 - organization ownership, member management, invitation acceptance, and invention sharing;
 - stale invention-grant cleanup and owner `manage` precedence;
 - invention deletion cleanup/storage/accounting behavior;
-- subscription application idempotency, stale/out-of-order rejection, invalid organization targeting, exact organization application, legacy-user behavior, and billing identity continuity across ownership transfer;
+- subscription application idempotency, invalid organization targeting, exact organization application, legacy-user behavior, and billing identity continuity across ownership transfer;
+- cancellation/past-due period-end behavior and immediate unpaid downgrade for both organization and legacy-user billing, including personal-organization entitlement mirroring;
+- delayed/older provider-event rejection and deterministic equal-timestamp resolution independent of delivery order for both billing scopes;
 - signed subscription HTTP ingress: secret/signature validation, malformed/oversized payload rejection, UTF-8 byte limits, payload normalization, and exact mutation handoff;
 - fulfillment replay safety: duplicate fulfillment cannot double-count sales and returns the authoritative stored download token rather than a dead newly proposed token;
 - signed fulfillment HTTP ingress: rejected requests perform zero product reads/purchase writes, unknown products do not create purchases, valid new purchases increment sales once, and replays do not increment sales;
-- download authorization: malformed external purchase IDs fail closed, wrong/unfulfilled links cannot reach storage, requested files must belong to the purchased product, successful redirects record download accounting first, and accounting failure prevents redirect.
+- download authorization: malformed external purchase IDs fail closed, wrong/unfulfilled links cannot reach storage, requested files must belong to the purchased product, successful redirects record download accounting first, and accounting failure prevents redirect;
+- checkout-success truth: a public checkout redirect/query string cannot emit authoritative `upgrade_completed` analytics or claim entitlement; the page records only a non-authoritative `checkout_returned` event while waiting for confirmed billing state.
 
 ## Engineering/manufacturing and external-use boundaries
 
@@ -80,7 +83,7 @@ Professional review, external-use authorization, consequential approval, manufac
 ## Immediate continuation order
 
 1. Qualify the final documentation-refresh head with exact-head InventSmith CI.
-2. Continue provider/billing lifecycle hardening around cancellation, past-due, out-of-order events, ownership changes, and representative checkout/download acceptance without weakening signed ingress or idempotency.
+2. Continue provider/billing acceptance on owner-controlled infrastructure: real signatures, checkout, confirmed provider events, cancellation/past-due, replay, fulfillment, download, ownership changes, and browser-visible entitlement transitions.
 3. Drive representative physical, software, hybrid, and regulated inventions through deeper persisted state transitions, evidence replacement/removal, newest-revision invalidation, manufacturing release, and later external-action boundaries.
 4. Continue specialized artifact/package and generated-format quality acceptance, including rendered document and CAD-format checks where feasible.
 5. Preserve the no-executor boundary until an outside-world executor is deliberately implemented with execution-time revalidation and separate execution evidence.
