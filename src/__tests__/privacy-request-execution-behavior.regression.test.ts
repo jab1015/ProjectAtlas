@@ -39,7 +39,7 @@ describe("privacy request execution behavior", () => {
     const state = buildCtx([{ _id: "req-1", requestType: "account_deletion", status: "pending" }]);
 
     await expect(resolvePrivacyRequestHandler(state.ctx, {
-      requestId: "req-1",
+      requestId: "req-1" as any,
       status: "completed",
       resolutionNotes: "Deletion was reviewed and completed.",
     })).rejects.toThrow(/must be completed through executeAccountDeletion/i);
@@ -52,7 +52,7 @@ describe("privacy request execution behavior", () => {
     const state = buildCtx([{ _id: "req-2", requestType: "data_export", status: "pending" }]);
 
     await expect(resolvePrivacyRequestHandler(state.ctx, {
-      requestId: "req-2",
+      requestId: "req-2" as any,
       status: "declined",
       resolutionNotes: "too short",
     })).rejects.toThrow(/requires auditable resolution notes/i);
@@ -67,7 +67,7 @@ describe("privacy request execution behavior", () => {
     ]);
 
     await expect(executeAccountDeletionHandler(state.ctx, {
-      requestId: "req-3",
+      requestId: "req-3" as any,
       externalBillingResolved: true,
       resolutionNotes: "Audited deletion resolution notes.",
     })).rejects.toThrow(/already terminal/i);
@@ -83,7 +83,7 @@ describe("privacy request execution behavior", () => {
     ]);
 
     await expect(executeAccountDeletionHandler(state.ctx, {
-      requestId: "req-4",
+      requestId: "req-4" as any,
       externalBillingResolved: true,
       resolutionNotes: "Audited administrator deletion attempt.",
     })).rejects.toThrow(/Administrator accounts cannot be deleted/i);
@@ -100,7 +100,7 @@ describe("privacy request execution behavior", () => {
     deleteAccountData.mockResolvedValue({ deletedRows: 12 });
 
     const result = await executeAccountDeletionHandler(state.ctx, {
-      requestId: "req-5",
+      requestId: "req-5" as any,
       externalBillingResolved: false,
       resolutionNotes: "Audited deletion approved for execution.",
     });
