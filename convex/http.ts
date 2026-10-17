@@ -124,7 +124,7 @@ http.route({
 
     const tokenBytes = new Uint8Array(32);
     crypto.getRandomValues(tokenBytes);
-    const downloadToken = Array.from(tokenBytes)
+    const proposedDownloadToken = Array.from(tokenBytes)
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
 
@@ -138,7 +138,7 @@ http.route({
         stripeCheckoutSessionId: body.stripeCheckoutSessionId,
         amountCents: body.amountCents,
         currency: body.currency,
-        downloadToken,
+        downloadToken: proposedDownloadToken,
       }
     );
     const purchaseId = fulfillment.purchaseId;
@@ -150,7 +150,7 @@ http.route({
     }
 
     const origin = new URL(request.url).origin;
-    const downloadUrl = `${origin}/api/download?purchaseId=${purchaseId}&token=${downloadToken}`;
+    const downloadUrl = `${origin}/api/download?purchaseId=${purchaseId}&token=${fulfillment.downloadToken}`;
 
     return new Response(
       JSON.stringify({ downloadUrl, purchaseId }),
