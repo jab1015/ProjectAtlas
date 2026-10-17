@@ -12,6 +12,8 @@
 
 InventSmith status is reported by capability and evidence, not by a single completion percentage. Repository implementation, automated verification, deployment, live functional verification, genuine professional review, real-world evidence, and outside-world execution remain separate states.
 
+The retired controlled-pilot 80% figure must never be used as overall InventSmith completion.
+
 ## Product vision and architecture
 
 InventSmith — The Inventor OS by Modern Methods — owns the applicable journey:
