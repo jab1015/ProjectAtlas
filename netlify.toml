@@ -1,0 +1,6 @@
+[build]
+  command = "npx convex deploy --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL --cmd 'npm run build'"
+
+# Netlify's native Next.js support handles the publish output automatically.
+# CONVEX_DEPLOY_KEY must be configured in Netlify's environment variables and
+# must be a production deploy key for the intended InventSmith Convex project.
