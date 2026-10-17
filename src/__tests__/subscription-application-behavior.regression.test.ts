@@ -66,6 +66,35 @@ function buildCtx(args?: {
   return { ctx, inserts, patches, tables, documents };
 }
 
+function organizationBillingState() {
+  return buildCtx({
+    memberships: [
+      {
+        _id: "membership-owner",
+        organizationId: "org-1",
+        userId: "owner-1",
+        role: "owner",
+        status: "active",
+      },
+    ],
+    documents: {
+      "org-1": {
+        _id: "org-1",
+        kind: "studio",
+        status: "active",
+        createdByUserId: "owner-1",
+        billingCustomerId: "customer-1",
+        planKey: "studio_6",
+        updatedAt: 10,
+      },
+      "owner-1": {
+        _id: "owner-1",
+        email: "owner@example.com",
+      },
+    },
+  });
+}
+
 const baseEvent = {
   providerEventId: "evt-new",
   customerEmail: "owner@example.com",
@@ -234,6 +263,69 @@ describe("subscription application behavior", () => {
       subscriptionUpdatedAt: 100,
     });
     expect(state.documents["org-2"].planKey).toBe("explorer");
+  });
+
+  it("preserves a Studio plan for canceled and past-due events until the paid period ends", async () => {
+    const now = vi.spyOn(Date, "now").mockReturnValue(1_000);
+    try {
+      for (const status of ["canceled", "past_due"] as const) {
+        const state = organizationBillingState();
+        const result = await applySubscriptionEventHandler(state.ctx, {
+          ...baseEvent,
+          providerEventId: `evt-${status}`,
+          tier: "enterprise",
+          organizationPlanKey: "studio_6",
+          status,
+          organizationId: "org-1" as any,
+          billingCustomerId: "customer-1",
+          currentPeriodEnd: 1_001,
+        });
+
+        expect(result).toMatchObject({ applied: true, scope: "organization", planKey: "studio_6" });
+        expect(state.patches).toHaveLength(1);
+        expect(state.patches[0].value).toMatchObject({
+          planKey: "studio_6",
+          subscriptionStatus: status,
+          subscriptionCurrentPeriodEnd: 1_001,
+        });
+      }
+    } finally {
+      now.mockRestore();
+    }
+  });
+
+  it("downgrades Studio access at the exact canceled period end and immediately for unpaid status", async () => {
+    const now = vi.spyOn(Date, "now").mockReturnValue(1_000);
+    try {
+      const cases = [
+        { status: "canceled" as const, currentPeriodEnd: 1_000 },
+        { status: "unpaid" as const, currentPeriodEnd: 2_000 },
+      ];
+
+      for (const [index, lifecycle] of cases.entries()) {
+        const state = organizationBillingState();
+        const result = await applySubscriptionEventHandler(state.ctx, {
+          ...baseEvent,
+          providerEventId: `evt-downgrade-${index}`,
+          tier: "enterprise",
+          organizationPlanKey: "studio_6",
+          status: lifecycle.status,
+          organizationId: "org-1" as any,
+          billingCustomerId: "customer-1",
+          currentPeriodEnd: lifecycle.currentPeriodEnd,
+        });
+
+        expect(result).toMatchObject({ applied: true, scope: "organization", planKey: "explorer" });
+        expect(state.patches).toHaveLength(1);
+        expect(state.patches[0].value).toMatchObject({
+          planKey: "explorer",
+          subscriptionStatus: lifecycle.status,
+          subscriptionCurrentPeriodEnd: lifecycle.currentPeriodEnd,
+        });
+      }
+    } finally {
+      now.mockRestore();
+    }
   });
 
   it("keeps an established provider billing identity authoritative after ownership transfer", async () => {
