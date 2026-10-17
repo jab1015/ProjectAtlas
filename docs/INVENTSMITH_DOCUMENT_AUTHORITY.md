@@ -12,36 +12,32 @@ The customer-facing and current product name is **InventSmith — The Inventor O
 
 The former **Atlas / ProjectAtlas** name is historical only. It may remain where changing it would make a factual record inaccurate, including the current repository slug `jab1015/ProjectAtlas`, exact historical records, compatibility identifiers pending tested migration, and separately excluded historical material.
 
-Current product prose, active plans, current-state descriptions, handoffs, headings, and canonical documentation must use **InventSmith**.
-
 ## Current authoritative documents
 
 Read these first, in this order:
 
-1. `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md` — authoritative product destination and non-negotiable requirements.
-2. `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md` — authoritative current implementation checkpoint and continuation order.
-3. `docs/INVENTSMITH_BUILD_PROGRESS.md` — repository progress and acceptance state.
-4. `docs/INVENTSMITH_CAPABILITY_MATRIX.md` — capability-by-capability implementation/acceptance evidence.
-5. `docs/INVENTSMITH_DEPLOYMENT_RUNBOOK.md` — owner-controlled deployment and live-acceptance procedure.
-6. `docs/INVENTSMITH_CONSEQUENTIAL_SECURITY_CHECKPOINT.md` — focused consequential-operation security boundary.
-7. `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md` — precedence, naming, and supersession rules.
+1. `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`
+2. `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`
+3. `docs/INVENTSMITH_BUILD_PROGRESS.md`
+4. `docs/INVENTSMITH_CAPABILITY_MATRIX.md`
+5. `docs/INVENTSMITH_DEPLOYMENT_RUNBOOK.md`
+6. `docs/INVENTSMITH_CONSEQUENTIAL_SECURITY_CHECKPOINT.md`
+7. `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md`
 
 When these documents disagree with newer verified GitHub branch/PR/CI state, the newer verified GitHub state wins and the documents must be refreshed.
 
 ## Status reporting rule
 
-Never publish one overall completion percentage. The retired controlled-pilot 80% figure must never be used as overall InventSmith completion.
+Never publish one overall completion percentage. Report these states independently:
 
-Report these states independently:
-
-- **Planned** — specified but not necessarily implemented.
-- **Implemented** — repository code exists.
-- **Automated verification passed** — the exact implementation head passed relevant deterministic CI/tests.
-- **Deployed** — the exact code/config is present on owner-controlled infrastructure.
-- **Live functionally verified** — representative authenticated behavior passed there.
-- **Professional review completed** — a genuine qualifying review was actually recorded.
-- **Real-world evidence present** — genuine outside-world evidence was actually ingested/verified.
-- **External action executed** — an outside-world side effect actually occurred and was separately recorded.
+- **Planned**
+- **Implemented**
+- **Automated verification passed**
+- **Deployed**
+- **Live functionally verified**
+- **Professional review completed**
+- **Real-world evidence present**
+- **External action executed**
 
 Repository-green is necessary but never sufficient for deployed/live/professional/real-world claims.
 
@@ -56,12 +52,14 @@ Repository-green is necessary but never sufficient for deployed/live/professiona
 - Invention-level sharing and bounded professional access are required.
 - Active organization membership is the outer invention-access boundary; removed/suspended membership cannot be resurrected by an explicit grant.
 - Organization owners retain `manage` authority across organization inventions even if a stale/narrow explicit grant exists.
-- Physical, software, and hybrid products are first-class invention types.
-- Regulated/safety-sensitive inventions are generally supported with explicit professional/regulatory/engineering/security/privacy gates rather than blanket rejection.
+- Physical, software, hybrid, and regulated invention paths remain first-class where applicable.
 - Harmful/abusive development remains refused.
 - Professional review and external-use authorization are separate states.
 - Consequential external approvals bind exact current authorized artifact revisions and must be revalidated at execution time.
 - Permission/review/release records are not evidence that an outside-world action occurred.
+- Signed subscription and fulfillment ingress must fail closed before application mutations on invalid secret/signature/payload/size.
+- Fulfillment replay must be idempotent for purchase creation and sales counting and must reuse the authoritative stored download token.
+- Download links must normalize external purchase IDs safely, enforce purchase token/status, constrain file selection to the purchased product, and record successful download accounting before redirect.
 
 ## Hosting/deployment authority
 
@@ -73,44 +71,29 @@ Current owner-controlled direction:
 
 The documented Convex development deployment `fiery-gazelle-628` has a prior backend health/configuration checkpoint. That is development infrastructure, not production/live acceptance. This documentation refresh does not claim the latest repository head is deployed there.
 
-MadeThis is retired from the active implementation plan. Do not synchronize back to it, deploy to it, modify it, migrate its test data/secrets, or treat it as source of truth.
+MadeThis is retired from the active implementation plan.
 
 ## Current exact repository truth
 
-Immediately before this documentation refresh, draft PR #24 was open, draft, unmerged, based on `main`, and the exact verified code checkpoint was `75ac3b9b7fb0bd20bf8254bb13ca80d033779e52`.
+Immediately before this documentation refresh, the exact verified code checkpoint was `d01b845b489ec8a7591980fa81d69b915c82d4fc`.
 
-InventSmith CI **#182** (`38997088336`) passed against that exact head with:
+InventSmith CI **#210** (`38999026644`) passed against that exact head with:
 
 - exact-head checkout/verification;
 - web and Convex typechecking;
-- **110 test files / 621 tests**;
+- **114 test files / 650 tests**;
 - production dependency audit: **0 vulnerabilities**;
 - bounded development advisory packages limited to `@next/eslint-plugin-next`, `braces`, `eslint-config-next`, `fast-glob`, and `micromatch`;
 - Next.js **15.5.27** production build;
 - **32/32** static pages generated.
 
-CI itself is hardened to use the actual expected branch head, pin official checkout/setup-node actions to immutable commits, and avoid persisted checkout credentials.
-
-Vitest config native-loader warnings are resolved. Lucia `3.2.2` remains deprecated and is a separately planned/tested authentication migration item.
+CI remains hardened to verify the actual expected PR head, pin official checkout/setup-node actions to immutable commits, and avoid persisted checkout credentials. Lucia `3.2.2` remains deprecated and is a separately planned/tested authentication migration item.
 
 ## Current implementation/security truth
 
-Implemented repository foundations include organization-native architecture; scoped entitlements/usage accounting; invention authorization/sharing; privacy/export/deletion behavior; consent-based invitations; complete applicable journey wiring; physical/software/hybrid/regulated classification/routing; evidence/trust boundaries; partial validation/recovery; attempt/lease worker reliability; genuine prototype/quote/launch/professional evidence gates; versioned artifact persistence; professional-review state; exact-revision external-use authorization; exact-artifact consequential approval scope; exact-generation manufacturing release; package export; and representative behavior/regression coverage.
+Implemented repository foundations include organization-native architecture; scoped entitlements/usage accounting; invention authorization/sharing; privacy/export/deletion behavior; consent-based invitations; complete applicable journey wiring; physical/software/hybrid/regulated classification/routing; evidence/trust boundaries; partial validation/recovery; attempt/lease worker reliability; genuine prototype/quote/launch/professional evidence gates; versioned artifact persistence; professional-review state; exact-revision external-use authorization; exact-artifact consequential approval scope; exact-generation manufacturing release; package export; signed subscription/fulfillment ingress; replay-safe purchase fulfillment; and authorized/accounted download delivery.
 
-Recent behavior-level security coverage directly verifies:
-
-- account-deletion administrator and organization-owner guards;
-- privacy request deletion execution ordering/terminal/billing guards;
-- personal privacy-export scope separation;
-- organization ownership transfer and member management;
-- secure invitation acceptance;
-- invention deletion cleanup and reserved-usage release;
-- active same-organization invention sharing;
-- stale grant cleanup on member removal;
-- owner `manage` precedence over stale/narrow explicit grants;
-- subscription application duplicate/stale/invalid-target behavior and exact organization entitlement application.
-
-Seventeen stable department-agent profiles cover common physical/hybrid work plus software-specific product, engineering, prototype, and release work. Unknown/missing department routing fails closed before model execution.
+Recent behavior coverage directly verifies subscription ingress/application, billing identity continuity, fulfillment replay safety, signed fulfillment rejection ordering, authoritative download-token reuse, external purchase-ID normalization, product-scoped download file selection, and download accounting before redirect.
 
 The repository currently has no outside-world executor that sends RFQs, contacts suppliers/manufacturers, discloses invention artifacts, places orders/payments, files submissions, or publishes for the inventor.
 
@@ -120,4 +103,4 @@ This documentation refresh creates a newer head and therefore requires a new exa
 
 A new chat or coding worker should use the authoritative InventSmith documents above and continue from the live branch/PR/CI state. Do not restart completed work, merge PR #24, touch `main`, reintroduce MadeThis synchronization, or treat historical former-name documents as current authority.
 
-Near-term engineering should continue signed billing-webhook behavior, replay/out-of-order/provider-identity cases, deeper persisted representative lifecycles, and artifact/output quality without weakening the existing consequential-action or no-executor boundaries.
+Near-term engineering should continue owner-controlled provider lifecycle acceptance, deeper persisted representative lifecycles, artifact/output quality, and deployment preparation without weakening the current signed-ingress, idempotency, authorization, accounting, consequential-action, or no-executor boundaries.
