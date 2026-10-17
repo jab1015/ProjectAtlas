@@ -225,4 +225,212 @@ describe("representative persisted lifecycle behavior", () => {
       }),
     ]));
   });
+
+  it("re-closes a physical prototype path when prototype evidence is removed without invalidating unrelated market or prior-art work", async () => {
+    const state = buildState({
+      inventions: [{ _id: "inv_physical", updatedAt: 200 }],
+      inventionRecords: [{
+        _id: "record_physical",
+        inventionId: "inv_physical",
+        structuredBrief: {
+          inventorEvidence: [
+            {
+              sourceId: "prototype_source",
+              label: "Prototype bench-test results",
+              evidenceKind: "prototype_test",
+              provenance: "inventor_upload",
+            },
+            {
+              sourceId: "market_source",
+              label: "Customer interview notes",
+              evidenceKind: "interview",
+              provenance: "inventor_upload",
+            },
+          ],
+        },
+        updatedAt: 200,
+      }],
+      atlasWorkItems: [
+        {
+          _id: "prototype_gate",
+          inventionId: "inv_physical",
+          kind: "prototype_physical_evidence",
+          status: "completed",
+          attemptCount: 1,
+          completedAt: 210,
+          outputSummary: "Prototype evidence verified",
+          dependsOnKinds: ["prototype_test_plan"],
+          updatedAt: 210,
+        },
+        {
+          _id: "prototype_assessment",
+          inventionId: "inv_physical",
+          kind: "prototype_evidence_assessment",
+          status: "completed",
+          attemptCount: 1,
+          completedAt: 211,
+          outputSummary: "Prototype evidence supports next-step work",
+          dependsOnKinds: ["prototype_physical_evidence"],
+          updatedAt: 211,
+        },
+        {
+          _id: "rfq_package",
+          inventionId: "inv_physical",
+          kind: "manufacturer_rfq_package",
+          status: "completed",
+          attemptCount: 1,
+          completedAt: 212,
+          outputSummary: "RFQ package based on tested prototype",
+          dependsOnKinds: ["prototype_evidence_assessment"],
+          updatedAt: 212,
+        },
+        {
+          _id: "manufacturing_ready",
+          inventionId: "inv_physical",
+          kind: "manufacturing_readiness",
+          status: "completed",
+          attemptCount: 1,
+          completedAt: 213,
+          outputSummary: "Manufacturing readiness based on prototype path",
+          dependsOnKinds: ["manufacturer_rfq_package"],
+          updatedAt: 213,
+        },
+        {
+          _id: "market_analysis",
+          inventionId: "inv_physical",
+          kind: "market_analysis",
+          status: "completed",
+          attemptCount: 1,
+          completedAt: 214,
+          outputSummary: "Market analysis complete",
+          dependsOnKinds: ["market_research"],
+          updatedAt: 214,
+        },
+        {
+          _id: "prior_art",
+          inventionId: "inv_physical",
+          kind: "preliminary_prior_art",
+          status: "completed",
+          attemptCount: 1,
+          completedAt: 215,
+          outputSummary: "Prior-art review complete",
+          updatedAt: 215,
+        },
+      ],
+      atlasDeliverables: [
+        {
+          _id: "prototype_deliverable",
+          inventionId: "inv_physical",
+          workItemId: "prototype_assessment",
+          sourceIds: ["prototype_source", "design_source"],
+          staleReason: undefined,
+          updatedAt: 211,
+        },
+        {
+          _id: "market_deliverable",
+          inventionId: "inv_physical",
+          workItemId: "market_analysis",
+          sourceIds: ["market_source"],
+          staleReason: undefined,
+          updatedAt: 214,
+        },
+      ],
+      deliverableDependencies: [{
+        _id: "prototype_finding_dep",
+        inventionId: "inv_physical",
+        deliverableId: "prototype_deliverable",
+        dependencyType: "finding",
+        dependencyId: "finding_prototype",
+      }],
+      evidenceFindings: [
+        {
+          _id: "finding_prototype",
+          inventionId: "inv_physical",
+          sourceIds: ["prototype_source", "design_source"],
+          status: "evidence_checked",
+          updatedAt: 211,
+        },
+        {
+          _id: "finding_market",
+          inventionId: "inv_physical",
+          sourceIds: ["market_source"],
+          status: "evidence_checked",
+          updatedAt: 214,
+        },
+      ],
+      atlasExecutionEvents: [],
+    });
+
+    await applyInventorEvidenceChange(state.ctx, "inv_physical" as any, {
+      action: "removed",
+      sourceId: "prototype_source" as any,
+      label: "Prototype bench-test results",
+      evidenceKind: "prototype_test",
+      now: 300,
+    });
+
+    const byWorkId = new Map(state.tables.atlasWorkItems.map((row) => [row._id, row]));
+    expect(byWorkId.get("prototype_gate")).toMatchObject({
+      status: "blocked",
+      attemptCount: 0,
+      humanGateType: "physical_work",
+      updatedAt: 300,
+    });
+    expect(byWorkId.get("prototype_gate")?.blockedReason).toMatch(/current physical prototype test evidence is required/i);
+    expect(byWorkId.get("prototype_gate")?.outputSummary).toBeUndefined();
+
+    for (const id of ["prototype_assessment", "rfq_package", "manufacturing_ready"]) {
+      expect(byWorkId.get(id)).toMatchObject({ status: "queued", attemptCount: 0, updatedAt: 300 });
+      expect(byWorkId.get(id)?.completedAt).toBeUndefined();
+      expect(byWorkId.get(id)?.outputSummary).toBeUndefined();
+      expect(byWorkId.get(id)?.lastError).toMatch(/Inventor evidence was removed: Prototype bench-test results/i);
+    }
+
+    expect(byWorkId.get("market_analysis")).toMatchObject({
+      status: "completed",
+      outputSummary: "Market analysis complete",
+      updatedAt: 214,
+    });
+    expect(byWorkId.get("prior_art")).toMatchObject({
+      status: "completed",
+      outputSummary: "Prior-art review complete",
+      updatedAt: 215,
+    });
+
+    const prototypeDeliverable = state.tables.atlasDeliverables.find((row) => row._id === "prototype_deliverable")!;
+    expect(prototypeDeliverable.sourceIds).toEqual(["design_source"]);
+    expect(prototypeDeliverable.staleReason).toMatch(/Inventor evidence was removed: Prototype bench-test results/i);
+    expect(prototypeDeliverable.updatedAt).toBe(300);
+
+    const marketDeliverable = state.tables.atlasDeliverables.find((row) => row._id === "market_deliverable")!;
+    expect(marketDeliverable.sourceIds).toEqual(["market_source"]);
+    expect(marketDeliverable.staleReason).toBeUndefined();
+    expect(marketDeliverable.updatedAt).toBe(214);
+
+    const prototypeFinding = state.tables.evidenceFindings.find((row) => row._id === "finding_prototype")!;
+    expect(prototypeFinding).toMatchObject({ status: "stale", updatedAt: 300 });
+    expect(prototypeFinding.sourceIds).toEqual(["design_source"]);
+
+    const marketFinding = state.tables.evidenceFindings.find((row) => row._id === "finding_market")!;
+    expect(marketFinding).toMatchObject({ status: "evidence_checked", updatedAt: 214 });
+    expect(marketFinding.sourceIds).toEqual(["market_source"]);
+
+    expect(state.tables.inventionRecords[0].structuredBrief.inventorEvidence).toEqual([
+      expect.objectContaining({ sourceId: "market_source", evidenceKind: "interview" }),
+    ]);
+    expect(state.tables.inventions[0].updatedAt).toBe(300);
+    expect(state.inserted).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        table: "atlasExecutionEvents",
+        doc: expect.objectContaining({ eventType: "work_blocked", workItemId: "prototype_gate" }),
+      }),
+      expect.objectContaining({
+        table: "atlasExecutionEvents",
+        doc: expect.objectContaining({
+          eventType: "invention_changed",
+          metadata: expect.objectContaining({ action: "removed", evidenceKind: "prototype_test" }),
+        }),
+      }),
+    ]));
+  });
 });
