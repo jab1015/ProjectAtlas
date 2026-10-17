@@ -1,7 +1,7 @@
 import { httpRouter, makeFunctionReference } from "convex/server";
 import { httpAction } from "./_generated/server";
-import { internal } from "./_generated/api";
 import { auth } from "./auth";
+import { downloadHandler } from "./downloadHandler";
 import { fulfillmentWebhookHandler } from "./fulfillmentWebhook";
 import { subscriptionWebhookHandler } from "./subscriptionWebhook";
 
@@ -64,39 +64,7 @@ http.route({
 http.route({
   path: "/api/download",
   method: "GET",
-  handler: httpAction(async (ctx, request) => {
-    const url = new URL(request.url);
-    const purchaseId = url.searchParams.get("purchaseId");
-    const token = url.searchParams.get("token");
-    const fileId = url.searchParams.get("fileId");
-
-    if (!purchaseId || !token) {
-      return new Response(
-        JSON.stringify({ error: "Missing purchaseId or token" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    const purchase = await ctx.runQuery(internal.purchasesInternal.getById, {
-      purchaseId: purchaseId as any,
-    });
-
-    if (!purchase || purchase.downloadToken !== token || purchase.fulfillmentStatus !== "fulfilled") {
-      return new Response(
-        JSON.stringify({ error: "Invalid download link" }),
-        { status: 403, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    const files = await ctx.runQuery(internal.filesInternal.getByProductId, {
-      productId: purchase.productId,
-    });
-    const requested = fileId ? files.find((file) => String(file._id) === fileId) : files[0];
-    if (!requested) return new Response(JSON.stringify({ error: "File not found" }), { status: 404, headers: { "Content-Type": "application/json" } });
-    const signedUrl = await ctx.storage.getUrl(requested.storageId);
-    if (!signedUrl) return new Response(JSON.stringify({ error: "File unavailable" }), { status: 404, headers: { "Content-Type": "application/json" } });
-    return Response.redirect(signedUrl, 302);
-  }),
+  handler: httpAction(async (ctx, request) => downloadHandler(ctx, request)),
 });
 
 export default http;
