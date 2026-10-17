@@ -8,16 +8,21 @@ export const getById = internalQuery({
   },
 });
 
+export async function getPurchaseByExternalIdHandler(
+  ctx: { db: { normalizeId: (table: "purchases", id: string) => any; get: (id: any) => Promise<any> } },
+  args: { purchaseId: string },
+) {
+  const normalizedId = ctx.db.normalizeId("purchases", args.purchaseId);
+  if (!normalizedId) return null;
+  return await ctx.db.get(normalizedId);
+}
+
 // HTTP download links carry opaque IDs as strings. Normalize the external
 // value before any typed database read so malformed links fail closed as
 // "not found" instead of surfacing a Convex argument-validation exception.
 export const getByExternalId = internalQuery({
   args: { purchaseId: v.string() },
-  handler: async (ctx, args) => {
-    const normalizedId = ctx.db.normalizeId("purchases", args.purchaseId);
-    if (!normalizedId) return null;
-    return await ctx.db.get(normalizedId);
-  },
+  handler: getPurchaseByExternalIdHandler,
 });
 
 function maskEmail(email: string): string {
