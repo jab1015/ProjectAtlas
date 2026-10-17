@@ -46,6 +46,7 @@ function buildState() {
           return {
             unique: vi.fn(async () => matches[0] ?? null),
             first: vi.fn(async () => matches[0] ?? null),
+            collect: vi.fn(async () => matches),
           };
         },
       })),
