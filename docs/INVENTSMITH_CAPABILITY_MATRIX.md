@@ -1,6 +1,6 @@
 # InventSmith Capability Matrix
 
-**Updated:** October 1, 2026
+**Updated:** October 16, 2026
 **Branch:** `inventsmith/full-product-build`  
 **Purpose:** Track implementation and acceptance dimensions independently from deployment and professional/real-world evidence.
 
@@ -19,13 +19,14 @@ The retired controlled-pilot 80% figure must never be used as overall InventSmit
 
 ## Naming / infrastructure
 
-Customer-facing product: **InventSmith — The Inventor OS** by **Modern Methods**. The historical repository slug `jab1015/ProjectAtlas` and selected `atlas*` / `ATLAS_*` compatibility identifiers remain intentionally until a separately tested migration is justified. MadeThis is retired. Owner-controlled Vercel and Convex are not yet deployed.
+Customer-facing product: **InventSmith — The Inventor OS** by **Modern Methods**. The historical repository slug `jab1015/ProjectAtlas` and selected `atlas*` / `ATLAS_*` compatibility identifiers remain intentionally until a separately tested migration is justified. MadeThis is retired. Owner-controlled Convex development is configured and backend-health verified; Vercel/frontend production deployment and authenticated acceptance are not complete.
 
 ## Current capability state
 
 | Capability | Repository state | Automated state | Live state | Remaining boundary |
 |---|---|---|---|---|
 | Complete applicable journey/navigation | implemented | representative regressions passed; completion semantics regression-locked | not deployed | deeper persisted state-transition acceptance |
+| Dedicated AI agent per department | implemented: 17 stable department profiles with unique identity, mission and guardrails; shared provider infrastructure | local 568-test suite includes complete physical/hybrid/software routing, prompt binding, audit metadata and fail-closed unknown routing | deployed to Convex development; provider-backed representative acceptance not yet run | exact-head CI and authenticated representative department executions |
 | Physical/software/hybrid/regulated classification | implemented | representative routing covered | not deployed | live acceptance |
 | Organization-native tenancy/access | implemented | authorization foundation covered | not deployed | deeper consequential runtime cases |
 | Evidence provenance/trust | implemented | fail-closed evidence tests established | not deployed | live provider calibration |
@@ -45,13 +46,13 @@ Customer-facing product: **InventSmith — The Inventor OS** by **Modern Methods
 | Exact-revision external-use authorization | implemented | manager authorization, duplicate-latest rejection, idempotency, Work Library UI and non-execution audit covered | not deployed | live multi-user acceptance |
 | Consequential external approval scope | implemented | exact artifact request/approval/execution revalidation plus non-execution approval audit passed by exact-head CI; all current resolution callers converge on guarded handler | not deployed | no external executor exists; guard and separately audit any future executor |
 | Blocked-work private-information resume | implemented | mutation-level authorization, gate, replay, usage and side-effect tests passed | not deployed | live persisted acceptance |
-| Fresh owner-controlled deployment path | documented | readiness scripts/build checks exist | not provisioned | create owner Vercel/Convex and execute runbook |
+| Fresh owner-controlled deployment path | documented and partially executed | Convex functions deployed; backend health confirms database, OpenAI and auth configuration | Convex development ready; frontend absent | Vercel/frontend, webhooks, monitoring/backup ownership and authenticated acceptance |
 | Billing/webhooks | backend foundation exists | security/idempotency foundations reviewed | not owner-live | select/configure owner billing provider and test real events |
 | Commercial cost calibration | instrumentation foundation | partial | not live | measured runtime/provider economics |
 
 ## Latest CI truth
 
-InventSmith CI #117, run `36930923481`, passed at exact code head `2263c17faae24ceb237ae29b23376f86761cb0e5`: dependency installation, operational-script checks, web TypeScript, Convex TypeScript, all 561 regression tests, production dependency audit, and Next production build all passed.
+InventSmith CI #118 passed at exact pre-change head `79e37ecdd60ccedfadab8dbe721cc9bac5b69f69`. Current department-agent/deployment changes pass local TypeScript, `git diff --check`, and all 568 regression tests; they require exact-head CI after commit/push.
 
 That verified code checkpoint includes deliberate manufacturing release, explicit non-execution audit semantics across approval/external-use/manufacturing-release transitions, launch-evidence-removal behavior, and tightened Journey/dashboard/department/status completion language. Documentation commits newer than that checkpoint require their own exact-head CI before the documentation head itself can be called automatically verified.
 

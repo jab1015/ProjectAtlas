@@ -10,6 +10,7 @@ import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { ensureOrganizationDailyUsage, findOrganizationDailyUsage } from "./organizationDailyUsage";
 import { conservativeAttemptSettlementCost } from "./usageSettlementLogic";
 import { isManufacturingMaturityEligible } from "./manufacturingMaturityLogic";
+import { departmentAgentAuditMetadata } from "./departmentAgentLogic";
 
 async function settleUsageReservation(
   ctx: MutationCtx,
@@ -205,6 +206,7 @@ export const claimNextWork = internalMutation({
       summary: `InventSmith claimed ${selection.selected.kind}.`,
       attemptNumber,
       metadata: {
+        ...departmentAgentAuditMetadata(selection.selected.inputSnapshot),
         usageScope: usageScope.scope,
         usageOrganizationId: usageScope.organizationId ? String(usageScope.organizationId) : undefined,
         usageUserId: usageScope.scope === "legacy_user" ? String(usageScope.usageUserId) : undefined,
@@ -493,7 +495,7 @@ export const completeWork = internalMutation({
       summary: args.summary.slice(0, 500),
       attemptNumber: args.attemptNumber,
       costUnits: args.actualCostUnits,
-      metadata: { findingCount: findings.length, sourceCount: sourceIds.length, sourceCoverage, usageKnown: true },
+      metadata: { ...departmentAgentAuditMetadata(workItem.inputSnapshot), findingCount: findings.length, sourceCount: sourceIds.length, sourceCoverage, usageKnown: true },
       createdAt: args.completedAt,
     });
     await settleUsageReservation(ctx, workItem, workItem.inventionId, args.actualCostUnits, 1, args.completedAt);
@@ -560,7 +562,7 @@ export const failWork = internalMutation({
       summary: "Autonomous work attempt failed.",
       attemptNumber: args.attemptNumber,
       costUnits: args.usageKnown ? args.actualCostUnits : undefined,
-      metadata: { retryScheduled: willRetry, usageKnown: args.usageKnown, budgetDebitUnits: settledCostUnits },
+      metadata: { ...departmentAgentAuditMetadata(item.inputSnapshot), retryScheduled: willRetry, usageKnown: args.usageKnown, budgetDebitUnits: settledCostUnits },
       createdAt: args.failedAt,
     });
     return { willRetry, staleAttempt: false };
@@ -617,7 +619,7 @@ export const blockWorkForHuman = internalMutation({
       summary: args.reason.slice(0, 500),
       attemptNumber: args.attemptNumber,
       costUnits: args.usageKnown ? args.actualCostUnits : undefined,
-      metadata: { gateType: args.gateType, usageKnown: args.usageKnown, budgetDebitUnits: settledCostUnits },
+      metadata: { ...departmentAgentAuditMetadata(item.inputSnapshot), gateType: args.gateType, usageKnown: args.usageKnown, budgetDebitUnits: settledCostUnits },
       createdAt: args.blockedAt,
     });
     return { accepted: true };

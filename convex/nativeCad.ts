@@ -7,6 +7,7 @@ import { requireInventionEditAccess, requireInventionReadAccess } from "./organi
 import { ensureOrganizationDailyUsage } from "./organizationDailyUsage";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { conservativeAttemptSettlementCost } from "./usageSettlementLogic";
+import { departmentAgentAuditMetadata } from "./departmentAgentLogic";
 
 const runAvailableWork = makeFunctionReference<"action", { inventionId: Id<"inventions">; costBudgetUnits?: number }, unknown>("atlasWorkOrchestration:runAvailableWork");
 
@@ -222,7 +223,7 @@ export const recordNativeCadSuccess = internalMutation({
     await settleCadUsage(ctx, workItem, args.inventionId, args.actualCostUnits, 1, args.completedAt);
     await ctx.db.patch(args.workItemId, { status: "completed", outputSummary: `Generated a ${args.partCount}-part preliminary native CAD package with STEP, STL, DXF, editable source, orthographic views, and exploded view.`, actualCostUnits: args.actualCostUnits, completedAt: args.completedAt, claimedAt: undefined, startedAt: undefined, leaseExpiresAt: undefined, reservedCostUnits: undefined, reservationDateKey: undefined, updatedAt: args.completedAt });
     const usageScope = await resolveInventionUsageScope(ctx, args.inventionId);
-    await ctx.db.insert("atlasExecutionEvents", { inventionId: args.inventionId, workItemId: args.workItemId, eventType: "work_completed", actorType: "atlas", summary: `InventSmith generated native preliminary CAD: ${args.partCount} parts, ${args.triangleCount} mesh facets, STEP/STL/DXF/source plus orthographic and exploded-view artifacts.`, attemptNumber: args.attemptNumber, costUnits: args.actualCostUnits, metadata: { artifactKinds: args.artifacts.map((item) => item.kind), maturity: "preliminary_cad", usageKnown: true, usageScope: usageScope?.scope, usageUserId: usageScope ? String(usageScope.usageUserId) : undefined }, createdAt: args.completedAt });
+    await ctx.db.insert("atlasExecutionEvents", { inventionId: args.inventionId, workItemId: args.workItemId, eventType: "work_completed", actorType: "atlas", summary: `InventSmith generated native preliminary CAD: ${args.partCount} parts, ${args.triangleCount} mesh facets, STEP/STL/DXF/source plus orthographic and exploded-view artifacts.`, attemptNumber: args.attemptNumber, costUnits: args.actualCostUnits, metadata: { ...departmentAgentAuditMetadata(workItem.inputSnapshot), artifactKinds: args.artifacts.map((item) => item.kind), maturity: "preliminary_cad", usageKnown: true, usageScope: usageScope?.scope, usageUserId: usageScope ? String(usageScope.usageUserId) : undefined }, createdAt: args.completedAt });
     return { discarded: false, actualCostUnits: args.actualCostUnits };
   },
 });
@@ -262,7 +263,7 @@ export const recordNativeCadFailure = internalMutation({
     });
     await settleCadUsage(ctx, workItem, args.inventionId, settledCostUnits, 0, args.failedAt);
     await ctx.db.patch(workItem._id, { status: willRetry ? "queued" : "failed", reservedCostUnits: undefined, reservationDateKey: undefined, lastError: args.error.slice(0, 2000), startedAt: undefined, claimedAt: undefined, leaseExpiresAt: undefined, updatedAt: args.failedAt });
-    await ctx.db.insert("atlasExecutionEvents", { inventionId: args.inventionId, workItemId: args.workItemId, eventType: "work_failed", actorType: "system", summary: willRetry ? "Native CAD generation failed and is eligible for autonomous retry." : "Native CAD generation exhausted its retry limit.", attemptNumber: args.attemptNumber, costUnits: args.usageKnown ? args.actualCostUnits : undefined, metadata: { error: args.error.slice(0, 1000), willRetry, usageKnown: args.usageKnown, budgetDebitUnits: settledCostUnits }, createdAt: args.failedAt });
+    await ctx.db.insert("atlasExecutionEvents", { inventionId: args.inventionId, workItemId: args.workItemId, eventType: "work_failed", actorType: "system", summary: willRetry ? "Native CAD generation failed and is eligible for autonomous retry." : "Native CAD generation exhausted its retry limit.", attemptNumber: args.attemptNumber, costUnits: args.usageKnown ? args.actualCostUnits : undefined, metadata: { ...departmentAgentAuditMetadata(workItem.inputSnapshot), error: args.error.slice(0, 1000), willRetry, usageKnown: args.usageKnown, budgetDebitUnits: settledCostUnits }, createdAt: args.failedAt });
     return { willRetry, staleAttempt: false };
   },
 });

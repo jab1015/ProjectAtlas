@@ -1,6 +1,6 @@
 # InventSmith Build Progress
 
-**Last updated:** October 1, 2026
+**Last updated:** October 16, 2026
 **Product destination:** Complete Idea-to-Market Inventor OS  
 **Authoritative product specification:** `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`  
 **Current continuation checkpoint:** `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`  
@@ -23,11 +23,13 @@ Physical, software, hybrid and regulated inventions route through applicable bra
 
 ## Hosting/source boundary
 
-GitHub remains source/CI authority. The target runtime is a future Modern Methods-owned Vercel + Convex deployment. MadeThis is retired/historical and must not be used as a sync or deployment target. Repository-green is not equivalent to deployed or live verified.
+GitHub remains source/CI authority. A Modern Methods-owned Convex development deployment (`fiery-gazelle-628`) is configured with OpenAI and Convex Auth and passed its backend health probe. Vercel/frontend production hosting and authenticated acceptance are not complete. MadeThis is retired/historical and must not be used as a sync or deployment target. Repository-green or development-backend health is not equivalent to production acceptance.
 
 ## Implemented foundation
 
 The branch contains organization-native ownership/membership/invention access; organization-scoped entitlements and usage accounting; active/archive capacity; consent-based invitations; privacy/export/deletion boundaries; complete journey routing; persistent invention records; evidence provenance/trust; autonomous work orchestration; partial validation/retry; worker lease/attempt safety; physical/software/hybrid/regulated classification; professional-review gates; real prototype/quote/launch evidence gates; versioned deliverables; explicit exact-revision external-use authorization; deliberate exact-generation manufacturing release; package export; and representative behavioral acceptance coverage.
+
+Every department now has a dedicated, stable AI agent profile with its own identity, mission, scope guardrails and audit metadata. Seventeen profiles cover the common physical/hybrid journey plus software-specific design, engineering, prototype and release paths. Provider/retry/evidence infrastructure remains shared, but model execution fails closed unless the work item resolves to a registered department agent. General work and native CAD both enforce this routing.
 
 ## Major hardening completed
 
@@ -87,7 +89,7 @@ Historical commit `d103d72b` produced a large textual change in `convex/inventio
 
 ## CI checkpoint truth
 
-InventSmith CI #117, run `36930923481`, passed at exact code head `2263c17faae24ceb237ae29b23376f86761cb0e5`. Dependency installation, operational-script checks, web TypeScript, Convex TypeScript, all 561 regression tests, production dependency audit and the Next production build all succeeded.
+InventSmith CI #118 passed at exact pre-change head `79e37ecdd60ccedfadab8dbe721cc9bac5b69f69`. The department-agent and Convex configuration work is newer. Current local qualification passes TypeScript, `git diff --check` and all 568 regression tests; exact-head CI remains required after commit/push.
 
 That exact verified head includes direct mutation tests for consequential approval artifact binding, stale/superseded revalidation, legacy denial, authorization failure, execution-time stale-scope rejection, manufacturing release, launch evidence removal, and the tightened inventor-facing completion semantics.
 

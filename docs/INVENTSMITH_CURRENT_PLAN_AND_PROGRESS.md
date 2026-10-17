@@ -1,6 +1,6 @@
 # InventSmith Current Plan and Progress
 
-**Updated:** October 1, 2026
+**Updated:** October 16, 2026
 **Product:** InventSmith — The Inventor OS  
 **Company:** Modern Methods  
 **Repository:** `jab1015/ProjectAtlas` (historical repository slug)  
@@ -17,11 +17,15 @@ Do not publish an overall completion percentage. Track repository implementation
 
 ## Source, hosting, and deployment boundary
 
-Source and CI remain in the current repository. The future runtime remains a Modern Methods-owned Vercel deployment plus a Modern Methods-owned Convex deployment. MadeThis is historical only and must not be used as a deployment or synchronization target. Repository-green does not mean deployed or live-functionally-verified.
+Source and CI remain in the current repository. A Modern Methods-owned Convex development deployment now exists at `fiery-gazelle-628`; its functions, OpenAI server configuration, database health and Convex Auth signing configuration passed the public backend health probe on October 16, 2026. This is development infrastructure, not production acceptance. Vercel/frontend deployment, authenticated browser acceptance, billing/webhook secrets, professional review and genuine real-world evidence remain separate. MadeThis is historical only and must not be used as a deployment or synchronization target.
 
 ## Implemented hardening state
 
 Hardening foundations include partial validation/retry, conservative confidence, fail-closed evidence promotion, attempt-aware usage settlement, organization/invention authorization boundaries, worker lease/attempt protection, genuine evidence gates, professional-review records, scoped evidence invalidation, manufacturing maturity and deliberate manufacturing release, consequential privacy/billing authorization, package-export safety, exact-revision external-use authorization, exact-artifact consequential approval scope, and explicit non-execution audit semantics for permission/release transitions.
+
+### Department-agent architecture
+
+Every InventSmith department resolves to its own stable AI agent profile before provider execution. Seventeen registered agents cover discovery/feasibility, patent readiness, product design/CAD, prototype, manufacturing, branding, IP/legal preparation, pricing, marketing, sales, funding, launch, growth and the four software-specific product/engineering/prototype/release departments. Each profile has a unique ID, name, mission and department guardrails while using the shared provider, evidence, usage, retry and authorization infrastructure. Missing or unknown department assignment fails closed before a model call. General autonomous work and native CAD both bind the selected agent identity into the system prompt, and execution audits record that identity.
 
 ### Engineering / prototype / RFQ maturity
 
@@ -71,7 +75,7 @@ Historical commit `d103d72b` had an unusually large textual diff in `convex/inve
 
 ## CI truth
 
-InventSmith CI #117, run `36930923481`, passed at exact head `2263c17faae24ceb237ae29b23376f86761cb0e5`. The run completed dependency installation, operational-script checks, web TypeScript, Convex TypeScript, 561 regression tests, production dependency audit, and the Next production build successfully. That checkpoint includes the deliberate manufacturing-release UI, fail-closed newest synchronized CAD-generation display semantics, and package duplicate-newest/content hardening.
+InventSmith CI #118 passed at exact pre-change head `79e37ecdd60ccedfadab8dbe721cc9bac5b69f69`. The October 16 department-agent and Convex-configuration changes are newer than that checkpoint. Locally, TypeScript, `git diff --check`, and all 568 regression tests pass; exact-head CI is still required after commit/push.
 
 Documentation commits after that verified code checkpoint must receive their own exact-head green CI before the documentation head itself is called automatically verified.
 
@@ -93,9 +97,10 @@ PR #24 remains draft/open/unmerged and `main` remains untouched.
 
 - **Product destination:** defined and locked in `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`.
 - **Repository implementation:** active and continuing on this branch.
-- **Automated verification:** full CI passed at exact code head `2263c17faae24ceb237ae29b23376f86761cb0e5`; this documentation head requires its own exact-head result before it is called automatically verified.
-- **Deployed to owner-controlled Vercel/Convex:** no.
-- **Live functionally verified:** no.
+- **Automated verification:** CI #118 passed at exact pre-change head `79e37ecdd60ccedfadab8dbe721cc9bac5b69f69`; current changes pass local TypeScript and 568 regressions but require exact-head CI.
+- **Owner-controlled Convex development deployment:** configured and public backend health verified at `fiery-gazelle-628`; this is not a production claim.
+- **Owner-controlled Vercel/frontend deployment:** not configured or verified.
+- **Live functional verification:** backend configuration/database health only; authenticated browser and representative workflow acceptance remain incomplete.
 - **Professional review completed:** only when a real qualified review is actually recorded; never infer it from repository-green or AI output.
 
 ## New-chat start instruction
