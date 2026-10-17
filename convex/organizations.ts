@@ -340,43 +340,51 @@ export const getMyInventionAccess = query({
   },
 });
 
+type GrantInventionAccessArgs = {
+  inventionId: Id<"inventions">;
+  userId: Id<"users">;
+  access: InventionAccess;
+};
+
+export async function grantInventionAccessHandler(ctx: MutationCtx, args: GrantInventionAccessArgs) {
+  const { userId: actingUserId } = await requireInventionManageAccess(ctx, args.inventionId);
+  const invention = await ctx.db.get(args.inventionId);
+  if (!invention?.organizationId) throw new ConvexError("Migrate invention to an organization first");
+
+  const targetMembership = await getOrganizationMembership(ctx, invention.organizationId, args.userId);
+  if (!targetMembership || targetMembership.status !== "active") {
+    throw new ConvexError("Target user must be an active organization member");
+  }
+
+  const existing = await ctx.db
+    .query("inventionAccessGrants")
+    .withIndex("by_inventionId_userId", (q) =>
+      q.eq("inventionId", args.inventionId).eq("userId", args.userId)
+    )
+    .first();
+  const now = Date.now();
+  if (existing) {
+    await ctx.db.patch(existing._id, { access: args.access, grantedByUserId: actingUserId, updatedAt: now });
+    return existing._id;
+  }
+  return ctx.db.insert("inventionAccessGrants", {
+    inventionId: args.inventionId,
+    organizationId: invention.organizationId,
+    userId: args.userId,
+    access: args.access,
+    grantedByUserId: actingUserId,
+    createdAt: now,
+    updatedAt: now,
+  });
+}
+
 export const grantInventionAccess = mutation({
   args: {
     inventionId: v.id("inventions"),
     userId: v.id("users"),
     access: v.union(v.literal("manage"), v.literal("edit"), v.literal("view"), v.literal("review")),
   },
-  handler: async (ctx, args) => {
-    const { userId: actingUserId } = await requireInventionManageAccess(ctx, args.inventionId);
-    const invention = await ctx.db.get(args.inventionId);
-    if (!invention?.organizationId) throw new ConvexError("Migrate invention to an organization first");
-
-    const targetMembership = await getOrganizationMembership(ctx, invention.organizationId, args.userId);
-    if (!targetMembership || targetMembership.status !== "active") {
-      throw new ConvexError("Target user must be an active organization member");
-    }
-
-    const existing = await ctx.db
-      .query("inventionAccessGrants")
-      .withIndex("by_inventionId_userId", (q) =>
-        q.eq("inventionId", args.inventionId).eq("userId", args.userId)
-      )
-      .first();
-    const now = Date.now();
-    if (existing) {
-      await ctx.db.patch(existing._id, { access: args.access, grantedByUserId: actingUserId, updatedAt: now });
-      return existing._id;
-    }
-    return ctx.db.insert("inventionAccessGrants", {
-      inventionId: args.inventionId,
-      organizationId: invention.organizationId,
-      userId: args.userId,
-      access: args.access,
-      grantedByUserId: actingUserId,
-      createdAt: now,
-      updatedAt: now,
-    });
-  },
+  handler: grantInventionAccessHandler,
 });
 
 export const canManageMyOrganization = query({
