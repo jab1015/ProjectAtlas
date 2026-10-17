@@ -7,7 +7,8 @@
  * stage has real work initialized.
  */
 
-import { mutation, query, internalQuery } from "./_generated/server";
+import { mutation, query, internalQuery, type MutationCtx } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
 import { v, ConvexError } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { internal } from "./_generated/api";
@@ -367,81 +368,85 @@ export const advanceStage = mutation({
   },
 });
 
+type DeleteInventionArgs = { inventionId: Id<"inventions"> };
+
+export async function deleteInventionHandler(ctx: MutationCtx, { inventionId }: DeleteInventionArgs) {
+  const { userId } = await requireInventionManageAccess(ctx, inventionId);
+  const invention = await ctx.db.get(inventionId);
+  if (!invention) throw new ConvexError("Invention not found");
+  const usageScope = await resolveInventionUsageScope(ctx, inventionId);
+
+  const stageProgressRows = await ctx.db.query("stageProgress").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+  for (const row of stageProgressRows) await ctx.db.delete(row._id);
+  const conversationMessageRows = await ctx.db.query("conversationMessages").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+  for (const row of conversationMessageRows) await ctx.db.delete(row._id);
+  const conversationRows = await ctx.db.query("conversations").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+  for (const row of conversationRows) await ctx.db.delete(row._id);
+  const documentRows = await ctx.db.query("documents").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+  for (const row of documentRows) await ctx.db.delete(row._id);
+  const validationResearchRows = await ctx.db.query("validationResearch").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+  for (const row of validationResearchRows) await ctx.db.delete(row._id);
+
+  const notificationUserIds = new Set<string>([String(invention.userId), String(userId)]);
+  if (invention.organizationId) {
+    const memberships = await ctx.db.query("organizationMemberships").withIndex("by_organizationId", (q) => q.eq("organizationId", invention.organizationId!)).collect();
+    for (const membership of memberships) notificationUserIds.add(String(membership.userId));
+  }
+  for (const notificationUserId of notificationUserIds) {
+    const notificationRows = await ctx.db.query("notifications").withIndex("by_userId", (q) => q.eq("userId", notificationUserId as typeof userId)).collect();
+    for (const row of notificationRows) if (row.inventionId === inventionId) await ctx.db.delete(row._id);
+  }
+
+  const generatedMediaRows = await ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+  for (const row of generatedMediaRows) if (row.storageId) await ctx.storage.delete(row.storageId);
+  const evidenceSourceRows = await ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+  for (const row of evidenceSourceRows) {
+    const storageId = row.metadata?.storageId;
+    if (typeof storageId === "string") {
+      try { await ctx.storage.delete(storageId as any); } catch { /* storage may already be absent */ }
+    }
+  }
+
+  const canonicalRowGroups = await Promise.all([
+    ctx.db.query("deliverableDependencies").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    ctx.db.query("atlasExecutionEvents").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    ctx.db.query("professionalReviews").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    ctx.db.query("approvalRequests").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    ctx.db.query("inventionDecisions").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    ctx.db.query("inventionAssumptions").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    ctx.db.query("evidenceFindings").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    Promise.resolve(evidenceSourceRows),
+    ctx.db.query("inventionRecords").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    ctx.db.query("inventionAccessGrants").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+  ]);
+
+  const reservedByDate = new Map<string, number>();
+  for (const row of canonicalRowGroups[4]) {
+    if (row.reservedCostUnits && row.reservationDateKey) reservedByDate.set(row.reservationDateKey, (reservedByDate.get(row.reservationDateKey) ?? 0) + row.reservedCostUnits);
+  }
+  for (const [dateKey, reservedUnits] of reservedByDate) {
+    if (usageScope?.scope === "organization") {
+      const usage = await ensureOrganizationDailyUsage(ctx, usageScope.organizationId, dateKey, Date.now());
+      await ctx.db.patch(usage._id, {
+        reservedAutonomousCostUnits: Math.max(0, (usage.reservedAutonomousCostUnits ?? 0) - reservedUnits),
+        updatedAt: Date.now(),
+      });
+    } else if (usageScope?.scope === "legacy_user") {
+      const usage = await ctx.db.query("atlasDailyUsage").withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey)).unique();
+      if (usage) await ctx.db.patch(usage._id, { reservedAutonomousCostUnits: Math.max(0, (usage.reservedAutonomousCostUnits ?? 0) - reservedUnits), updatedAt: Date.now() });
+    }
+  }
+  for (const rows of canonicalRowGroups) for (const row of rows) await ctx.db.delete(row._id);
+
+  await ctx.db.delete(inventionId);
+  return { success: true };
+}
+
 export const deleteInvention = mutation({
   args: { inventionId: v.id("inventions") },
-  handler: async (ctx, { inventionId }) => {
-    const { userId } = await requireInventionManageAccess(ctx, inventionId);
-    const invention = await ctx.db.get(inventionId);
-    if (!invention) throw new ConvexError("Invention not found");
-    const usageScope = await resolveInventionUsageScope(ctx, inventionId);
-
-    const stageProgressRows = await ctx.db.query("stageProgress").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
-    for (const row of stageProgressRows) await ctx.db.delete(row._id);
-    const conversationMessageRows = await ctx.db.query("conversationMessages").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
-    for (const row of conversationMessageRows) await ctx.db.delete(row._id);
-    const conversationRows = await ctx.db.query("conversations").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
-    for (const row of conversationRows) await ctx.db.delete(row._id);
-    const documentRows = await ctx.db.query("documents").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
-    for (const row of documentRows) await ctx.db.delete(row._id);
-    const validationResearchRows = await ctx.db.query("validationResearch").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
-    for (const row of validationResearchRows) await ctx.db.delete(row._id);
-
-    const notificationUserIds = new Set<string>([String(invention.userId), String(userId)]);
-    if (invention.organizationId) {
-      const memberships = await ctx.db.query("organizationMemberships").withIndex("by_organizationId", (q) => q.eq("organizationId", invention.organizationId!)).collect();
-      for (const membership of memberships) notificationUserIds.add(String(membership.userId));
-    }
-    for (const notificationUserId of notificationUserIds) {
-      const notificationRows = await ctx.db.query("notifications").withIndex("by_userId", (q) => q.eq("userId", notificationUserId as typeof userId)).collect();
-      for (const row of notificationRows) if (row.inventionId === inventionId) await ctx.db.delete(row._id);
-    }
-
-    const generatedMediaRows = await ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
-    for (const row of generatedMediaRows) if (row.storageId) await ctx.storage.delete(row.storageId);
-    const evidenceSourceRows = await ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
-    for (const row of evidenceSourceRows) {
-      const storageId = row.metadata?.storageId;
-      if (typeof storageId === "string") {
-        try { await ctx.storage.delete(storageId as any); } catch { /* storage may already be absent */ }
-      }
-    }
-
-    const canonicalRowGroups = await Promise.all([
-      ctx.db.query("deliverableDependencies").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
-      ctx.db.query("atlasExecutionEvents").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
-      ctx.db.query("professionalReviews").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
-      ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
-      ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
-      ctx.db.query("approvalRequests").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
-      ctx.db.query("inventionDecisions").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
-      ctx.db.query("inventionAssumptions").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
-      ctx.db.query("evidenceFindings").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
-      Promise.resolve(evidenceSourceRows),
-      ctx.db.query("inventionRecords").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
-      ctx.db.query("inventionAccessGrants").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
-    ]);
-
-    const reservedByDate = new Map<string, number>();
-    for (const row of canonicalRowGroups[4]) {
-      if (row.reservedCostUnits && row.reservationDateKey) reservedByDate.set(row.reservationDateKey, (reservedByDate.get(row.reservationDateKey) ?? 0) + row.reservedCostUnits);
-    }
-    for (const [dateKey, reservedUnits] of reservedByDate) {
-      if (usageScope?.scope === "organization") {
-        const usage = await ensureOrganizationDailyUsage(ctx, usageScope.organizationId, dateKey, Date.now());
-        await ctx.db.patch(usage._id, {
-          reservedAutonomousCostUnits: Math.max(0, (usage.reservedAutonomousCostUnits ?? 0) - reservedUnits),
-          updatedAt: Date.now(),
-        });
-      } else if (usageScope?.scope === "legacy_user") {
-        const usage = await ctx.db.query("atlasDailyUsage").withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey)).unique();
-        if (usage) await ctx.db.patch(usage._id, { reservedAutonomousCostUnits: Math.max(0, (usage.reservedAutonomousCostUnits ?? 0) - reservedUnits), updatedAt: Date.now() });
-      }
-    }
-    for (const rows of canonicalRowGroups) for (const row of rows) await ctx.db.delete(row._id);
-
-    await ctx.db.delete(inventionId);
-    return { success: true };
-  },
+  handler: deleteInventionHandler,
 });
 
 export const getStageProgressForInvention = internalQuery({
