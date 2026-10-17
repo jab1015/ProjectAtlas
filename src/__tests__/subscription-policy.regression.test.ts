@@ -42,9 +42,13 @@ describe("subscription lifecycle policy", () => {
   it("applies explicitly targeted subscriptions to the organization without duplicating entitlement across users", () => {
     const mutation = readFileSync(join(process.cwd(), "convex/subscriptionMutations.ts"), "utf8");
     const http = readFileSync(join(process.cwd(), "convex/http.ts"), "utf8");
+    const webhook = readFileSync(join(process.cwd(), "convex/subscriptionWebhook.ts"), "utf8");
 
-    expect(http).toContain("organizationId: body.organizationId");
-    expect(http).toContain("organizationPlanKey: body.organizationPlanKey");
+    expect(http).toContain('import { subscriptionWebhookHandler } from "./subscriptionWebhook"');
+    expect(http).toContain("subscriptionWebhookHandler(ctx, request)");
+    expect(webhook).toContain("organizationId: body.organizationId");
+    expect(webhook).toContain("organizationPlanKey: body.organizationPlanKey");
+    expect(webhook).toContain('"subscriptionMutations:applySubscriptionEvent"');
     expect(mutation).toContain("if (args.organizationId)");
     expect(mutation).toContain('membership.status === "active" && membership.role === "owner"');
     expect(mutation).toContain("ownerMembership.userId === organization.createdByUserId");
