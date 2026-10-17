@@ -27,11 +27,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Report full dependency audit
+      - name: Simulate safe audit repair
+        shell: bash
+        run: |
+          npm audit fix --package-lock-only --ignore-scripts
+          git status --short
+
+      - name: Report remaining full dependency audit
         shell: bash
         run: |
           set +e
           npm audit --audit-level=high
           status=$?
-          echo "Full dependency audit exit code: $status"
+          echo "Full dependency audit exit code after safe repair: $status"
           exit 0
