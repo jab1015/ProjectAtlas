@@ -107,6 +107,27 @@ describe("invention authorization behavior", () => {
     await expect(resolveInventionAccess(ctx, "inv1" as any, "user2" as any)).resolves.toBeNull();
   });
 
+  it("does not let a stale explicit grant downgrade the active organization owner", async () => {
+    authState.userId = "owner2";
+    const ctx = fakeCtx({
+      inventions: {
+        inv1: { _id: "inv1", userId: "owner1", organizationId: "org1" },
+      },
+      memberships: [
+        { organizationId: "org1", userId: "owner2", role: "owner", status: "active" },
+      ],
+      grants: [
+        { inventionId: "inv1", userId: "owner2", access: "view" },
+      ],
+    });
+
+    await expect(resolveInventionAccess(ctx, "inv1" as any, "owner2" as any)).resolves.toBe("manage");
+    await expect(requireInventionManageAccess(ctx, "inv1" as any)).resolves.toMatchObject({
+      userId: "owner2",
+      access: "manage",
+    });
+  });
+
   it("lets an active viewer read but not edit or manage", async () => {
     authState.userId = "viewer1";
     const ctx = fakeCtx({
