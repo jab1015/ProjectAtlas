@@ -2,7 +2,7 @@
 
 **Status:** Repository implementation active; Convex development infrastructure exists; owner-controlled Vercel/frontend and full live acceptance are not complete  
 **Product:** InventSmith — The Inventor OS by Modern Methods  
-**Updated:** October 16, 2026  
+**Updated:** October 16, 2026 (America/New_York)  
 **Active branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged
 
@@ -14,9 +14,9 @@ Target ownership:
 
 - **GitHub:** `jab1015/ProjectAtlas` remains the historical repository slug and source/CI authority.
 - **Vercel:** a Modern Methods-owned project is the intended Next.js web host.
-- **Convex:** a Modern Methods-controlled development deployment already exists; owner-controlled production/live acceptance remains separate.
+- **Convex:** a Modern Methods-controlled development deployment exists; owner-controlled production/live acceptance remains separate.
 
-MadeThis is historical only. Do not synchronize back to it, deploy to it, modify it, migrate its test data/secrets, or treat it as the current source of truth.
+MadeThis is historical only. Do not synchronize back to it, deploy to it, modify it, migrate its test data/secrets, or treat it as current source of truth.
 
 Do not call InventSmith deployed, production-ready, or live-verified until the exact intended code/config has actually been deployed to owner-controlled infrastructure and representative authenticated acceptance has passed there.
 
@@ -24,17 +24,16 @@ Do not call InventSmith deployed, production-ready, or live-verified until the e
 
 Use branch `inventsmith/full-product-build` and keep draft PR #24 unmerged unless the owner explicitly changes that boundary.
 
-Latest verified code checkpoint before this documentation update:
+Latest verified code checkpoint before this documentation refresh:
 
-- exact head: `995a9fef88a9cdafa2f4b37bd4a9841eb7557d44`;
-- InventSmith CI run: **#136** (`38990243845`);
+- exact head: `2e0933bfdda56b3b005fb0a0e17363a77364c9f1`;
+- InventSmith CI: **#165** (`38994705687`);
 - conclusion: **success**;
-- 101 test files passed;
-- 571 tests passed;
-- production dependency audit: 0 vulnerabilities;
-- Next.js 15.5.27 production build passed with 32/32 static pages generated.
+- **107 test files / 603 tests**;
+- production dependency audit: **0 vulnerabilities**;
+- Next.js **15.5.27** production build passed with **32/32** static pages generated.
 
-The exact-head workflow verifies:
+Exact-head CI verifies:
 
 ```text
 checkout/assert exact expected head
@@ -48,9 +47,11 @@ development dependency advisory boundary
 npx next build
 ```
 
-The development advisory boundary currently accepts only the known unresolved Next/ESLint lint-tool chain packages `@next/eslint-plugin-next`, `braces`, `eslint-config-next`, `fast-glob`, and `micromatch`; unexpected advisory package names fail CI.
+The development advisory boundary currently accepts only `@next/eslint-plugin-next`, `braces`, `eslint-config-next`, `fast-glob`, and `micromatch`; unexpected advisory package names fail CI.
 
-This documentation update creates a newer head, so that documentation head must pass its own exact-head CI before being described as automatically verified.
+The Vitest config is now explicit ESM (`vitest.config.mts`) and native-loader compatible through `import.meta.dirname`; the prior loader warnings are gone. Lucia `3.2.2` remains deprecated and should be migrated only through a separately tested authentication change.
+
+This documentation refresh creates a newer head, so the final documentation head must pass its own exact-head CI before being described as automatically verified.
 
 Never suppress a failing gate, weaken tests, bypass exact-head verification, or downgrade a security check merely to obtain green CI.
 
@@ -61,12 +62,12 @@ A Modern Methods-controlled **development** deployment is documented at `fiery-g
 Important boundaries:
 
 - that checkpoint is development infrastructure, not production acceptance;
-- this documentation update does not claim the newest branch head is currently deployed there;
+- this document does not claim exact head `2e0933bf...` or the newer documentation head is deployed there;
 - repository-green does not prove deployed/live behavior;
 - backend health does not substitute for authenticated browser acceptance;
-- genuine provider, billing, professional-review, and real-world evidence acceptance remain separate.
+- provider, billing, professional-review, and real-world evidence acceptance remain separate.
 
-The controlled development deployment workflow itself is guarded: deployment is manual, requires explicit confirmation, requires `CONVEX_DEPLOY_KEY`, and rejects a deploy key that is not a development key. Do not dispatch it casually or describe deployment unless a run was actually executed and observed.
+The controlled Convex development deployment workflow remains manual and guarded by explicit confirmation, `CONVEX_DEPLOY_KEY`, and a development-key prefix check. Do not dispatch it casually or describe deployment unless a run was actually executed and observed.
 
 ## 4. Configuration inventory — names only
 
@@ -74,10 +75,10 @@ Never put real values in source, documentation, issues, logs, screenshots, or ch
 
 ### Vercel / Next.js
 
-- `NEXT_PUBLIC_CONVEX_URL` — Convex client deployment URL.
-- `CONVEX_DEPLOYMENT` — deployment selector for supported Convex tooling.
-- `CONVEX_DEPLOY_KEY` — secret deploy credential; never expose to browser code.
-- `NEXT_PUBLIC_PLATFORM_URL` — legacy platform/billing adapter setting; do not point at MadeThis. Keep unset until intentionally replaced/verified.
+- `NEXT_PUBLIC_CONVEX_URL`
+- `CONVEX_DEPLOYMENT`
+- `CONVEX_DEPLOY_KEY`
+- `NEXT_PUBLIC_PLATFORM_URL` — legacy adapter setting; do not point at MadeThis.
 
 ### Convex server
 
@@ -94,18 +95,16 @@ Any newly required provider variable must be added by name/ownership before depl
 
 ## 5. Fresh/intentional Convex deployment procedure
 
-When the owner intentionally advances the backend deployment:
-
 1. Confirm the exact candidate commit and verify exact-head CI is green.
 2. Use the Modern Methods-controlled Convex project/deployment, never a MadeThis deployment/key.
 3. Install dependencies from the repository lockfile.
 4. Run required Convex generation/type/schema checks and resolve failures.
 5. Confirm Convex Auth/server environment configuration is present without exposing secrets.
 6. Confirm provider/admin/billing secrets only for integrations actually enabled.
-7. Deploy the exact intended Convex head through the guarded development/production path appropriate to the environment.
+7. Deploy the exact intended Convex head through the guarded path appropriate to the environment.
 8. Record the exact deployed commit and observed deployment result.
 9. Verify scheduled work, storage, auth callbacks, HTTP/webhook endpoints, entitlement checks, and database/function health.
-10. Only then describe that exact code as deployed; do not call it live-functionally-verified until representative authenticated acceptance passes.
+10. Only then describe that exact code as deployed; live functional verification still requires representative authenticated acceptance.
 
 ## 6. Fresh Vercel/frontend procedure
 
@@ -126,11 +125,13 @@ Using disposable accounts, verify behavior rather than source strings:
 - cross-organization invention/evidence/deliverable/chat/usage/billing/private-artifact access is denied;
 - Viewer cannot mutate;
 - Member/Admin/Owner boundaries are server-enforced;
-- Professional/Guest access is limited to explicit invention/review grants;
+- Professional access is limited to explicit invention/review grants where required;
 - ordinary users cannot execute administrator operations;
 - backend entitlements and active-invention limits remain enforced if UI controls are bypassed;
 - ownership/member departure and archival behavior preserve intended records;
 - rejected consequential operations have no unauthorized side effects.
+
+The repository now directly tests organization ownership transfer, member role/removal actions, privacy deletion execution, billing-sensitive export, personal-export scoping, and invitation acceptance. Live acceptance must still reproduce those boundaries with real disposable authenticated accounts.
 
 ## 8. Core representative acceptance
 
@@ -140,7 +141,7 @@ Exercise at least:
 
 The workspace must make clear what completed, what is running, what failed, what is blocked and why, what authorization/input is required, what artifacts exist, and what happens next.
 
-Run representative physical, software, hybrid, and regulated cases through their applicable paths rather than assuming one path represents all inventions.
+Run representative physical, software, hybrid, and regulated cases through their applicable paths.
 
 ## 9. Evidence/trust acceptance
 
@@ -169,7 +170,7 @@ For each consequential external artifact action:
 5. revalidate exact current approved scope immediately before any eventual outside-world side effect;
 6. record outside-world execution separately from permission.
 
-The current repository has no executor that sends RFQs, contacts suppliers/manufacturers, discloses invention artifacts, places orders/payments, files submissions, or publishes for the inventor. Preserve that no-executor boundary until an executor is deliberately implemented and tested.
+The current repository has no executor that sends RFQs, contacts suppliers/manufacturers, discloses invention artifacts, places orders/payments, files submissions, or publishes for the inventor.
 
 ## 13. Billing/webhook acceptance
 
@@ -183,11 +184,20 @@ Before paid plans are enabled:
 6. verify customer-visible pricing matches backend entitlements;
 7. do not enable production billing until those checks pass.
 
-## 14. Privacy/deletion/storage acceptance
+## 14. Privacy, organization, deletion, and storage acceptance
 
 Verify account/organization export boundaries, invention/evidence deletion authorization, original/generated storage cleanup, member departure, invitations, billing fail-closed requirements, deletion/anonymization semantics, and exclusion of credentials/tokens/secrets/unrelated organization data from exports.
 
-The current code checkpoint includes direct account-deletion behavior tests for administrator protection and suspended owner fail-closed behavior with zero destructive side effects before ownership resolution. Continue expanding direct destructive/privacy coverage.
+Current deterministic behavior coverage includes:
+
+- administrator and company/studio owner account-deletion guards;
+- privacy request terminal/admin/billing checks and execution ordering;
+- personal export exclusion of company/studio inventions/billing events;
+- organization export owner-only raw billing attribution;
+- ownership transfer and member-role/removal safety;
+- invitation exact-account/email binding, expiration, and current seat-capacity recheck before membership activation.
+
+The next larger destructive path to harden behaviorally is invention deletion and its usage/storage cleanup/accounting behavior.
 
 ## 15. Artifact quality acceptance
 
@@ -199,14 +209,6 @@ Before public production release establish owners/tested procedures for uptime, 
 
 ## 17. Release/status rule
 
-Keep these states separate:
+Keep these states separate: implemented; automated verification passed; deployed; live functionally verified; professional review completed; real-world evidence present; external action executed.
 
-- implemented;
-- automated verification passed;
-- deployed;
-- live functionally verified;
-- professional review completed;
-- real-world evidence present;
-- external action executed.
-
-Do not collapse them into a single completion percentage or production-ready claim.
+Do not collapse them into one completion percentage or production-ready claim.
