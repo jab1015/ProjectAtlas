@@ -128,8 +128,8 @@ http.route({
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
 
-    const purchaseId = await ctx.runMutation(
-      internal.purchasesMutations.createFromFulfillment,
+    const fulfillment = await ctx.runMutation(
+      internal.purchasesMutations.createFromFulfillmentWithStatus,
       {
         productId: product._id,
         customerEmail: body.customerEmail,
@@ -141,10 +141,13 @@ http.route({
         downloadToken,
       }
     );
+    const purchaseId = fulfillment.purchaseId;
 
-    await ctx.runMutation(internal.productsMutations.incrementSales, {
-      id: product._id,
-    });
+    if (fulfillment.created) {
+      await ctx.runMutation(internal.productsMutations.incrementSales, {
+        id: product._id,
+      });
+    }
 
     const origin = new URL(request.url).origin;
     const downloadUrl = `${origin}/api/download?purchaseId=${purchaseId}&token=${downloadToken}`;
