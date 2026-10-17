@@ -2,7 +2,7 @@
 
 **Status:** Repository implementation active; Convex development infrastructure exists; owner-controlled Vercel/frontend and full live acceptance are not complete  
 **Product:** InventSmith — The Inventor OS by Modern Methods  
-**Updated:** October 16, 2026 (America/New_York)  
+**Updated:** October 17, 2026 (America/New_York)  
 **Active branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged
 
@@ -22,10 +22,10 @@ Do not call InventSmith deployed, production-ready, or live-verified until the e
 
 Latest verified code checkpoint before this documentation refresh:
 
-- exact head: `d01b845b489ec8a7591980fa81d69b915c82d4fc`;
-- InventSmith CI: **#210** (`38999026644`);
+- exact head: `93744db1fdf2772925f96dbc4d33ed1823192f86`;
+- InventSmith CI: **#226** (`39016181734`);
 - conclusion: **success**;
-- **114 test files / 650 tests**;
+- **116 test files / 660 tests**;
 - production dependency audit: **0 vulnerabilities**;
 - Next.js **15.5.27** production build passed with **32/32** static pages generated.
 
@@ -35,7 +35,7 @@ Lucia `3.2.2` remains deprecated and should be migrated only through a separatel
 
 ## 3. Current Convex status
 
-A Modern Methods-controlled **development** deployment is documented at `fiery-gazelle-628`. A prior checkpoint verified backend health/configuration there. This document does **not** claim exact head `d01b845b...` or this documentation refresh is deployed there.
+A Modern Methods-controlled **development** deployment is documented at `fiery-gazelle-628`. A prior checkpoint verified backend health/configuration there. This document does **not** claim exact head `93744db1...` or this documentation refresh is deployed there.
 
 The controlled Convex development deployment workflow remains manual and guarded by explicit confirmation, `CONVEX_DEPLOY_KEY`, and a development-key prefix check. Do not dispatch it casually.
 
@@ -109,29 +109,33 @@ Engineering review and manufacturing release remain separate. Manufacturing rele
 
 For consequential artifact actions, require exact latest/fresh external-use authorization, exact artifact scope, authorized manager resolution, execution-time revalidation, and separate outside-world execution evidence. The repository currently has no executor for supplier contact, RFQs, disclosure, orders/payments, filings, or publication.
 
-## 12. Billing, subscription, fulfillment, and download acceptance
+## 12. Billing, subscription, fulfillment, checkout, and download acceptance
 
 Deterministic repository coverage now directly exercises:
 
-- subscription duplicate/stale/invalid-target behavior and exact organization application;
+- subscription duplicate/invalid-target behavior and exact organization application;
 - provider billing identity continuity across ownership transfer;
+- organization and legacy-user cancellation/past-due access through period end plus immediate unpaid downgrade;
+- deterministic provider-event ordering: delayed older events cannot overwrite newer state and equal timestamps resolve consistently independent of delivery order;
 - signed subscription HTTP ingress with HMAC validation, UTF-8 byte limits, normalization, and exact mutation handoff;
 - fulfillment replay idempotency across Stripe session/platform order identifiers;
 - one-time sales counting and authoritative stored download-token reuse on replay;
 - signed fulfillment HTTP ingress with zero product/purchase side effects on rejected requests;
 - safe external purchase-ID normalization for download URLs;
-- purchase token/fulfillment-state validation, product-scoped file selection, signed storage URL resolution, and download accounting before redirect.
+- purchase token/fulfillment-state validation, product-scoped file selection, signed storage URL resolution, and download accounting before redirect;
+- checkout-success UI/analytics truth: a public redirect/query parameter is not treated as confirmed entitlement and cannot emit authoritative `upgrade_completed`; only `checkout_returned` is recorded pending confirmed billing state.
 
 Before paid plans/fulfillment are enabled live:
 
 1. select/configure the owner-controlled provider integration;
 2. verify real provider signatures and secret ownership;
-3. test cancellation, past-due, duplicate, replay, out-of-order and delayed events;
-4. exercise real checkout → fulfillment → success page → download with disposable purchases;
-5. verify duplicate fulfillment neither increments sales twice nor returns a dead token;
-6. verify malformed/wrong download links fail cleanly and successful downloads update accounting;
-7. verify customer-visible pricing matches backend entitlements;
-8. do not enable production billing until these checks pass.
+3. test cancellation, past-due, duplicate, replay, out-of-order, delayed and equal-time events against real callbacks;
+4. exercise real checkout → confirmed provider event → fulfillment → success page → download with disposable purchases;
+5. verify success-page/browser messaging reflects actual server-side entitlement rather than redirect/query parameters;
+6. verify duplicate fulfillment neither increments sales twice nor returns a dead token;
+7. verify malformed/wrong download links fail cleanly and successful downloads update accounting;
+8. verify customer-visible pricing matches backend entitlements;
+9. do not enable production billing until these checks pass.
 
 ## 13. Privacy, deletion, and storage acceptance
 
