@@ -8,103 +8,68 @@
 
 ## 1. Deployment authority and boundary
 
-This runbook supersedes the previous MadeThis replication workflow.
-
 Target ownership:
 
-- **GitHub:** `jab1015/ProjectAtlas` remains the historical repository slug and source/CI authority.
+- **GitHub:** `jab1015/ProjectAtlas` remains source/CI authority.
 - **Vercel:** a Modern Methods-owned project is the intended Next.js web host.
-- **Convex:** a Modern Methods-controlled development deployment exists; owner-controlled production/live acceptance remains separate.
+- **Convex:** a Modern Methods-controlled development deployment exists; production/live acceptance remains separate.
 
-MadeThis is historical only. Do not synchronize back to it, deploy to it, modify it, migrate its test data/secrets, or treat it as current source of truth.
+MadeThis is historical only. Do not synchronize back to it, deploy to it, migrate its data/secrets, or treat it as source of truth.
 
 Do not call InventSmith deployed, production-ready, or live-verified until the exact intended code/config has actually been deployed to owner-controlled infrastructure and representative authenticated acceptance has passed there.
 
 ## 2. Latest repository gate
 
-Use branch `inventsmith/full-product-build` and keep draft PR #24 unmerged unless the owner explicitly changes that boundary.
-
 Latest verified code checkpoint before this documentation refresh:
 
-- exact head: `75ac3b9b7fb0bd20bf8254bb13ca80d033779e52`;
-- InventSmith CI: **#182** (`38997088336`);
+- exact head: `d01b845b489ec8a7591980fa81d69b915c82d4fc`;
+- InventSmith CI: **#210** (`38999026644`);
 - conclusion: **success**;
-- **110 test files / 621 tests**;
+- **114 test files / 650 tests**;
 - production dependency audit: **0 vulnerabilities**;
 - Next.js **15.5.27** production build passed with **32/32** static pages generated.
 
-Exact-head CI verifies:
+Exact-head CI verifies exact checkout, lockfile install, operational scripts, web/Convex TypeScript, regression tests, production audit, bounded development audit, and production build. The development advisory boundary accepts only `@next/eslint-plugin-next`, `braces`, `eslint-config-next`, `fast-glob`, and `micromatch`.
 
-```text
-checkout/assert exact expected head
-npm ci
-operational script syntax checks
-npx tsc --noEmit
-npx tsc -p convex --noEmit
-npm test
-npm audit --omit=dev --audit-level=high
-development dependency advisory boundary
-npx next build
-```
-
-The development advisory boundary currently accepts only `@next/eslint-plugin-next`, `braces`, `eslint-config-next`, `fast-glob`, and `micromatch`; unexpected advisory package names fail CI.
-
-The Vitest config is explicit ESM (`vitest.config.mts`) and native-loader compatible through `import.meta.dirname`; the prior loader warnings are gone. Lucia `3.2.2` remains deprecated and should be migrated only through a separately tested authentication change.
-
-This documentation refresh creates a newer head, so the final documentation head must pass its own exact-head CI before being described as automatically verified.
-
-Never suppress a failing gate, weaken tests, bypass exact-head verification, or downgrade a security check merely to obtain green CI.
+Lucia `3.2.2` remains deprecated and should be migrated only through a separately tested authentication change. This documentation refresh creates a newer head, so that final head must pass exact-head CI before being described as automatically verified.
 
 ## 3. Current Convex status
 
-A Modern Methods-controlled **development** deployment is documented at `fiery-gazelle-628`. At the previously recorded checkpoint, backend health/configuration checks passed for deployed Convex functions/database connectivity, OpenAI server configuration, and Convex Auth signing configuration.
+A Modern Methods-controlled **development** deployment is documented at `fiery-gazelle-628`. A prior checkpoint verified backend health/configuration there. This document does **not** claim exact head `d01b845b...` or this documentation refresh is deployed there.
 
-Important boundaries:
-
-- that checkpoint is development infrastructure, not production acceptance;
-- this document does not claim exact head `75ac3b9b...` or the newer documentation head is deployed there;
-- repository-green does not prove deployed/live behavior;
-- backend health does not substitute for authenticated browser acceptance;
-- provider, billing, professional-review, and real-world evidence acceptance remain separate.
-
-The controlled Convex development deployment workflow remains manual and guarded by explicit confirmation, `CONVEX_DEPLOY_KEY`, and a development-key prefix check. Do not dispatch it casually or describe deployment unless a run was actually executed and observed.
+The controlled Convex development deployment workflow remains manual and guarded by explicit confirmation, `CONVEX_DEPLOY_KEY`, and a development-key prefix check. Do not dispatch it casually.
 
 ## 4. Configuration inventory — names only
 
-Never put real values in source, documentation, issues, logs, screenshots, or chat transcripts.
-
 ### Vercel / Next.js
-
 - `NEXT_PUBLIC_CONVEX_URL`
 - `CONVEX_DEPLOYMENT`
 - `CONVEX_DEPLOY_KEY`
-- `NEXT_PUBLIC_PLATFORM_URL` — legacy adapter setting; do not point at MadeThis.
+- `NEXT_PUBLIC_PLATFORM_URL` — legacy compatibility setting; never point at MadeThis.
 
 ### Convex server
-
 - `OPENAI_API_KEY`
 - `ATLAS_OPENAI_MODEL` — historical compatibility identifier pending tested migration.
 - `JWT_PRIVATE_KEY`
 - `JWKS`
 - `CONVEX_SITE_URL`
 - `ADMIN_TOKEN_SECRET`
-- `PLATFORM_FULFILLMENT_SECRET` — legacy adapter secret; do not copy from MadeThis.
-- `ATLAS_SUBSCRIPTION_WEBHOOK_SECRET` — historical compatibility identifier; preserve signature enforcement until deliberate tested migration.
+- `PLATFORM_FULFILLMENT_SECRET`
+- `ATLAS_SUBSCRIPTION_WEBHOOK_SECRET`
 
-Any newly required provider variable must be added by name/ownership before deployment. Never infer or invent values.
+Never place real secret values in source, docs, issues, logs, screenshots, or chat transcripts.
 
 ## 5. Fresh/intentional Convex deployment procedure
 
-1. Confirm the exact candidate commit and verify exact-head CI is green.
-2. Use the Modern Methods-controlled Convex project/deployment, never a MadeThis deployment/key.
+1. Confirm the exact candidate commit and exact-head CI success.
+2. Use the Modern Methods-controlled Convex project/deployment only.
 3. Install dependencies from the repository lockfile.
 4. Run required Convex generation/type/schema checks and resolve failures.
-5. Confirm Convex Auth/server environment configuration is present without exposing secrets.
-6. Confirm provider/admin/billing secrets only for integrations actually enabled.
-7. Deploy the exact intended Convex head through the guarded path appropriate to the environment.
-8. Record the exact deployed commit and observed deployment result.
-9. Verify scheduled work, storage, auth callbacks, HTTP/webhook endpoints, entitlement checks, and database/function health.
-10. Only then describe that exact code as deployed; live functional verification still requires representative authenticated acceptance.
+5. Confirm auth/provider/admin/billing configuration without exposing secrets.
+6. Deploy the exact intended head through the guarded environment-appropriate path.
+7. Record the exact deployed commit and observed deployment result.
+8. Verify scheduled work, storage, auth callbacks, signed HTTP/webhook endpoints, entitlement checks, and database/function health.
+9. Only then describe that exact code as deployed; live functional verification still requires representative authenticated acceptance.
 
 ## 6. Fresh Vercel/frontend procedure
 
@@ -113,27 +78,14 @@ Any newly required provider variable must be added by name/ownership before depl
 3. Configure only public values in `NEXT_PUBLIC_*` variables.
 4. Store server/build credentials in encrypted environment settings.
 5. Point `NEXT_PUBLIC_CONVEX_URL` only to the intended owner-controlled Convex deployment.
-6. Leave legacy MadeThis/platform billing settings unset unless an owner-controlled replacement is intentionally configured and verified.
-7. Build a preview first; do not attach production DNS during initial acceptance.
-8. Run authenticated preview acceptance before promotion.
+6. Do not reuse MadeThis credentials/integration settings.
+7. Build a preview first and run authenticated acceptance before production promotion.
 
 ## 7. Authentication/authorization acceptance
 
-Using disposable accounts, verify behavior rather than source strings:
+Using disposable accounts verify unauthenticated denial, cross-organization isolation, role boundaries, invitation/share/member/owner controls, backend entitlements, account/invention deletion boundaries, and zero unauthorized side effects on rejected consequential actions.
 
-- unauthenticated reads/writes are denied;
-- cross-organization invention/evidence/deliverable/chat/usage/billing/private-artifact access is denied;
-- Viewer cannot mutate;
-- Member/Admin/Owner boundaries are server-enforced;
-- active organization membership remains the outer invention-sharing boundary;
-- explicit invention grants cannot resurrect removed/suspended membership;
-- removing a member clears that organization’s explicit grants for that user;
-- organization ownership always retains `manage` access despite stale/narrow grants;
-- ordinary users cannot execute administrator operations;
-- backend entitlements and active-invention limits remain enforced if UI controls are bypassed;
-- rejected consequential operations have no unauthorized side effects.
-
-Repository tests now directly cover organization ownership transfer, member role/removal, invention sharing, privacy deletion execution, invention deletion, billing-sensitive export, personal-export scoping, and invitation acceptance. Live acceptance must reproduce those boundaries with disposable authenticated accounts.
+Repository tests already cover these deterministically; live acceptance must reproduce them with real disposable authenticated accounts.
 
 ## 8. Core representative acceptance
 
@@ -141,68 +93,59 @@ Exercise at least:
 
 **Sign in → create invention → upload evidence → extraction → research/validation → decision/review → versioned deliverable/package → download/inspect.**
 
-The workspace must make clear what completed, what is running, what failed, what is blocked and why, what authorization/input is required, what artifacts exist, and what happens next.
-
 Run representative physical, software, hybrid, and regulated cases through their applicable paths.
 
-## 9. Evidence/trust acceptance
+## 9. Evidence/trust and worker acceptance
 
-Verify partial/failed-only retry, source provenance, claim/source association, distinction among sourced facts/inventor statements/estimates/AI inference, stale/disputed evidence behavior, prompt-injection resistance, and fail-closed behavior when production providers are unavailable.
+Verify provenance, source association, partial/failed-only retry, stale/disputed evidence, prompt-injection resistance, provider outage fail-closed behavior, duplicate/late/stale worker attempts, leases, bounded retries, cleanup, and conservative usage settlement.
 
-AI/model output cannot satisfy real prototype, manufacturer quote, completed software deployment/test, post-launch sales/analytics, or professional-review gates merely by assertion.
+AI/model output cannot satisfy real prototype, manufacturer quote, completed deployment/test, post-launch sales/analytics, or professional-review gates merely by assertion.
 
-## 10. Worker/resource acceptance
+## 10. Engineering/manufacturing acceptance
 
-Test duplicate, late, stale, failed, blocked, cancelled, and retried attempts. Confirm lease/attempt identity, bounded retries, context/output bounds, cleanup, usage reservation/settlement, and conservative unknown-cost handling.
+Engineering review and manufacturing release remain separate. Manufacturing release must remain bound to the exact newest synchronized qualifying generation and must not itself contact a supplier, disclose artifacts, place an order, spend money, file, or publish.
 
-## 11. Engineering/manufacturing acceptance
+## 11. External-use and consequential-action acceptance
 
-For applicable physical/hybrid cases, verify Product Design Specification, CAD/geometry outputs, prototype/test planning, real physical-evidence gates, RFQ/manufacturing preparation, and genuine quote gates.
+For consequential artifact actions, require exact latest/fresh external-use authorization, exact artifact scope, authorized manager resolution, execution-time revalidation, and separate outside-world execution evidence. The repository currently has no executor for supplier contact, RFQs, disclosure, orders/payments, filings, or publication.
 
-Engineering review and manufacturing release are separate. Manufacturing release must remain bound to the exact newest synchronized qualifying generation and must not itself contact a supplier, disclose artifacts, place an order, spend money, file, or publish.
+## 12. Billing, subscription, fulfillment, and download acceptance
 
-## 12. External-use and consequential-action acceptance
+Deterministic repository coverage now directly exercises:
 
-For each consequential external artifact action:
+- subscription duplicate/stale/invalid-target behavior and exact organization application;
+- provider billing identity continuity across ownership transfer;
+- signed subscription HTTP ingress with HMAC validation, UTF-8 byte limits, normalization, and exact mutation handoff;
+- fulfillment replay idempotency across Stripe session/platform order identifiers;
+- one-time sales counting and authoritative stored download-token reuse on replay;
+- signed fulfillment HTTP ingress with zero product/purchase side effects on rejected requests;
+- safe external purchase-ID normalization for download URLs;
+- purchase token/fulfillment-state validation, product-scoped file selection, signed storage URL resolution, and download accounting before redirect.
 
-1. authorize the exact latest fresh deliverable revision for external use;
-2. create the consequential request bound to exact deliverable ID(s);
-3. verify stale, unauthorized, wrong-invention, superseded, duplicate-latest, and legacy-unscoped artifacts fail closed;
-4. approve/deny only as an authorized manager;
-5. revalidate exact current approved scope immediately before any eventual outside-world side effect;
-6. record outside-world execution separately from permission.
+Before paid plans/fulfillment are enabled live:
 
-The current repository has no executor that sends RFQs, contacts suppliers/manufacturers, discloses invention artifacts, places orders/payments, files submissions, or publishes for the inventor.
+1. select/configure the owner-controlled provider integration;
+2. verify real provider signatures and secret ownership;
+3. test cancellation, past-due, duplicate, replay, out-of-order and delayed events;
+4. exercise real checkout → fulfillment → success page → download with disposable purchases;
+5. verify duplicate fulfillment neither increments sales twice nor returns a dead token;
+6. verify malformed/wrong download links fail cleanly and successful downloads update accounting;
+7. verify customer-visible pricing matches backend entitlements;
+8. do not enable production billing until these checks pass.
 
-## 13. Billing/webhook acceptance
+## 13. Privacy, deletion, and storage acceptance
 
-Current deterministic coverage directly exercises subscription application for duplicate provider events, stale events, invalid organization billing identity, exact organization application, stale legacy-user events, and rejection of organization-only plans on the legacy-user path. Rejected events may be retained as audit records without changing entitlement state.
+Verify account/organization export boundaries, invention/evidence deletion, generated/original storage cleanup, member departure, invitations, billing fail-closed requirements, deletion/anonymization semantics, and exclusion of credentials/tokens/secrets/unrelated organization data from exports.
 
-Before paid plans are enabled live:
+## 14. Artifact quality acceptance
 
-1. inventory checkout, fulfillment, subscription-event and webhook consumers;
-2. select/configure the owner-controlled billing provider/integration;
-3. replace/isolate legacy MadeThis-specific adapters/secrets;
-4. verify the signed HTTP webhook path reaches the behavior-tested application handler with validated normalized data;
-5. test cancellation, past-due, replay, duplicate, out-of-order, stale, and ownership-transfer/provider-identity events;
-6. verify customer-visible pricing matches backend entitlements;
-7. do not enable production billing until those checks pass.
+Do not accept outputs merely because a file exists. Open representative PDF/DOCX/PPTX/XLSX/CSV/image/CAD outputs and inspect content, formatting, metadata, evidence/limitation labels, and usability. Validate STEP/STL/DXF structure with appropriate tooling before advancing engineering maturity.
 
-## 14. Privacy, organization, deletion, and storage acceptance
+## 15. Operational acceptance
 
-Verify account/organization export boundaries, invention/evidence deletion authorization, original/generated storage cleanup, member departure, invitations, billing fail-closed requirements, deletion/anonymization semantics, and exclusion of credentials/tokens/secrets/unrelated organization data from exports.
+Before public production release establish tested procedures for uptime, spend alerts, backup/restore, key rotation, incidents, provider/model changes, billing/webhook incidents, rollback, privacy/deletion requests, and deployment access.
 
-Current deterministic behavior coverage includes account deletion guards, privacy request execution ordering, personal and organization export scoping, ownership/member/invitation controls, invention-level sharing, invention deletion cleanup, and reserved autonomous-usage release.
-
-## 15. Artifact quality acceptance
-
-Do not accept outputs merely because a file exists. Open representative PDF/DOCX/PPTX/XLSX/CSV/image/CAD outputs and inspect content, formatting, version metadata, evidence/limitation labels, and usability. For geometry, validate supported units/dimensions and STEP/STL/DXF structure with appropriate tooling before advancing maturity.
-
-## 16. Operational acceptance
-
-Before public production release establish owners/tested procedures for uptime, spend alerts, backup/restore, key rotation, incident response, provider/model changes, billing/webhook incidents, rollback, privacy/deletion requests, and deployment access.
-
-## 17. Release/status rule
+## 16. Release/status rule
 
 Keep these states separate: implemented; automated verification passed; deployed; live functionally verified; professional review completed; real-world evidence present; external action executed.
 
