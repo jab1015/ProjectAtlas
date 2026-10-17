@@ -31,6 +31,32 @@ type ApplySubscriptionEventArgs = {
   occurredAt: number;
 };
 
+function maximumProviderEventId(events: Array<{ providerEventId: string; occurredAt: number }>, occurredAt: number) {
+  let winner: string | undefined;
+  for (const event of events) {
+    if (event.occurredAt !== occurredAt) continue;
+    if (!winner || event.providerEventId > winner) winner = event.providerEventId;
+  }
+  return winner;
+}
+
+function eventIsStale(
+  existingUpdatedAt: number | undefined,
+  existingProviderEventId: string | undefined,
+  incomingOccurredAt: number,
+  incomingProviderEventId: string,
+) {
+  if (existingUpdatedAt === undefined) return false;
+  if (existingUpdatedAt > incomingOccurredAt) return true;
+  if (existingUpdatedAt < incomingOccurredAt) return false;
+  // Equal provider timestamps must not resolve according to network arrival order.
+  // Applied audit rows provide a stable provider-event tie-break for current data.
+  // Legacy rows without a recoverable tie-break fail closed rather than being
+  // overwritten by an ambiguous equal-time event.
+  if (!existingProviderEventId) return true;
+  return existingProviderEventId >= incomingProviderEventId;
+}
+
 export async function applySubscriptionEventHandler(ctx: MutationCtx, args: ApplySubscriptionEventArgs) {
   const existing = await ctx.db
     .query("subscriptionEvents")
@@ -79,8 +105,23 @@ export async function applySubscriptionEventHandler(ctx: MutationCtx, args: Appl
       ownerMembership.userId === organization.createdByUserId &&
       (existingCustomerMatch || existingSubscriptionMatch || ownerActivationMatch)
     );
-    // Billing recency is independent from organization profile/team edits.
-    const stale = Boolean(organization && (organization.subscriptionUpdatedAt ?? 0) > args.occurredAt);
+    const appliedOrganizationEvents = organization
+      ? await ctx.db
+          .query("subscriptionEvents")
+          .withIndex("by_appliedOrganizationId", (q) => q.eq("appliedOrganizationId", args.organizationId!))
+          .collect()
+      : [];
+    const currentProviderEventId = organization?.subscriptionUpdatedAt === undefined
+      ? undefined
+      : maximumProviderEventId(appliedOrganizationEvents, organization.subscriptionUpdatedAt);
+    // Billing recency is independent from organization profile/team edits and
+    // uses providerEventId as a deterministic tie-break for equal timestamps.
+    const stale = Boolean(organization && eventIsStale(
+      organization.subscriptionUpdatedAt,
+      currentProviderEventId,
+      args.occurredAt,
+      args.providerEventId,
+    ));
     const plan = requestedOrganizationPlan(args.tier, args.organizationPlanKey);
     const eventId = await ctx.db.insert("subscriptionEvents", {
       providerEventId: args.providerEventId,
@@ -140,7 +181,24 @@ export async function applySubscriptionEventHandler(ctx: MutationCtx, args: Appl
     return { duplicate: false, applied: false, eventId, invalidOrganizationPlanTarget: true };
   }
 
-  const stale = Boolean(user && (user.subscriptionUpdatedAt ?? 0) > args.occurredAt);
+  const customerEvents = user
+    ? await ctx.db
+        .query("subscriptionEvents")
+        .withIndex("by_customerEmail", (q) => q.eq("customerEmail", args.customerEmail))
+        .collect()
+    : [];
+  const appliedUserEvents = user
+    ? customerEvents.filter((event) => event.appliedUserId === user._id)
+    : [];
+  const currentProviderEventId = user?.subscriptionUpdatedAt === undefined
+    ? undefined
+    : maximumProviderEventId(appliedUserEvents, user.subscriptionUpdatedAt);
+  const stale = Boolean(user && eventIsStale(
+    user.subscriptionUpdatedAt,
+    currentProviderEventId,
+    args.occurredAt,
+    args.providerEventId,
+  ));
   const eventId = await ctx.db.insert("subscriptionEvents", {
     providerEventId: args.providerEventId,
     customerEmail: args.customerEmail,
