@@ -433,4 +433,211 @@ describe("representative persisted lifecycle behavior", () => {
       }),
     ]));
   });
+
+  it("re-closes post-launch conclusions when sales evidence is removed without invalidating pre-launch engineering work", async () => {
+    const state = buildState({
+      inventions: [{ _id: "inv_launch", updatedAt: 400 }],
+      inventionRecords: [{
+        _id: "record_launch",
+        inventionId: "inv_launch",
+        structuredBrief: {
+          inventorEvidence: [
+            {
+              sourceId: "sales_source",
+              label: "Verified launch sales export",
+              evidenceKind: "sales_evidence",
+              provenance: "inventor_upload",
+            },
+            {
+              sourceId: "engineering_source",
+              label: "Engineering review record",
+              evidenceKind: "engineering_review",
+              provenance: "inventor_upload",
+            },
+          ],
+        },
+        updatedAt: 400,
+      }],
+      atlasWorkItems: [
+        {
+          _id: "launch_gate",
+          inventionId: "inv_launch",
+          kind: "launch_actual_evidence",
+          status: "completed",
+          attemptCount: 1,
+          completedAt: 410,
+          outputSummary: "Actual launch evidence verified",
+          updatedAt: 410,
+        },
+        {
+          _id: "launch_performance",
+          inventionId: "inv_launch",
+          kind: "launch_performance",
+          status: "completed",
+          attemptCount: 1,
+          completedAt: 411,
+          outputSummary: "Launch performance analyzed from real sales",
+          dependsOnKinds: ["launch_actual_evidence"],
+          updatedAt: 411,
+        },
+        {
+          _id: "growth_roadmap",
+          inventionId: "inv_launch",
+          kind: "growth_roadmap",
+          status: "completed",
+          attemptCount: 1,
+          completedAt: 412,
+          outputSummary: "Growth roadmap based on launch performance",
+          dependsOnKinds: ["launch_performance"],
+          updatedAt: 412,
+        },
+        {
+          _id: "growth_reporting",
+          inventionId: "inv_launch",
+          kind: "growth_performance_reporting",
+          status: "completed",
+          attemptCount: 1,
+          completedAt: 413,
+          outputSummary: "Growth reporting based on launch evidence",
+          dependsOnKinds: ["growth_roadmap"],
+          updatedAt: 413,
+        },
+        {
+          _id: "engineering_review",
+          inventionId: "inv_launch",
+          kind: "engineering_review",
+          status: "completed",
+          attemptCount: 1,
+          completedAt: 414,
+          outputSummary: "Engineering review complete",
+          updatedAt: 414,
+        },
+        {
+          _id: "manufacturing_ready_launch",
+          inventionId: "inv_launch",
+          kind: "manufacturing_readiness",
+          status: "completed",
+          attemptCount: 1,
+          completedAt: 415,
+          outputSummary: "Manufacturing readiness complete before launch",
+          dependsOnKinds: ["engineering_review"],
+          updatedAt: 415,
+        },
+      ],
+      atlasDeliverables: [
+        {
+          _id: "launch_deliverable",
+          inventionId: "inv_launch",
+          workItemId: "launch_performance",
+          sourceIds: ["sales_source", "campaign_source"],
+          staleReason: undefined,
+          updatedAt: 411,
+        },
+        {
+          _id: "engineering_deliverable",
+          inventionId: "inv_launch",
+          workItemId: "engineering_review",
+          sourceIds: ["engineering_source"],
+          staleReason: undefined,
+          updatedAt: 414,
+        },
+      ],
+      deliverableDependencies: [{
+        _id: "launch_finding_dep",
+        inventionId: "inv_launch",
+        deliverableId: "launch_deliverable",
+        dependencyType: "finding",
+        dependencyId: "finding_launch",
+      }],
+      evidenceFindings: [
+        {
+          _id: "finding_launch",
+          inventionId: "inv_launch",
+          sourceIds: ["sales_source", "campaign_source"],
+          status: "evidence_checked",
+          updatedAt: 411,
+        },
+        {
+          _id: "finding_engineering",
+          inventionId: "inv_launch",
+          sourceIds: ["engineering_source"],
+          status: "evidence_checked",
+          updatedAt: 414,
+        },
+      ],
+      atlasExecutionEvents: [],
+    });
+
+    await applyInventorEvidenceChange(state.ctx, "inv_launch" as any, {
+      action: "removed",
+      sourceId: "sales_source" as any,
+      label: "Verified launch sales export",
+      evidenceKind: "sales_evidence",
+      now: 500,
+    });
+
+    const byWorkId = new Map(state.tables.atlasWorkItems.map((row) => [row._id, row]));
+    expect(byWorkId.get("launch_gate")).toMatchObject({
+      status: "blocked",
+      attemptCount: 0,
+      humanGateType: "private_information",
+      updatedAt: 500,
+    });
+    expect(byWorkId.get("launch_gate")?.blockedReason).toMatch(/current actual launch\/sales\/customer evidence is required/i);
+    expect(byWorkId.get("launch_gate")?.outputSummary).toBeUndefined();
+
+    for (const id of ["launch_performance", "growth_roadmap", "growth_reporting"]) {
+      expect(byWorkId.get(id)).toMatchObject({ status: "queued", attemptCount: 0, updatedAt: 500 });
+      expect(byWorkId.get(id)?.completedAt).toBeUndefined();
+      expect(byWorkId.get(id)?.outputSummary).toBeUndefined();
+      expect(byWorkId.get(id)?.lastError).toMatch(/Inventor evidence was removed: Verified launch sales export/i);
+    }
+
+    expect(byWorkId.get("engineering_review")).toMatchObject({
+      status: "completed",
+      outputSummary: "Engineering review complete",
+      updatedAt: 414,
+    });
+    expect(byWorkId.get("manufacturing_ready_launch")).toMatchObject({
+      status: "completed",
+      outputSummary: "Manufacturing readiness complete before launch",
+      updatedAt: 415,
+    });
+
+    const launchDeliverable = state.tables.atlasDeliverables.find((row) => row._id === "launch_deliverable")!;
+    expect(launchDeliverable.sourceIds).toEqual(["campaign_source"]);
+    expect(launchDeliverable.staleReason).toMatch(/Inventor evidence was removed: Verified launch sales export/i);
+    expect(launchDeliverable.updatedAt).toBe(500);
+
+    const engineeringDeliverable = state.tables.atlasDeliverables.find((row) => row._id === "engineering_deliverable")!;
+    expect(engineeringDeliverable.sourceIds).toEqual(["engineering_source"]);
+    expect(engineeringDeliverable.staleReason).toBeUndefined();
+    expect(engineeringDeliverable.updatedAt).toBe(414);
+
+    const launchFinding = state.tables.evidenceFindings.find((row) => row._id === "finding_launch")!;
+    expect(launchFinding).toMatchObject({ status: "stale", updatedAt: 500 });
+    expect(launchFinding.sourceIds).toEqual(["campaign_source"]);
+
+    const engineeringFinding = state.tables.evidenceFindings.find((row) => row._id === "finding_engineering")!;
+    expect(engineeringFinding).toMatchObject({ status: "evidence_checked", updatedAt: 414 });
+    expect(engineeringFinding.sourceIds).toEqual(["engineering_source"]);
+
+    expect(state.tables.inventionRecords[0].structuredBrief.inventorEvidence).toEqual([
+      expect.objectContaining({ sourceId: "engineering_source", evidenceKind: "engineering_review" }),
+    ]);
+    expect(state.tables.inventions[0].updatedAt).toBe(500);
+    expect(state.inserted).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        table: "atlasExecutionEvents",
+        doc: expect.objectContaining({ eventType: "work_blocked", workItemId: "launch_gate" }),
+      }),
+      expect.objectContaining({
+        table: "atlasExecutionEvents",
+        doc: expect.objectContaining({
+          eventType: "invention_changed",
+          metadata: expect.objectContaining({ action: "removed", evidenceKind: "sales_evidence" }),
+        }),
+      }),
+    ]));
+  });
 });
