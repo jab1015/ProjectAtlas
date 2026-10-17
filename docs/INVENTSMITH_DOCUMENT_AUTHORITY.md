@@ -54,6 +54,8 @@ Repository-green is necessary but never sufficient for deployed/live/professiona
 - Billing/entitlements and expensive-work allowances belong to organization scope for organization-owned inventions.
 - Multiple active/archived inventions and multi-user organizations are first-class requirements.
 - Invention-level sharing and bounded professional access are required.
+- Active organization membership is the outer invention-access boundary; removed/suspended membership cannot be resurrected by an explicit grant.
+- Organization owners retain `manage` authority across organization inventions even if a stale/narrow explicit grant exists.
 - Physical, software, and hybrid products are first-class invention types.
 - Regulated/safety-sensitive inventions are generally supported with explicit professional/regulatory/engineering/security/privacy gates rather than blanket rejection.
 - Harmful/abusive development remains refused.
@@ -75,13 +77,13 @@ MadeThis is retired from the active implementation plan. Do not synchronize back
 
 ## Current exact repository truth
 
-Immediately before this documentation refresh, draft PR #24 was open, draft, unmerged, based on `main`, and the exact verified code checkpoint was `2e0933bfdda56b3b005fb0a0e17363a77364c9f1`.
+Immediately before this documentation refresh, draft PR #24 was open, draft, unmerged, based on `main`, and the exact verified code checkpoint was `75ac3b9b7fb0bd20bf8254bb13ca80d033779e52`.
 
-InventSmith CI **#165** (`38994705687`) passed against that exact head with:
+InventSmith CI **#182** (`38997088336`) passed against that exact head with:
 
 - exact-head checkout/verification;
 - web and Convex typechecking;
-- **107 test files / 603 tests**;
+- **110 test files / 621 tests**;
 - production dependency audit: **0 vulnerabilities**;
 - bounded development advisory packages limited to `@next/eslint-plugin-next`, `braces`, `eslint-config-next`, `fast-glob`, and `micromatch`;
 - Next.js **15.5.27** production build;
@@ -99,10 +101,14 @@ Recent behavior-level security coverage directly verifies:
 
 - account-deletion administrator and organization-owner guards;
 - privacy request deletion execution ordering/terminal/billing guards;
+- personal privacy-export scope separation;
 - organization ownership transfer and member management;
-- owner-only billing attribution in organization export;
-- personal-export exclusion of company/studio invention and billing scope;
-- exact-account/email invitation acceptance, expiration, and seat-capacity checks before membership activation.
+- secure invitation acceptance;
+- invention deletion cleanup and reserved-usage release;
+- active same-organization invention sharing;
+- stale grant cleanup on member removal;
+- owner `manage` precedence over stale/narrow explicit grants;
+- subscription application duplicate/stale/invalid-target behavior and exact organization entitlement application.
 
 Seventeen stable department-agent profiles cover common physical/hybrid work plus software-specific product, engineering, prototype, and release work. Unknown/missing department routing fails closed before model execution.
 
@@ -114,4 +120,4 @@ This documentation refresh creates a newer head and therefore requires a new exa
 
 A new chat or coding worker should use the authoritative InventSmith documents above and continue from the live branch/PR/CI state. Do not restart completed work, merge PR #24, touch `main`, reintroduce MadeThis synchronization, or treat historical former-name documents as current authority.
 
-The next larger destructive behavior target is invention deletion and its storage/usage cleanup/accounting path; modify it only with careful behavior-preserving extraction and exact-head verification.
+Near-term engineering should continue signed billing-webhook behavior, replay/out-of-order/provider-identity cases, deeper persisted representative lifecycles, and artifact/output quality without weakening the existing consequential-action or no-executor boundaries.
