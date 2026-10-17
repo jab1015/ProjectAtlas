@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { mutation, query, type MutationCtx } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
 import { requireAdmin } from "./authHelpers";
 import { deleteAccountData } from "./accountDeletion";
 import { requiresExternalBillingResolution } from "./accountDeletionPolicy";
@@ -40,7 +41,7 @@ export const listPending = query({
 });
 
 type ResolvePrivacyRequestArgs = {
-  requestId: any;
+  requestId: Id<"privacyRequests">;
   status: "in_progress" | "completed" | "declined";
   resolutionNotes?: string;
 };
@@ -74,7 +75,7 @@ export const resolve = mutation({
 });
 
 type ExecuteAccountDeletionArgs = {
-  requestId: any;
+  requestId: Id<"privacyRequests">;
   externalBillingResolved: boolean;
   resolutionNotes: string;
 };
