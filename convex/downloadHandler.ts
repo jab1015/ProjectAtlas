@@ -25,7 +25,7 @@ export async function downloadHandler(ctx: DownloadHandlerCtx, request: Request)
     return jsonResponse({ error: "Missing purchaseId or token" }, 400);
   }
 
-  const purchase = await ctx.runQuery(internal.purchasesInternal.getById, {
+  const purchase = await ctx.runQuery(internal.purchasesInternal.getByExternalId, {
     purchaseId,
   });
 
