@@ -286,33 +286,50 @@ export const addMemberByEmail = mutation({
   },
 });
 
+type ManagedMemberRole = "admin" | "member" | "viewer" | "professional";
+
+type UpdateMemberRoleArgs = {
+  organizationId: Id<"organizations">;
+  userId: Id<"users">;
+  role: ManagedMemberRole;
+};
+
+export async function updateMemberRoleHandler(ctx: MutationCtx, args: UpdateMemberRoleArgs) {
+  await requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"]);
+  const membership = await getOrganizationMembership(ctx, args.organizationId, args.userId);
+  if (!membership || membership.status !== "active") throw new ConvexError("Active organization member not found");
+  if (membership.role === "owner") throw new ConvexError("Organization ownership cannot be changed through member-role management");
+  await ctx.db.patch(membership._id, { role: args.role, updatedAt: Date.now() });
+  return { membershipId: membership._id };
+}
+
 export const updateMemberRole = mutation({
   args: {
     organizationId: v.id("organizations"),
     userId: v.id("users"),
     role: v.union(v.literal("admin"), v.literal("member"), v.literal("viewer"), v.literal("professional")),
   },
-  handler: async (ctx, args) => {
-    await requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"]);
-    const membership = await getOrganizationMembership(ctx, args.organizationId, args.userId);
-    if (!membership || membership.status !== "active") throw new ConvexError("Active organization member not found");
-    if (membership.role === "owner") throw new ConvexError("Organization ownership cannot be changed through member-role management");
-    await ctx.db.patch(membership._id, { role: args.role, updatedAt: Date.now() });
-    return { membershipId: membership._id };
-  },
+  handler: updateMemberRoleHandler,
 });
+
+type RemoveMemberArgs = {
+  organizationId: Id<"organizations">;
+  userId: Id<"users">;
+};
+
+export async function removeMemberHandler(ctx: MutationCtx, args: RemoveMemberArgs) {
+  const { userId: actingUserId } = await requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"]);
+  const membership = await getOrganizationMembership(ctx, args.organizationId, args.userId);
+  if (!membership || membership.status !== "active") return { removed: false };
+  if (membership.role === "owner") throw new ConvexError("Transfer organization ownership before removing the owner");
+  if (actingUserId === args.userId) throw new ConvexError("Use leave-organization flow to remove your own membership");
+  await ctx.db.patch(membership._id, { status: "removed", updatedAt: Date.now() });
+  return { removed: true };
+}
 
 export const removeMember = mutation({
   args: { organizationId: v.id("organizations"), userId: v.id("users") },
-  handler: async (ctx, args) => {
-    const { userId: actingUserId } = await requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"]);
-    const membership = await getOrganizationMembership(ctx, args.organizationId, args.userId);
-    if (!membership || membership.status !== "active") return { removed: false };
-    if (membership.role === "owner") throw new ConvexError("Transfer organization ownership before removing the owner");
-    if (actingUserId === args.userId) throw new ConvexError("Use leave-organization flow to remove your own membership");
-    await ctx.db.patch(membership._id, { status: "removed", updatedAt: Date.now() });
-    return { removed: true };
-  },
+  handler: removeMemberHandler,
 });
 
 export const getMyInventionAccess = query({
