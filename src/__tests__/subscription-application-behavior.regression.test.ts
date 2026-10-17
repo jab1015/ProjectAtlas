@@ -236,6 +236,65 @@ describe("subscription application behavior", () => {
     expect(state.documents["org-2"].planKey).toBe("explorer");
   });
 
+  it("keeps an established provider billing identity authoritative after ownership transfer", async () => {
+    const state = buildCtx({
+      memberships: [
+        {
+          _id: "membership-new-owner",
+          organizationId: "org-1",
+          userId: "owner-2",
+          role: "owner",
+          status: "active",
+        },
+        {
+          _id: "membership-old-owner",
+          organizationId: "org-1",
+          userId: "owner-1",
+          role: "admin",
+          status: "active",
+        },
+      ],
+      documents: {
+        "org-1": {
+          _id: "org-1",
+          kind: "company",
+          status: "active",
+          createdByUserId: "owner-2",
+          billingCustomerId: "customer-established",
+          subscriptionId: "subscription-established",
+          updatedAt: 50,
+        },
+        "owner-2": {
+          _id: "owner-2",
+          email: "new-owner@example.com",
+        },
+      },
+    });
+
+    const result = await applySubscriptionEventHandler(state.ctx, {
+      ...baseEvent,
+      customerEmail: "old-billing-email@example.com",
+      organizationId: "org-1" as any,
+      billingCustomerId: "customer-established",
+      subscriptionId: "subscription-established",
+    });
+
+    expect(result).toMatchObject({
+      duplicate: false,
+      applied: true,
+      scope: "organization",
+      organizationId: "org-1",
+      planKey: "pro",
+    });
+    expect(state.patches).toHaveLength(1);
+    expect(state.patches[0].id).toBe("org-1");
+    expect(state.patches[0].value).toMatchObject({
+      billingCustomerId: "customer-established",
+      subscriptionId: "subscription-established",
+      subscriptionUpdatedAt: 100,
+    });
+  });
+
   it("records but does not apply a stale legacy-user subscription event", async () => {
     const user = {
       _id: "user-1",
