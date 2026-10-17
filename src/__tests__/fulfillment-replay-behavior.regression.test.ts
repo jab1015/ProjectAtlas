@@ -65,45 +65,60 @@ const baseArgs = {
 };
 
 describe("fulfillment replay behavior", () => {
-  it("returns an existing Stripe purchase as a replay without inserting or patching", async () => {
+  it("returns an existing Stripe purchase and its stored token on replay without writes", async () => {
     const state = buildCtx({
       purchases: [{
         _id: "purchase-existing",
         stripeCheckoutSessionId: "session-1",
         platformOrderId: "order-1",
+        downloadToken: "token-existing",
       }],
     });
 
     const result = await createFromFulfillmentHandler(state.ctx, baseArgs);
 
-    expect(result).toEqual({ purchaseId: "purchase-existing", created: false });
+    expect(result).toEqual({
+      purchaseId: "purchase-existing",
+      created: false,
+      downloadToken: "token-existing",
+    });
+    expect(result.downloadToken).not.toBe(baseArgs.downloadToken);
     expect(state.inserts).toEqual([]);
     expect(state.patches).toEqual([]);
   });
 
-  it("returns an existing platform order as a replay and only backfills a missing Stripe session id", async () => {
+  it("returns an existing platform order token and only backfills a missing Stripe session id", async () => {
     const state = buildCtx({
       purchases: [{
         _id: "purchase-existing",
         platformOrderId: "order-1",
+        downloadToken: "token-existing",
       }],
     });
 
     const result = await createFromFulfillmentHandler(state.ctx, baseArgs);
 
-    expect(result).toEqual({ purchaseId: "purchase-existing", created: false });
+    expect(result).toEqual({
+      purchaseId: "purchase-existing",
+      created: false,
+      downloadToken: "token-existing",
+    });
     expect(state.inserts).toEqual([]);
     expect(state.patches).toEqual([{ id: "purchase-existing", value: { stripeCheckoutSessionId: "session-1" } }]);
   });
 
-  it("creates one new fulfilled purchase and reports created=true", async () => {
+  it("creates one new fulfilled purchase and returns its newly stored token", async () => {
     const state = buildCtx({
       users: [{ _id: "user-1", email: "buyer@example.com" }],
     });
 
     const result = await createFromFulfillmentHandler(state.ctx, baseArgs);
 
-    expect(result).toEqual({ purchaseId: "purchases-insert-1", created: true });
+    expect(result).toEqual({
+      purchaseId: "purchases-insert-1",
+      created: true,
+      downloadToken: "token-new",
+    });
     expect(state.inserts).toHaveLength(1);
     expect(state.inserts[0]).toMatchObject({
       table: "purchases",
@@ -113,6 +128,7 @@ describe("fulfillment replay behavior", () => {
         userId: "user-1",
         platformOrderId: "order-1",
         stripeCheckoutSessionId: "session-1",
+        downloadToken: "token-new",
         fulfillmentStatus: "fulfilled",
         downloadCount: 0,
       },
@@ -120,14 +136,16 @@ describe("fulfillment replay behavior", () => {
     expect(state.patches).toEqual([]);
   });
 
-  it("keeps sales counting conditional on a newly created purchase", () => {
+  it("keeps sales counting conditional and builds response links from the authoritative token", () => {
     const http = readFileSync(join(process.cwd(), "convex/http.ts"), "utf8");
     const mutation = readFileSync(join(process.cwd(), "convex/purchasesMutations.ts"), "utf8");
 
     expect(http).toContain("createFromFulfillmentWithStatus");
     expect(http).toContain("if (fulfillment.created)");
     expect(http).toContain("internal.productsMutations.incrementSales");
-    expect(mutation).toContain("return { purchaseId: existing._id, created: false as const }");
-    expect(mutation).toContain("return { purchaseId, created: true as const }");
+    expect(http).toContain("token=${fulfillment.downloadToken}");
+    expect(http).not.toContain("token=${proposedDownloadToken}");
+    expect(mutation).toContain("downloadToken: existing.downloadToken");
+    expect(mutation).toContain("downloadToken: args.downloadToken");
   });
 });
