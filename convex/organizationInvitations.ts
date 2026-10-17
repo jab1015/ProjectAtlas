@@ -193,76 +193,82 @@ export const getMyPendingInvitations = query({
   },
 });
 
-export const acceptInvitation = mutation({
-  args: { invitationId: v.id("organizationInvitations") },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new ConvexError("Authentication required");
-    const user = await ctx.db.get(userId);
-    const userEmail = user?.email?.trim().toLowerCase();
-    if (!userEmail) throw new ConvexError("An account email is required to accept an invitation");
+type AcceptInvitationArgs = {
+  invitationId: Id<"organizationInvitations">;
+};
 
-    const invitation = await ctx.db.get(args.invitationId);
-    if (!invitation || invitation.status !== "pending") throw new ConvexError("Invitation is no longer available");
-    if (!invitation.acceptedByUserId) {
-      throw new ConvexError("This invitation predates secure account binding and must be reissued by an organization administrator");
-    }
-    if (invitation.acceptedByUserId !== userId) throw new ConvexError("This invitation belongs to a different InventSmith account");
-    if (invitation.email !== userEmail) throw new ConvexError("This invitation email no longer matches the intended account; ask an organization administrator to reissue it");
-    const intendedUser = await getUniqueAccountByEmail(ctx, invitation.email);
-    if (!intendedUser || intendedUser._id !== userId) throw new ConvexError("This invitation belongs to a different InventSmith account");
+export async function acceptInvitationHandler(ctx: MutationCtx, args: AcceptInvitationArgs) {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) throw new ConvexError("Authentication required");
+  const user = await ctx.db.get(userId);
+  const userEmail = user?.email?.trim().toLowerCase();
+  if (!userEmail) throw new ConvexError("An account email is required to accept an invitation");
 
-    const now = Date.now();
-    if (invitation.expiresAt <= now) {
-      await ctx.db.patch(invitation._id, { status: "expired", updatedAt: now });
-      throw new ConvexError("This invitation has expired");
-    }
+  const invitation = await ctx.db.get(args.invitationId);
+  if (!invitation || invitation.status !== "pending") throw new ConvexError("Invitation is no longer available");
+  if (!invitation.acceptedByUserId) {
+    throw new ConvexError("This invitation predates secure account binding and must be reissued by an organization administrator");
+  }
+  if (invitation.acceptedByUserId !== userId) throw new ConvexError("This invitation belongs to a different InventSmith account");
+  if (invitation.email !== userEmail) throw new ConvexError("This invitation email no longer matches the intended account; ask an organization administrator to reissue it");
+  const intendedUser = await getUniqueAccountByEmail(ctx, invitation.email);
+  if (!intendedUser || intendedUser._id !== userId) throw new ConvexError("This invitation belongs to a different InventSmith account");
 
-    const organization = await ctx.db.get(invitation.organizationId);
-    if (!organization || organization.status !== "active") throw new ConvexError("Organization is no longer available");
+  const now = Date.now();
+  if (invitation.expiresAt <= now) {
+    await ctx.db.patch(invitation._id, { status: "expired", updatedAt: now });
+    throw new ConvexError("This invitation has expired");
+  }
 
-    const policy = getOrganizationPlanPolicy(organization.planKey);
-    const memberships = await ctx.db
-      .query("organizationMemberships")
-      .withIndex("by_organizationId", (q) => q.eq("organizationId", organization._id))
-      .collect();
-    const existing = memberships.find((membership) => membership.userId === userId);
+  const organization = await ctx.db.get(invitation.organizationId);
+  if (!organization || organization.status !== "active") throw new ConvexError("Organization is no longer available");
 
-    // Acceptance converts this pending invitation into a membership rather than
-    // consuming a second seat. Recalculate the projected reservation total so a
-    // plan downgrade or stale over-reservation cannot push the organization past
-    // its current included-seat limit.
-    const reservedSeats = await countReservedSeats(ctx, organization._id, now);
-    const existingAlreadyOccupiesSeat = Boolean(existing && (existing.status === "active" || existing.status === "invited"));
-    const projectedReservedSeats = reservedSeats - 1 + (existingAlreadyOccupiesSeat ? 0 : 1);
-    if (policy.includedSeatLimit !== null && projectedReservedSeats > policy.includedSeatLimit) {
-      throw new ConvexError("The organization no longer has an available seat for this invitation");
-    }
+  const policy = getOrganizationPlanPolicy(organization.planKey);
+  const memberships = await ctx.db
+    .query("organizationMemberships")
+    .withIndex("by_organizationId", (q) => q.eq("organizationId", organization._id))
+    .collect();
+  const existing = memberships.find((membership) => membership.userId === userId);
 
-    let membershipId: Id<"organizationMemberships">;
-    if (existing) {
-      if (existing.status === "active") {
-        membershipId = existing._id;
-      } else {
-        await ctx.db.patch(existing._id, { role: invitation.role, status: "active", updatedAt: now });
-        membershipId = existing._id;
-      }
+  // Acceptance converts this pending invitation into a membership rather than
+  // consuming a second seat. Recalculate the projected reservation total so a
+  // plan downgrade or stale over-reservation cannot push the organization past
+  // its current included-seat limit.
+  const reservedSeats = await countReservedSeats(ctx, organization._id, now);
+  const existingAlreadyOccupiesSeat = Boolean(existing && (existing.status === "active" || existing.status === "invited"));
+  const projectedReservedSeats = reservedSeats - 1 + (existingAlreadyOccupiesSeat ? 0 : 1);
+  if (policy.includedSeatLimit !== null && projectedReservedSeats > policy.includedSeatLimit) {
+    throw new ConvexError("The organization no longer has an available seat for this invitation");
+  }
+
+  let membershipId: Id<"organizationMemberships">;
+  if (existing) {
+    if (existing.status === "active") {
+      membershipId = existing._id;
     } else {
-      membershipId = await ctx.db.insert("organizationMemberships", {
-        organizationId: organization._id,
-        userId,
-        role: invitation.role,
-        status: "active",
-        createdAt: now,
-        updatedAt: now,
-      });
+      await ctx.db.patch(existing._id, { role: invitation.role, status: "active", updatedAt: now });
+      membershipId = existing._id;
     }
-
-    await ctx.db.patch(invitation._id, {
-      status: "accepted",
-      acceptedByUserId: userId,
+  } else {
+    membershipId = await ctx.db.insert("organizationMemberships", {
+      organizationId: organization._id,
+      userId,
+      role: invitation.role,
+      status: "active",
+      createdAt: now,
       updatedAt: now,
     });
-    return { organizationId: organization._id, membershipId, role: invitation.role };
-  },
+  }
+
+  await ctx.db.patch(invitation._id, {
+    status: "accepted",
+    acceptedByUserId: userId,
+    updatedAt: now,
+  });
+  return { organizationId: organization._id, membershipId, role: invitation.role };
+}
+
+export const acceptInvitation = mutation({
+  args: { invitationId: v.id("organizationInvitations") },
+  handler: acceptInvitationHandler,
 });
