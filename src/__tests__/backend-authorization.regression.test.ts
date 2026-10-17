@@ -85,11 +85,12 @@ describe("backend authorization boundaries", () => {
 
   it("keeps raw organization billing attribution owner-only even though admins may export project data", () => {
     const exportSource = source("organizationExport.ts");
-    const block = exportedFunctionBlock(exportSource, "getOrganizationStructuredExport");
-    expect(block).toContain('requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"])');
-    expect(block).toContain("canManageBilling(membership.role)");
-    expect(block).toContain("includeBillingAttribution");
-    expect(block).toContain(': Promise.resolve([])');
+    const handler = exportedAsyncFunctionBlock(exportSource, "getOrganizationStructuredExportHandler");
+    expect(handler).toContain('requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"])');
+    expect(handler).toContain("canManageBilling(membership.role)");
+    expect(handler).toContain("includeBillingAttribution");
+    expect(handler).toContain(': Promise.resolve([])');
+    expect(exportedFunctionBlock(exportSource, "getOrganizationStructuredExport")).toContain("handler: getOrganizationStructuredExportHandler");
   });
 
   it("binds file access to a fulfilled purchase token and product", () => {
