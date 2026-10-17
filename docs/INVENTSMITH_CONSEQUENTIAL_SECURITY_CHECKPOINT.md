@@ -1,15 +1,15 @@
 # InventSmith Consequential Security Checkpoint
 
-**Updated:** October 16, 2026 (America/New_York)  
+**Updated:** October 17, 2026 (America/New_York)  
 **Branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified code head before this documentation refresh:** `d01b845b489ec8a7591980fa81d69b915c82d4fc`
+**Latest verified code head before this documentation refresh:** `93744db1fdf2772925f96dbc4d33ed1823192f86`
 
 ## Current security checkpoint
 
 Consequential operations remain fail-closed, server-authorized, revision-bound where artifacts are involved, and explicitly separated from outside-world execution.
 
-InventSmith CI **#210** (`38999026644`) passed against exact code head `d01b845b489ec8a7591980fa81d69b915c82d4fc` with web/Convex typechecking, **114 test files / 650 tests**, production dependency audit with **0 vulnerabilities**, bounded development-dependency audit, and Next.js **15.5.27** production build with **32/32** static pages generated.
+InventSmith CI **#226** (`39016181734`) passed against exact code head `93744db1fdf2772925f96dbc4d33ed1823192f86` with web/Convex typechecking, **116 test files / 660 tests**, production dependency audit with **0 vulnerabilities**, bounded development-dependency audit, and Next.js **15.5.27** production build with **32/32** static pages generated.
 
 This documentation refresh creates a newer head and therefore requires its own exact-head CI before that documentation head itself is called automatically verified.
 
@@ -35,11 +35,16 @@ Rejected destructive/consequential paths are tested for zero unauthorized side e
 The behavior-tested subscription application path proves:
 
 - duplicate provider event IDs are idempotent with zero new entitlement writes;
-- stale organization and legacy-user events are recorded for audit but do not mutate entitlement;
 - invalid organization billing identity is rejected without entitlement mutation;
 - exact valid organization application patches only the intended organization;
 - organization-only plans cannot flow through the legacy user path;
-- an established provider customer/subscription identity remains authoritative across legitimate ownership transfer.
+- an established provider customer/subscription identity remains authoritative across legitimate ownership transfer;
+- canceled and past-due access survives only while `currentPeriodEnd > now`;
+- cancellation downgrades exactly at period end;
+- unpaid access downgrades immediately even if a future provider period remains;
+- legacy-user and personal-organization mirrored entitlements remain aligned across those lifecycle transitions;
+- delayed older provider events are retained for audit but cannot overwrite newer entitlement state;
+- equal-timestamp provider events resolve deterministically by provider-event ID rather than network arrival order for both organization and legacy-user scopes.
 
 The signed subscription HTTP ingress additionally proves:
 
@@ -48,6 +53,20 @@ The signed subscription HTTP ingress additionally proves:
 - actual body size is enforced in UTF-8 bytes;
 - signed malformed JSON and invalid subscription payloads never reach the mutation;
 - a valid signed event is normalized and handed to the exact subscription application mutation once.
+
+## Checkout success / analytics truth boundary
+
+The checkout-success page does not treat a browser redirect or public query parameter as proof that entitlement changed.
+
+Direct regression coverage now proves:
+
+- the success page continues to state that confirmed billing state is authoritative;
+- no public `plan` query parameter is read to determine completion;
+- the page cannot call `trackUpgradeCompleted` from a public redirect;
+- the page records only `checkout_returned`, which is explicitly non-authoritative;
+- `upgrade_completed` remains reserved for a future call site backed by a confirmed provider billing event.
+
+This prevents spoofed success URLs from corrupting upgrade-completion analytics or implying server-side entitlement that has not actually been confirmed.
 
 ## Fulfillment replay and signed-ingress security
 
@@ -106,8 +125,8 @@ Lucia `3.2.2` deprecation remains a separately planned authentication migration 
 
 Near-term targets are:
 
-1. owner-controlled live provider lifecycle acceptance for cancellation, past-due, delayed/out-of-order and duplicate events;
-2. real disposable checkout → fulfillment → download acceptance, including replay and accounting verification;
+1. owner-controlled live provider acceptance for signatures, checkout confirmation, cancellation, past-due, delayed/equal-time/duplicate events, and browser-visible entitlement changes;
+2. real disposable checkout → confirmed provider event → fulfillment → download acceptance, including replay and accounting verification;
 3. deeper persisted physical/software/hybrid/regulated lifecycle cases and evidence replacement/removal;
 4. artifact/rendered-output quality validation;
 5. continued execution-time revalidation if any future outside-world executor is deliberately introduced.
