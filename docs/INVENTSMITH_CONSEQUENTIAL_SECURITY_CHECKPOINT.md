@@ -3,13 +3,13 @@
 **Updated:** October 16, 2026 (America/New_York)  
 **Branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified code head before this documentation refresh:** `2e0933bfdda56b3b005fb0a0e17363a77364c9f1`
+**Latest verified code head before this documentation refresh:** `75ac3b9b7fb0bd20bf8254bb13ca80d033779e52`
 
 ## Current security checkpoint
 
 Consequential operations remain fail-closed, server-authorized, revision-bound where artifacts are involved, and explicitly separated from outside-world execution.
 
-InventSmith CI **#165** (`38994705687`) passed against exact code head `2e0933bfdda56b3b005fb0a0e17363a77364c9f1`. That checkpoint passed web/Convex typechecking, **107 test files / 603 tests**, production dependency audit with **0 vulnerabilities**, bounded development-dependency audit, and the Next.js **15.5.27** production build with **32/32** static pages generated.
+InventSmith CI **#182** (`38997088336`) passed against exact code head `75ac3b9b7fb0bd20bf8254bb13ca80d033779e52`. That checkpoint passed web/Convex typechecking, **110 test files / 621 tests**, production dependency audit with **0 vulnerabilities**, bounded development-dependency audit, and the Next.js **15.5.27** production build with **32/32** static pages generated.
 
 This documentation refresh creates a newer head and therefore requires its own exact-head CI before the documentation head itself is called automatically verified.
 
@@ -26,13 +26,18 @@ Current backend/regression coverage protects consequential boundaries around:
 - consent-based invitation acceptance bound to the intended account/email;
 - owner-only raw billing attribution in organization export;
 - personal privacy export separation from company/studio invention/billing data;
+- invention deletion authorization/storage/accounting cleanup;
+- invention-level access grants restricted to active same-organization membership;
+- stale invention-grant cleanup on member removal;
+- organization-owner `manage` precedence over stale/narrow explicit grants;
+- subscription-event idempotency, stale/invalid-target rejection, and exact organization entitlement application;
 - blocked-work private-information resume versus consequential gate classes;
 - professional-review recording/invalidation;
 - exact-revision external-use authorization;
 - exact-artifact consequential approval scope and execution-time revalidation;
 - exact-generation manufacturing release.
 
-### Account deletion and privacy request execution
+### Destructive privacy and deletion behavior
 
 Executable tests prove:
 
@@ -40,20 +45,27 @@ Executable tests prove:
 - suspended company/studio ownership blocks account deletion with zero destructive writes/storage deletes;
 - generic privacy resolution cannot falsely mark account deletion complete;
 - terminal/admin/billing guards run before destructive account deletion;
-- successful deletion follows `request in_progress → deleteAccountData → request completed`, so a failed deletion cannot be recorded as completed by ordering alone.
+- successful account deletion follows `request in_progress → deleteAccountData → request completed`;
+- invention deletion requires management authority before reads/writes;
+- related invention rows and storage-backed artifacts are cleaned through the existing deletion algorithm;
+- reserved autonomous usage is released without going negative before the invention is removed.
 
-### Organization ownership/member management
+### Organization membership, ownership, and invention sharing
 
 Executable tests prove:
 
 - personal organization ownership cannot be transferred;
 - inactive new-owner targets fail with zero writes;
 - same-owner transfer is idempotent;
-- valid ownership transfer performs the expected membership/organization changes;
+- valid ownership transfer performs expected transitions;
 - non-managers cannot change member roles;
 - organization owner role cannot be mutated/removed through member-management paths;
 - inactive targets and manager self-removal fail safely;
-- valid role/removal paths perform only the intended membership write.
+- valid member removal deletes only that departing user’s invention grants in the exact organization;
+- grants in other organizations and grants belonging to other users remain untouched;
+- active same-organization membership is required before an invention grant can be inserted or updated;
+- a removed/suspended membership cannot regain access through an old grant;
+- an active organization owner always retains `manage` access even when an older explicit grant says `view` or `review`.
 
 ### Billing and privacy exports
 
@@ -65,18 +77,22 @@ Executable tests prove:
 - non-owner or removed personal-organization memberships do not create personal ownership scope;
 - personal subscription-event filtering does not allow a user binding to override a non-personal organization binding.
 
+### Subscription application behavior
+
+The behavior-tested subscription handler proves:
+
+- duplicate provider event IDs are idempotent and cause no new writes;
+- an organization event with an invalid billing identity is recorded for audit but does not mutate entitlement state;
+- stale organization events are recorded but do not patch the organization;
+- a valid matched organization event patches only the intended organization;
+- stale legacy-user subscription events are recorded without mutating user entitlement;
+- organization-only plans are rejected on the legacy-user path without entitlement changes.
+
+The signed HTTP/provider path still requires further end-to-end owner-controlled acceptance before production billing can be called live.
+
 ### Invitation consent boundary
 
-Executable tests prove:
-
-- legacy pre-binding invitations cannot be accepted;
-- wrong-account invitations fail with zero membership writes;
-- changed-email invitations fail with zero membership writes;
-- ambiguous duplicate-account email resolution fails closed;
-- elapsed invitations are marked expired but never create membership;
-- current seat capacity is rechecked at acceptance time;
-- membership is created/reactivated only after account, email, organization, expiry, and seat-capacity checks pass;
-- the public Convex mutation delegates to the behavior-tested `acceptInvitationHandler`.
+Executable tests prove legacy pre-binding invitations cannot be accepted; wrong-account, changed-email, ambiguous-account, expired, and over-capacity cases fail closed; and membership is created/reactivated only after account, email, organization, expiry, and capacity checks pass.
 
 ## External-use and approval boundary
 
@@ -103,19 +119,19 @@ The CI workflow verifies the actual expected PR head rather than GitHub's synthe
 
 Production audit remains fail-closed with `npm audit --omit=dev --audit-level=high` and reported **0 vulnerabilities** at the verified checkpoint.
 
-The remaining accepted development-only advisory boundary is limited to:
+The remaining accepted development-only advisory boundary is limited to `@next/eslint-plugin-next`, `braces`, `eslint-config-next`, `fast-glob`, and `micromatch`. Unexpected development advisory packages fail CI.
 
-- `@next/eslint-plugin-next`
-- `braces`
-- `eslint-config-next`
-- `fast-glob`
-- `micromatch`
+The previous Vitest config-loader warnings are fixed rather than suppressed. Lucia `3.2.2` deprecation remains a separately planned authentication migration item.
 
-Unexpected development advisory packages fail CI. The previous Vitest config-loader warnings are fixed rather than suppressed. Lucia `3.2.2` deprecation remains a separately planned authentication migration item.
+## Next security targets
 
-## Next destructive-security target
+Near-term direct behavior targets are:
 
-The next larger direct behavior target is invention deletion in `convex/journeyEngine.ts`, including authorization-before-write, storage cleanup, canonical-row deletion, notification cleanup, and reserved-usage accounting. Because that path has many side effects, it should be exposed/tested through behavior-preserving extraction rather than duplicated or simplified merely for tests.
+1. signed HTTP subscription-webhook → normalized application-handler coupling;
+2. replay/out-of-order/cancellation/past-due provider lifecycle cases;
+3. billing identity continuity across legitimate organization ownership transfer;
+4. additional persisted representative lifecycle cases and external-use execution guards;
+5. rendered artifact/output quality validation without weakening current authorization gates.
 
 ## Boundaries not changed
 
