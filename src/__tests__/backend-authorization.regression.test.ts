@@ -30,10 +30,18 @@ describe("backend authorization boundaries", () => {
     ["productFiles.ts", "remove"], ["productFiles.ts", "updateSortOrder"],
     ["products.ts", "listAll"], ["products.ts", "getById"],
     ["purchases.ts", "getByEmail"], ["purchases.ts", "getRecent"], ["purchases.ts", "listAll"], ["purchases.ts", "getStats"],
-    ["privacyRequests.ts", "listPending"], ["privacyRequests.ts", "resolve"], ["privacyRequests.ts", "executeAccountDeletion"],
+    ["privacyRequests.ts", "listPending"],
     ["privacyExport.ts", "getStructuredExportForUser"],
   ])("requires administrator authorization in %s:%s", (file, name) => {
     expect(exportedFunctionBlock(source(file), name)).toContain("await requireAdmin(ctx)");
+  });
+
+  it("keeps privacy resolution and deletion handlers administrator-authorized", () => {
+    const requests = source("privacyRequests.ts");
+    expect(exportedAsyncFunctionBlock(requests, "resolvePrivacyRequestHandler")).toContain("await requireAdmin(ctx)");
+    expect(exportedAsyncFunctionBlock(requests, "executeAccountDeletionHandler")).toContain("await requireAdmin(ctx)");
+    expect(exportedFunctionBlock(requests, "resolve")).toContain("handler: resolvePrivacyRequestHandler");
+    expect(exportedFunctionBlock(requests, "executeAccountDeletion")).toContain("handler: executeAccountDeletionHandler");
   });
 
   it("binds self-service privacy operations to the authenticated account instead of accepting a target user ID", () => {
@@ -55,7 +63,7 @@ describe("backend authorization boundaries", () => {
   it("keeps account deletion behind admin execution and target-account safety checks", () => {
     const requests = source("privacyRequests.ts");
     const deletion = source("accountDeletion.ts");
-    const execute = exportedFunctionBlock(requests, "executeAccountDeletion");
+    const execute = exportedAsyncFunctionBlock(requests, "executeAccountDeletionHandler");
 
     expect(execute).toContain("await requireAdmin(ctx)");
     expect(execute).toContain('request.requestType !== "account_deletion"');
