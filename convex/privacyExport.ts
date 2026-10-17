@@ -15,7 +15,7 @@ function requireWithinLimit<T>(rows: T[], limit: number, label: string): T[] {
   return rows;
 }
 
-async function personalExportScope(ctx: QueryCtx, userId: Id<"users">) {
+export async function personalExportScope(ctx: QueryCtx, userId: Id<"users">) {
   const user = await ctx.db.get(userId);
   if (!user) throw new ConvexError("User profile not found");
 
@@ -99,6 +99,26 @@ async function invitationRowsForAccount(ctx: QueryCtx, userId: Id<"users">) {
   return requireWithinLimit(rows.filter((row) => row.acceptedByUserId === userId), ROW_LIMIT, "account-bound organization-invitation count");
 }
 
+type PersonalSubscriptionEvent = {
+  appliedUserId?: Id<"users">;
+  appliedOrganizationId?: Id<"organizations">;
+};
+
+export function filterPersonalSubscriptionEvents<T extends PersonalSubscriptionEvent>(
+  events: T[],
+  userId: Id<"users">,
+  personalOrganizationIdValues: Id<"organizations">[],
+): T[] {
+  const personalOrganizationIdSet = new Set(personalOrganizationIdValues.map(String));
+  return events.filter((event) => {
+    const belongsToUser = event.appliedUserId === userId;
+    const belongsToPersonalOrganization = Boolean(event.appliedOrganizationId && personalOrganizationIdSet.has(String(event.appliedOrganizationId)));
+    if (!belongsToUser && !belongsToPersonalOrganization) return false;
+    if (event.appliedOrganizationId && !belongsToPersonalOrganization) return false;
+    return true;
+  });
+}
+
 async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
   const { user, inventions: scopedInventions, organizationAffiliations, personalOrganizationIdValues } = await personalExportScope(ctx, userId);
   const inventions = requireWithinLimit(scopedInventions, INVENTION_LIMIT, "personal invention count");
@@ -122,14 +142,7 @@ async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
   const matchingSubscriptionEvents = user.email
     ? await ctx.db.query("subscriptionEvents").withIndex("by_customerEmail", (q) => q.eq("customerEmail", user.email!)).take(ROW_LIMIT + 1)
     : [];
-  const personalOrganizationIdSet = new Set(personalOrganizationIdValues.map(String));
-  const subscriptionEvents = matchingSubscriptionEvents.filter((event) => {
-    const belongsToUser = event.appliedUserId === userId;
-    const belongsToPersonalOrganization = Boolean(event.appliedOrganizationId && personalOrganizationIdSet.has(String(event.appliedOrganizationId)));
-    if (!belongsToUser && !belongsToPersonalOrganization) return false;
-    if (event.appliedOrganizationId && !belongsToPersonalOrganization) return false;
-    return true;
-  });
+  const subscriptionEvents = filterPersonalSubscriptionEvents(matchingSubscriptionEvents, userId, personalOrganizationIdValues);
 
   const normalizedEmail = user.email?.trim().toLowerCase();
   const usersForEmail = normalizedEmail
