@@ -1,6 +1,6 @@
 # InventSmith Document Authority
 
-**Updated:** October 16, 2026 (America/New_York)  
+**Updated:** October 17, 2026 (America/New_York)  
 **Active branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged
 
@@ -58,6 +58,8 @@ Repository-green is necessary but never sufficient for deployed/live/professiona
 - Consequential external approvals bind exact current authorized artifact revisions and must be revalidated at execution time.
 - Permission/review/release records are not evidence that an outside-world action occurred.
 - Signed subscription and fulfillment ingress must fail closed before application mutations on invalid secret/signature/payload/size.
+- Subscription lifecycle access is derived from confirmed recorded provider state, with cancellation/past-due period-end handling, immediate unpaid downgrade, stale-event rejection, and deterministic equal-time ordering.
+- A public checkout redirect/query parameter is not evidence of entitlement or a completed upgrade and must not emit authoritative completion analytics.
 - Fulfillment replay must be idempotent for purchase creation and sales counting and must reuse the authoritative stored download token.
 - Download links must normalize external purchase IDs safely, enforce purchase token/status, constrain file selection to the purchased product, and record successful download accounting before redirect.
 
@@ -75,13 +77,13 @@ MadeThis is retired from the active implementation plan.
 
 ## Current exact repository truth
 
-Immediately before this documentation refresh, the exact verified code checkpoint was `d01b845b489ec8a7591980fa81d69b915c82d4fc`.
+Immediately before this documentation refresh, the exact verified code checkpoint was `93744db1fdf2772925f96dbc4d33ed1823192f86`.
 
-InventSmith CI **#210** (`38999026644`) passed against that exact head with:
+InventSmith CI **#226** (`39016181734`) passed against that exact head with:
 
 - exact-head checkout/verification;
 - web and Convex typechecking;
-- **114 test files / 650 tests**;
+- **116 test files / 660 tests**;
 - production dependency audit: **0 vulnerabilities**;
 - bounded development advisory packages limited to `@next/eslint-plugin-next`, `braces`, `eslint-config-next`, `fast-glob`, and `micromatch`;
 - Next.js **15.5.27** production build;
@@ -93,7 +95,7 @@ CI remains hardened to verify the actual expected PR head, pin official checkout
 
 Implemented repository foundations include organization-native architecture; scoped entitlements/usage accounting; invention authorization/sharing; privacy/export/deletion behavior; consent-based invitations; complete applicable journey wiring; physical/software/hybrid/regulated classification/routing; evidence/trust boundaries; partial validation/recovery; attempt/lease worker reliability; genuine prototype/quote/launch/professional evidence gates; versioned artifact persistence; professional-review state; exact-revision external-use authorization; exact-artifact consequential approval scope; exact-generation manufacturing release; package export; signed subscription/fulfillment ingress; replay-safe purchase fulfillment; and authorized/accounted download delivery.
 
-Recent behavior coverage directly verifies subscription ingress/application, billing identity continuity, fulfillment replay safety, signed fulfillment rejection ordering, authoritative download-token reuse, external purchase-ID normalization, product-scoped download file selection, and download accounting before redirect.
+Recent behavior coverage directly verifies subscription lifecycle timing, delayed/duplicate/equal-timestamp event ordering, billing identity continuity, signed subscription ingress/application, fulfillment replay safety, signed fulfillment rejection ordering, authoritative download-token reuse, external purchase-ID normalization, product-scoped download file selection, download accounting before redirect, and checkout-success analytics/entitlement truth separation.
 
 The repository currently has no outside-world executor that sends RFQs, contacts suppliers/manufacturers, discloses invention artifacts, places orders/payments, files submissions, or publishes for the inventor.
 
@@ -103,4 +105,4 @@ This documentation refresh creates a newer head and therefore requires a new exa
 
 A new chat or coding worker should use the authoritative InventSmith documents above and continue from the live branch/PR/CI state. Do not restart completed work, merge PR #24, touch `main`, reintroduce MadeThis synchronization, or treat historical former-name documents as current authority.
 
-Near-term engineering should continue owner-controlled provider lifecycle acceptance, deeper persisted representative lifecycles, artifact/output quality, and deployment preparation without weakening the current signed-ingress, idempotency, authorization, accounting, consequential-action, or no-executor boundaries.
+Near-term engineering should continue owner-controlled provider lifecycle/live acceptance, deeper persisted representative lifecycles, artifact/output quality, and deployment preparation without weakening the current signed-ingress, lifecycle-ordering, idempotency, authorization, accounting, consequential-action, checkout-truth, or no-executor boundaries.
