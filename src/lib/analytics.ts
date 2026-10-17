@@ -84,6 +84,19 @@ export function trackUpgradeStarted(plan: string) {
   emit("upgrade_started", { plan });
 }
 
+/**
+ * Records that the browser returned from a checkout flow. This is deliberately
+ * not an entitlement/completion event: public redirect URLs and query strings
+ * are not authoritative billing evidence.
+ */
+export function trackCheckoutReturned() {
+  emit("checkout_returned");
+}
+
+/**
+ * Reserved for a future call site backed by a confirmed provider billing event.
+ * Do not call this from a public redirect/query parameter alone.
+ */
 export function trackUpgradeCompleted(plan: string) {
   emit("upgrade_completed", { plan });
 }
