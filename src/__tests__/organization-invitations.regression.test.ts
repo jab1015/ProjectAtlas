@@ -40,16 +40,17 @@ describe("organization invitations", () => {
   });
 
   it("grants membership only after explicit acceptance by the intended authenticated account", () => {
-    expect(invitations).toContain("acceptInvitation");
+    expect(invitations).toContain("acceptInvitationHandler");
     expect(invitations).toContain("invitation.email !== userEmail");
     expect(invitations).toContain('status: "accepted"');
     expect(invitations).toContain("acceptedByUserId: userId");
     expect(invitations).toContain('status: "active"');
+    expect(invitations).toContain("handler: acceptInvitationHandler");
   });
 
   it("keeps the legacy direct-add API fail-closed instead of bypassing invitation consent", () => {
     const legacyStart = organizations.indexOf("export const addMemberByEmail");
-    const legacyEnd = organizations.indexOf("export const updateMemberRole", legacyStart);
+    const legacyEnd = organizations.indexOf("export async function updateMemberRoleHandler", legacyStart);
     const legacyMutation = organizations.slice(legacyStart, legacyEnd);
     expect(legacyStart).toBeGreaterThanOrEqual(0);
     expect(legacyMutation).toContain("Direct member assignment is disabled");
