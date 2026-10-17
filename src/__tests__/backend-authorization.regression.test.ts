@@ -80,11 +80,17 @@ describe("backend authorization boundaries", () => {
     const organizations = source("organizations.ts");
     const ownership = source("organizationOwnership.ts");
 
-    for (const name of ["updateMemberRole", "removeMember", "addMemberByEmail"]) {
-      expect(exportedFunctionBlock(organizations, name)).toContain('requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"])');
-    }
-    expect(exportedFunctionBlock(organizations, "updateMemberRole")).toContain('membership.role === "owner"');
-    expect(exportedFunctionBlock(organizations, "removeMember")).toContain('membership.role === "owner"');
+    expect(exportedFunctionBlock(organizations, "addMemberByEmail")).toContain('requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"])');
+    const updateHandler = exportedAsyncFunctionBlock(organizations, "updateMemberRoleHandler");
+    const removeHandler = exportedAsyncFunctionBlock(organizations, "removeMemberHandler");
+    expect(updateHandler).toContain('requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"])');
+    expect(removeHandler).toContain('requireOrganizationRole(ctx, args.organizationId, ["owner", "admin"])');
+    expect(updateHandler).toContain('membership.role === "owner"');
+    expect(removeHandler).toContain('membership.role === "owner"');
+    expect(removeHandler).toContain("actingUserId === args.userId");
+    expect(exportedFunctionBlock(organizations, "updateMemberRole")).toContain("handler: updateMemberRoleHandler");
+    expect(exportedFunctionBlock(organizations, "removeMember")).toContain("handler: removeMemberHandler");
+
     const transferHandler = exportedAsyncFunctionBlock(ownership, "transferOwnershipHandler");
     expect(transferHandler).toContain('["owner"]');
     expect(transferHandler).toContain("The new owner must already be an active organization member");
