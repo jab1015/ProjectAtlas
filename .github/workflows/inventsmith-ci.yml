@@ -63,5 +63,28 @@ jobs:
       - name: Production dependency audit
         run: npm audit --omit=dev --audit-level=high
 
+      - name: Development dependency audit boundary
+        shell: bash
+        run: |
+          npm audit --json > /tmp/audit.json || true
+          node <<'NODE'
+          const fs = require('fs');
+          const report = JSON.parse(fs.readFileSync('/tmp/audit.json', 'utf8'));
+          const allowed = new Set([
+            'braces',
+            'micromatch',
+            'fast-glob',
+            '@next/eslint-plugin-next',
+            'eslint-config-next',
+          ]);
+          const names = Object.keys(report.vulnerabilities || {});
+          const unexpected = names.filter((name) => !allowed.has(name));
+          if (unexpected.length) {
+            console.error(`Unexpected development dependency audit findings: ${unexpected.join(', ')}`);
+            process.exit(1);
+          }
+          console.log(`Accepted audit boundary: ${names.length ? names.join(', ') : 'no remaining findings'}`);
+          NODE
+
       - name: Next production build
         run: npx next build
