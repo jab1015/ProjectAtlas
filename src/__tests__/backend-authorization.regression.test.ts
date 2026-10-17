@@ -169,8 +169,10 @@ describe("backend authorization boundaries", () => {
     expect(exportedFunctionBlock(file, "updateStageProgress")).toContain("requireInventionEditAccess");
     expect(exportedFunctionBlock(file, "updateInventionField")).toContain("requireInventionEditAccess");
     expect(exportedFunctionBlock(file, "advanceStage")).toContain("requireInventionEditAccess");
-    expect(exportedFunctionBlock(file, "deleteInvention")).toContain("requireInventionManageAccess");
-    expect(exportedFunctionBlock(file, "deleteInvention")).toContain("resolveInventionUsageScope");
-    expect(exportedFunctionBlock(file, "deleteInvention")).toContain("ensureOrganizationDailyUsage");
+    const deletionHandler = exportedAsyncFunctionBlock(file, "deleteInventionHandler");
+    expect(deletionHandler).toContain("requireInventionManageAccess");
+    expect(deletionHandler).toContain("resolveInventionUsageScope");
+    expect(deletionHandler).toContain("ensureOrganizationDailyUsage");
+    expect(exportedFunctionBlock(file, "deleteInvention")).toContain("handler: deleteInventionHandler");
   });
 });
