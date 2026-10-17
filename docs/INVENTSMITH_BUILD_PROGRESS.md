@@ -6,7 +6,7 @@
 **Current continuation checkpoint:** `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`  
 **Active build branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified code head before this documentation refresh:** `2e0933bfdda56b3b005fb0a0e17363a77364c9f1`
+**Latest verified code head before this documentation refresh:** `75ac3b9b7fb0bd20bf8254bb13ca80d033779e52`
 
 ## Current status snapshot
 
@@ -36,13 +36,16 @@ Direct executable behavior coverage now includes:
 
 - account deletion destructive guards and organization-owner protection;
 - privacy request execution ordering and terminal/admin/billing protections;
-- organization ownership transfer safety and exact transition writes;
-- organization member-role/removal authority, owner protection, self-removal protection, and inactive-member behavior;
-- owner-only raw billing attribution in organization export, including proof that Admin export does not query raw subscription events;
-- personal privacy export scoping that excludes company/studio inventions and organization-bound billing events from personal exports;
-- secure invitation acceptance bound to the exact intended account/email, current expiry, organization availability, and seat capacity before membership activation.
+- personal privacy-export scoping with company/studio data exclusion;
+- organization ownership transfer and member-role/removal authority;
+- invitation exact-account/email/expiry/current-capacity acceptance checks;
+- invention deletion authorization, storage/row cleanup, and reserved-usage release;
+- invention sharing restricted to active same-organization members;
+- stale invention-grant deletion when a member is removed;
+- organization-owner `manage` authority taking precedence over stale/narrow explicit invention grants;
+- subscription application idempotency, stale-event rejection, invalid organization target handling, exact target application, and legacy-path organization-plan rejection.
 
-Rejected consequential paths above are explicitly tested for zero writes/zero destructive side effects where that is the intended behavior. Expired invitation handling is deliberately allowed to write only the `expired` state.
+Rejected consequential/billing paths are tested for zero unauthorized destructive/entitlement writes where that is the intended behavior. Subscription events can still be recorded for audit even when application is rejected.
 
 ## Engineering, evidence, and external-use state
 
@@ -54,7 +57,7 @@ The repository still has no current executor that sends an RFQ, contacts a suppl
 
 ## Exact CI checkpoint
 
-InventSmith CI **#165**, run `38994705687`, passed at exact code head `2e0933bfdda56b3b005fb0a0e17363a77364c9f1`.
+InventSmith CI **#182**, run `38997088336`, passed at exact code head `75ac3b9b7fb0bd20bf8254bb13ca80d033779e52`.
 
 Successful gates:
 
@@ -63,7 +66,7 @@ Successful gates:
 - operational-script checks;
 - web TypeScript;
 - Convex TypeScript;
-- **107 test files / 603 tests**;
+- **110 test files / 621 tests**;
 - production dependency audit: **0 vulnerabilities**;
 - development advisory boundary accepted only `@next/eslint-plugin-next`, `braces`, `eslint-config-next`, `fast-glob`, and `micromatch`;
 - Next.js **15.5.27** production build;
@@ -77,14 +80,14 @@ PR #24 remains draft/open/unmerged. `main` remains untouched.
 
 ## Remaining work
 
-1. Qualify the newest documentation head with exact-head CI.
-2. Continue direct destructive behavior coverage, with invention deletion the next larger/high-risk candidate.
+1. Qualify the final documentation head with exact-head CI.
+2. Expand billing/webhook behavior coverage for the signed HTTP path, replay/out-of-order events, provider identity continuity, and ownership-transfer billing cases.
 3. Drive representative physical/hybrid/software/regulated cases through deeper persisted transitions, evidence replacement/removal, newest-revision behavior, manufacturing release, and later external-action boundaries.
 4. Continue specialized artifact content, rendered export, and generated-format quality acceptance.
 5. Preserve the no-executor boundary until a deliberate executor exists with execution-time revalidation and separate execution evidence.
 6. Finish low-risk InventSmith naming cleanup without destabilizing compatibility identifiers.
 7. Prepare owner-controlled Vercel/Convex runtime configuration and perform deployment/live acceptance only when actually provisioned and observed.
-8. Validate real billing/webhooks/providers/concurrency and calibrate commercial limits from measured economics.
+8. Validate real billing/provider/concurrency behavior and calibrate commercial limits from measured economics.
 9. Plan/test a Lucia v3 migration separately from routine hardening.
 
 ## Status boundaries
