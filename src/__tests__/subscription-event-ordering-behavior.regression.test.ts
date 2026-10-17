@@ -117,6 +117,22 @@ const unpaidEvent = {
   occurredAt: 500,
 };
 
+const olderUnpaidEvent = {
+  providerEventId: "evt-older-unpaid",
+  customerEmail: "owner@example.com",
+  tier: "pro" as const,
+  status: "unpaid" as const,
+  occurredAt: 400,
+};
+
+const newerActiveEvent = {
+  providerEventId: "evt-newer-active",
+  customerEmail: "owner@example.com",
+  tier: "pro" as const,
+  status: "active" as const,
+  occurredAt: 600,
+};
+
 describe("subscription provider event ordering", () => {
   it("produces the same organization entitlement for equal timestamps regardless of arrival order", async () => {
     const now = vi.spyOn(Date, "now").mockReturnValue(1_000);
@@ -171,6 +187,64 @@ describe("subscription provider event ordering", () => {
         const activeResult = results[events.findIndex((event) => event.providerEventId === activeEvent.providerEventId)];
         if (events[0].providerEventId === unpaidEvent.providerEventId) {
           expect(activeResult).toMatchObject({ applied: false, stale: true });
+        }
+      }
+    } finally {
+      now.mockRestore();
+    }
+  });
+
+  it("ignores a delayed older organization event regardless of delivery order", async () => {
+    const now = vi.spyOn(Date, "now").mockReturnValue(1_000);
+    try {
+      for (const events of [
+        [olderUnpaidEvent, newerActiveEvent],
+        [newerActiveEvent, olderUnpaidEvent],
+      ]) {
+        const state = organizationState();
+        const results = [];
+        for (const event of events) {
+          results.push(await applySubscriptionEventHandler(state.ctx, {
+            ...event,
+            organizationId: "org-1" as any,
+            billingCustomerId: "customer-1",
+          }));
+        }
+
+        expect(state.documents["org-1"]).toMatchObject({
+          planKey: "pro",
+          subscriptionStatus: "active",
+          subscriptionUpdatedAt: 600,
+        });
+        if (events[0].providerEventId === newerActiveEvent.providerEventId) {
+          expect(results[1]).toMatchObject({ applied: false, stale: true });
+        }
+      }
+    } finally {
+      now.mockRestore();
+    }
+  });
+
+  it("ignores a delayed older legacy-user event regardless of delivery order", async () => {
+    const now = vi.spyOn(Date, "now").mockReturnValue(1_000);
+    try {
+      for (const events of [
+        [olderUnpaidEvent, newerActiveEvent],
+        [newerActiveEvent, olderUnpaidEvent],
+      ]) {
+        const state = legacyUserState();
+        const results = [];
+        for (const event of events) {
+          results.push(await applySubscriptionEventHandler(state.ctx, event));
+        }
+
+        expect(state.documents["user-1"]).toMatchObject({
+          subscriptionTier: "pro",
+          subscriptionStatus: "active",
+          subscriptionUpdatedAt: 600,
+        });
+        if (events[0].providerEventId === newerActiveEvent.providerEventId) {
+          expect(results[1]).toMatchObject({ applied: false, stale: true });
         }
       }
     } finally {
