@@ -35,7 +35,11 @@ export async function createFromFulfillmentHandler(ctx: any, args: FulfillmentAr
       .unique();
 
     if (existing) {
-      return { purchaseId: existing._id, created: false as const };
+      return {
+        purchaseId: existing._id,
+        created: false as const,
+        downloadToken: existing.downloadToken,
+      };
     }
   }
 
@@ -57,7 +61,11 @@ export async function createFromFulfillmentHandler(ctx: any, args: FulfillmentAr
           stripeCheckoutSessionId: args.stripeCheckoutSessionId,
         });
       }
-      return { purchaseId: existing._id, created: false as const };
+      return {
+        purchaseId: existing._id,
+        created: false as const,
+        downloadToken: existing.downloadToken,
+      };
     }
   }
 
@@ -82,7 +90,11 @@ export async function createFromFulfillmentHandler(ctx: any, args: FulfillmentAr
     createdAt: Date.now(),
   });
 
-  return { purchaseId, created: true as const };
+  return {
+    purchaseId,
+    created: true as const,
+    downloadToken: args.downloadToken,
+  };
 }
 
 // Compatibility API for existing internal callers that only need the purchase id.
@@ -94,8 +106,8 @@ export const createFromFulfillment = internalMutation({
   },
 });
 
-// Replay-aware API for fulfillment ingress. The caller can safely distinguish
-// a newly created purchase from an idempotent replay.
+// Replay-aware API for fulfillment ingress. The caller receives both creation
+// state and the authoritative stored token so a replay cannot emit a dead link.
 export const createFromFulfillmentWithStatus = internalMutation({
   args: fulfillmentArgs,
   handler: createFromFulfillmentHandler,
