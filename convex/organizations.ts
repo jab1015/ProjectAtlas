@@ -323,6 +323,18 @@ export async function removeMemberHandler(ctx: MutationCtx, args: RemoveMemberAr
   if (!membership || membership.status !== "active") return { removed: false };
   if (membership.role === "owner") throw new ConvexError("Transfer organization ownership before removing the owner");
   if (actingUserId === args.userId) throw new ConvexError("Use leave-organization flow to remove your own membership");
+
+  // Explicit invention grants are organization-scoped privileges. Remove them
+  // with the membership so a later re-invitation cannot silently resurrect an
+  // access override that was granted during an earlier membership lifecycle.
+  const grants = await ctx.db
+    .query("inventionAccessGrants")
+    .withIndex("by_organizationId_userId", (q) =>
+      q.eq("organizationId", args.organizationId).eq("userId", args.userId)
+    )
+    .collect();
+  for (const grant of grants) await ctx.db.delete(grant._id);
+
   await ctx.db.patch(membership._id, { status: "removed", updatedAt: Date.now() });
   return { removed: true };
 }
