@@ -1,9 +1,9 @@
 # InventSmith Capability Matrix
 
-**Updated:** October 16, 2026 (America/New_York)  
+**Updated:** October 17, 2026 (America/New_York)  
 **Branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified code head before this documentation refresh:** `d01b845b489ec8a7591980fa81d69b915c82d4fc`
+**Latest verified code head before this documentation refresh:** `93744db1fdf2772925f96dbc4d33ed1823192f86`
 
 ## Status vocabulary
 
@@ -42,11 +42,14 @@ MadeThis is retired/historical. A Modern Methods-controlled Convex development d
 | Real prototype/quote/launch evidence gates | implemented | direct behavior covered | only genuine outside evidence counts | representative real evidence |
 | Account/privacy/invention deletion | implemented | destructive guards, execution ordering, cleanup/storage/accounting directly tested | not live-destructive-tested | disposable live acceptance |
 | Personal / organization export scope | implemented | company/studio separation and owner-only billing attribution covered | not live-accepted | representative export inspection |
-| Subscription event application | implemented | duplicate, stale, invalid target, exact org, legacy path, ownership-transfer identity directly tested | provider not owner-live | real provider lifecycle acceptance |
+| Subscription event application | implemented | duplicate/invalid-target/exact-org/legacy/ownership-transfer behavior directly tested | provider not owner-live | real provider lifecycle acceptance |
+| Subscription lifecycle semantics | implemented | cancellation/past-due period-end, unpaid downgrade, user/personal-org mirror directly tested | provider not owner-live | real provider timing acceptance |
+| Subscription event ordering | implemented | delayed older events rejected; equal timestamps deterministic independent of arrival order for org + legacy scopes | provider not owner-live | live delayed/replay acceptance |
 | Signed subscription HTTP ingress | implemented | secret/signature, malformed/oversized payload, UTF-8 byte limit, normalization and exact mutation handoff directly tested | not owner-live | provider callback acceptance |
 | Fulfillment replay handling | implemented | duplicate sales suppression, platform/Stripe replay and authoritative stored token directly tested | provider not owner-live | real checkout replay acceptance |
 | Signed fulfillment HTTP ingress | implemented | signature/body validation, no-side-effect rejects, product lookup, new/replay mutation order directly tested | not owner-live | real provider fulfillment acceptance |
 | Authorized download delivery | implemented | malformed external ID fail-closed, token/status checks, product-scoped file selection, storage availability and accounting-before-redirect directly tested | not live-accepted | owner-controlled storage/download acceptance |
+| Checkout success truth | implemented | public redirect/query string cannot emit authoritative upgrade-completed analytics; only checkout-return event recorded | not live-accepted | bind future confirmed conversion analytics to provider-backed state |
 | Package external-use safety | implemented | stale/quality/exact authorization/duplicate-newest/empty-content fail-closed coverage | not live-accepted | rendered artifact QA |
 | Exact-revision external-use authorization | implemented | exact latest/fresh manager authorization and non-execution semantics covered | not live multi-user accepted | persisted/live acceptance |
 | Consequential external approval scope | implemented | exact artifact request/approval/execution-time revalidation covered | no external executor exists | preserve guard; separately audit future executor |
@@ -56,17 +59,17 @@ MadeThis is retired/historical. A Modern Methods-controlled Convex development d
 | Authentication dependency modernization | Lucia v3 currently in use | current auth/type/build gates pass | migration not performed | deliberately plan/test replacement |
 | Owner-controlled Convex path | partially executed | backend health/config previously verified on dev deployment | development only | verify exact newest deployment when intentionally deployed |
 | Owner-controlled Vercel/frontend path | documented | repository build passes | not provisioned/accepted | preview + authenticated acceptance |
-| Billing/webhooks | substantial backend/security foundation | direct signed subscription + fulfillment + replay/download behavior coverage | not owner-live | provider/live lifecycle acceptance |
+| Billing/webhooks | substantial backend/security foundation | signed ingress, lifecycle, ordering, fulfillment, replay/download and checkout-truth behavior covered | not owner-live | provider/live lifecycle acceptance |
 | Commercial cost calibration | instrumentation foundation exists | partial | not production-measured | measured provider/runtime economics |
 
 ## Latest exact CI truth
 
-InventSmith CI **#210**, run `38999026644`, passed at exact code head `d01b845b489ec8a7591980fa81d69b915c82d4fc`.
+InventSmith CI **#226**, run `39016181734`, passed at exact code head `93744db1fdf2772925f96dbc4d33ed1823192f86`.
 
 Checkpoint results:
 
-- **114 test files passed**;
-- **650 tests passed**;
+- **116 test files passed**;
+- **660 tests passed**;
 - production dependency audit: **0 vulnerabilities**;
 - accepted development-only advisory packages limited to `@next/eslint-plugin-next`, `braces`, `eslint-config-next`, `fast-glob`, and `micromatch`;
 - Next.js **15.5.27** build passed with **32/32** static pages generated;
@@ -77,7 +80,7 @@ This documentation refresh creates a newer head and therefore requires exact-hea
 ## Immediate tracker
 
 1. Exact-head CI for the final documentation-refresh head.
-2. Provider billing lifecycle cases: cancellation, past-due, out-of-order events, real checkout/fulfillment/download and ownership-transfer acceptance.
+2. Owner-controlled live provider lifecycle acceptance: signatures, checkout confirmation, cancellation/past-due, delayed/replayed events, fulfillment/download, ownership transitions, and browser-visible entitlement changes.
 3. Representative persisted physical/software/hybrid/regulated lifecycle acceptance through replacement/removal, newest-revision invalidation, manufacturing release, and later external-action boundaries.
 4. Artifact/rendered export and generated-format quality.
 5. Preserve the no-executor boundary until an outside-world executor is deliberately implemented with execution-time revalidation and separate execution evidence.
