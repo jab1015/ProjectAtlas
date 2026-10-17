@@ -71,12 +71,17 @@ Do NOT include phrases like "Mock provider", "Placeholder", or "API key not conf
 }
 
 export class OpenAIValidationResearchProvider implements ValidationResearchProvider {
-  private static readonly VERSION = "openai-gpt4o-context-only-1.3.0";
+  private static readonly VERSION = "2.0.0";
   private static readonly NAME = "OpenAIValidationResearchProvider";
   private readonly client: OpenAI;
+  private readonly model: string;
 
   constructor(apiKey: string) {
     this.client = new OpenAI({ apiKey });
+    this.model =
+      process.env.ATLAS_VALIDATION_MODEL?.trim() ||
+      process.env.ATLAS_OPENAI_MODEL?.trim() ||
+      "gpt-5.4-mini";
   }
 
   getProviderName(): string {
@@ -97,14 +102,13 @@ export class OpenAIValidationResearchProvider implements ValidationResearchProvi
   ): Promise<SectionGenerationResult> {
     try {
       const prompt = buildSectionPrompt(context, sectionKey);
-      const response = await this.client.chat.completions.create({
-        model: "gpt-4o",
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.7,
-        max_tokens: 1500,
+      const response = await this.client.responses.create({
+        model: this.model,
+        input: prompt,
+        max_output_tokens: 1500,
       });
 
-      const generatedContent = response.choices[0]?.message?.content?.trim();
+      const generatedContent = response.output_text?.trim();
       if (!generatedContent) {
         throw new Error(`OpenAI returned empty content for section: ${sectionKey}`);
       }
@@ -130,7 +134,7 @@ export class OpenAIValidationResearchProvider implements ValidationResearchProvi
 }
 
 export function tryCreateOpenAIProvider(): OpenAIValidationResearchProvider | null {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) {
     console.warn("[ValidationResearch] OPENAI_API_KEY not set — live validation provider unavailable");
     return null;
