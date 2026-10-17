@@ -4,3 +4,10 @@
 # Netlify's native Next.js support handles the publish output automatically.
 # CONVEX_DEPLOY_KEY must be configured in Netlify's environment variables and
 # must be a production deploy key for the intended InventSmith Convex project.
+
+# PR deploy previews are compile-only. They must never receive or use the
+# production Convex deploy key. The committed generated Convex client types are
+# sufficient for a Next.js preview build; production remains the only context
+# that deploys Convex functions.
+[context.deploy-preview]
+  command = "npx next build"
