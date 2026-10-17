@@ -39,8 +39,8 @@ function buildCtx(args?: {
     created: true,
     downloadToken: "stored-token",
   };
-  const runQuery = vi.fn(async () => product);
-  const runMutation = vi.fn(async () => {
+  const runQuery = vi.fn(async (_reference: unknown, _queryArgs: unknown) => product);
+  const runMutation = vi.fn(async (_reference: unknown, _mutationArgs: unknown) => {
     if (runMutation.mock.calls.length === 1) return fulfillment;
     return undefined;
   });
@@ -169,9 +169,9 @@ describe("fulfillment webhook behavior", () => {
       downloadUrl: "https://inventsmith.example/api/download?purchaseId=purchase-new&token=authoritative-new-token",
     });
     expect(state.runQuery).toHaveBeenCalledTimes(1);
-    expect(state.runQuery.mock.calls[0][1]).toEqual({ platformProductId: "product-platform-1" });
+    expect(state.runQuery.mock.calls[0]![1]).toEqual({ platformProductId: "product-platform-1" });
     expect(state.runMutation).toHaveBeenCalledTimes(2);
-    expect(state.runMutation.mock.calls[0][1]).toMatchObject({
+    expect(state.runMutation.mock.calls[0]![1]).toMatchObject({
       productId: "product-1",
       customerEmail: "buyer@example.com",
       customerName: "Buyer",
@@ -180,8 +180,9 @@ describe("fulfillment webhook behavior", () => {
       amountCents: 9900,
       currency: "usd",
     });
-    expect(state.runMutation.mock.calls[0][1].downloadToken).toMatch(/^[0-9a-f]{64}$/);
-    expect(state.runMutation.mock.calls[1][1]).toEqual({ id: "product-1" });
+    const purchaseArgs = state.runMutation.mock.calls[0]![1] as Record<string, unknown>;
+    expect(purchaseArgs.downloadToken).toMatch(/^[0-9a-f]{64}$/);
+    expect(state.runMutation.mock.calls[1]![1]).toEqual({ id: "product-1" });
   });
 
   it("returns the authoritative existing token on replay and never increments sales", async () => {
