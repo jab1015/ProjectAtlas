@@ -18,9 +18,23 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
-      - name: Checkout
+      - name: Checkout exact head
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.EXPECTED_SHA }}
+
+      - name: Verify exact head
+        shell: bash
+        run: |
+          actual_sha="$(git rev-parse HEAD)"
+          if [ "$actual_sha" != "$EXPECTED_SHA" ]; then
+            echo "Expected exact head $EXPECTED_SHA but checked out $actual_sha" >&2
+            exit 1
+          fi
+          echo "Verified exact head: $actual_sha"
 
       - name: Setup Node
         uses: actions/setup-node@v4
