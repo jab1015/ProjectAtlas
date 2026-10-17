@@ -1,12 +1,12 @@
 # InventSmith Build Progress
 
-**Last updated:** October 16, 2026 (America/New_York)  
+**Last updated:** October 17, 2026 (America/New_York)  
 **Product destination:** Complete Idea-to-Market Inventor OS  
 **Authoritative product specification:** `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`  
 **Current continuation checkpoint:** `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`  
 **Active build branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified code head before this documentation refresh:** `d01b845b489ec8a7591980fa81d69b915c82d4fc`
+**Latest verified code head before this documentation refresh:** `93744db1fdf2772925f96dbc4d33ed1823192f86`
 
 ## Current status snapshot
 
@@ -34,13 +34,16 @@ Direct executable behavior coverage now includes:
 
 - account deletion, privacy request execution, privacy/export scope, invention deletion, ownership/member/invitation controls, and invention sharing;
 - stale invention-grant deletion on member removal and owner `manage` precedence;
-- subscription application duplicate/stale/invalid-target behavior, exact organization application, legacy-path rejection, and ownership-transfer billing identity continuity;
+- subscription application duplicate/invalid-target behavior, exact organization application, legacy-path rejection, and ownership-transfer billing identity continuity;
+- organization and legacy-user cancellation/past-due period-end semantics plus immediate unpaid downgrade;
+- deterministic subscription provider-event ordering: older delayed events are retained but cannot overwrite newer entitlement state, and equal timestamps resolve by stable provider-event tie-break independent of delivery order;
 - signed subscription ingress with HMAC validation, UTF-8 body-size limits, normalization, and exact handler handoff;
 - signed fulfillment ingress with zero side effects on rejected events;
 - replay-aware fulfillment that prevents duplicate sales counts and reuses the purchase’s authoritative stored download token;
-- safe download handling that normalizes external purchase IDs, constrains file selection to the purchased product, records successful downloads before redirect, and fails closed if download accounting cannot be recorded.
+- safe download handling that normalizes external purchase IDs, constrains file selection to the purchased product, records successful downloads before redirect, and fails closed if download accounting cannot be recorded;
+- checkout-success truth separation: public redirect/query parameters cannot produce authoritative `upgrade_completed` analytics; the page emits only `checkout_returned` and waits for confirmed subscription state.
 
-Rejected consequential/billing paths are tested for zero unauthorized destructive/entitlement writes where intended. Subscription events may still be retained as audit records when application is rejected.
+Rejected consequential/billing paths are tested for zero unauthorized destructive/entitlement writes where intended. Subscription events may still be retained as audit records when application is rejected or stale.
 
 ## Engineering, evidence, and external-use state
 
@@ -52,7 +55,7 @@ The repository still has no current executor that sends an RFQ, contacts a suppl
 
 ## Exact CI checkpoint
 
-InventSmith CI **#210**, run `38999026644`, passed at exact code head `d01b845b489ec8a7591980fa81d69b915c82d4fc`.
+InventSmith CI **#226**, run `39016181734`, passed at exact code head `93744db1fdf2772925f96dbc4d33ed1823192f86`.
 
 Successful gates:
 
@@ -61,7 +64,7 @@ Successful gates:
 - operational-script checks;
 - web TypeScript;
 - Convex TypeScript;
-- **114 test files / 650 tests**;
+- **116 test files / 660 tests**;
 - production dependency audit: **0 vulnerabilities**;
 - development advisory boundary accepted only `@next/eslint-plugin-next`, `braces`, `eslint-config-next`, `fast-glob`, and `micromatch`;
 - Next.js **15.5.27** production build;
@@ -76,7 +79,7 @@ PR #24 remains draft/open/unmerged. `main` remains untouched.
 ## Remaining work
 
 1. Qualify the final documentation head with exact-head CI.
-2. Continue provider billing lifecycle acceptance: cancellation, past-due, out-of-order events, real checkout/fulfillment/download flows, and ownership-transfer cases on owner-controlled infrastructure.
+2. Perform real owner-controlled provider lifecycle acceptance: signed callbacks, checkout confirmation, cancellation/past-due, replay, fulfillment/download, ownership transitions, and browser-visible entitlement changes.
 3. Drive representative physical/hybrid/software/regulated cases through deeper persisted transitions, evidence replacement/removal, newest-revision behavior, manufacturing release, and later external-action boundaries.
 4. Continue specialized artifact content, rendered export, and generated-format quality acceptance.
 5. Preserve the no-executor boundary until a deliberate executor exists with execution-time revalidation and separate execution evidence.
