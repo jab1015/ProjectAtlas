@@ -13,6 +13,13 @@ function exportedFunctionBlock(fileSource: string, name: string) {
   return fileSource.slice(start, next < 0 ? undefined : next);
 }
 
+function exportedAsyncFunctionBlock(fileSource: string, name: string) {
+  const start = fileSource.indexOf(`export async function ${name}`);
+  if (start < 0) throw new Error(`Missing exported async function ${name}`);
+  const next = fileSource.indexOf("\nexport ", start + 1);
+  return fileSource.slice(start, next < 0 ? undefined : next);
+}
+
 describe("backend authorization boundaries", () => {
   it.each([
     ["categories.ts", "create"], ["categories.ts", "update"], ["categories.ts", "remove"],
@@ -70,8 +77,10 @@ describe("backend authorization boundaries", () => {
     }
     expect(exportedFunctionBlock(organizations, "updateMemberRole")).toContain('membership.role === "owner"');
     expect(exportedFunctionBlock(organizations, "removeMember")).toContain('membership.role === "owner"');
-    expect(exportedFunctionBlock(ownership, "transferOwnership")).toContain('["owner"]');
-    expect(exportedFunctionBlock(ownership, "transferOwnership")).toContain("The new owner must already be an active organization member");
+    const transferHandler = exportedAsyncFunctionBlock(ownership, "transferOwnershipHandler");
+    expect(transferHandler).toContain('["owner"]');
+    expect(transferHandler).toContain("The new owner must already be an active organization member");
+    expect(exportedFunctionBlock(ownership, "transferOwnership")).toContain("handler: transferOwnershipHandler");
   });
 
   it("keeps raw organization billing attribution owner-only even though admins may export project data", () => {
