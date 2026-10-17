@@ -77,6 +77,11 @@ export async function resolveInventionAccess(
   const membership = await getOrganizationMembership(ctx, invention.organizationId, userId);
   if (!membership || membership.status !== "active") return null;
 
+  // Organization ownership is authoritative across every invention in the
+  // organization. A stale or previously narrower explicit grant must never
+  // downgrade the current owner after an ownership transfer.
+  if (membership.role === "owner") return "manage";
+
   const explicitGrant = await ctx.db
     .query("inventionAccessGrants")
     .withIndex("by_inventionId_userId", (q) =>
