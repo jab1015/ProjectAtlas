@@ -26,10 +26,10 @@ Use branch `inventsmith/full-product-build` and keep draft PR #24 unmerged unles
 
 Latest verified code checkpoint before this documentation refresh:
 
-- exact head: `2e0933bfdda56b3b005fb0a0e17363a77364c9f1`;
-- InventSmith CI: **#165** (`38994705687`);
+- exact head: `75ac3b9b7fb0bd20bf8254bb13ca80d033779e52`;
+- InventSmith CI: **#182** (`38997088336`);
 - conclusion: **success**;
-- **107 test files / 603 tests**;
+- **110 test files / 621 tests**;
 - production dependency audit: **0 vulnerabilities**;
 - Next.js **15.5.27** production build passed with **32/32** static pages generated.
 
@@ -49,7 +49,7 @@ npx next build
 
 The development advisory boundary currently accepts only `@next/eslint-plugin-next`, `braces`, `eslint-config-next`, `fast-glob`, and `micromatch`; unexpected advisory package names fail CI.
 
-The Vitest config is now explicit ESM (`vitest.config.mts`) and native-loader compatible through `import.meta.dirname`; the prior loader warnings are gone. Lucia `3.2.2` remains deprecated and should be migrated only through a separately tested authentication change.
+The Vitest config is explicit ESM (`vitest.config.mts`) and native-loader compatible through `import.meta.dirname`; the prior loader warnings are gone. Lucia `3.2.2` remains deprecated and should be migrated only through a separately tested authentication change.
 
 This documentation refresh creates a newer head, so the final documentation head must pass its own exact-head CI before being described as automatically verified.
 
@@ -62,7 +62,7 @@ A Modern Methods-controlled **development** deployment is documented at `fiery-g
 Important boundaries:
 
 - that checkpoint is development infrastructure, not production acceptance;
-- this document does not claim exact head `2e0933bf...` or the newer documentation head is deployed there;
+- this document does not claim exact head `75ac3b9b...` or the newer documentation head is deployed there;
 - repository-green does not prove deployed/live behavior;
 - backend health does not substitute for authenticated browser acceptance;
 - provider, billing, professional-review, and real-world evidence acceptance remain separate.
@@ -125,13 +125,15 @@ Using disposable accounts, verify behavior rather than source strings:
 - cross-organization invention/evidence/deliverable/chat/usage/billing/private-artifact access is denied;
 - Viewer cannot mutate;
 - Member/Admin/Owner boundaries are server-enforced;
-- Professional access is limited to explicit invention/review grants where required;
+- active organization membership remains the outer invention-sharing boundary;
+- explicit invention grants cannot resurrect removed/suspended membership;
+- removing a member clears that organization’s explicit grants for that user;
+- organization ownership always retains `manage` access despite stale/narrow grants;
 - ordinary users cannot execute administrator operations;
 - backend entitlements and active-invention limits remain enforced if UI controls are bypassed;
-- ownership/member departure and archival behavior preserve intended records;
 - rejected consequential operations have no unauthorized side effects.
 
-The repository now directly tests organization ownership transfer, member role/removal actions, privacy deletion execution, billing-sensitive export, personal-export scoping, and invitation acceptance. Live acceptance must still reproduce those boundaries with real disposable authenticated accounts.
+Repository tests now directly cover organization ownership transfer, member role/removal, invention sharing, privacy deletion execution, invention deletion, billing-sensitive export, personal-export scoping, and invitation acceptance. Live acceptance must reproduce those boundaries with disposable authenticated accounts.
 
 ## 8. Core representative acceptance
 
@@ -174,13 +176,15 @@ The current repository has no executor that sends RFQs, contacts suppliers/manuf
 
 ## 13. Billing/webhook acceptance
 
-Before paid plans are enabled:
+Current deterministic coverage directly exercises subscription application for duplicate provider events, stale events, invalid organization billing identity, exact organization application, stale legacy-user events, and rejection of organization-only plans on the legacy-user path. Rejected events may be retained as audit records without changing entitlement state.
+
+Before paid plans are enabled live:
 
 1. inventory checkout, fulfillment, subscription-event and webhook consumers;
-2. select the owner-controlled billing provider/integration;
+2. select/configure the owner-controlled billing provider/integration;
 3. replace/isolate legacy MadeThis-specific adapters/secrets;
-4. verify signed/idempotent webhook handling and backend plan authority;
-5. test cancellation, past-due, replay, duplicate, and out-of-order events;
+4. verify the signed HTTP webhook path reaches the behavior-tested application handler with validated normalized data;
+5. test cancellation, past-due, replay, duplicate, out-of-order, stale, and ownership-transfer/provider-identity events;
 6. verify customer-visible pricing matches backend entitlements;
 7. do not enable production billing until those checks pass.
 
@@ -188,16 +192,7 @@ Before paid plans are enabled:
 
 Verify account/organization export boundaries, invention/evidence deletion authorization, original/generated storage cleanup, member departure, invitations, billing fail-closed requirements, deletion/anonymization semantics, and exclusion of credentials/tokens/secrets/unrelated organization data from exports.
 
-Current deterministic behavior coverage includes:
-
-- administrator and company/studio owner account-deletion guards;
-- privacy request terminal/admin/billing checks and execution ordering;
-- personal export exclusion of company/studio inventions/billing events;
-- organization export owner-only raw billing attribution;
-- ownership transfer and member-role/removal safety;
-- invitation exact-account/email binding, expiration, and current seat-capacity recheck before membership activation.
-
-The next larger destructive path to harden behaviorally is invention deletion and its usage/storage cleanup/accounting behavior.
+Current deterministic behavior coverage includes account deletion guards, privacy request execution ordering, personal and organization export scoping, ownership/member/invitation controls, invention-level sharing, invention deletion cleanup, and reserved autonomous-usage release.
 
 ## 15. Artifact quality acceptance
 
