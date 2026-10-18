@@ -19,6 +19,7 @@ function dateKey(timestamp: number) {
 async function settleCadUsage(ctx: any, workItem: any, inventionId: Id<"inventions">, actualCostUnits: number, completedWorkItems: number, now: number) {
   const usageScope = await resolveInventionUsageScope(ctx, inventionId);
   if (!usageScope) throw new ConvexError("Invention not found while settling CAD usage");
+  if (usageScope.isAdmin) return;
   const key = workItem.reservationDateKey ?? dateKey(now);
 
   if (usageScope.scope === "organization" && usageScope.organizationId) {
@@ -91,7 +92,7 @@ export const requestNativeCadGeneration = mutation({
     await requireInventionEditAccess(ctx, args.inventionId);
     const usageScope = await resolveInventionUsageScope(ctx, args.inventionId);
     if (!usageScope) throw new ConvexError("Invention not found");
-    if (!canTierRunWorkKind(usageScope.plan, "cad_model_specification")) throw new ConvexError("Native CAD generation requires a Pro or higher entitlement");
+    if (!usageScope.isAdmin && !canTierRunWorkKind(usageScope.plan, "cad_model_specification")) throw new ConvexError("Native CAD generation requires a Pro or higher entitlement");
 
     const designSpecs = await ctx.db.query("atlasDeliverables").withIndex("by_inventionId_kind", (q: any) => q.eq("inventionId", args.inventionId).eq("kind", "product_design_specification")).collect();
     const currentDesign = designSpecs.filter((item: any) => !item.staleReason).sort((a: any, b: any) => b.version - a.version)[0];
