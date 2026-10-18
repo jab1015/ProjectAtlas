@@ -1,6 +1,6 @@
 # InventSmith Owner-Controlled Deployment and Acceptance Runbook
 
-**Status:** Repository implementation active; limited Convex production deployment, password-recovery acceptance, and preview operations-console compatibility acceptance complete; dedicated InventSmith test deployment pending
+**Status:** Repository implementation active; limited Convex production deployment, password-recovery acceptance, and preview operations-console compatibility acceptance complete; dedicated InventSmith test deployment created, code deployment pending
 **Product:** InventSmith — The Inventor OS by Modern Methods  
 **Updated:** October 18, 2026 (America/New_York)
 **Active branch:** `inventsmith/full-product-build`  
@@ -35,7 +35,7 @@ Lucia `3.2.2` remains deprecated and should be migrated only through a separatel
 
 ## 3. Current Convex status
 
-A Convex deployment named `fiery-gazelle-628` exists but belongs to another application and is not an InventSmith environment. A separate owner-controlled **production** deployment is `agile-seahorse-379`. InventSmith requires a new dedicated test/development deployment before full-branch acceptance.
+A Convex deployment named `fiery-gazelle-628` exists but belongs to another application and is not an InventSmith environment. A separate owner-controlled **production** deployment is `agile-seahorse-379`. InventSmith's dedicated test/development deployment is now `dev/inventsmith-test` (`quick-fox-785`); it exists but has not yet received branch code.
 
 Production currently contains only the intentionally limited password-recovery backend scope. Existing production functions and data were preserved. PR #24 was not merged and the full unverified product was not deployed.
 
