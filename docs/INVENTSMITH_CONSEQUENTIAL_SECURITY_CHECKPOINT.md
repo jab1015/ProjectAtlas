@@ -19,7 +19,7 @@ The owner-controlled Convex production deployment `agile-seahorse-379` received 
 
 Password recovery was live-functionally verified through the Netlify PR #24 preview: the reset email was delivered, the recovery code was received, and authenticated sign-in succeeded. The first test email was routed to spam.
 
-The preview's InventSmith operations page currently fails on `snapshot.ai.openAiConfigured` because the limited production `operationalHealth:getSnapshot` response does not include the newer `ai` field. This is a frontend/backend compatibility defect, not a security or password-recovery failure. The operations-console fix remains scoped separately from the production authentication deployment.
+The refreshed preview's InventSmith operations page now tolerates the limited production `operationalHealth:getSnapshot` response without the newer `ai` field and reports AI details as unavailable. This was a frontend/backend compatibility defect, not a security or password-recovery failure. Full-branch testing requires a dedicated InventSmith Convex test deployment; the unrelated `fiery-gazelle-628` deployment must remain untouched.
 
 ## Authorization and destructive behavior coverage
 
