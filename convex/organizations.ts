@@ -173,6 +173,33 @@ export const ensurePersonalOrganization = mutation({
   },
 });
 
+export const renamePersonalOrganization = mutation({
+  args: {
+    organizationId: v.id("organizations"),
+    name: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await requireUserId(ctx);
+    const name = args.name.trim();
+    if (!name || name.length > 80) {
+      throw new ConvexError("Workspace name must be between 1 and 80 characters");
+    }
+
+    const organization = await ctx.db.get(args.organizationId);
+    if (!organization || organization.status !== "active" || organization.kind !== "personal") {
+      throw new ConvexError("Active personal workspace not found");
+    }
+
+    const membership = await getOrganizationMembership(ctx, organization._id, userId);
+    if (!membership || membership.status !== "active" || membership.role !== "owner") {
+      throw new ConvexError("Only the personal workspace owner can rename it");
+    }
+
+    await ctx.db.patch(organization._id, { name, updatedAt: Date.now() });
+    return { organizationId: organization._id, name };
+  },
+});
+
 export const migrateMyLegacyInventions = mutation({
   args: {},
   handler: async (ctx) => {

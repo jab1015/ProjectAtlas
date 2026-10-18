@@ -13,6 +13,7 @@ import { MadeThisBadge } from "@/components/atlas/made-this-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 type OrganizationPlanKey =
   | "explorer"
@@ -44,6 +45,7 @@ interface PrivacyRequest {
 
 const getMyOrganizations = makeFunctionReference<"query", Record<string, never>, OrganizationSummary[]>("organizations:getMyOrganizations");
 const ensurePersonalOrganization = makeFunctionReference<"mutation", Record<string, never>, { organizationId: string }>("organizations:ensurePersonalOrganization");
+const renamePersonalOrganization = makeFunctionReference<"mutation", { organizationId: string; name: string }, { organizationId: string; name: string }>("organizations:renamePersonalOrganization");
 const migrateMyLegacyInventions = makeFunctionReference<"mutation", Record<string, never>, { organizationId: string; migrated: number }>("organizations:migrateMyLegacyInventions");
 const listPrivacyRequests = makeFunctionReference<"query", Record<string, never>, PrivacyRequest[]>("privacyRequests:listMine");
 const createPrivacyRequest = makeFunctionReference<"mutation", { requestType: "data_export" | "account_deletion" }, { requestId: string; duplicate: boolean }>("privacyRequests:request");
@@ -80,6 +82,9 @@ export default function AccountPage() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const [privacyMessage, setPrivacyMessage] = useState<string | null>(null);
   const [migrationMessage, setMigrationMessage] = useState<string | null>(null);
+  const [organizationNameDrafts, setOrganizationNameDrafts] = useState<Record<string, string>>({});
+  const [renamingOrganizationId, setRenamingOrganizationId] = useState<string | null>(null);
+  const [organizationNameMessage, setOrganizationNameMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.push("/sign-in");
@@ -89,6 +94,7 @@ export default function AccountPage() {
   const organizations = useQuery(getMyOrganizations, isAuthenticated ? {} : "skip");
   const privacyRequests = useQuery(listPrivacyRequests, isAuthenticated ? {} : "skip");
   const ensureOrganization = useMutation(ensurePersonalOrganization);
+  const renameOrganization = useMutation(renamePersonalOrganization);
   const migrateLegacy = useMutation(migrateMyLegacyInventions);
   const requestPrivacyAction = useMutation(createPrivacyRequest);
 
@@ -96,6 +102,38 @@ export default function AccountPage() {
     if (!isAuthenticated || organizations === undefined || organizations.length > 0) return;
     void ensureOrganization({}).catch(() => undefined);
   }, [ensureOrganization, isAuthenticated, organizations]);
+
+  useEffect(() => {
+    if (!organizations) return;
+    setOrganizationNameDrafts((current) => {
+      const next = { ...current };
+      for (const organization of organizations) {
+        if (next[organization.organizationId] === undefined) {
+          next[organization.organizationId] = organization.name;
+        }
+      }
+      return next;
+    });
+  }, [organizations]);
+
+  const saveOrganizationName = async (organizationId: string) => {
+    const name = organizationNameDrafts[organizationId]?.trim() ?? "";
+    if (!name || name.length > 80) {
+      setOrganizationNameMessage("Choose a workspace name from 1 to 80 characters.");
+      return;
+    }
+    setOrganizationNameMessage(null);
+    setRenamingOrganizationId(organizationId);
+    try {
+      const result = await renameOrganization({ organizationId, name });
+      setOrganizationNameDrafts((current) => ({ ...current, [organizationId]: result.name }));
+      setOrganizationNameMessage("Workspace name saved.");
+    } catch (error) {
+      setOrganizationNameMessage(error instanceof Error ? error.message : "Could not save the workspace name.");
+    } finally {
+      setRenamingOrganizationId(null);
+    }
+  };
 
   const migrateLegacyWorkspaces = async () => {
     try {
@@ -195,6 +233,28 @@ export default function AccountPage() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <p className="text-xl font-semibold">{plan.price}</p>
+                      {organization.kind === "personal" && organization.role === "owner" && (
+                        <div className="space-y-2">
+                          <label htmlFor={`workspace-name-${organization.organizationId}`} className="text-sm font-medium">Personal workspace name</label>
+                          <Input
+                            id={`workspace-name-${organization.organizationId}`}
+                            value={organizationNameDrafts[organization.organizationId] ?? organization.name}
+                            maxLength={80}
+                            onChange={(event) => setOrganizationNameDrafts((current) => ({ ...current, [organization.organizationId]: event.target.value }))}
+                            placeholder="For example, RiseJars"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            disabled={renamingOrganizationId === organization.organizationId || !(organizationNameDrafts[organization.organizationId] ?? organization.name).trim() || (organizationNameDrafts[organization.organizationId] ?? organization.name).trim() === organization.name}
+                            onClick={() => void saveOrganizationName(organization.organizationId)}
+                          >
+                            {renamingOrganizationId === organization.organizationId ? "Saving…" : "Save workspace name"}
+                          </Button>
+                          {organizationNameMessage && <p role="status" className="text-sm text-muted-foreground">{organizationNameMessage}</p>}
+                          <p className="text-xs text-muted-foreground">Only changes the label for this personal workspace; it does not change your login name or email.</p>
+                        </div>
+                      )}
                       <div className="grid gap-3 sm:grid-cols-2">
                         <div className="rounded-md border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Active inventions</p><p className="mt-1 font-medium">{formatLimit(organization.activeInventionLimit, "slot", "slots")}</p></div>
                         <div className="rounded-md border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Included users</p><p className="mt-1 font-medium">{formatLimit(organization.includedSeatLimit, "seat", "seats")}</p></div>
