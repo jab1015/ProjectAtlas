@@ -1,6 +1,6 @@
 # InventSmith Owner-Controlled Deployment and Acceptance Runbook
 
-**Status:** Repository implementation active; limited Convex production deployment, password-recovery acceptance, preview operations-console compatibility acceptance, and isolated test-backend code deployment complete; full-product acceptance remains pending
+**Status:** Repository implementation active; limited Convex production deployment, password-recovery acceptance, preview operations-console compatibility acceptance, isolated test-backend code deployment, and test auth configuration complete; full-product acceptance remains pending
 **Product:** InventSmith — The Inventor OS by Modern Methods  
 **Updated:** October 18, 2026 (America/New_York)
 **Active branch:** `inventsmith/full-product-build`  
@@ -35,7 +35,7 @@ Lucia `3.2.2` remains deprecated and should be migrated only through a separatel
 
 ## 3. Current Convex status
 
-A Convex deployment named `fiery-gazelle-628` exists but belongs to another application and is not an InventSmith environment. A separate owner-controlled **production** deployment is `agile-seahorse-379`. InventSmith's dedicated test/development deployment is now `dev/inventsmith-test` (`quick-fox-785`); the branch Convex code is deployed there, while auth secrets remain to be provisioned before account-creation testing.
+A Convex deployment named `fiery-gazelle-628` exists but belongs to another application and is not an InventSmith environment. A separate owner-controlled **production** deployment is `agile-seahorse-379`. InventSmith's dedicated test/development deployment is now `dev/inventsmith-test` (`quick-fox-785`); the branch Convex code and required auth configuration are deployed there for account-creation testing.
 
 Production currently contains only the intentionally limited password-recovery backend scope. Existing production functions and data were preserved. PR #24 was not merged and the full unverified product was not deployed.
 
@@ -79,7 +79,7 @@ Never place real secret values in source, docs, issues, logs, screenshots, or ch
 
 ## 6. Current frontend preview status
 
-The current Netlify PR #24 preview is `https://deploy-preview-24--inventsmith.netlify.app`. Its deploy-preview context now points the frontend at `https://quick-fox-785.convex.cloud`; it is still not a full-product production release. Authenticated full-journey testing must wait until the isolated test deployment has its auth secrets.
+The current Netlify PR #24 preview is `https://deploy-preview-24--inventsmith.netlify.app`. Its deploy-preview context now points the frontend at `https://quick-fox-785.convex.cloud`; it is still not a full-product production release. The isolated backend is now configured for authenticated full-journey testing.
 
 ## 7. Fresh Vercel/frontend procedure
 
