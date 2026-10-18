@@ -92,7 +92,7 @@ PR #24 remains draft/open/unmerged. `main` remains untouched.
 4. Continue specialized artifact content, rendered export, and generated-format quality acceptance.
 5. Preserve the no-executor boundary until a deliberate executor exists with execution-time revalidation and separate execution evidence.
 6. Finish low-risk InventSmith naming cleanup without destabilizing compatibility identifiers.
-7. Deploy the branch to the dedicated InventSmith Convex test deployment `dev/inventsmith-test` (`quick-fox-785`) and verify the full invention journey there. Do not touch `fiery-gazelle-628`; it belongs to another application. Keep `agile-seahorse-379` limited to the verified password-recovery scope.
+7. Provision auth secrets in the dedicated InventSmith Convex test deployment `dev/inventsmith-test` (`quick-fox-785`) and verify the full invention journey there. The branch code is deployed and the PR preview is configured to use it. Do not touch `fiery-gazelle-628`; it belongs to another application. Keep `agile-seahorse-379` limited to the verified password-recovery scope.
 8. Validate real provider/concurrency behavior and calibrate commercial limits from measured economics.
 9. Plan/test a Lucia v3 migration separately from routine hardening.
 
@@ -108,3 +108,4 @@ PR #24 remains draft/open/unmerged. `main` remains untouched.
 - **External action executed** means the outside-world side effect actually occurred and was separately recorded.
 
 These states must never be collapsed into a production-ready claim.
+
