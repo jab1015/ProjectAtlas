@@ -8,6 +8,7 @@
  */
 
 import { internalMutation } from "./_generated/server";
+import { v } from "convex/values";
 
 const ADMIN_EMAIL = "jerry.brown1015@gmail.com";
 const ADMIN_SUBSCRIPTION_TIER = "enterprise";
@@ -45,5 +46,46 @@ export const ensureAdminUser = internalMutation({
     });
 
     return { created: true, userId };
+  },
+});
+
+// Test-environment bootstrap only: create the password-auth record for the
+// already designated owner/admin identity. The password is never stored here;
+// callers provide a one-time Scrypt hash and the owner completes setup through
+// the normal password-reset email flow.
+export const ensureAdminAuthAccount = internalMutation({
+  args: { secretHash: v.string() },
+  handler: async (ctx, args) => {
+    const email = ADMIN_EMAIL;
+    const existingUsers = await ctx.db.query("users").withIndex("email", (q) => q.eq("email", email)).collect();
+    const user = existingUsers.find((candidate) => candidate.role === "admin") ?? existingUsers[0];
+    const userId = user?._id ?? await ctx.db.insert("users", {
+      email,
+      role: "admin",
+      subscriptionTier: ADMIN_SUBSCRIPTION_TIER,
+      emailVerificationTime: Date.now(),
+      createdAt: Date.now(),
+    });
+
+    await ctx.db.patch(userId, {
+      email,
+      role: "admin",
+      subscriptionTier: ADMIN_SUBSCRIPTION_TIER,
+      emailVerificationTime: Date.now(),
+    });
+
+    const existingAccount = await ctx.db.query("authAccounts").withIndex("providerAndAccountId", (q) => q.eq("provider", "password").eq("providerAccountId", email)).unique();
+    if (existingAccount) {
+      await ctx.db.patch(existingAccount._id, { userId, secret: args.secretHash });
+      return { created: false, repaired: true, userId, accountId: existingAccount._id };
+    }
+
+    const accountId = await ctx.db.insert("authAccounts", {
+      userId,
+      provider: "password",
+      providerAccountId: email,
+      secret: args.secretHash,
+    });
+    return { created: true, repaired: false, userId, accountId };
   },
 });
