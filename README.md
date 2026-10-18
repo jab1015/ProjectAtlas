@@ -33,7 +33,7 @@ The future owner-controlled runtime is:
 
 The previous MadeThis-managed Convex/Vercel environment is not a migration dependency. Its test data is disposable. Do not deploy to, modify, delete, synchronize, or require access to the MadeThis environment for repository development.
 
-Limited owner-controlled Convex production work has now been performed for password recovery on `agile-seahorse-379`, with existing production functions and data preserved. Password recovery was accepted through the PR #24 Netlify preview. Full-product deployment and production acceptance remain intentionally deferred; PR #24 is still unmerged and the full unverified product has not been published.
+Limited owner-controlled Convex production work has now been performed for password recovery on `agile-seahorse-379`, with existing production functions and data preserved. Password recovery and the operations-console compatibility fix were accepted through the PR #24 Netlify preview. Full-product production deployment and acceptance remain intentionally deferred; PR #24 is still unmerged and the full unverified product has not been published.
 
 ## Current repository capabilities
 
