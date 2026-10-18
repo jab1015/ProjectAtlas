@@ -211,11 +211,13 @@ export const kickAutonomousWork = mutation({
           .query("atlasDailyUsage")
           .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey))
           .unique();
-    const remaining = remainingAutonomousCostUnitsAfterReservations(
-      usageScope.plan,
-      usage?.autonomousCostUnits ?? 0,
-      usage?.reservedAutonomousCostUnits ?? 0
-    );
+    const remaining = usageScope.isAdmin
+      ? Number.MAX_SAFE_INTEGER
+      : remainingAutonomousCostUnitsAfterReservations(
+          usageScope.plan,
+          usage?.autonomousCostUnits ?? 0,
+          usage?.reservedAutonomousCostUnits ?? 0
+        );
     if (remaining === 0) return { scheduled: false, reason: "daily_usage_limit" as const };
     await ctx.scheduler.runAfter(0, runAvailableWork, {
       inventionId,
