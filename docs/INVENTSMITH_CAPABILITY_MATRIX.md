@@ -1,6 +1,6 @@
 # InventSmith Capability Matrix
 
-**Updated:** October 17, 2026 (America/New_York)  
+**Updated:** October 18, 2026 (America/New_York)
 **Branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
 **Latest verified code head before this documentation refresh:** `93744db1fdf2772925f96dbc4d33ed1823192f86`
@@ -24,11 +24,16 @@ Customer-facing product: **InventSmith — The Inventor OS** by **Modern Methods
 
 MadeThis is retired/historical. A Modern Methods-controlled Convex development deployment (`fiery-gazelle-628`) has a prior backend health/configuration checkpoint. The newest branch head is not claimed deployed there. Modern Methods-owned Vercel/frontend deployment and authenticated browser acceptance remain separate incomplete steps.
 
+### Limited production checkpoint
+
+Convex production `agile-seahorse-379` has a deliberately limited password-recovery backend deployment. Existing production functions and data were preserved; PR #24 remains unmerged and the full unverified product was not deployed. The Netlify PR #24 preview has live-functionally verified password recovery through successful reset-email delivery, code entry, and sign-in.
+
 ## Current capability state
 
 | Capability | Repository state | Automated state | Deployment/live state | Remaining boundary |
 |---|---|---|---|---|
 | Complete applicable journey/navigation | implemented | representative regressions passed; completion semantics locked | newest head not claimed live | deeper persisted lifecycle acceptance |
+| Password recovery | implemented | recovery flow and auth backend checks passed | live-functionally verified on the PR #24 preview against limited Convex production | broader authenticated acceptance and final release decision |
 | Dedicated AI agent per department | implemented: 17 stable profiles | routing/prompt/audit/fail-closed coverage passed | newest head not claimed deployed | provider-backed authenticated executions |
 | Physical/software/hybrid/regulated routing | implemented | representative routing covered | not live-accepted | persisted/live acceptance |
 | Organization-native tenancy/access | implemented | direct authorization, ownership, member, sharing and owner-precedence behavior covered | not live multi-user accepted | deeper live multi-user cases |
@@ -58,7 +63,9 @@ MadeThis is retired/historical. A Modern Methods-controlled Convex development d
 | Exact-head CI integrity | implemented | PR head checkout/assertion; pinned actions; no persisted credentials | repository-only state | keep enforced |
 | Authentication dependency modernization | Lucia v3 currently in use | current auth/type/build gates pass | migration not performed | deliberately plan/test replacement |
 | Owner-controlled Convex path | partially executed | backend health/config previously verified on dev deployment | development only | verify exact newest deployment when intentionally deployed |
-| Owner-controlled Vercel/frontend path | documented | repository build passes | not provisioned/accepted | preview + authenticated acceptance |
+| Owner-controlled Convex production path | limited deployment | password-recovery backend deployed and health/auth acceptance verified | limited live acceptance only | preserve existing functions/data while expanding scope deliberately |
+| Owner-controlled Vercel/frontend path | preview exists | repository build passes | PR #24 preview authenticated; operations console currently blocked by response mismatch | compatibility fix + fresh preview acceptance |
+| InventSmith operations console | implemented | page code exists | not functionally accepted; `snapshot.ai` mismatch causes runtime error | align frontend/backend response, then re-test |
 | Billing/webhooks | substantial backend/security foundation | signed ingress, lifecycle, ordering, fulfillment, replay/download and checkout-truth behavior covered | not owner-live | provider/live lifecycle acceptance |
 | Commercial cost calibration | instrumentation foundation exists | partial | not production-measured | measured provider/runtime economics |
 
