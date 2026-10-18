@@ -37,6 +37,7 @@ import type * as deliverableLogic from "../deliverableLogic.js";
 import type * as deliverablePersistenceLogic from "../deliverablePersistenceLogic.js";
 import type * as departmentAgentLogic from "../departmentAgentLogic.js";
 import type * as departmentExtensions from "../departmentExtensions.js";
+import type * as downloadHandler from "../downloadHandler.js";
 import type * as entitlementPolicyLogic from "../entitlementPolicyLogic.js";
 import type * as evidenceExtractionControl from "../evidenceExtractionControl.js";
 import type * as evidenceFileExtraction from "../evidenceFileExtraction.js";
@@ -47,6 +48,7 @@ import type * as externalUseAuthorization from "../externalUseAuthorization.js";
 import type * as faqEntries from "../faqEntries.js";
 import type * as files from "../files.js";
 import type * as filesInternal from "../filesInternal.js";
+import type * as fulfillmentWebhook from "../fulfillmentWebhook.js";
 import type * as fullJourneyDefinition from "../fullJourneyDefinition.js";
 import type * as fullProductWorkPlan from "../fullProductWorkPlan.js";
 import type * as http from "../http.js";
@@ -104,6 +106,7 @@ import type * as stalenessLogic from "../stalenessLogic.js";
 import type * as statusBriefingLogic from "../statusBriefingLogic.js";
 import type * as subscriptionMutations from "../subscriptionMutations.js";
 import type * as subscriptionPolicyLogic from "../subscriptionPolicyLogic.js";
+import type * as subscriptionWebhook from "../subscriptionWebhook.js";
 import type * as tabularExportLogic from "../tabularExportLogic.js";
 import type * as testimonials from "../testimonials.js";
 import type * as usagePolicyLogic from "../usagePolicyLogic.js";
@@ -162,6 +165,7 @@ declare const fullApi: ApiFromModules<{
   deliverablePersistenceLogic: typeof deliverablePersistenceLogic;
   departmentAgentLogic: typeof departmentAgentLogic;
   departmentExtensions: typeof departmentExtensions;
+  downloadHandler: typeof downloadHandler;
   entitlementPolicyLogic: typeof entitlementPolicyLogic;
   evidenceExtractionControl: typeof evidenceExtractionControl;
   evidenceFileExtraction: typeof evidenceFileExtraction;
@@ -172,6 +176,7 @@ declare const fullApi: ApiFromModules<{
   faqEntries: typeof faqEntries;
   files: typeof files;
   filesInternal: typeof filesInternal;
+  fulfillmentWebhook: typeof fulfillmentWebhook;
   fullJourneyDefinition: typeof fullJourneyDefinition;
   fullProductWorkPlan: typeof fullProductWorkPlan;
   http: typeof http;
@@ -229,6 +234,7 @@ declare const fullApi: ApiFromModules<{
   statusBriefingLogic: typeof statusBriefingLogic;
   subscriptionMutations: typeof subscriptionMutations;
   subscriptionPolicyLogic: typeof subscriptionPolicyLogic;
+  subscriptionWebhook: typeof subscriptionWebhook;
   tabularExportLogic: typeof tabularExportLogic;
   testimonials: typeof testimonials;
   usagePolicyLogic: typeof usagePolicyLogic;
@@ -279,3 +285,4 @@ export declare const internal: FilterApi<
 >;
 
 export declare const components: {};
+
