@@ -99,6 +99,23 @@ export const grantComplimentaryAccess = mutation({
     const user = await findUserByEmail(ctx, email);
     const organization = await resolvePersonalOrganization(ctx, user._id);
     const now = Date.now();
+
+    // A new grant replaces any current/future unrevoked grant for this
+    // organization. Otherwise an older lifetime grant could reappear when a
+    // newer temporary grant expires or is revoked.
+    const existingOverrides = await ctx.db
+      .query("organizationEntitlementOverrides")
+      .withIndex("by_organizationId", (q) => q.eq("organizationId", organization._id))
+      .collect();
+    for (const existing of existingOverrides) {
+      if (existing.revokedAt) continue;
+      await ctx.db.patch(existing._id, {
+        revokedAt: now,
+        revokedByUserId: adminUserId!,
+        revokedReason: `Superseded by a new access grant: ${reason}`,
+      });
+    }
+
     const overrideId = await ctx.db.insert("organizationEntitlementOverrides", {
       organizationId: organization._id,
       planKey: args.planKey,
