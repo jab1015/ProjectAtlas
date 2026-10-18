@@ -6,7 +6,7 @@
 **Repository:** `jab1015/ProjectAtlas` (historical repository slug)  
 **Active branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified code checkpoint before this documentation refresh:** `93744db1fdf2772925f96dbc4d33ed1823192f86`
+**Latest verified CI checkpoint:** `93744db1fdf2772925f96dbc4d33ed1823192f86` (CI #226). Later operations-console compatibility changes were preview-accepted and await exact-head CI.
 
 ## Product destination
 
@@ -40,16 +40,16 @@ The owner-controlled Convex production deployment `agile-seahorse-379` was updat
 
 The Netlify PR #24 preview at `deploy-preview-24--inventsmith.netlify.app` has been used for authenticated acceptance. Password recovery is live-functionally verified: the reset email was delivered, the recovery code was received, and sign-in succeeded. The first test email was routed to spam.
 
-The preview's **InventSmith operations** page is not currently usable. Its frontend expects `snapshot.ai.openAiConfigured`, but the limited production `operationalHealth:getSnapshot` response does not include the newer `ai` field, producing the observed `TypeError`. This is the next compatibility fix; it does not indicate loss of production data or failure of password recovery.
+The refreshed preview's **InventSmith operations** page is usable. Its frontend now tolerates the limited production response without the newer `ai` field and labels AI details unavailable while preserving health/work monitoring. This does not indicate loss of production data or failure of password recovery.
 
 ## Source, Convex, hosting, and deployment boundary
 
-GitHub remains source/CI authority. Convex is a core InventSmith backend, not an optional add-on. The documented Modern Methods-controlled Convex **development** deployment `fiery-gazelle-628` has a prior backend health/configuration checkpoint.
+GitHub remains source/CI authority. Convex is a core InventSmith backend, not an optional add-on. The Convex deployment `fiery-gazelle-628` belongs to another application and must not be used or modified for InventSmith. InventSmith needs a new dedicated test deployment before full-branch acceptance.
 
 That does **not** mean the current code head is deployed or live accepted. Current truth remains:
 
 - repository/CI: verified through exact code head `93744db1...`;
-- Convex development infrastructure: previously configured/health-checked;
+- InventSmith Convex test infrastructure: not yet created;
 - newest branch head on Convex: not claimed deployed;
 - Modern Methods-owned Vercel/frontend deployment: not yet verified complete;
 - authenticated browser acceptance: not yet complete;
@@ -96,7 +96,7 @@ Professional review, external-use authorization, consequential approval, manufac
 4. Continue specialized artifact/package and generated-format quality acceptance, including rendered document and CAD-format checks where feasible.
 5. Preserve the no-executor boundary until an outside-world executor is deliberately implemented with execution-time revalidation and separate execution evidence.
 6. Continue low-risk InventSmith naming cleanup while preserving compatibility/historical identifiers that still require tested migration.
-7. Repair the operations-console response compatibility, create a fresh preview, and re-test that console while keeping the production deployment limited.
+7. Create and verify a dedicated InventSmith Convex test deployment, then point a test preview at it while keeping production limited.
 8. Complete live authenticated multi-user/multi-invention acceptance, provider failure/retry, concurrency, billing/webhooks, professional-review, and representative lifecycle acceptance after owner-controlled infrastructure is ready.
 9. Plan the Lucia v3 authentication migration separately.
 10. Calibrate commercial limits from measured provider/runtime economics.
