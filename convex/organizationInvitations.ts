@@ -4,6 +4,7 @@ import { mutation, query, type MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { getOrganizationMembership, requireOrganizationRole } from "./organizations";
 import { getOrganizationPlanPolicy } from "./organizationPolicyLogic";
+import { getEffectiveOrganizationPlanKey } from "./betaAccessLogic";
 
 const INVITATION_TTL_MS = 14 * 24 * 60 * 60 * 1000;
 
@@ -94,7 +95,8 @@ export const inviteMemberByEmail = mutation({
       return { invitationId: pending._id, created: false, expiresAt: now + INVITATION_TTL_MS };
     }
 
-    const policy = getOrganizationPlanPolicy(organization.planKey);
+    // The former direct lookup was getOrganizationPlanPolicy(organization.planKey).
+    const policy = getOrganizationPlanPolicy(await getEffectiveOrganizationPlanKey(ctx, organization));
     const reservedSeats = await countReservedSeats(ctx, args.organizationId, now);
     if (policy.includedSeatLimit !== null && reservedSeats >= policy.includedSeatLimit) {
       throw new ConvexError("Organization included-seat limit reached");
@@ -223,7 +225,8 @@ export async function acceptInvitationHandler(ctx: MutationCtx, args: AcceptInvi
   const organization = await ctx.db.get(invitation.organizationId);
   if (!organization || organization.status !== "active") throw new ConvexError("Organization is no longer available");
 
-  const policy = getOrganizationPlanPolicy(organization.planKey);
+  // The former direct lookup was getOrganizationPlanPolicy(organization.planKey).
+  const policy = getOrganizationPlanPolicy(await getEffectiveOrganizationPlanKey(ctx, organization));
   const memberships = await ctx.db
     .query("organizationMemberships")
     .withIndex("by_organizationId", (q) => q.eq("organizationId", organization._id))
