@@ -12,6 +12,7 @@ import {
   type InventionAccess,
   type OrganizationRole,
 } from "./organizationPolicyLogic";
+import { getActiveEntitlementOverride, getEffectiveOrganizationPlanKey } from "./betaAccessLogic";
 
 type AuthCtx = QueryCtx | MutationCtx;
 
@@ -112,7 +113,7 @@ export async function requireInventionManageAccess(ctx: AuthCtx, inventionId: Id
   return { userId, access };
 }
 
-async function ensurePersonalOrganizationForUser(ctx: MutationCtx, userId: Id<"users">) {
+export async function ensurePersonalOrganizationForUser(ctx: MutationCtx, userId: Id<"users">) {
   const user = await ctx.db.get(userId);
   if (!user) throw new ConvexError("User not found");
 
@@ -239,12 +240,16 @@ export const getMyOrganizations = query({
       if (membership.status !== "active") continue;
       const organization = await ctx.db.get(membership.organizationId);
       if (!organization || organization.status !== "active") continue;
-      const planPolicy = getOrganizationPlanPolicy(organization.planKey);
+      const planKey = await getEffectiveOrganizationPlanKey(ctx, organization);
+      const planPolicy = getOrganizationPlanPolicy(planKey);
+      const override = await getActiveEntitlementOverride(ctx, organization._id);
       result.push({
         organizationId: organization._id,
         name: organization.name,
         kind: organization.kind,
-        planKey: organization.planKey,
+        planKey,
+        basePlanKey: organization.planKey,
+        complimentaryAccess: override ? { expiresAt: override.expiresAt ?? null, reason: override.reason } : null,
         role: membership.role,
         activeInventionLimit: planPolicy.activeInventionLimit,
         includedSeatLimit: planPolicy.includedSeatLimit,
