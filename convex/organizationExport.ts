@@ -84,16 +84,18 @@ export async function getOrganizationStructuredExportHandler(
     });
   }
 
-  const [dailyUsage, subscriptionEvents, invitations] = await Promise.all([
+  const [dailyUsage, subscriptionEvents, invitations, entitlementOverrides, creditLedger] = await Promise.all([
     ctx.db.query("organizationDailyUsage").withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId)).take(EVENT_LIMIT + 1),
     includeBillingAttribution
       ? ctx.db.query("subscriptionEvents").withIndex("by_appliedOrganizationId", (q) => q.eq("appliedOrganizationId", args.organizationId)).take(ROW_LIMIT + 1)
       : Promise.resolve([]),
     ctx.db.query("organizationInvitations").withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId)).take(ROW_LIMIT + 1),
+    ctx.db.query("organizationEntitlementOverrides").withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId)).take(ROW_LIMIT + 1),
+    ctx.db.query("organizationCreditLedger").withIndex("by_organizationId", (q) => q.eq("organizationId", args.organizationId)).take(EVENT_LIMIT + 1),
   ]);
 
   return {
-    exportVersion: 4,
+    exportVersion: 5,
     generatedAt: Date.now(),
     scope: includeBillingAttribution
       ? "Organization-owned InventSmith structured project, membership invitation, and owner-authorized billing-attribution data. Binary bytes and authentication secrets are not embedded."
@@ -115,6 +117,8 @@ export async function getOrganizationStructuredExportHandler(
     invitations: bounded(invitations, ROW_LIMIT, "Organization invitation count"),
     inventions: inventionBundles,
     dailyUsage: bounded(dailyUsage, EVENT_LIMIT, "Organization usage-history count"),
+    entitlementOverrides: bounded(entitlementOverrides, ROW_LIMIT, "Entitlement-override count"),
+    creditLedger: bounded(creditLedger, EVENT_LIMIT, "Credit-ledger count"),
     subscriptionEvents: bounded(subscriptionEvents, ROW_LIMIT, "Organization subscription-event count"),
     excludedSecrets: ["password hashes", "auth sessions", "refresh tokens", "verification codes", "server/API keys", "webhook secrets"],
   };
