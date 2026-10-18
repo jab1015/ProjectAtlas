@@ -6,7 +6,7 @@
 **Current continuation checkpoint:** `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`  
 **Active build branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified code head before this documentation refresh:** `93744db1fdf2772925f96dbc4d33ed1823192f86`
+**Latest verified CI checkpoint:** `93744db1fdf2772925f96dbc4d33ed1823192f86` (CI #226). Later operations-console compatibility changes were locally verified and preview-accepted; their documentation head still requires exact-head CI.
 
 ## Current status snapshot
 
@@ -20,7 +20,7 @@ The owner-controlled Convex production deployment `agile-seahorse-379` received 
 
 The password-recovery flow was live-functionally verified on the Netlify PR #24 preview at `deploy-preview-24--inventsmith.netlify.app`: reset email delivery succeeded, the recovery code was received, and authenticated sign-in succeeded. The email initially landed in spam during testing.
 
-The admin **InventSmith operations** page is currently blocked in the preview by a frontend/backend response mismatch. The page reads `snapshot.ai.openAiConfigured`, while the limited production backend response does not yet include `snapshot.ai`; this is a preview compatibility defect, not a password-recovery or data-integrity failure. Bugsnag blocking and the preload warning are unrelated browser messages.
+The refreshed admin **InventSmith operations** page works in the preview. Because the limited production response does not expose the newer `snapshot.ai` field, the frontend reports AI details as unavailable while keeping health/work monitoring available. This is an intentional compatibility state, not a password-recovery or data-integrity failure. Bugsnag blocking and the preload warning are unrelated browser messages.
 
 ## Product vision and architecture
 
@@ -92,7 +92,7 @@ PR #24 remains draft/open/unmerged. `main` remains untouched.
 4. Continue specialized artifact content, rendered export, and generated-format quality acceptance.
 5. Preserve the no-executor boundary until a deliberate executor exists with execution-time revalidation and separate execution evidence.
 6. Finish low-risk InventSmith naming cleanup without destabilizing compatibility identifiers.
-7. Repair the operations-console response compatibility, create a fresh preview, and re-test the console without expanding the limited production deployment.
+7. Create and verify a dedicated InventSmith Convex test deployment. Do not touch `fiery-gazelle-628`; it belongs to another application. Keep `agile-seahorse-379` limited to the verified password-recovery scope.
 8. Validate real provider/concurrency behavior and calibrate commercial limits from measured economics.
 9. Plan/test a Lucia v3 migration separately from routine hardening.
 
