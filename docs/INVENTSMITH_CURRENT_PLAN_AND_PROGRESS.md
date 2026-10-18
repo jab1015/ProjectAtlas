@@ -42,6 +42,8 @@ The Netlify PR #24 preview at `deploy-preview-24--inventsmith.netlify.app` has b
 
 The refreshed preview's **InventSmith operations** page is usable. Its frontend now tolerates the limited production response without the newer `ai` field and labels AI details unavailable while preserving health/work monitoring. This does not indicate loss of production data or failure of password recovery.
 
+The branch now includes an admin-only **Beta access & credits** console. An administrator can grant a selected existing account a dated organization-level plan override, revoke it, and grant/debit/refund credits through an append-only ledger. Overrides preserve the base plan, require a reason, expire automatically, and do not create lifetime free access. The highest plan can be used for full-premium beta access while Explorer remains changeable later without rewriting account history.
+
 ## Source, Convex, hosting, and deployment boundary
 
 GitHub remains source/CI authority. Convex is a core InventSmith backend, not an optional add-on. The Convex deployment `fiery-gazelle-628` belongs to another application and must not be used or modified for InventSmith. The dedicated InventSmith test deployment `dev/inventsmith-test` (`quick-fox-785`) contains the branch Convex code and required auth configuration and is ready for account-creation testing.
@@ -50,7 +52,7 @@ That does **not** mean the current code head is deployed or live accepted. Curre
 
 - repository/CI: verified through exact code head `93744db1...`;
 - InventSmith Convex test infrastructure: `dev/inventsmith-test` / `quick-fox-785` created, code deployed, and auth configured;
-- newest branch head on Convex: not claimed deployed;
+- beta-access/credit implementation: present in the branch and deployed to the isolated test backend for verification; the newest uncommitted local head is not claimed deployed;
 - Modern Methods-owned Vercel/frontend deployment: not yet verified complete;
 - authenticated browser acceptance: not yet complete;
 - production billing/webhooks: not owner-live accepted;
@@ -96,7 +98,7 @@ Professional review, external-use authorization, consequential approval, manufac
 4. Continue specialized artifact/package and generated-format quality acceptance, including rendered document and CAD-format checks where feasible.
 5. Preserve the no-executor boundary until an outside-world executor is deliberately implemented with execution-time revalidation and separate execution evidence.
 6. Continue low-risk InventSmith naming cleanup while preserving compatibility/historical identifiers that still require tested migration.
-7. Verify the full invention journey in `dev/inventsmith-test` / `quick-fox-785` using the PR preview configured to use it while production remains limited.
+7. Verify the full invention journey and selected-account beta access/credit controls in `dev/inventsmith-test` / `quick-fox-785` using the PR preview configured to use it while production remains limited.
 8. Complete live authenticated multi-user/multi-invention acceptance, provider failure/retry, concurrency, billing/webhooks, professional-review, and representative lifecycle acceptance after owner-controlled infrastructure is ready.
 9. Plan the Lucia v3 authentication migration separately.
 10. Calibrate commercial limits from measured provider/runtime economics.
@@ -117,4 +119,3 @@ Never collapse these states into a single production-ready claim.
 ## New-chat start instruction
 
 Read `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`, this file, `docs/INVENTSMITH_BUILD_PROGRESS.md`, `docs/INVENTSMITH_CAPABILITY_MATRIX.md`, `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md`, `docs/INVENTSMITH_DEPLOYMENT_RUNBOOK.md`, and `docs/INVENTSMITH_CONSEQUENTIAL_SECURITY_CHECKPOINT.md`; then fetch the live branch, draft PR #24, and exact-head CI. Trust newer verified GitHub state over documentation text. Do not restart completed work, merge PR #24, touch `main`, or reintroduce MadeThis synchronization.
-
