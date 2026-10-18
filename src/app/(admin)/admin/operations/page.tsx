@@ -95,7 +95,7 @@ export default function AtlasOperationsPage() {
       <Card>
         <CardHeader><CardTitle className="flex items-center gap-2 text-lg"><FlaskConical className="h-5 w-5" />Controlled-pilot launcher</CardTitle></CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-sm text-muted-foreground">Creates the standard adjustable produce-rinsing rack case used by InventSmith regression evaluation, then starts whatever autonomous work the signed-in administrator&apos;s plan and daily budget permit.</p>
+          <p className="text-sm text-muted-foreground">Creates the standard adjustable produce-rinsing rack case used by InventSmith regression evaluation, then starts eligible autonomous work. Administrator execution is exempt from customer plan limits, daily usage caps, and AI-credit consumption.</p>
           <div className="flex flex-wrap items-center gap-3">
             <Button onClick={() => void launchRepresentativePilot()} disabled={pilotState.creating}>{pilotState.creating ? "Creating…" : "Create representative pilot"}</Button>
             {pilotState.inventionId && <Button asChild variant="outline"><Link href={`/invention/${pilotState.inventionId}/work`}>Open pilot work</Link></Button>}
