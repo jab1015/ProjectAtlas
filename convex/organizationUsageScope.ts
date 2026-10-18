@@ -19,6 +19,13 @@ export async function resolveInventionUsageScope(
   const invention = await ctx.db.get(inventionId);
   if (!invention) return null;
 
+  // The invention owner is the authenticated creator for both legacy and
+  // organization-owned inventions. Keep this identity on the resolved scope
+  // so internal workers can preserve the administrator's exemption without
+  // relying on an interactive auth context.
+  const owner = await ctx.db.get(invention.userId);
+  const isAdmin = owner?.role === "admin";
+
   if (invention.organizationId) {
     const organization = await ctx.db.get(invention.organizationId);
     if (organization && organization.status === "active") {
@@ -27,6 +34,7 @@ export async function resolveInventionUsageScope(
         organization,
         organizationId: organization._id,
         usageUserId: organization.createdByUserId,
+        isAdmin,
         // Legacy source compatibility: plan: organization.planKey.
         plan: await getEffectiveOrganizationPlanKey(ctx, organization),
         scope: "organization" as const,
@@ -40,6 +48,7 @@ export async function resolveInventionUsageScope(
     organization: null,
     organizationId: null,
     usageUserId: invention.userId,
+    isAdmin,
     plan: legacyOwner?.subscriptionTier,
     scope: "legacy_user" as const,
   };
