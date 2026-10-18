@@ -22,7 +22,7 @@ No overall completion percentage is asserted.
 
 Customer-facing product: **InventSmith — The Inventor OS** by **Modern Methods**. The historical repository slug `jab1015/ProjectAtlas` and selected `atlas*` / `ATLAS_*` compatibility identifiers remain only where tested migration has not yet occurred.
 
-MadeThis is retired/historical. The Convex deployment `fiery-gazelle-628` belongs to another application and is excluded from InventSmith work. The dedicated InventSmith test deployment `dev/inventsmith-test` (`quick-fox-785`) now exists but has not received the branch code yet. Modern Methods-owned Vercel/frontend deployment and authenticated browser acceptance remain separate acceptance dimensions.
+MadeThis is retired/historical. The Convex deployment `fiery-gazelle-628` belongs to another application and is excluded from InventSmith work. The dedicated InventSmith test deployment `dev/inventsmith-test` (`quick-fox-785`) contains the branch Convex code and required auth configuration. Modern Methods-owned Vercel/frontend deployment and authenticated browser acceptance remain separate acceptance dimensions.
 
 ### Limited production checkpoint
 
@@ -37,6 +37,7 @@ Convex production `agile-seahorse-379` has a deliberately limited password-recov
 | Dedicated AI agent per department | implemented: 17 stable profiles | routing/prompt/audit/fail-closed coverage passed | newest head not claimed deployed | provider-backed authenticated executions |
 | Physical/software/hybrid/regulated routing | implemented | representative routing covered | not live-accepted | persisted/live acceptance |
 | Organization-native tenancy/access | implemented | direct authorization, ownership, member, sharing and owner-precedence behavior covered | not live multi-user accepted | deeper live multi-user cases |
+| Selected beta access and credits | implemented | admin-only dated overrides, append-only credit ledger, effective-plan enforcement, reservation settlement, deletion/export coverage | isolated test backend deployed; live admin workflow not yet accepted | exercise selected-account grant/revoke and credit adjustment with disposable testers |
 | Secure organization invitations | implemented | exact account/email binding, expiry and current seat-capacity directly tested | not live multi-user accepted | authenticated live acceptance |
 | Invention sharing/grants | implemented | active same-org target requirement, exact insert/update, stale-grant cleanup directly tested | not live multi-user accepted | live grant/revocation acceptance |
 | Evidence provenance/trust | implemented | fail-closed evidence tests established | not live-calibrated | provider-backed calibration |
@@ -62,7 +63,7 @@ Convex production `agile-seahorse-379` has a deliberately limited password-recov
 | Development dependency audit boundary | implemented | only known Next/ESLint lint-chain advisories accepted | repository-only state | upstream fixes or safe migration |
 | Exact-head CI integrity | implemented | PR head checkout/assertion; pinned actions; no persisted credentials | repository-only state | keep enforced |
 | Authentication dependency modernization | Lucia v3 currently in use | current auth/type/build gates pass | migration not performed | deliberately plan/test replacement |
-| Owner-controlled Convex path | partially executed | dedicated test deployment `quick-fox-785` created; `fiery-gazelle-628` is another app | test deployment not yet code-deployed; production remains limited | deploy exact branch and perform authenticated acceptance |
+| Owner-controlled Convex path | partially executed | dedicated test deployment `quick-fox-785` created and branch code deployed; `fiery-gazelle-628` is another app | production remains limited; newest local head not claimed deployed | perform authenticated acceptance |
 | Owner-controlled Convex production path | limited deployment | password-recovery backend deployed and health/auth acceptance verified | limited live acceptance only | preserve existing functions/data while expanding scope deliberately |
 | Owner-controlled Vercel/frontend path | preview exists | repository build passes | PR #24 preview authenticated; password recovery and operations console preview-verified | point a test preview at the dedicated InventSmith test deployment |
 | InventSmith operations console | implemented | page code and compatibility fallback verified locally | refreshed preview works; AI details intentionally unavailable from limited production response | verify against full test deployment and exercise a controlled failed work item |
@@ -92,7 +93,7 @@ This documentation refresh creates a newer head and therefore requires exact-hea
 4. Artifact/rendered export and generated-format quality.
 5. Preserve the no-executor boundary until an outside-world executor is deliberately implemented with execution-time revalidation and separate execution evidence.
 6. Remaining low-risk customer-facing naming cleanup.
-7. Deploy and verify the dedicated InventSmith test deployment `dev/inventsmith-test` (`quick-fox-785`); never reuse `fiery-gazelle-628`.
+7. Verify the dedicated InventSmith test deployment `dev/inventsmith-test` (`quick-fox-785`), including selected beta access and credit controls; never reuse `fiery-gazelle-628`.
 8. Provider/concurrency and commercial calibration.
 9. Deliberately planned/tested Lucia migration.
 
