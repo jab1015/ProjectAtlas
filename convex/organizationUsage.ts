@@ -3,6 +3,7 @@ import { query } from "./_generated/server";
 import { requireOrganizationRole } from "./organizations";
 import { getOrganizationPlanPolicy } from "./organizationPolicyLogic";
 import { addCostClassUsage, buildObservedCostProfile, emptyCostClassSummary } from "./costEconomicsLogic";
+import { getActiveEntitlementOverride, getEffectiveOrganizationPlanKey, getOrganizationCreditBalance } from "./betaAccessLogic";
 
 function utcDateKey(timestamp: number) {
   return new Date(timestamp).toISOString().slice(0, 10);
@@ -143,7 +144,10 @@ export const getOrganizationUsageOverview = query({
       });
     }
 
-    const policy = getOrganizationPlanPolicy(organization.planKey);
+    const effectivePlanKey = await getEffectiveOrganizationPlanKey(ctx, organization);
+    const activeOverride = await getActiveEntitlementOverride(ctx, organization._id);
+    const creditBalance = await getOrganizationCreditBalance(ctx, organization._id);
+    const policy = getOrganizationPlanPolicy(effectivePlanKey);
     const autonomousLedgerVsEventDelta = sharedUsage.autonomousCostUnits - autonomousEventCostUnits;
     const observedCostProfile = buildObservedCostProfile(inventionUsage.map((item) => item.costUnits));
     return {
@@ -151,7 +155,10 @@ export const getOrganizationUsageOverview = query({
         organizationId: organization._id,
         name: organization.name,
         kind: organization.kind,
-        planKey: organization.planKey,
+        planKey: effectivePlanKey,
+        basePlanKey: organization.planKey,
+        complimentaryAccess: activeOverride ? { expiresAt: activeOverride.expiresAt ?? null, reason: activeOverride.reason } : null,
+        creditBalance,
         monthlyPriceUsd: policy.monthlyPriceUsd,
         activeInventionLimit: policy.activeInventionLimit,
         includedSeatLimit: policy.includedSeatLimit,
