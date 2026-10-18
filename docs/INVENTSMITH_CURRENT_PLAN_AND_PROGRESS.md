@@ -44,12 +44,12 @@ The refreshed preview's **InventSmith operations** page is usable. Its frontend 
 
 ## Source, Convex, hosting, and deployment boundary
 
-GitHub remains source/CI authority. Convex is a core InventSmith backend, not an optional add-on. The Convex deployment `fiery-gazelle-628` belongs to another application and must not be used or modified for InventSmith. The dedicated InventSmith test deployment `dev/inventsmith-test` (`quick-fox-785`) has now been created, but the branch code has not yet been deployed there.
+GitHub remains source/CI authority. Convex is a core InventSmith backend, not an optional add-on. The Convex deployment `fiery-gazelle-628` belongs to another application and must not be used or modified for InventSmith. The dedicated InventSmith test deployment `dev/inventsmith-test` (`quick-fox-785`) has been created and now contains the branch Convex code. Its auth secrets remain to be provisioned before account-creation testing.
 
 That does **not** mean the current code head is deployed or live accepted. Current truth remains:
 
 - repository/CI: verified through exact code head `93744db1...`;
-- InventSmith Convex test infrastructure: `dev/inventsmith-test` / `quick-fox-785` created; code deployment pending;
+- InventSmith Convex test infrastructure: `dev/inventsmith-test` / `quick-fox-785` created and code deployed; auth secret provisioning pending;
 - newest branch head on Convex: not claimed deployed;
 - Modern Methods-owned Vercel/frontend deployment: not yet verified complete;
 - authenticated browser acceptance: not yet complete;
@@ -96,7 +96,7 @@ Professional review, external-use authorization, consequential approval, manufac
 4. Continue specialized artifact/package and generated-format quality acceptance, including rendered document and CAD-format checks where feasible.
 5. Preserve the no-executor boundary until an outside-world executor is deliberately implemented with execution-time revalidation and separate execution evidence.
 6. Continue low-risk InventSmith naming cleanup while preserving compatibility/historical identifiers that still require tested migration.
-7. Deploy the branch to `dev/inventsmith-test` / `quick-fox-785`, configure its required test secrets, and point a test preview at it while keeping production limited.
+7. Provision auth secrets in `dev/inventsmith-test` / `quick-fox-785` and verify the full invention journey there. The branch code is deployed and the PR preview is configured to use it while production remains limited.
 8. Complete live authenticated multi-user/multi-invention acceptance, provider failure/retry, concurrency, billing/webhooks, professional-review, and representative lifecycle acceptance after owner-controlled infrastructure is ready.
 9. Plan the Lucia v3 authentication migration separately.
 10. Calibrate commercial limits from measured provider/runtime economics.
@@ -117,3 +117,4 @@ Never collapse these states into a single production-ready claim.
 ## New-chat start instruction
 
 Read `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`, this file, `docs/INVENTSMITH_BUILD_PROGRESS.md`, `docs/INVENTSMITH_CAPABILITY_MATRIX.md`, `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md`, `docs/INVENTSMITH_DEPLOYMENT_RUNBOOK.md`, and `docs/INVENTSMITH_CONSEQUENTIAL_SECURITY_CHECKPOINT.md`; then fetch the live branch, draft PR #24, and exact-head CI. Trust newer verified GitHub state over documentation text. Do not restart completed work, merge PR #24, touch `main`, or reintroduce MadeThis synchronization.
+
