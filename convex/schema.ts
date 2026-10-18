@@ -70,6 +70,47 @@ export default defineSchema({
     .index("by_kind", ["kind"])
     .index("by_status", ["status"]),
 
+  // Audited, time-bounded entitlement overrides for beta testers and other
+  // explicitly approved complimentary access. The base plan remains intact so
+  // future Explorer pricing changes do not erase the exception history.
+  organizationEntitlementOverrides: defineTable({
+    organizationId: v.id("organizations"),
+    planKey: v.union(
+      v.literal("explorer"),
+      v.literal("inventor"),
+      v.literal("pro"),
+      v.literal("enterprise"),
+      v.literal("studio_3"),
+      v.literal("studio_6"),
+      v.literal("studio_custom")
+    ),
+    startsAt: v.number(),
+    expiresAt: v.optional(v.number()),
+    reason: v.string(),
+    grantedByUserId: v.id("users"),
+    createdAt: v.number(),
+    revokedAt: v.optional(v.number()),
+    revokedByUserId: v.optional(v.id("users")),
+    revokedReason: v.optional(v.string()),
+  })
+    .index("by_organizationId", ["organizationId"])
+    .index("by_organizationId_createdAt", ["organizationId", "createdAt"]),
+
+  // Signed credit-unit ledger. Positive entries grant capacity; negative
+  // entries debit/refund/adjust it. Never edit daily usage rows to change a
+  // customer's allowance.
+  organizationCreditLedger: defineTable({
+    organizationId: v.id("organizations"),
+    deltaUnits: v.number(),
+    kind: v.union(v.literal("grant"), v.literal("debit"), v.literal("refund"), v.literal("adjustment")),
+    reason: v.string(),
+    actorUserId: v.optional(v.id("users")),
+    referenceId: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_organizationId", ["organizationId"])
+    .index("by_organizationId_createdAt", ["organizationId", "createdAt"]),
+
   organizationMemberships: defineTable({
     organizationId: v.id("organizations"),
     userId: v.id("users"),
@@ -368,6 +409,8 @@ export default defineSchema({
     attemptCount: v.number(),
     estimatedCostUnits: v.optional(v.number()),
     reservedCostUnits: v.optional(v.number()),
+    reservedDailyCostUnits: v.optional(v.number()),
+    reservedCreditUnits: v.optional(v.number()),
     reservationDateKey: v.optional(v.string()),
     actualCostUnits: v.optional(v.number()),
     maxAttempts: v.optional(v.number()),
