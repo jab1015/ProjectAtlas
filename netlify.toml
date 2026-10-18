@@ -9,7 +9,8 @@
 # production Convex deploy key. The committed generated Convex client types are
 # sufficient for a Next.js preview build; production remains the only context
 # that deploys Convex functions.
-# Touch this file to force Netlify to recreate Preview #24 when its deploy artifact is removed.
+# Recreate Preview #24 when its deploy artifact has been deleted; changing this
+# file creates a real configuration commit for Netlify's Git-based deploy hook.
 [context.deploy-preview]
   command = "npx next build"
 
