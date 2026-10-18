@@ -1,6 +1,6 @@
 # InventSmith Build Progress
 
-**Last updated:** October 17, 2026 (America/New_York)  
+**Last updated:** October 18, 2026 (America/New_York)
 **Product destination:** Complete Idea-to-Market Inventor OS  
 **Authoritative product specification:** `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`  
 **Current continuation checkpoint:** `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`  
@@ -13,6 +13,14 @@
 InventSmith status is reported by capability and evidence, not by a single completion percentage. Repository implementation, automated verification, deployment, live functional verification, genuine professional review, real-world evidence, and outside-world execution remain separate states.
 
 The retired controlled-pilot 80% figure must never be used as overall InventSmith completion.
+
+## Current limited deployment checkpoint
+
+The owner-controlled Convex production deployment `agile-seahorse-379` received only the password-recovery backend scope required for acceptance. Existing production functions and data were preserved; PR #24 was not merged and the full unverified product was not deployed.
+
+The password-recovery flow was live-functionally verified on the Netlify PR #24 preview at `deploy-preview-24--inventsmith.netlify.app`: reset email delivery succeeded, the recovery code was received, and authenticated sign-in succeeded. The email initially landed in spam during testing.
+
+The admin **InventSmith operations** page is currently blocked in the preview by a frontend/backend response mismatch. The page reads `snapshot.ai.openAiConfigured`, while the limited production backend response does not yet include `snapshot.ai`; this is a preview compatibility defect, not a password-recovery or data-integrity failure. Bugsnag blocking and the preload warning are unrelated browser messages.
 
 ## Product vision and architecture
 
@@ -84,7 +92,7 @@ PR #24 remains draft/open/unmerged. `main` remains untouched.
 4. Continue specialized artifact content, rendered export, and generated-format quality acceptance.
 5. Preserve the no-executor boundary until a deliberate executor exists with execution-time revalidation and separate execution evidence.
 6. Finish low-risk InventSmith naming cleanup without destabilizing compatibility identifiers.
-7. Prepare owner-controlled Vercel/Convex runtime configuration and perform deployment/live acceptance only when actually provisioned and observed.
+7. Repair the operations-console response compatibility, create a fresh preview, and re-test the console without expanding the limited production deployment.
 8. Validate real provider/concurrency behavior and calibrate commercial limits from measured economics.
 9. Plan/test a Lucia v3 migration separately from routine hardening.
 
