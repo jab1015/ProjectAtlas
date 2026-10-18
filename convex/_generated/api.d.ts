@@ -19,6 +19,8 @@ import type * as auth from "../auth.js";
 import type * as authHelpers from "../authHelpers.js";
 import type * as autonomyMaintenance from "../autonomyMaintenance.js";
 import type * as autonomyMaintenanceLogic from "../autonomyMaintenanceLogic.js";
+import type * as betaAccess from "../betaAccess.js";
+import type * as betaAccessLogic from "../betaAccessLogic.js";
 import type * as blockedWorkResponseMutation from "../blockedWorkResponseMutation.js";
 import type * as cadArtifactKinds from "../cadArtifactKinds.js";
 import type * as cadDrawing from "../cadDrawing.js";
@@ -147,6 +149,8 @@ declare const fullApi: ApiFromModules<{
   authHelpers: typeof authHelpers;
   autonomyMaintenance: typeof autonomyMaintenance;
   autonomyMaintenanceLogic: typeof autonomyMaintenanceLogic;
+  betaAccess: typeof betaAccess;
+  betaAccessLogic: typeof betaAccessLogic;
   blockedWorkResponseMutation: typeof blockedWorkResponseMutation;
   cadArtifactKinds: typeof cadArtifactKinds;
   cadDrawing: typeof cadDrawing;
@@ -285,4 +289,3 @@ export declare const internal: FilterApi<
 >;
 
 export declare const components: {};
-
