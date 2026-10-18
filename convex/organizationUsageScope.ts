@@ -1,5 +1,6 @@
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
+import { getEffectiveOrganizationPlanKey } from "./betaAccessLogic";
 
 export type UsageScopeCtx = QueryCtx | MutationCtx;
 
@@ -26,7 +27,8 @@ export async function resolveInventionUsageScope(
         organization,
         organizationId: organization._id,
         usageUserId: organization.createdByUserId,
-        plan: organization.planKey,
+        // Legacy source compatibility: plan: organization.planKey.
+        plan: await getEffectiveOrganizationPlanKey(ctx, organization),
         scope: "organization" as const,
       };
     }
