@@ -23,6 +23,7 @@ async function settleUsageReservation(
 ) {
   const usageScope = await resolveInventionUsageScope(ctx, inventionId);
   if (!usageScope) throw new ConvexError("Invention not found while settling usage");
+  if (usageScope.isAdmin) return;
   const dateKey = item.reservationDateKey ?? utcDateKey(now);
   const reservedCostUnits = item.reservedDailyCostUnits ?? item.reservedCostUnits ?? 0;
 
@@ -157,7 +158,7 @@ export const claimNextWork = internalMutation({
     if (!usageScope) throw new ConvexError("Invention not found");
     const dateKey = utcDateKey(args.now);
 
-    const organizationUsage = usageScope.scope === "organization"
+    const organizationUsage = usageScope.scope === "organization" && !usageScope.isAdmin
       ? await ensureOrganizationDailyUsage(ctx, usageScope.organizationId, dateKey, args.now)
       : null;
     const legacyUsage = usageScope.scope === "legacy_user"
@@ -169,20 +170,20 @@ export const claimNextWork = internalMutation({
     const autonomousCostUnits = organizationUsage?.autonomousCostUnits ?? legacyUsage?.autonomousCostUnits ?? 0;
     const reservedAutonomousCostUnits = organizationUsage?.reservedAutonomousCostUnits ?? legacyUsage?.reservedAutonomousCostUnits ?? 0;
 
-    const dailyAvailableUnits = remainingAutonomousCostUnitsAfterReservations(
-      usageScope.plan,
-      autonomousCostUnits,
-      reservedAutonomousCostUnits
-    );
+    const dailyAvailableUnits = usageScope.isAdmin
+      ? Number.MAX_SAFE_INTEGER
+      : remainingAutonomousCostUnitsAfterReservations(usageScope.plan, autonomousCostUnits, reservedAutonomousCostUnits);
     const creditBalance = usageScope.scope === "organization"
       ? await getOrganizationCreditBalance(ctx, usageScope.organizationId)
       : 0;
-    const serverAvailableUnits = dailyAvailableUnits + Math.max(0, creditBalance);
+    const serverAvailableUnits = usageScope.isAdmin
+      ? args.availableCostUnits
+      : dailyAvailableUnits + Math.max(0, creditBalance);
     const selection = selectNextWorkItem(
       items.map((item) => ({ ...item, _id: String(item._id) })),
       Math.min(args.availableCostUnits, serverAvailableUnits),
       args.now,
-      (kind) => canTierRunWorkKind(usageScope.plan, kind),
+      (kind) => usageScope.isAdmin || canTierRunWorkKind(usageScope.plan, kind),
       (kind) => isManufacturingMaturityEligible(kind, deliverables)
     );
     if (!selection.selected) return { workItemId: null, attemptNumber: null, reason: selection.reason };
@@ -190,8 +191,8 @@ export const claimNextWork = internalMutation({
     const workItemId = selection.selected._id as typeof items[number]["_id"];
     const attemptNumber = selection.selected.attemptCount + 1;
     const reservation = selection.selected.reservedCostUnits ?? selection.selected.estimatedCostUnits ?? 0;
-    const reservedDailyCostUnits = Math.min(reservation, dailyAvailableUnits);
-    const reservedCreditUnits = Math.max(0, reservation - reservedDailyCostUnits);
+    const reservedDailyCostUnits = usageScope.isAdmin ? 0 : Math.min(reservation, dailyAvailableUnits);
+    const reservedCreditUnits = usageScope.isAdmin ? 0 : Math.max(0, reservation - reservedDailyCostUnits);
     if (reservedCreditUnits > 0 && usageScope.scope === "organization") {
       await recordCreditEntry(ctx, {
         organizationId: usageScope.organizationId,
