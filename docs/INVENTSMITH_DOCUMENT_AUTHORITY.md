@@ -1,6 +1,6 @@
 # InventSmith Document Authority
 
-**Updated:** October 17, 2026 (America/New_York)  
+**Updated:** October 18, 2026 (America/New_York)
 **Active branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged
 
@@ -71,7 +71,7 @@ Current owner-controlled direction:
 - **Vercel:** intended Modern Methods-owned web deployment;
 - **Convex:** Modern Methods-controlled backend/database/auth/storage/functions deployment path.
 
-The documented Convex development deployment `fiery-gazelle-628` has a prior backend health/configuration checkpoint. That is development infrastructure, not production/live acceptance. This documentation refresh does not claim the latest repository head is deployed there.
+The Convex deployment `fiery-gazelle-628` belongs to another application and is not an InventSmith environment. It must not be inspected, modified, or used for InventSmith testing. InventSmith production is `agile-seahorse-379`; a separate InventSmith test deployment is pending creation. This documentation refresh does not claim the latest repository head is deployed to either deployment.
 
 MadeThis is retired from the active implementation plan.
 
