@@ -424,7 +424,8 @@ export async function deleteInventionHandler(ctx: MutationCtx, { inventionId }: 
 
   const reservedByDate = new Map<string, number>();
   for (const row of canonicalRowGroups[4]) {
-    if (row.reservedCostUnits && row.reservationDateKey) reservedByDate.set(row.reservationDateKey, (reservedByDate.get(row.reservationDateKey) ?? 0) + row.reservedCostUnits);
+    const reservedDailyCostUnits = row.reservedDailyCostUnits ?? row.reservedCostUnits;
+    if (reservedDailyCostUnits && row.reservationDateKey) reservedByDate.set(row.reservationDateKey, (reservedByDate.get(row.reservationDateKey) ?? 0) + reservedDailyCostUnits);
   }
   for (const [dateKey, reservedUnits] of reservedByDate) {
     if (usageScope?.scope === "organization") {
