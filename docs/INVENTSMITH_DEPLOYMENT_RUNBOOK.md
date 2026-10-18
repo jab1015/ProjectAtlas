@@ -1,6 +1,6 @@
 # InventSmith Owner-Controlled Deployment and Acceptance Runbook
 
-**Status:** Repository implementation active; limited Convex production deployment and password-recovery acceptance complete; operations-console compatibility remains open
+**Status:** Repository implementation active; limited Convex production deployment, password-recovery acceptance, and preview operations-console compatibility acceptance complete; dedicated InventSmith test deployment pending
 **Product:** InventSmith — The Inventor OS by Modern Methods  
 **Updated:** October 18, 2026 (America/New_York)
 **Active branch:** `inventsmith/full-product-build`  
@@ -35,15 +35,15 @@ Lucia `3.2.2` remains deprecated and should be migrated only through a separatel
 
 ## 3. Current Convex status
 
-A Modern Methods-controlled **development** deployment is documented at `fiery-gazelle-628`. A separate owner-controlled **production** deployment is `agile-seahorse-379`.
+A Convex deployment named `fiery-gazelle-628` exists but belongs to another application and is not an InventSmith environment. A separate owner-controlled **production** deployment is `agile-seahorse-379`. InventSmith requires a new dedicated test/development deployment before full-branch acceptance.
 
 Production currently contains only the intentionally limited password-recovery backend scope. Existing production functions and data were preserved. PR #24 was not merged and the full unverified product was not deployed.
 
 Password recovery was live-functionally verified through the Netlify PR #24 preview: reset email delivery, recovery-code entry, and sign-in succeeded. This does not constitute full-product production acceptance.
 
-The preview's InventSmith operations page currently fails because its frontend expects `snapshot.ai.openAiConfigured`, while the limited production `operationalHealth:getSnapshot` response does not include `snapshot.ai`. Repairing that compatibility is the next scoped task. Do not expand production deployment merely to make the page render.
+The refreshed preview's InventSmith operations page works against the limited production response by treating the absent `snapshot.ai` field as unavailable. Do not expand production deployment merely to expose AI configuration or to test the full product.
 
-The controlled Convex development deployment workflow remains manual and guarded by explicit confirmation, `CONVEX_DEPLOY_KEY`, and a development-key prefix check. Do not dispatch it casually.
+The new InventSmith test deployment workflow must remain manual and guarded by explicit confirmation, `CONVEX_DEPLOY_KEY`, and a deployment-specific key/prefix check. Never use `fiery-gazelle-628` credentials or deployment settings for InventSmith.
 
 ## 4. Configuration inventory — names only
 
@@ -72,14 +72,14 @@ Never place real secret values in source, docs, issues, logs, screenshots, or ch
 3. Install dependencies from the repository lockfile.
 4. Run required Convex generation/type/schema checks and resolve failures.
 5. Confirm auth/provider/admin/billing configuration without exposing secrets.
-6. Deploy the exact intended head through the guarded environment-appropriate path.
+6. Deploy the exact intended head through the guarded InventSmith test-deployment path. Do not deploy this full branch to `agile-seahorse-379` during test setup.
 7. Record the exact deployed commit and observed deployment result.
 8. Verify scheduled work, storage, auth callbacks, signed HTTP/webhook endpoints, entitlement checks, and database/function health.
 9. Only then describe that exact code as deployed; live functional verification still requires representative authenticated acceptance.
 
 ## 6. Current frontend preview status
 
-The current Netlify PR #24 preview is `https://deploy-preview-24--inventsmith.netlify.app`. It is suitable for the limited password-recovery acceptance already completed, but it is not a full-product production release. The operations console remains blocked by the response mismatch described above.
+The current Netlify PR #24 preview is `https://deploy-preview-24--inventsmith.netlify.app`. It is suitable for limited password-recovery acceptance and preview operations-console verification, but it is not a full-product production release. A test preview must be configured against the dedicated InventSmith test deployment before testing the full invention journey.
 
 ## 7. Fresh Vercel/frontend procedure
 
