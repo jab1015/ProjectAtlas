@@ -133,10 +133,16 @@ async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
   ]);
 
   const personalOrganizationUsage = [];
+  const personalOrganizationEntitlementOverrides = [];
+  const personalOrganizationCreditLedger = [];
   for (const organizationId of personalOrganizationIdValues) {
     const rows = await ctx.db.query("organizationDailyUsage").withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId)).take(EVENT_LIMIT + 1);
     personalOrganizationUsage.push(...requireWithinLimit(rows, EVENT_LIMIT, "personal organization usage-history count"));
     if (personalOrganizationUsage.length > EVENT_LIMIT) throw new ConvexError("Your personal organization usage history exceeds the self-service export limit. Submit a formal data-export request for a coordinated complete package.");
+    const overrides = await ctx.db.query("organizationEntitlementOverrides").withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId)).take(ROW_LIMIT + 1);
+    personalOrganizationEntitlementOverrides.push(...requireWithinLimit(overrides, ROW_LIMIT, "personal organization entitlement-override count"));
+    const credits = await ctx.db.query("organizationCreditLedger").withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId)).take(EVENT_LIMIT + 1);
+    personalOrganizationCreditLedger.push(...requireWithinLimit(credits, EVENT_LIMIT, "personal organization credit-ledger count"));
   }
 
   const matchingSubscriptionEvents = user.email
@@ -186,6 +192,8 @@ async function buildStructuredExport(ctx: QueryCtx, userId: Id<"users">) {
     inventions: inventionBundles,
     dailyUsage: requireWithinLimit(usage, EVENT_LIMIT, "usage-history count"),
     personalOrganizationDailyUsage: personalOrganizationUsage,
+    personalOrganizationEntitlementOverrides,
+    personalOrganizationCreditLedger,
     notifications: requireWithinLimit(notifications, EVENT_LIMIT, "notification count"),
     privacyRequests: requireWithinLimit(privacyRequests, ROW_LIMIT, "privacy-request count"),
     purchases: requireWithinLimit(purchases, ROW_LIMIT, "purchase count").map((purchase) => ({
