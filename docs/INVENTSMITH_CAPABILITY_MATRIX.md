@@ -22,7 +22,7 @@ No overall completion percentage is asserted.
 
 Customer-facing product: **InventSmith — The Inventor OS** by **Modern Methods**. The historical repository slug `jab1015/ProjectAtlas` and selected `atlas*` / `ATLAS_*` compatibility identifiers remain only where tested migration has not yet occurred.
 
-MadeThis is retired/historical. The Convex deployment `fiery-gazelle-628` belongs to another application and is excluded from InventSmith work. A new dedicated InventSmith test deployment must be created before full-branch live acceptance. Modern Methods-owned Vercel/frontend deployment and authenticated browser acceptance remain separate acceptance dimensions.
+MadeThis is retired/historical. The Convex deployment `fiery-gazelle-628` belongs to another application and is excluded from InventSmith work. The dedicated InventSmith test deployment `dev/inventsmith-test` (`quick-fox-785`) now exists but has not received the branch code yet. Modern Methods-owned Vercel/frontend deployment and authenticated browser acceptance remain separate acceptance dimensions.
 
 ### Limited production checkpoint
 
@@ -62,7 +62,7 @@ Convex production `agile-seahorse-379` has a deliberately limited password-recov
 | Development dependency audit boundary | implemented | only known Next/ESLint lint-chain advisories accepted | repository-only state | upstream fixes or safe migration |
 | Exact-head CI integrity | implemented | PR head checkout/assertion; pinned actions; no persisted credentials | repository-only state | keep enforced |
 | Authentication dependency modernization | Lucia v3 currently in use | current auth/type/build gates pass | migration not performed | deliberately plan/test replacement |
-| Owner-controlled Convex path | partially executed | no InventSmith test deployment yet; `fiery-gazelle-628` is another app | limited production only | create and verify dedicated InventSmith test deployment |
+| Owner-controlled Convex path | partially executed | dedicated test deployment `quick-fox-785` created; `fiery-gazelle-628` is another app | test deployment not yet code-deployed; production remains limited | deploy exact branch and perform authenticated acceptance |
 | Owner-controlled Convex production path | limited deployment | password-recovery backend deployed and health/auth acceptance verified | limited live acceptance only | preserve existing functions/data while expanding scope deliberately |
 | Owner-controlled Vercel/frontend path | preview exists | repository build passes | PR #24 preview authenticated; password recovery and operations console preview-verified | point a test preview at the dedicated InventSmith test deployment |
 | InventSmith operations console | implemented | page code and compatibility fallback verified locally | refreshed preview works; AI details intentionally unavailable from limited production response | verify against full test deployment and exercise a controlled failed work item |
@@ -92,7 +92,7 @@ This documentation refresh creates a newer head and therefore requires exact-hea
 4. Artifact/rendered export and generated-format quality.
 5. Preserve the no-executor boundary until an outside-world executor is deliberately implemented with execution-time revalidation and separate execution evidence.
 6. Remaining low-risk customer-facing naming cleanup.
-7. Create a dedicated InventSmith Convex test deployment; never reuse `fiery-gazelle-628`.
+7. Deploy and verify the dedicated InventSmith test deployment `dev/inventsmith-test` (`quick-fox-785`); never reuse `fiery-gazelle-628`.
 8. Provider/concurrency and commercial calibration.
 9. Deliberately planned/tested Lucia migration.
 
