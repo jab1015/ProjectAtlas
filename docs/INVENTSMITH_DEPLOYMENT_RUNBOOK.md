@@ -1,8 +1,8 @@
 # InventSmith Owner-Controlled Deployment and Acceptance Runbook
 
-**Status:** Repository implementation active; Convex development infrastructure exists; owner-controlled Vercel/frontend and full live acceptance are not complete  
+**Status:** Repository implementation active; limited Convex production deployment and password-recovery acceptance complete; operations-console compatibility remains open
 **Product:** InventSmith — The Inventor OS by Modern Methods  
-**Updated:** October 17, 2026 (America/New_York)  
+**Updated:** October 18, 2026 (America/New_York)
 **Active branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged
 
@@ -35,7 +35,13 @@ Lucia `3.2.2` remains deprecated and should be migrated only through a separatel
 
 ## 3. Current Convex status
 
-A Modern Methods-controlled **development** deployment is documented at `fiery-gazelle-628`. A prior checkpoint verified backend health/configuration there. This document does **not** claim exact head `93744db1...` or this documentation refresh is deployed there.
+A Modern Methods-controlled **development** deployment is documented at `fiery-gazelle-628`. A separate owner-controlled **production** deployment is `agile-seahorse-379`.
+
+Production currently contains only the intentionally limited password-recovery backend scope. Existing production functions and data were preserved. PR #24 was not merged and the full unverified product was not deployed.
+
+Password recovery was live-functionally verified through the Netlify PR #24 preview: reset email delivery, recovery-code entry, and sign-in succeeded. This does not constitute full-product production acceptance.
+
+The preview's InventSmith operations page currently fails because its frontend expects `snapshot.ai.openAiConfigured`, while the limited production `operationalHealth:getSnapshot` response does not include `snapshot.ai`. Repairing that compatibility is the next scoped task. Do not expand production deployment merely to make the page render.
 
 The controlled Convex development deployment workflow remains manual and guarded by explicit confirmation, `CONVEX_DEPLOY_KEY`, and a development-key prefix check. Do not dispatch it casually.
 
@@ -71,7 +77,11 @@ Never place real secret values in source, docs, issues, logs, screenshots, or ch
 8. Verify scheduled work, storage, auth callbacks, signed HTTP/webhook endpoints, entitlement checks, and database/function health.
 9. Only then describe that exact code as deployed; live functional verification still requires representative authenticated acceptance.
 
-## 6. Fresh Vercel/frontend procedure
+## 6. Current frontend preview status
+
+The current Netlify PR #24 preview is `https://deploy-preview-24--inventsmith.netlify.app`. It is suitable for the limited password-recovery acceptance already completed, but it is not a full-product production release. The operations console remains blocked by the response mismatch described above.
+
+## 7. Fresh Vercel/frontend procedure
 
 1. Create/use a Modern Methods-owned Vercel project from `jab1015/ProjectAtlas`.
 2. Use the supported Node/package manager and lockfile.
@@ -81,13 +91,13 @@ Never place real secret values in source, docs, issues, logs, screenshots, or ch
 6. Do not reuse MadeThis credentials/integration settings.
 7. Build a preview first and run authenticated acceptance before production promotion.
 
-## 7. Authentication/authorization acceptance
+## 8. Authentication/authorization acceptance
 
 Using disposable accounts verify unauthenticated denial, cross-organization isolation, role boundaries, invitation/share/member/owner controls, backend entitlements, account/invention deletion boundaries, and zero unauthorized side effects on rejected consequential actions.
 
 Repository tests already cover these deterministically; live acceptance must reproduce them with real disposable authenticated accounts.
 
-## 8. Core representative acceptance
+## 9. Core representative acceptance
 
 Exercise at least:
 
@@ -95,21 +105,21 @@ Exercise at least:
 
 Run representative physical, software, hybrid, and regulated cases through their applicable paths.
 
-## 9. Evidence/trust and worker acceptance
+## 10. Evidence/trust and worker acceptance
 
 Verify provenance, source association, partial/failed-only retry, stale/disputed evidence, prompt-injection resistance, provider outage fail-closed behavior, duplicate/late/stale worker attempts, leases, bounded retries, cleanup, and conservative usage settlement.
 
 AI/model output cannot satisfy real prototype, manufacturer quote, completed deployment/test, post-launch sales/analytics, or professional-review gates merely by assertion.
 
-## 10. Engineering/manufacturing acceptance
+## 11. Engineering/manufacturing acceptance
 
 Engineering review and manufacturing release remain separate. Manufacturing release must remain bound to the exact newest synchronized qualifying generation and must not itself contact a supplier, disclose artifacts, place an order, spend money, file, or publish.
 
-## 11. External-use and consequential-action acceptance
+## 12. External-use and consequential-action acceptance
 
 For consequential artifact actions, require exact latest/fresh external-use authorization, exact artifact scope, authorized manager resolution, execution-time revalidation, and separate outside-world execution evidence. The repository currently has no executor for supplier contact, RFQs, disclosure, orders/payments, filings, or publication.
 
-## 12. Billing, subscription, fulfillment, checkout, and download acceptance
+## 13. Billing, subscription, fulfillment, checkout, and download acceptance
 
 Deterministic repository coverage now directly exercises:
 
@@ -137,19 +147,19 @@ Before paid plans/fulfillment are enabled live:
 8. verify customer-visible pricing matches backend entitlements;
 9. do not enable production billing until these checks pass.
 
-## 13. Privacy, deletion, and storage acceptance
+## 14. Privacy, deletion, and storage acceptance
 
 Verify account/organization export boundaries, invention/evidence deletion, generated/original storage cleanup, member departure, invitations, billing fail-closed requirements, deletion/anonymization semantics, and exclusion of credentials/tokens/secrets/unrelated organization data from exports.
 
-## 14. Artifact quality acceptance
+## 15. Artifact quality acceptance
 
 Do not accept outputs merely because a file exists. Open representative PDF/DOCX/PPTX/XLSX/CSV/image/CAD outputs and inspect content, formatting, metadata, evidence/limitation labels, and usability. Validate STEP/STL/DXF structure with appropriate tooling before advancing engineering maturity.
 
-## 15. Operational acceptance
+## 16. Operational acceptance
 
 Before public production release establish tested procedures for uptime, spend alerts, backup/restore, key rotation, incidents, provider/model changes, billing/webhook incidents, rollback, privacy/deletion requests, and deployment access.
 
-## 16. Release/status rule
+## 17. Release/status rule
 
 Keep these states separate: implemented; automated verification passed; deployed; live functionally verified; professional review completed; real-world evidence present; external action executed.
 
