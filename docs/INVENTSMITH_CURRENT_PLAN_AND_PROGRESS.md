@@ -1,6 +1,6 @@
 # InventSmith Current Plan and Progress
 
-**Updated:** October 17, 2026 (America/New_York)  
+**Updated:** October 18, 2026 (America/New_York)
 **Product:** InventSmith — The Inventor OS  
 **Company:** Modern Methods  
 **Repository:** `jab1015/ProjectAtlas` (historical repository slug)  
@@ -33,6 +33,14 @@ The successful exact-head workflow passed:
 The accepted development-only advisory boundary remains limited to `@next/eslint-plugin-next`, `braces`, `eslint-config-next`, `fast-glob`, and `micromatch`. Unexpected advisory packages fail CI. Lucia `3.2.2` remains deprecated and requires a separately planned authentication migration rather than a blind dependency change.
 
 This documentation refresh creates a newer branch head. The final documentation head must receive its own exact-head CI before that documentation head is called automatically verified.
+
+## Current limited deployment and acceptance status
+
+The owner-controlled Convex production deployment `agile-seahorse-379` was updated only with the password-recovery backend scope. Existing production functions and data were preserved. PR #24 remains unmerged, and the full unverified product was not published to production.
+
+The Netlify PR #24 preview at `deploy-preview-24--inventsmith.netlify.app` has been used for authenticated acceptance. Password recovery is live-functionally verified: the reset email was delivered, the recovery code was received, and sign-in succeeded. The first test email was routed to spam.
+
+The preview's **InventSmith operations** page is not currently usable. Its frontend expects `snapshot.ai.openAiConfigured`, but the limited production `operationalHealth:getSnapshot` response does not include the newer `ai` field, producing the observed `TypeError`. This is the next compatibility fix; it does not indicate loss of production data or failure of password recovery.
 
 ## Source, Convex, hosting, and deployment boundary
 
@@ -88,7 +96,7 @@ Professional review, external-use authorization, consequential approval, manufac
 4. Continue specialized artifact/package and generated-format quality acceptance, including rendered document and CAD-format checks where feasible.
 5. Preserve the no-executor boundary until an outside-world executor is deliberately implemented with execution-time revalidation and separate execution evidence.
 6. Continue low-risk InventSmith naming cleanup while preserving compatibility/historical identifiers that still require tested migration.
-7. Prepare fresh owner-controlled Vercel/Convex runtime configuration; deploy/verify only when intentionally executed and observed.
+7. Repair the operations-console response compatibility, create a fresh preview, and re-test that console while keeping the production deployment limited.
 8. Complete live authenticated multi-user/multi-invention acceptance, provider failure/retry, concurrency, billing/webhooks, professional-review, and representative lifecycle acceptance after owner-controlled infrastructure is ready.
 9. Plan the Lucia v3 authentication migration separately.
 10. Calibrate commercial limits from measured provider/runtime economics.
