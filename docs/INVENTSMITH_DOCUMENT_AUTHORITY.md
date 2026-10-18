@@ -71,7 +71,7 @@ Current owner-controlled direction:
 - **Vercel:** intended Modern Methods-owned web deployment;
 - **Convex:** Modern Methods-controlled backend/database/auth/storage/functions deployment path.
 
-The Convex deployment `fiery-gazelle-628` belongs to another application and is not an InventSmith environment. It must not be inspected, modified, or used for InventSmith testing. InventSmith production is `agile-seahorse-379`; a separate InventSmith test deployment is pending creation. This documentation refresh does not claim the latest repository head is deployed to either deployment.
+The Convex deployment `fiery-gazelle-628` belongs to another application and is not an InventSmith environment. It must not be inspected, modified, or used for InventSmith testing. InventSmith production is `agile-seahorse-379`; the dedicated InventSmith test deployment is `dev/inventsmith-test` (`quick-fox-785`). The test deployment exists but has not yet received the latest repository head.
 
 MadeThis is retired from the active implementation plan.
 
