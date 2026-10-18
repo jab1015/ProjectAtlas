@@ -137,6 +137,12 @@ export async function deleteAccountData(ctx: MutationCtx, userId: Id<"users">): 
     const invitations = await ctx.db.query("organizationInvitations").withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId)).collect();
     for (const invitation of invitations) await ctx.db.delete(invitation._id);
 
+    const entitlementOverrides = await ctx.db.query("organizationEntitlementOverrides").withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId)).collect();
+    for (const override of entitlementOverrides) await ctx.db.delete(override._id);
+
+    const creditLedger = await ctx.db.query("organizationCreditLedger").withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId)).collect();
+    for (const entry of creditLedger) await ctx.db.delete(entry._id);
+
     const remainingMemberships = await ctx.db.query("organizationMemberships").withIndex("by_organizationId", (q) => q.eq("organizationId", organizationId)).collect();
     for (const membership of remainingMemberships) await ctx.db.delete(membership._id);
     const organization = await ctx.db.get(organizationId);
