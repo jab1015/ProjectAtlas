@@ -12,3 +12,9 @@
 # Touch this file to force Netlify to recreate Preview #24 when its deploy artifact is removed.
 [context.deploy-preview]
   command = "npx next build"
+
+# Keep PR previews isolated from production while exercising the full test backend.
+# This public Convex URL contains no credentials; production deploys remain unchanged.
+[context.deploy-preview.environment]
+  NEXT_PUBLIC_CONVEX_URL = "https://quick-fox-785.convex.cloud"
+
