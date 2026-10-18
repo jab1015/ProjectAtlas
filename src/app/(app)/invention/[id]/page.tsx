@@ -698,3 +698,48 @@ export default function InventionWorkspacePage() {
                     {field.type === "textarea" ? (
                       <Textarea
                         id={field.key}
+                        value={fieldValues[field.key] ?? ""}
+                        onChange={(e) =>
+                          setFieldValues((v) => ({ ...v, [field.key]: e.target.value }))
+                        }
+                        onBlur={() => handleBlur(field)}
+                        placeholder={field.placeholder}
+                        rows={4}
+                        className="resize-none"
+                        // Stage 1 fields are editable (inline edit)
+                        readOnly={stageId === 1 && !["problemStatement", "targetAudience", "solutionDescription", "title"].includes(field.key)}
+                      />
+                    ) : (
+                      <Input
+                        id={field.key}
+                        value={fieldValues[field.key] ?? ""}
+                        onChange={(e) =>
+                          setFieldValues((v) => ({ ...v, [field.key]: e.target.value }))
+                        }
+                        onBlur={() => handleBlur(field)}
+                        placeholder={field.placeholder}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+
+              <p className="text-xs text-muted-foreground">
+                Fields save automatically when you move to the next one.
+              </p>
+            </div>
+          </div>
+
+          {/* Journey map */}
+          <div className="mt-12 pt-8 border-t border-border">
+            <JourneyMap currentStageId={stageId} inventionId={inventionId} />
+          </div>
+        </div>
+      </main>
+
+      <footer className="border-t border-border">
+        <MadeThisBadge />
+      </footer>
+    </div>
+  );
+}
