@@ -11,10 +11,11 @@ import { ensureOrganizationDailyUsage, findOrganizationDailyUsage } from "./orga
 import { conservativeAttemptSettlementCost } from "./usageSettlementLogic";
 import { isManufacturingMaturityEligible } from "./manufacturingMaturityLogic";
 import { departmentAgentAuditMetadata } from "./departmentAgentLogic";
+import { getOrganizationCreditBalance, recordCreditEntry } from "./betaAccessLogic";
 
 async function settleUsageReservation(
   ctx: MutationCtx,
-  item: { reservedCostUnits?: number; reservationDateKey?: string },
+  item: { reservedCostUnits?: number; reservedDailyCostUnits?: number; reservedCreditUnits?: number; reservationDateKey?: string },
   inventionId: Id<"inventions">,
   actualCostUnits: number,
   completedWorkItems: number,
@@ -23,7 +24,7 @@ async function settleUsageReservation(
   const usageScope = await resolveInventionUsageScope(ctx, inventionId);
   if (!usageScope) throw new ConvexError("Invention not found while settling usage");
   const dateKey = item.reservationDateKey ?? utcDateKey(now);
-  const reservedCostUnits = item.reservedCostUnits ?? 0;
+  const reservedCostUnits = item.reservedDailyCostUnits ?? item.reservedCostUnits ?? 0;
 
   if (usageScope.scope === "organization") {
     let organizationUsage = await findOrganizationDailyUsage(ctx, usageScope.organizationId, dateKey);
@@ -40,6 +41,7 @@ async function settleUsageReservation(
           completedWorkItems: transitionalUsage.completedWorkItems + completedWorkItems,
           updatedAt: now,
         });
+        await settleCreditReservation(ctx, usageScope.organizationId, item, actualCostUnits, now);
         return;
       }
     }
@@ -51,6 +53,7 @@ async function settleUsageReservation(
       completedWorkItems: organizationUsage.completedWorkItems + completedWorkItems,
       updatedAt: now,
     });
+    await settleCreditReservation(ctx, usageScope.organizationId, item, actualCostUnits, now);
     return;
   }
 
@@ -75,6 +78,25 @@ async function settleUsageReservation(
       chatQuestions: 0,
       updatedAt: now,
     });
+  }
+}
+
+async function settleCreditReservation(
+  ctx: MutationCtx,
+  organizationId: Id<"organizations">,
+  item: { reservedDailyCostUnits?: number; reservedCreditUnits?: number },
+  actualCostUnits: number,
+  now: number,
+) {
+  const reservedCreditUnits = item.reservedCreditUnits ?? 0;
+  if (reservedCreditUnits <= 0) return;
+  const dailyReserved = item.reservedDailyCostUnits ?? 0;
+  const creditUsed = Math.max(0, actualCostUnits - dailyReserved);
+  const deltaUnits = reservedCreditUnits - creditUsed;
+  if (deltaUnits > 0) {
+    await recordCreditEntry(ctx, { organizationId, deltaUnits, kind: "refund", reason: "Unused beta credit reservation refunded", createdAt: now });
+  } else if (deltaUnits < 0) {
+    await recordCreditEntry(ctx, { organizationId, deltaUnits, kind: "debit", reason: "Additional beta credits consumed by actual work cost", createdAt: now });
   }
 }
 
@@ -147,11 +169,15 @@ export const claimNextWork = internalMutation({
     const autonomousCostUnits = organizationUsage?.autonomousCostUnits ?? legacyUsage?.autonomousCostUnits ?? 0;
     const reservedAutonomousCostUnits = organizationUsage?.reservedAutonomousCostUnits ?? legacyUsage?.reservedAutonomousCostUnits ?? 0;
 
-    const serverAvailableUnits = remainingAutonomousCostUnitsAfterReservations(
+    const dailyAvailableUnits = remainingAutonomousCostUnitsAfterReservations(
       usageScope.plan,
       autonomousCostUnits,
       reservedAutonomousCostUnits
     );
+    const creditBalance = usageScope.scope === "organization"
+      ? await getOrganizationCreditBalance(ctx, usageScope.organizationId)
+      : 0;
+    const serverAvailableUnits = dailyAvailableUnits + Math.max(0, creditBalance);
     const selection = selectNextWorkItem(
       items.map((item) => ({ ...item, _id: String(item._id) })),
       Math.min(args.availableCostUnits, serverAvailableUnits),
@@ -164,15 +190,27 @@ export const claimNextWork = internalMutation({
     const workItemId = selection.selected._id as typeof items[number]["_id"];
     const attemptNumber = selection.selected.attemptCount + 1;
     const reservation = selection.selected.reservedCostUnits ?? selection.selected.estimatedCostUnits ?? 0;
+    const reservedDailyCostUnits = Math.min(reservation, dailyAvailableUnits);
+    const reservedCreditUnits = Math.max(0, reservation - reservedDailyCostUnits);
+    if (reservedCreditUnits > 0 && usageScope.scope === "organization") {
+      await recordCreditEntry(ctx, {
+        organizationId: usageScope.organizationId,
+        deltaUnits: -reservedCreditUnits,
+        kind: "debit",
+        reason: `Reserved credits for ${selection.selected.kind}`,
+        referenceId: String(workItemId),
+        createdAt: args.now,
+      });
+    }
     if (!selection.selected.reservedCostUnits && reservation > 0) {
       if (organizationUsage) {
         await ctx.db.patch(organizationUsage._id, {
-          reservedAutonomousCostUnits: (organizationUsage.reservedAutonomousCostUnits ?? 0) + reservation,
+          reservedAutonomousCostUnits: (organizationUsage.reservedAutonomousCostUnits ?? 0) + reservedDailyCostUnits,
           updatedAt: args.now,
         });
       } else if (legacyUsage) {
         await ctx.db.patch(legacyUsage._id, {
-          reservedAutonomousCostUnits: (legacyUsage.reservedAutonomousCostUnits ?? 0) + reservation,
+          reservedAutonomousCostUnits: (legacyUsage.reservedAutonomousCostUnits ?? 0) + reservedDailyCostUnits,
           updatedAt: args.now,
         });
       } else if (usageScope.scope === "legacy_user") {
@@ -180,7 +218,7 @@ export const claimNextWork = internalMutation({
           userId: usageScope.usageUserId,
           dateKey,
           autonomousCostUnits: 0,
-          reservedAutonomousCostUnits: reservation,
+          reservedAutonomousCostUnits: reservedDailyCostUnits,
           completedWorkItems: 0,
           chatQuestions: 0,
           updatedAt: args.now,
@@ -195,6 +233,8 @@ export const claimNextWork = internalMutation({
       attemptCount: attemptNumber,
       lastError: undefined,
       reservedCostUnits: reservation || undefined,
+      reservedDailyCostUnits: reservedDailyCostUnits || undefined,
+      reservedCreditUnits: reservedCreditUnits || undefined,
       reservationDateKey: reservation ? selection.selected.reservationDateKey ?? dateKey : undefined,
       updatedAt: args.now,
     });
@@ -290,6 +330,8 @@ export const completeWork = internalMutation({
         status: "queued",
         leaseExpiresAt: undefined,
         reservedCostUnits: undefined,
+        reservedDailyCostUnits: undefined,
+        reservedCreditUnits: undefined,
         reservationDateKey: undefined,
         lastError: "Invention inputs changed while this work was running; the stale output was discarded.",
         updatedAt: args.completedAt,
@@ -507,6 +549,8 @@ export const completeWork = internalMutation({
       completedAt: args.completedAt,
       leaseExpiresAt: undefined,
       reservedCostUnits: undefined,
+      reservedDailyCostUnits: undefined,
+      reservedCreditUnits: undefined,
       reservationDateKey: undefined,
       updatedAt: args.completedAt,
     });
@@ -551,6 +595,8 @@ export const failWork = internalMutation({
       lastError: args.error.slice(0, 1000),
       leaseExpiresAt: undefined,
       reservedCostUnits: undefined,
+      reservedDailyCostUnits: undefined,
+      reservedCreditUnits: undefined,
       reservationDateKey: undefined,
       updatedAt: args.failedAt,
     });
@@ -608,6 +654,8 @@ export const blockWorkForHuman = internalMutation({
       humanGateType: args.gateType,
       leaseExpiresAt: undefined,
       reservedCostUnits: undefined,
+      reservedDailyCostUnits: undefined,
+      reservedCreditUnits: undefined,
       reservationDateKey: undefined,
       updatedAt: args.blockedAt,
     });
