@@ -9,6 +9,7 @@ import { BarChart3, Building2, Download, LogOut, Map, ScrollText, UserRound, Wre
 import { Button } from "@/components/ui/button";
 import { AtlasLogo } from "@/components/atlas/atlas-logo";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 interface AppNavProps { className?: string; }
 interface AccessibleInvention { _id: string; title: string; access: "manage" | "edit" | "view" | "review"; }
@@ -16,10 +17,23 @@ const getActiveAccessibleInvention = makeFunctionReference<"query", Record<strin
 
 export function AppNav({ className }: AppNavProps) {
   const { signOut } = useAuthActions();
+  const router = useRouter();
   const { isAuthenticated } = useConvexAuth();
   const user = useQuery(api.authHelpers.getCurrentUser);
   const activeInvention = useQuery(getActiveAccessibleInvention, isAuthenticated ? {} : "skip");
   const ensureProfile = useMutation(api.users.ensureUserProfile);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } finally {
+      // Convex Auth clears its persisted tokens in signOut. Replace the
+      // current route as well so a protected page cannot appear to keep the
+      // old account active while auth state and queries settle.
+      router.replace("/sign-in");
+      router.refresh();
+    }
+  };
 
   useEffect(() => {
     if (isAuthenticated) ensureProfile().catch(() => undefined);
@@ -39,7 +53,7 @@ export function AppNav({ className }: AppNavProps) {
           <Button asChild variant="ghost" size="sm" className="gap-1.5"><Link href="/account/data-export" title="Download your InventSmith data"><Download className="h-4 w-4" /><span className="hidden 2xl:inline">My Data</span></Link></Button>
           <Button asChild variant="ghost" size="sm" className="gap-1.5"><Link href="/account"><UserRound className="h-4 w-4" /><span className="hidden sm:inline">Account</span></Link></Button>
           {user && <span className="hidden max-w-[140px] truncate text-sm text-muted-foreground 2xl:block">{user.name ?? user.email ?? ""}</span>}
-          <Button variant="ghost" size="sm" onClick={() => void signOut()} className="gap-1.5 text-muted-foreground hover:text-foreground" title="Sign out"><LogOut className="h-4 w-4" /><span className="hidden sm:inline">Sign Out</span></Button>
+          <Button variant="ghost" size="sm" onClick={() => void handleSignOut()} className="gap-1.5 text-muted-foreground hover:text-foreground" title="Sign out"><LogOut className="h-4 w-4" /><span className="hidden sm:inline">Sign Out</span></Button>
         </div>
       </div>
     </header>
