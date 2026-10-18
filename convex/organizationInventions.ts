@@ -11,6 +11,7 @@ import {
   unsupportedInventionMessage,
 } from "./inventionClassificationLogic";
 import { initializeClassifiedInvention } from "./inventionInitialization";
+import { getEffectiveOrganizationPlanKey } from "./betaAccessLogic";
 
 /**
  * Organization-native invention entry points.
@@ -65,7 +66,9 @@ export const create = mutation({
         q.eq("organizationId", args.organizationId).eq("status", "active")
       )
       .collect();
-    if (!canCreateActiveInvention(organization.planKey, activeInventions.length)) {
+    const effectivePlanKey = await getEffectiveOrganizationPlanKey(ctx, organization);
+    // The former direct expression was canCreateActiveInvention(organization.planKey, activeInventions.length).
+    if (!canCreateActiveInvention(effectivePlanKey, activeInventions.length)) {
       throw new ConvexError("Organization active-invention limit reached");
     }
 
@@ -190,7 +193,9 @@ export const restore = mutation({
         q.eq("organizationId", invention.organizationId).eq("status", "active")
       )
       .collect();
-    if (!canCreateActiveInvention(organization.planKey, activeInventions.length)) {
+    const effectivePlanKey = await getEffectiveOrganizationPlanKey(ctx, organization);
+    // The former direct expression was canCreateActiveInvention(organization.planKey, activeInventions.length).
+    if (!canCreateActiveInvention(effectivePlanKey, activeInventions.length)) {
       throw new ConvexError("Organization active-invention limit reached");
     }
 
