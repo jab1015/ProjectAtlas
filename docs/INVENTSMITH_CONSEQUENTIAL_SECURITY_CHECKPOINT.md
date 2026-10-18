@@ -1,6 +1,6 @@
 # InventSmith Consequential Security Checkpoint
 
-**Updated:** October 17, 2026 (America/New_York)  
+**Updated:** October 18, 2026 (America/New_York)
 **Branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
 **Latest verified code head before this documentation refresh:** `93744db1fdf2772925f96dbc4d33ed1823192f86`
@@ -12,6 +12,14 @@ Consequential operations remain fail-closed, server-authorized, revision-bound w
 InventSmith CI **#226** (`39016181734`) passed against exact code head `93744db1fdf2772925f96dbc4d33ed1823192f86` with web/Convex typechecking, **116 test files / 660 tests**, production dependency audit with **0 vulnerabilities**, bounded development-dependency audit, and Next.js **15.5.27** production build with **32/32** static pages generated.
 
 This documentation refresh creates a newer head and therefore requires its own exact-head CI before that documentation head itself is called automatically verified.
+
+## Limited production authentication checkpoint
+
+The owner-controlled Convex production deployment `agile-seahorse-379` received only the password-recovery backend scope. Existing production functions and data were preserved; PR #24 remains draft/open/unmerged and the full unverified product was not deployed.
+
+Password recovery was live-functionally verified through the Netlify PR #24 preview: the reset email was delivered, the recovery code was received, and authenticated sign-in succeeded. The first test email was routed to spam.
+
+The preview's InventSmith operations page currently fails on `snapshot.ai.openAiConfigured` because the limited production `operationalHealth:getSnapshot` response does not include the newer `ai` field. This is a frontend/backend compatibility defect, not a security or password-recovery failure. The operations-console fix remains scoped separately from the production authentication deployment.
 
 ## Authorization and destructive behavior coverage
 
