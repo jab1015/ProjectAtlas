@@ -43,6 +43,8 @@ Password recovery was live-functionally verified through the Netlify PR #24 prev
 
 The refreshed preview's InventSmith operations page works against the limited production response by treating the absent `snapshot.ai` field as unavailable. Do not expand production deployment merely to expose AI configuration or to test the full product.
 
+The isolated test backend also contains the admin-only Beta access & credits controls. Use them only with selected test accounts: grant a dated plan override with a written reason, optionally adjust credits with a written reason, and revoke the override when testing ends. These controls preserve the account's base plan and append audit records; they are not a lifetime-free-account mechanism.
+
 The new InventSmith test deployment workflow must remain manual and guarded by explicit confirmation, `CONVEX_DEPLOY_KEY`, and a deployment-specific key/prefix check. Never use `fiery-gazelle-628` credentials or deployment settings for InventSmith.
 
 ## 4. Configuration inventory — names only
@@ -164,4 +166,3 @@ Before public production release establish tested procedures for uptime, spend a
 Keep these states separate: implemented; automated verification passed; deployed; live functionally verified; professional review completed; real-world evidence present; external action executed.
 
 Do not collapse them into one completion percentage or production-ready claim.
-
