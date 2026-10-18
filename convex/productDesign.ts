@@ -76,7 +76,7 @@ export const ensureProductDesignWorkspace = mutation({
     await requireInventionEditAccess(ctx, args.inventionId);
     const usageScope = await resolveInventionUsageScope(ctx, args.inventionId);
     if (!usageScope) throw new ConvexError("Invention not found");
-    if (!canTierRunWorkKind(usageScope.plan, "design_candidate_generation")) {
+    if (!usageScope.isAdmin && !canTierRunWorkKind(usageScope.plan, "design_candidate_generation")) {
       throw new ConvexError("Product Design requires a Pro or higher entitlement");
     }
 
