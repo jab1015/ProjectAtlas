@@ -4,6 +4,7 @@ import { query } from "./_generated/server";
 import { getDailyUsageLimits, normalizeAtlasTier, remainingAutonomousCostUnitsAfterReservations, utcDateKey } from "./usagePolicyLogic";
 import { getOrganizationMembership } from "./organizations";
 import { getOrganizationUsageSnapshot } from "./organizationDailyUsage";
+import { getActiveEntitlementOverride, getEffectiveOrganizationPlanKey, getOrganizationCreditBalance } from "./betaAccessLogic";
 
 export const getCurrentUsage = query({
   args: { organizationId: v.optional(v.id("organizations")) },
@@ -15,6 +16,7 @@ export const getCurrentUsage = query({
     let plan: unknown = user?.subscriptionTier;
     let organizationId = args.organizationId ?? user?.personalOrganizationId;
     let scope: "organization" | "legacy_user" = "legacy_user";
+    let complimentaryAccess = false;
 
     if (organizationId) {
       const [organization, membership] = await Promise.all([
@@ -25,7 +27,9 @@ export const getCurrentUsage = query({
         if (args.organizationId) throw new ConvexError("Organization access required");
         organizationId = undefined;
       } else {
-        plan = organization.planKey;
+        // Legacy source compatibility: plan = organization.planKey.
+        plan = await getEffectiveOrganizationPlanKey(ctx, organization);
+        complimentaryAccess = Boolean(await getActiveEntitlementOverride(ctx, organization._id));
         scope = "organization";
       }
     }
@@ -40,6 +44,9 @@ export const getCurrentUsage = query({
           .unique();
     const tier = normalizeAtlasTier(plan);
     const limits = getDailyUsageLimits(tier);
+    const creditBalance = scope === "organization" && organizationId
+      ? await getOrganizationCreditBalance(ctx, organizationId)
+      : 0;
     return {
       dateKey,
       tier,
@@ -47,6 +54,8 @@ export const getCurrentUsage = query({
       organizationId: organizationId ?? null,
       usage: usage ?? { autonomousCostUnits: 0, reservedAutonomousCostUnits: 0, completedWorkItems: 0, chatQuestions: 0 },
       limits,
+      creditBalance,
+      complimentaryAccess,
       remainingAutonomousCostUnits: remainingAutonomousCostUnitsAfterReservations(tier, usage?.autonomousCostUnits ?? 0, usage?.reservedAutonomousCostUnits ?? 0),
     };
   },
