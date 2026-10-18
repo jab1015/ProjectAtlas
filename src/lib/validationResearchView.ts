@@ -37,6 +37,13 @@ export interface ValidationResearchViewState {
   statusLabel: string;
 }
 
+export function getSafeValidationFailureMessage(rawMessage: string): string {
+  if (/\b401\b|incorrect api key|invalid api key|unauthorized/i.test(rawMessage)) {
+    return "The AI provider rejected its configured credentials. Ask an administrator to check the OpenAI API key for this environment, then retry. No key is displayed here.";
+  }
+  return "The AI provider could not generate this section. Check the operations status for this environment, then retry.";
+}
+
 export function getValidationResearchViewState(
   validationResearch: ValidationResearchViewInput | null | undefined,
   rebuilding: boolean,
