@@ -51,13 +51,13 @@ export const ask = mutation({
 
     const now = Date.now();
     const dateKey = utcDateKey(now);
-    const dailyUsage = usageScope.scope === "organization"
+    const dailyUsage = usageScope.isAdmin ? null : usageScope.scope === "organization"
       ? await ensureOrganizationDailyUsage(ctx, usageScope.organizationId, dateKey, now)
       : await ctx.db
           .query("atlasDailyUsage")
           .withIndex("by_userId_dateKey", (q) => q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey))
           .unique();
-    if (!canAskWithinDailyAllowance(usageScope.plan, dailyUsage?.chatQuestions ?? 0)) {
+    if (!usageScope.isAdmin && !canAskWithinDailyAllowance(usageScope.plan, dailyUsage?.chatQuestions ?? 0)) {
       throw new ConvexError("InventSmith chat's daily allowance has been reached. It resets at 00:00 UTC.");
     }
 
