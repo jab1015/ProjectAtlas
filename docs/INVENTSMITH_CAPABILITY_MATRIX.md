@@ -3,7 +3,7 @@
 **Updated:** October 18, 2026 (America/New_York)
 **Branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified code head before this documentation refresh:** `93744db1fdf2772925f96dbc4d33ed1823192f86`
+**Latest verified CI checkpoint:** `93744db1fdf2772925f96dbc4d33ed1823192f86` (CI #226). Later operations-console compatibility changes were preview-accepted but await exact-head CI.
 
 ## Status vocabulary
 
@@ -22,7 +22,7 @@ No overall completion percentage is asserted.
 
 Customer-facing product: **InventSmith — The Inventor OS** by **Modern Methods**. The historical repository slug `jab1015/ProjectAtlas` and selected `atlas*` / `ATLAS_*` compatibility identifiers remain only where tested migration has not yet occurred.
 
-MadeThis is retired/historical. A Modern Methods-controlled Convex development deployment (`fiery-gazelle-628`) has a prior backend health/configuration checkpoint. The newest branch head is not claimed deployed there. Modern Methods-owned Vercel/frontend deployment and authenticated browser acceptance remain separate incomplete steps.
+MadeThis is retired/historical. The Convex deployment `fiery-gazelle-628` belongs to another application and is excluded from InventSmith work. A new dedicated InventSmith test deployment must be created before full-branch live acceptance. Modern Methods-owned Vercel/frontend deployment and authenticated browser acceptance remain separate acceptance dimensions.
 
 ### Limited production checkpoint
 
@@ -62,10 +62,10 @@ Convex production `agile-seahorse-379` has a deliberately limited password-recov
 | Development dependency audit boundary | implemented | only known Next/ESLint lint-chain advisories accepted | repository-only state | upstream fixes or safe migration |
 | Exact-head CI integrity | implemented | PR head checkout/assertion; pinned actions; no persisted credentials | repository-only state | keep enforced |
 | Authentication dependency modernization | Lucia v3 currently in use | current auth/type/build gates pass | migration not performed | deliberately plan/test replacement |
-| Owner-controlled Convex path | partially executed | backend health/config previously verified on dev deployment | development only | verify exact newest deployment when intentionally deployed |
+| Owner-controlled Convex path | partially executed | no InventSmith test deployment yet; `fiery-gazelle-628` is another app | limited production only | create and verify dedicated InventSmith test deployment |
 | Owner-controlled Convex production path | limited deployment | password-recovery backend deployed and health/auth acceptance verified | limited live acceptance only | preserve existing functions/data while expanding scope deliberately |
-| Owner-controlled Vercel/frontend path | preview exists | repository build passes | PR #24 preview authenticated; operations console currently blocked by response mismatch | compatibility fix + fresh preview acceptance |
-| InventSmith operations console | implemented | page code exists | not functionally accepted; `snapshot.ai` mismatch causes runtime error | align frontend/backend response, then re-test |
+| Owner-controlled Vercel/frontend path | preview exists | repository build passes | PR #24 preview authenticated; password recovery and operations console preview-verified | point a test preview at the dedicated InventSmith test deployment |
+| InventSmith operations console | implemented | page code and compatibility fallback verified locally | refreshed preview works; AI details intentionally unavailable from limited production response | verify against full test deployment and exercise a controlled failed work item |
 | Billing/webhooks | substantial backend/security foundation | signed ingress, lifecycle, ordering, fulfillment, replay/download and checkout-truth behavior covered | not owner-live | provider/live lifecycle acceptance |
 | Commercial cost calibration | instrumentation foundation exists | partial | not production-measured | measured provider/runtime economics |
 
@@ -92,7 +92,7 @@ This documentation refresh creates a newer head and therefore requires exact-hea
 4. Artifact/rendered export and generated-format quality.
 5. Preserve the no-executor boundary until an outside-world executor is deliberately implemented with execution-time revalidation and separate execution evidence.
 6. Remaining low-risk customer-facing naming cleanup.
-7. Owner-controlled Vercel/Convex preparation and live acceptance only after actual deployment.
+7. Create a dedicated InventSmith Convex test deployment; never reuse `fiery-gazelle-628`.
 8. Provider/concurrency and commercial calibration.
 9. Deliberately planned/tested Lucia migration.
 
