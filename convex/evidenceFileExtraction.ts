@@ -77,7 +77,14 @@ export const extractInventorEvidenceFile = internalAction({
       if (isImageMime(context.mimeType)) {
         content.push({ type: "input_image", image_url: `data:${context.mimeType};base64,${base64}`, detail: "high" });
       } else {
-        content.push({ type: "input_file", filename: context.fileName, file_data: base64 });
+        // Responses API file_data requires a MIME-prefixed data URL, not bare base64.
+        // Detect PDFs from their header too: mobile uploads can omit MIME/extension.
+        const isPdf = bytes.subarray(0, 5).toString("ascii") === "%PDF-";
+        const mimeType = isPdf ? "application/pdf" : context.mimeType;
+        const filename = isPdf && !/\.pdf$/i.test(context.fileName)
+          ? `${context.fileName}.pdf`
+          : context.fileName;
+        content.push({ type: "input_file", filename, file_data: `data:${mimeType};base64,${base64}` });
       }
 
       const response = await client.responses.create({
