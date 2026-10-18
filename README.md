@@ -35,6 +35,8 @@ The previous MadeThis-managed Convex/Vercel environment is not a migration depen
 
 Limited owner-controlled Convex production work has now been performed for password recovery on `agile-seahorse-379`, with existing production functions and data preserved. Password recovery and the operations-console compatibility fix were accepted through the PR #24 Netlify preview. Full-product production deployment and acceptance remain intentionally deferred; PR #24 is still unmerged and the full unverified product has not been published. A dedicated InventSmith test deployment, `dev/inventsmith-test` (`quick-fox-785`), now exists for the next acceptance phase.
 
+The founder/admin console includes selected-account beta controls: dated complimentary plan overrides plus auditable credit grants, debits, refunds, and revocation. This allows free access for chosen beta testers while keeping the base plan intact and avoiding lifetime-free access.
+
 ## Current repository capabilities
 
 The full-product branch contains material implementation across the canonical invention record, Evidence Locker, validation/research, Market Research, Patent Readiness, Ask InventSmith, dependency-aware autonomous work, physical Product Design/native CAD foundations, software-product routing, prototype/manufacturing evidence gates, branding, IP/legal preparation, pricing, marketing, sales, funding artifacts, launch/growth work, organization authorization, entitlement/usage controls, privacy, exports, and operational tooling.
