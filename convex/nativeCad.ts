@@ -8,6 +8,7 @@ import { ensureOrganizationDailyUsage } from "./organizationDailyUsage";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { conservativeAttemptSettlementCost } from "./usageSettlementLogic";
 import { departmentAgentAuditMetadata } from "./departmentAgentLogic";
+import { recordCreditEntry } from "./betaAccessLogic";
 
 const runAvailableWork = makeFunctionReference<"action", { inventionId: Id<"inventions">; costBudgetUnits?: number }, unknown>("atlasWorkOrchestration:runAvailableWork");
 
@@ -24,10 +25,16 @@ async function settleCadUsage(ctx: any, workItem: any, inventionId: Id<"inventio
     const usage = await ensureOrganizationDailyUsage(ctx, usageScope.organizationId, key, now);
     await ctx.db.patch(usage._id, {
       autonomousCostUnits: usage.autonomousCostUnits + actualCostUnits,
-      reservedAutonomousCostUnits: Math.max(0, (usage.reservedAutonomousCostUnits ?? 0) - (workItem.reservedCostUnits ?? 0)),
+      reservedAutonomousCostUnits: Math.max(0, (usage.reservedAutonomousCostUnits ?? 0) - (workItem.reservedDailyCostUnits ?? workItem.reservedCostUnits ?? 0)),
       completedWorkItems: usage.completedWorkItems + completedWorkItems,
       updatedAt: now,
     });
+    const reservedCreditUnits = workItem.reservedCreditUnits ?? 0;
+    if (reservedCreditUnits > 0) {
+      const creditUsed = Math.max(0, actualCostUnits - (workItem.reservedDailyCostUnits ?? 0));
+      const deltaUnits = reservedCreditUnits - creditUsed;
+      if (deltaUnits !== 0) await recordCreditEntry(ctx, { organizationId: usageScope.organizationId, deltaUnits, kind: deltaUnits > 0 ? "refund" : "debit", reason: deltaUnits > 0 ? "Unused beta credit reservation refunded" : "Additional beta credits consumed by actual CAD cost", createdAt: now });
+    }
     return;
   }
 
@@ -200,7 +207,7 @@ export const recordNativeCadSuccess = internalMutation({
     if (workItem.claimedAt && currentInvention.updatedAt > workItem.claimedAt) {
       for (const artifact of args.artifacts) await ctx.storage.delete(artifact.storageId);
       await settleCadUsage(ctx, workItem, args.inventionId, args.actualCostUnits, 0, args.completedAt);
-      await ctx.db.patch(workItem._id, { status: "queued", reservedCostUnits: undefined, reservationDateKey: undefined, claimedAt: undefined, startedAt: undefined, leaseExpiresAt: undefined, lastError: "Invention inputs changed while CAD was generating; generated artifacts were discarded.", updatedAt: args.completedAt });
+      await ctx.db.patch(workItem._id, { status: "queued", reservedCostUnits: undefined, reservedDailyCostUnits: undefined, reservedCreditUnits: undefined, reservationDateKey: undefined, claimedAt: undefined, startedAt: undefined, leaseExpiresAt: undefined, lastError: "Invention inputs changed while CAD was generating; generated artifacts were discarded.", updatedAt: args.completedAt });
       await ctx.db.insert("atlasExecutionEvents", { inventionId: args.inventionId, workItemId: args.workItemId, eventType: "work_failed", actorType: "system", summary: "InventSmith discarded native CAD because the invention changed during generation.", attemptNumber: args.attemptNumber, costUnits: args.actualCostUnits, metadata: { staleInputDiscarded: true, retryScheduled: true, usageKnown: true }, createdAt: args.completedAt });
       return { discarded: true, actualCostUnits: args.actualCostUnits };
     }
@@ -221,7 +228,7 @@ export const recordNativeCadSuccess = internalMutation({
     }
 
     await settleCadUsage(ctx, workItem, args.inventionId, args.actualCostUnits, 1, args.completedAt);
-    await ctx.db.patch(args.workItemId, { status: "completed", outputSummary: `Generated a ${args.partCount}-part preliminary native CAD package with STEP, STL, DXF, editable source, orthographic views, and exploded view.`, actualCostUnits: args.actualCostUnits, completedAt: args.completedAt, claimedAt: undefined, startedAt: undefined, leaseExpiresAt: undefined, reservedCostUnits: undefined, reservationDateKey: undefined, updatedAt: args.completedAt });
+    await ctx.db.patch(args.workItemId, { status: "completed", outputSummary: `Generated a ${args.partCount}-part preliminary native CAD package with STEP, STL, DXF, editable source, orthographic views, and exploded view.`, actualCostUnits: args.actualCostUnits, completedAt: args.completedAt, claimedAt: undefined, startedAt: undefined, leaseExpiresAt: undefined, reservedCostUnits: undefined, reservedDailyCostUnits: undefined, reservedCreditUnits: undefined, reservationDateKey: undefined, updatedAt: args.completedAt });
     const usageScope = await resolveInventionUsageScope(ctx, args.inventionId);
     await ctx.db.insert("atlasExecutionEvents", { inventionId: args.inventionId, workItemId: args.workItemId, eventType: "work_completed", actorType: "atlas", summary: `InventSmith generated native preliminary CAD: ${args.partCount} parts, ${args.triangleCount} mesh facets, STEP/STL/DXF/source plus orthographic and exploded-view artifacts.`, attemptNumber: args.attemptNumber, costUnits: args.actualCostUnits, metadata: { ...departmentAgentAuditMetadata(workItem.inputSnapshot), artifactKinds: args.artifacts.map((item) => item.kind), maturity: "preliminary_cad", usageKnown: true, usageScope: usageScope?.scope, usageUserId: usageScope ? String(usageScope.usageUserId) : undefined }, createdAt: args.completedAt });
     return { discarded: false, actualCostUnits: args.actualCostUnits };
@@ -262,7 +269,7 @@ export const recordNativeCadFailure = internalMutation({
       reservedCostUnits: workItem.reservedCostUnits,
     });
     await settleCadUsage(ctx, workItem, args.inventionId, settledCostUnits, 0, args.failedAt);
-    await ctx.db.patch(workItem._id, { status: willRetry ? "queued" : "failed", reservedCostUnits: undefined, reservationDateKey: undefined, lastError: args.error.slice(0, 2000), startedAt: undefined, claimedAt: undefined, leaseExpiresAt: undefined, updatedAt: args.failedAt });
+    await ctx.db.patch(workItem._id, { status: willRetry ? "queued" : "failed", reservedCostUnits: undefined, reservedDailyCostUnits: undefined, reservedCreditUnits: undefined, reservationDateKey: undefined, lastError: args.error.slice(0, 2000), startedAt: undefined, claimedAt: undefined, leaseExpiresAt: undefined, updatedAt: args.failedAt });
     await ctx.db.insert("atlasExecutionEvents", { inventionId: args.inventionId, workItemId: args.workItemId, eventType: "work_failed", actorType: "system", summary: willRetry ? "Native CAD generation failed and is eligible for autonomous retry." : "Native CAD generation exhausted its retry limit.", attemptNumber: args.attemptNumber, costUnits: args.usageKnown ? args.actualCostUnits : undefined, metadata: { ...departmentAgentAuditMetadata(workItem.inputSnapshot), error: args.error.slice(0, 1000), willRetry, usageKnown: args.usageKnown, budgetDebitUnits: settledCostUnits }, createdAt: args.failedAt });
     return { willRetry, staleAttempt: false };
   },
