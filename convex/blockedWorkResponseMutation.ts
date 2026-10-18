@@ -58,11 +58,13 @@ export async function respondToBlockedWorkHandler(
             q.eq("userId", usageScope.usageUserId).eq("dateKey", dateKey)
           )
           .unique();
-  const remaining = remainingAutonomousCostUnitsAfterReservations(
-    usageScope.plan,
-    usage?.autonomousCostUnits ?? 0,
-    usage?.reservedAutonomousCostUnits ?? 0
-  );
+  const remaining = usageScope.isAdmin
+    ? Number.MAX_SAFE_INTEGER
+    : remainingAutonomousCostUnitsAfterReservations(
+        usageScope.plan,
+        usage?.autonomousCostUnits ?? 0,
+        usage?.reservedAutonomousCostUnits ?? 0
+      );
 
   await ctx.db.patch(workItemId, {
     status: "queued",
