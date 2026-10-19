@@ -6,6 +6,14 @@ Post-deploy read-only verification: the protected Netlify Preview now loads the 
 
 This successful account-authorized test deployment supersedes prior notes that `quick-fox-785` deployment was unverified or blocked pending a development deploy key. The permanent key constraint remains: the owner has only a production-scoped deploy key; never use it for test or production backend deployment. Test Convex deployment can use this authenticated CLI account flow when explicitly authorized.
 
+### Department agents and bounded parallel execution — October 19, 2026
+
+Implemented dedicated Idea, Validation, Market Research, Patent Readiness, Product Design, Prototype, Manufacturing, Branding, IP/Legal, Pricing, Marketing, Sales, Funding, Launch, Growth, Regulatory, and software-agent identities. Older canonical work routes key assignments to the correct department identity, and execution audit events record that identity. Autonomous department work and independent Validation sections now run with bounded concurrency (three workers), while atomic claims enforce a hard cap, declared prerequisites, usage reservations, retry limits, and professional/physical/human gates. Validation writes each concurrent batch serially so persisted progress counts cannot race. Validation provider version is 2.1.0 so older cached reports do not silently survive the updated evidence-aware generator.
+
+Verification: **127 Vitest files / 695 tests passed**, `npx tsc --noEmit` passed, and `npx next build` passed (**36/36 pages**). Convex functions were deployed to the explicitly confirmed InventSmith test deployment `dev:quick-fox-785` using the authenticated CLI account session; CLI confirmed **Convex functions ready**. No AI/provider/CAD work was started and no AI credits were used. No production backend or data was changed. The website code has not yet been pushed for a fresh Netlify Preview. PR #24 remains unmerged and Netlify Production remains unpublished.
+
+Live limitation: survey attribution and confidence still need verification after the new Preview is built. Three-worker execution is verified by deterministic tests, not yet by a live AI run. Patent work remains dependency-gated; no legal opinion, filing, physical test, supplier contact, payment, or release is implied.
+
 # InventSmith Build Progress
 
 ## Latest controlled verification — October 19, 2026
@@ -184,8 +192,8 @@ PR #24 remains draft/open/unmerged. `main` remains untouched.
 4. Continue specialized artifact content, rendered export, and generated-format quality acceptance.
 5. Preserve the no-executor boundary until a deliberate executor exists with execution-time revalidation and separate execution evidence.
 6. Finish low-risk InventSmith naming cleanup without destabilizing compatibility identifiers.
-7. Obtain and verify a deployment key explicitly scoped to `quick-fox-785`, then deploy only after local verification. Do not touch `fiery-gazelle-628`; it belongs to another application. No further deployment to `agile-seahorse-379`.
-8. Validate real provider/concurrency behavior and calibrate commercial limits from measured economics.
+7. The current implementation is deployed to `quick-fox-785` via authenticated CLI login; do not use the production-scoped deploy key. Push the verified website code to PR #24 and inspect its new Netlify Deploy Preview; keep Production unpublished and do not merge.
+8. Verify survey attribution and automatic refresh first, then run a small live concurrency batch and confirm saved outputs/audit identities before broader provider acceptance. Keep `fiery-gazelle-628` untouched and do not deploy further to `agile-seahorse-379`.
 9. Plan/test a Lucia v3 migration separately from routine hardening.
 
 ## Status boundaries

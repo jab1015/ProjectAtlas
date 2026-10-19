@@ -46,6 +46,7 @@ import type * as evidenceFileExtraction from "../evidenceFileExtraction.js";
 import type * as evidenceImpact from "../evidenceImpact.js";
 import type * as evidenceImpactScopeLogic from "../evidenceImpactScopeLogic.js";
 import type * as evidenceIntegrityLogic from "../evidenceIntegrityLogic.js";
+import type * as evidenceRequests from "../evidenceRequests.js";
 import type * as externalUseAuthorization from "../externalUseAuthorization.js";
 import type * as faqEntries from "../faqEntries.js";
 import type * as files from "../files.js";
@@ -57,6 +58,7 @@ import type * as http from "../http.js";
 import type * as inventionClassificationLogic from "../inventionClassificationLogic.js";
 import type * as inventionInitialization from "../inventionInitialization.js";
 import type * as inventionMigrations from "../inventionMigrations.js";
+import type * as inventionRefresh from "../inventionRefresh.js";
 import type * as inventionSharing from "../inventionSharing.js";
 import type * as inventionWorkPlanLogic from "../inventionWorkPlanLogic.js";
 import type * as inventionWorkspace from "../inventionWorkspace.js";
@@ -107,9 +109,9 @@ import type * as softwareWorkPlan from "../softwareWorkPlan.js";
 import type * as stalenessLogic from "../stalenessLogic.js";
 import type * as statusBriefingLogic from "../statusBriefingLogic.js";
 import type * as subscriptionMutations from "../subscriptionMutations.js";
-import type * as supportCases from "../supportCases.js";
 import type * as subscriptionPolicyLogic from "../subscriptionPolicyLogic.js";
 import type * as subscriptionWebhook from "../subscriptionWebhook.js";
+import type * as supportCases from "../supportCases.js";
 import type * as tabularExportLogic from "../tabularExportLogic.js";
 import type * as testimonials from "../testimonials.js";
 import type * as usagePolicyLogic from "../usagePolicyLogic.js";
@@ -119,6 +121,7 @@ import type * as usersMutations from "../usersMutations.js";
 import type * as validation_researchProvider from "../validation/researchProvider.js";
 import type * as validationActions from "../validationActions.js";
 import type * as validationConfidenceLogic from "../validationConfidenceLogic.js";
+import type * as validationEvidence from "../validationEvidence.js";
 import type * as validationMutations from "../validationMutations.js";
 import type * as validationResearchMutations from "../validationResearchMutations.js";
 import type * as validationResearchOrchestration from "../validationResearchOrchestration.js";
@@ -130,6 +133,7 @@ import type * as validationResearchSessionMutations from "../validationResearchS
 import type * as validationResearchTypes from "../validationResearchTypes.js";
 import type * as webRetrievalEvidenceLogic from "../webRetrievalEvidenceLogic.js";
 import type * as webhookSecurityLogic from "../webhookSecurityLogic.js";
+import type * as workFailureSummary from "../workFailureSummary.js";
 import type * as workOrchestratorLogic from "../workOrchestratorLogic.js";
 
 import type {
@@ -177,6 +181,7 @@ declare const fullApi: ApiFromModules<{
   evidenceImpact: typeof evidenceImpact;
   evidenceImpactScopeLogic: typeof evidenceImpactScopeLogic;
   evidenceIntegrityLogic: typeof evidenceIntegrityLogic;
+  evidenceRequests: typeof evidenceRequests;
   externalUseAuthorization: typeof externalUseAuthorization;
   faqEntries: typeof faqEntries;
   files: typeof files;
@@ -188,6 +193,7 @@ declare const fullApi: ApiFromModules<{
   inventionClassificationLogic: typeof inventionClassificationLogic;
   inventionInitialization: typeof inventionInitialization;
   inventionMigrations: typeof inventionMigrations;
+  inventionRefresh: typeof inventionRefresh;
   inventionSharing: typeof inventionSharing;
   inventionWorkPlanLogic: typeof inventionWorkPlanLogic;
   inventionWorkspace: typeof inventionWorkspace;
@@ -238,9 +244,9 @@ declare const fullApi: ApiFromModules<{
   stalenessLogic: typeof stalenessLogic;
   statusBriefingLogic: typeof statusBriefingLogic;
   subscriptionMutations: typeof subscriptionMutations;
-  supportCases: typeof supportCases;
   subscriptionPolicyLogic: typeof subscriptionPolicyLogic;
   subscriptionWebhook: typeof subscriptionWebhook;
+  supportCases: typeof supportCases;
   tabularExportLogic: typeof tabularExportLogic;
   testimonials: typeof testimonials;
   usagePolicyLogic: typeof usagePolicyLogic;
@@ -250,6 +256,7 @@ declare const fullApi: ApiFromModules<{
   "validation/researchProvider": typeof validation_researchProvider;
   validationActions: typeof validationActions;
   validationConfidenceLogic: typeof validationConfidenceLogic;
+  validationEvidence: typeof validationEvidence;
   validationMutations: typeof validationMutations;
   validationResearchMutations: typeof validationResearchMutations;
   validationResearchOrchestration: typeof validationResearchOrchestration;
@@ -261,6 +268,7 @@ declare const fullApi: ApiFromModules<{
   validationResearchTypes: typeof validationResearchTypes;
   webRetrievalEvidenceLogic: typeof webRetrievalEvidenceLogic;
   webhookSecurityLogic: typeof webhookSecurityLogic;
+  workFailureSummary: typeof workFailureSummary;
   workOrchestratorLogic: typeof workOrchestratorLogic;
 }>;
 

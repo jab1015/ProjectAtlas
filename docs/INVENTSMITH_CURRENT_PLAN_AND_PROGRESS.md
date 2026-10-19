@@ -6,6 +6,14 @@ Post-deploy read-only verification: the protected Netlify Preview now loads the 
 
 This successful account-authorized test deployment supersedes prior notes that `quick-fox-785` deployment was unverified or blocked pending a development deploy key. The permanent key constraint remains: the owner has only a production-scoped deploy key; never use it for test or production backend deployment. Test Convex deployment can use this authenticated CLI account flow when explicitly authorized.
 
+### Current engineering status — October 19, 2026
+
+The department-agent and concurrency repair is implemented and deployed to InventSmith test (`quick-fox-785`) through authenticated Convex CLI login, with the exact target confirmed as `dev/inventsmith-test` in `decideforusapp:projectatlas`. Three bounded workers can claim distinct eligible department work at once; Validation sections also generate in batches of three and persist progress serially. Dedicated department identities are wired for the 15 invention journey stages and regulatory/software specialties; older canonical work routes to Idea, Market Research, Patent Readiness, or Regulatory by work kind. Validation uses its own Validation agent identity and provider version 2.1.0. Dependency gating, atomic usage reservations, retries, stale-result protection, and human/professional gates remain enforced.
+
+Automated verification is green: **127 test files / 695 tests**, TypeScript, and Next build (**36/36 pages**). No AI calls/credits or customer-data mutations occurred. The new website code still needs to be pushed to PR #24's branch and built as a fresh Netlify Preview. Do not merge PR #24 or publish Netlify Production. After the Preview build, verify survey attribution and confidence refresh before any live parallel agent run; then use only a small bounded batch and inspect saved deliverables/audit metadata.
+
+Open acceptance items: confirm live per-department outputs and downstream handoffs on `quick-fox-785`; confirm Validation cites the uploaded 100-user survey and relevant section confidence reflects it; verify automatic evidence refresh and affected-department requeue; verify potential prior-art conflicts are carried into new design candidates. No professional clearance, patentability conclusion, external contact, prototype completion, or release action has been made.
+
 # InventSmith Current Plan and Progress
 
 ## Current acceptance checkpoint — October 19, 2026
@@ -183,8 +191,8 @@ Professional review, external-use authorization, consequential approval, manufac
 4. Continue specialized artifact/package and generated-format quality acceptance, including rendered document and CAD-format checks where feasible.
 5. Preserve the no-executor boundary until an outside-world executor is deliberately implemented with execution-time revalidation and separate execution evidence.
 6. Continue low-risk InventSmith naming cleanup while preserving compatibility/historical identifiers that still require tested migration.
-7. Verify the full invention journey and selected-account beta access/credit controls only after `quick-fox-785` is confirmed as the backend target and deployed with a test-scoped key. No further deployment to `agile-seahorse-379`.
-8. Complete live authenticated multi-user/multi-invention acceptance, provider failure/retry, concurrency, billing/webhooks, professional-review, and representative lifecycle acceptance after owner-controlled infrastructure is ready.
+7. `quick-fox-785` is confirmed and the current Convex functions are deployed via authenticated CLI account login. Do not use the production-scoped deploy key. Push the verified website code to PR #24 and inspect a fresh Deploy Preview; keep Production unpublished and do not merge.
+8. Verify survey attribution and automatic refresh first, then run a small live concurrency batch and confirm saved outputs/audit identities before broader multi-user/provider/billing/lifecycle acceptance. No further deployment to `agile-seahorse-379`; `fiery-gazelle-628` remains untouched.
 9. Plan the Lucia v3 authentication migration separately.
 10. Calibrate commercial limits from measured provider/runtime economics.
 

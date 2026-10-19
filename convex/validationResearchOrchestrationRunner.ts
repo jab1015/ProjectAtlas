@@ -129,38 +129,66 @@ export async function runValidationSections({
   let completedCount = Math.max(0, initialCompletedCount);
   let failedCount = 0;
 
-  for (const sectionKey of sectionOrder) {
-    try {
-      const result = await provider.generateSection(inventionContext, sectionKey);
-      const nextCompletedCount = completedCount + 1;
+  // Generate independent sections in small batches, then persist each batch
+  // serially so progress counters cannot race or overwrite one another.
+  const concurrency = 3;
+  for (let offset = 0; offset < sectionOrder.length; offset += concurrency) {
+    const batch = sectionOrder.slice(offset, offset + concurrency);
+    const outcomes = await Promise.all(batch.map(async (sectionKey) => {
+      try {
+        return { sectionKey, ok: true as const, result: await provider.generateSection(inventionContext, sectionKey) };
+      } catch (error) {
+        return { sectionKey, ok: false as const, error };
+      }
+    }));
+
+    for (const outcome of outcomes) {
       const updatedAt = now();
+      if (outcome.ok) {
+        const nextCompletedCount = completedCount + 1;
+        try {
+          await persistCompletedSection({
+            sectionKey: outcome.sectionKey,
+            sectionEntry: buildCompletedSectionEntry(outcome.result, outcome.sectionKey),
+            completedSectionCount: nextCompletedCount,
+            lastCompletedSection: outcome.sectionKey,
+            overallStatus: "IN_PROGRESS",
+            updatedAt,
+          });
+          completedCount = nextCompletedCount;
+        } catch (persistError) {
+          failedCount += 1;
+          onError?.(`Failed to persist completed section "${outcome.sectionKey}"`, persistError);
+          try {
+            await persistFailedSection({
+              sectionKey: outcome.sectionKey,
+              sectionEntry: buildFailedSectionEntry(outcome.sectionKey, persistError, updatedAt),
+              completedSectionCount: completedCount,
+              lastCompletedSection: outcome.sectionKey,
+              overallStatus: "IN_PROGRESS",
+              updatedAt,
+            });
+          } catch (failurePersistError) {
+            onError?.(`Failed to persist failed section "${outcome.sectionKey}"`, failurePersistError);
+            throw failurePersistError;
+          }
+        }
+        continue;
+      }
 
-      await persistCompletedSection({
-        sectionKey,
-        sectionEntry: buildCompletedSectionEntry(result, sectionKey),
-        completedSectionCount: nextCompletedCount,
-        lastCompletedSection: sectionKey,
-        overallStatus: "IN_PROGRESS",
-        updatedAt,
-      });
-
-      completedCount = nextCompletedCount;
-    } catch (error) {
       failedCount += 1;
-      const updatedAt = now();
-      onError?.(`Section "${sectionKey}" failed`, error);
-
+      onError?.(`Section "${outcome.sectionKey}" failed`, outcome.error);
       try {
         await persistFailedSection({
-          sectionKey,
-          sectionEntry: buildFailedSectionEntry(sectionKey, error, updatedAt),
+          sectionKey: outcome.sectionKey,
+          sectionEntry: buildFailedSectionEntry(outcome.sectionKey, outcome.error, updatedAt),
           completedSectionCount: completedCount,
-          lastCompletedSection: sectionKey,
+          lastCompletedSection: outcome.sectionKey,
           overallStatus: "IN_PROGRESS",
           updatedAt,
         });
       } catch (persistError) {
-        onError?.(`Failed to persist failed section "${sectionKey}"`, persistError);
+        onError?.(`Failed to persist failed section "${outcome.sectionKey}"`, persistError);
         throw persistError;
       }
     }

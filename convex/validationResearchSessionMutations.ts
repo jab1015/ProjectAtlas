@@ -13,7 +13,7 @@ import { readValidationEvidence, scheduleValidationEvidenceRefresh } from "./val
 
 // Must match OpenAIValidationResearchProvider.VERSION. A version change prevents
 // older confidence/research semantics from being silently reused by the 24h cache.
-const PROVIDER_VERSION = "2.0.0";
+const PROVIDER_VERSION = "2.1.0";
 
 const VALIDATION_SECTION_KEYS = new Set([
   "validationPlan",

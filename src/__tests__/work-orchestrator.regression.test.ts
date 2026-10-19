@@ -23,9 +23,16 @@ describe("autonomous work selection", () => {
     expect(result.selected?._id).toBe("urgent");
   });
 
-  it("does not start a second job while an active lease exists", () => {
+  it("fills available worker slots while respecting the parallel cap", () => {
     const result = selectNextWorkItem([work(), work({ status: "running", leaseExpiresAt: 200 })], 20, 100);
-    expect(result.reason).toBe("already_running");
+    expect(result.reason).toBe("selected");
+    const atCapacity = selectNextWorkItem([
+      work(),
+      work({ _id: "running-1", status: "running", leaseExpiresAt: 200 }),
+      work({ _id: "running-2", status: "running", leaseExpiresAt: 200 }),
+      work({ _id: "running-3", status: "running", leaseExpiresAt: 200 }),
+    ], 20, 100);
+    expect(atCapacity.reason).toBe("already_running");
   });
 
   it("recovers work after a lease expires", () => {

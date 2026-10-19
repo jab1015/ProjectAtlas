@@ -23,6 +23,9 @@ function profile(department: string, name: string, mission: string, guardrails: 
 }
 
 export const DEPARTMENT_AGENT_PROFILES = {
+  idea: profile("idea", "Invention Idea Agent", "Clarify the inventor's problem, intended user, mechanism, constraints, and the highest-value unknowns before downstream work begins."),
+  validation: profile("validation", "Validation Agent", "Evaluate the problem and solution hypotheses against inventor-provided evidence, preserve sample and provenance details, and identify the next evidence that would change the decision."),
+  market_research: profile("market_research", "Market Research Agent", "Research customers, alternatives, competitors, market evidence, and demand while keeping sourced observations separate from estimates and hypotheses."),
   canonical: profile("canonical", "Discovery & Feasibility Agent", "Turn the initial invention brief into an evidence-backed problem, market, technical, regulatory, and risk foundation."),
   patent_readiness: profile("patent_readiness", "Patent Readiness Agent", "Prepare preliminary prior-art analysis, distinguishing-feature hypotheses, and a traceable handoff for qualified patent professionals.", ["Provide preliminary research and preparation only; never give a patentability or freedom-to-operate opinion."]),
   product_design: profile("product_design", "Product Design & CAD Agent", "Translate validated requirements into product directions, specifications, preliminary CAD, drawings, BOM hypotheses, and engineering-review packages.", ["Keep CAD and engineering outputs preliminary until the required prototype and qualified-engineering evidence exists."]),
@@ -40,6 +43,7 @@ export const DEPARTMENT_AGENT_PROFILES = {
   software_engineering: profile("software_engineering", "Software Engineering Agent", "Design implementation-ready architecture, data/API contracts, and security/privacy readiness with explicit specialist gates."),
   software_prototype_build: profile("software_prototype_build", "Software Prototype Agent", "Plan the smallest useful working prototype and a sequenced implementation path that tests the highest-risk assumptions."),
   software_engineering_release: profile("software_engineering_release", "Software Release Agent", "Define evidence-based QA, beta, distribution, monitoring, rollout, and rollback readiness without claiming unexecuted tests or deployment."),
+  regulatory: profile("regulatory", "Regulatory Screening Agent", "Screen potentially applicable regulatory, safety, labeling, testing, and certification requirements and prepare traceable questions for qualified specialists."),
 } as const satisfies Record<string, DepartmentAgentProfile>;
 
 export type DepartmentAgentKey = keyof typeof DEPARTMENT_AGENT_PROFILES;
@@ -48,9 +52,28 @@ export function isDepartmentAgentKey(value: unknown): value is DepartmentAgentKe
   return typeof value === "string" && Object.prototype.hasOwnProperty.call(DEPARTMENT_AGENT_PROFILES, value);
 }
 
-export function resolveDepartmentAgent(inputSnapshot: unknown): DepartmentAgentProfile {
+const WORK_KIND_DEPARTMENT: Readonly<Record<string, DepartmentAgentKey>> = {
+  idea_capture: "idea",
+  brief_analysis: "idea",
+  assumptions_unknowns: "idea",
+  competitor_discovery: "market_research",
+  market_feasibility: "market_research",
+  preliminary_prior_art: "patent_readiness",
+  feature_prior_art_comparison: "patent_readiness",
+  distinguishing_features: "patent_readiness",
+  patent_design_handoff: "patent_readiness",
+  ip_readiness: "patent_readiness",
+  regulatory_screening: "regulatory",
+};
+
+export function resolveDepartmentAgent(inputSnapshot: unknown, workKind?: string): DepartmentAgentProfile {
   const input = inputSnapshot && typeof inputSnapshot === "object" ? inputSnapshot as Record<string, unknown> : null;
-  const department = input?.department;
+  const declaredDepartment = input?.department;
+  // Older canonical jobs carried a single umbrella label. Route those by their
+  // actual assignment so each department gets its own mission and audit identity.
+  const department = declaredDepartment === "canonical" && workKind && WORK_KIND_DEPARTMENT[workKind]
+    ? WORK_KIND_DEPARTMENT[workKind]
+    : declaredDepartment;
   if (!isDepartmentAgentKey(department)) {
     throw new Error(`Work item is missing a registered department agent: ${String(department ?? "unknown")}`);
   }
@@ -66,9 +89,12 @@ export function departmentAgentSystemPrompt(agent: DepartmentAgentProfile): stri
   ].join(" ");
 }
 
-export function departmentAgentAuditMetadata(inputSnapshot: unknown) {
+export function departmentAgentAuditMetadata(inputSnapshot: unknown, workKind?: string) {
   const input = inputSnapshot && typeof inputSnapshot === "object" ? inputSnapshot as Record<string, unknown> : null;
-  const department = input?.department;
+  const declaredDepartment = input?.department;
+  const department = declaredDepartment === "canonical" && workKind && WORK_KIND_DEPARTMENT[workKind]
+    ? WORK_KIND_DEPARTMENT[workKind]
+    : declaredDepartment;
   if (!isDepartmentAgentKey(department)) return { departmentAgentRegistered: false, department: typeof department === "string" ? department : undefined };
   const agent = DEPARTMENT_AGENT_PROFILES[department];
   return { departmentAgentRegistered: true, department: agent.department, departmentAgentId: agent.agentId, departmentAgentName: agent.name };

@@ -18,7 +18,7 @@ const getWorkContext = makeFunctionReference<"query", { workItemId: Id<"atlasWor
 const completeWork = makeFunctionReference<"mutation", any, void>("atlasWorkState:completeWork");
 const failWork = makeFunctionReference<"mutation", { workItemId: Id<"atlasWorkItems">; attemptNumber: number; error: string; actualCostUnits: number; usageKnown: boolean; failedAt: number }, { willRetry: boolean; staleAttempt: boolean }>("atlasWorkState:failWork");
 const blockWorkForHuman = makeFunctionReference<"mutation", any, { accepted: boolean }>("atlasWorkState:blockWorkForHuman");
-const continueAvailableWork = makeFunctionReference<"action", { inventionId: Id<"inventions">; costBudgetUnits?: number }, unknown>("atlasWorkOrchestration:runAvailableWork");
+const continueAvailableWork = makeFunctionReference<"action", { inventionId: Id<"inventions">; costBudgetUnits?: number; parallelWorker?: boolean }, unknown>("atlasWorkOrchestration:runAvailableWork");
 const generateNativeCad = makeFunctionReference<"action", { inventionId: Id<"inventions">; workItemId: Id<"atlasWorkItems">; attemptNumber: number }, { discarded: boolean; failed: boolean; willRetry?: boolean; actualCostUnits: number }>("nativeCadGeneration:generateNativeCad");
 
 const resultSchema = {
@@ -95,8 +95,15 @@ function contextDeliverableLimit(kind: string) {
 }
 
 export const runAvailableWork = internalAction({
-  args: { inventionId: v.id("inventions"), costBudgetUnits: v.optional(v.number()) },
-  handler: async (ctx, { inventionId, costBudgetUnits = MAX_AUTONOMOUS_RUN_BUDGET }) => {
+  args: { inventionId: v.id("inventions"), costBudgetUnits: v.optional(v.number()), parallelWorker: v.optional(v.boolean()) },
+  handler: async (ctx, { inventionId, costBudgetUnits = MAX_AUTONOMOUS_RUN_BUDGET, parallelWorker = false }) => {
+    // A single wake-up starts a small worker pool. Atomic claims and the
+    // selector's active-work cap keep workers on distinct, dependency-ready jobs.
+    if (!parallelWorker) {
+      for (let worker = 1; worker < 3; worker += 1) {
+        await ctx.scheduler.runAfter(0, continueAvailableWork, { inventionId, costBudgetUnits, parallelWorker: true });
+      }
+    }
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error("OPENAI_API_KEY is not configured for the InventSmith execution environment");
     const client = new OpenAI({ apiKey });
@@ -112,7 +119,7 @@ export const runAvailableWork = internalAction({
 
       try {
         const { workItem, invention, record, sources, findings, deliverables } = await ctx.runQuery(getWorkContext, { workItemId: claim.workItemId, attemptNumber, now: Date.now() });
-        const departmentAgent = resolveDepartmentAgent(workItem.inputSnapshot);
+        const departmentAgent = resolveDepartmentAgent(workItem.inputSnapshot, workItem.kind);
         const risk = triageInventionRisk(invention);
         if (risk.restricted) {
           await ctx.runMutation(blockWorkForHuman, {
@@ -131,7 +138,7 @@ export const runAvailableWork = internalAction({
           const cadResult = await ctx.runAction(generateNativeCad, { inventionId, workItemId: claim.workItemId, attemptNumber });
           remainingBudget = Math.max(0, remainingBudget - (cadResult.actualCostUnits ?? 0));
           if (cadResult.failed) {
-            if (shouldScheduleAutonomousRetry(Boolean(cadResult.willRetry), remainingBudget)) await ctx.scheduler.runAfter(2_000, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget });
+            if (shouldScheduleAutonomousRetry(Boolean(cadResult.willRetry), remainingBudget)) await ctx.scheduler.runAfter(2_000, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget, parallelWorker: true });
             return { completed, stopReason: "native_cad_failed", remainingBudget };
           }
           continue;
@@ -257,14 +264,14 @@ export const runAvailableWork = internalAction({
         });
         remainingBudget = Math.max(0, remainingBudget - incurredCostUnits);
         if (!failure.staleAttempt && shouldScheduleAutonomousRetry(failure.willRetry, remainingBudget)) {
-          await ctx.scheduler.runAfter(2_000, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget });
+          await ctx.scheduler.runAfter(2_000, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget, parallelWorker: true });
         }
         return { completed, stopReason: failure.staleAttempt ? "stale_attempt" : "failed", remainingBudget };
       }
     }
 
     const stopReason = "turn_limit";
-    if (shouldContinueAutonomousRun(stopReason, remainingBudget)) await ctx.scheduler.runAfter(500, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget });
+    if (shouldContinueAutonomousRun(stopReason, remainingBudget)) await ctx.scheduler.runAfter(500, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget, parallelWorker: true });
     return { completed: 2, stopReason, remainingBudget };
   },
 });

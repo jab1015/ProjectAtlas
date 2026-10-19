@@ -1,5 +1,13 @@
 # InventSmith Owner-Controlled Deployment and Acceptance Runbook
 
+### Latest checkpoint — October 19, 2026
+
+The repository now sets Netlify contexts to a website-only `npx next build`; the historical Convex-upload incident below remains part of the audit record but this current config contains no Convex CLI command. Auto Publishing remains locked; do not publish a production deploy. PR #24 remains open/draft/unmerged.
+
+The authorized test-backend deployment completed successfully using authenticated Convex CLI account login with the target explicitly set and confirmed as `dev:quick-fox-785` (`decideforusapp:projectatlas`, `dev/inventsmith-test`). No deploy key was used. Production deployment `agile-seahorse-379` and unrelated `fiery-gazelle-628` were not targeted.
+
+Dedicated per-department agent identities, three-worker bounded concurrency, sequential Validation persistence, and agent audit metadata are implemented locally. Checks pass: 127 test files / 695 tests, TypeScript, Next.js build (36/36 pages). The Convex functions are deployed to test; these website/code changes still need a push and a fresh Deploy Preview. No provider or CAD calls/credits were spent. Validate survey attribution and report confidence before any live parallel AI work.
+
 **Status:** Repository implementation active; password-recovery acceptance complete; PR #24 preview `6ad6853b072c128eb3df13a6` is available; full-product acceptance pending. Netlify Production-context build deployed Convex functions to `agile-seahorse-379` on October 19, 2026; do not trigger further production-context builds until the deploy command is guarded.
 **Product:** InventSmith — The Inventor OS by Modern Methods  
 **Updated:** October 19, 2026 (America/New_York)

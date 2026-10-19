@@ -16,17 +16,21 @@ export interface WorkSelectionResult<T> {
   reason: "selected" | "already_running" | "budget_exceeded" | "entitlement_required" | "no_eligible_work";
 }
 
+/** Keep provider spend and database contention bounded while allowing independent departments to work together. */
+export const MAX_CONCURRENT_DEPARTMENT_WORK_ITEMS = 3;
+
 export function selectNextWorkItem<T extends SchedulableWorkItem>(
   items: T[],
   availableCostUnits: number,
   now: number,
   canRunKind: (kind: string | undefined) => boolean = () => true,
-  isMaturityEligible: (kind: string | undefined) => boolean = () => true
+  isMaturityEligible: (kind: string | undefined) => boolean = () => true,
+  maxConcurrentWorkItems = MAX_CONCURRENT_DEPARTMENT_WORK_ITEMS
 ): WorkSelectionResult<T> {
-  const activelyRunning = items.some(
+  const activeCount = items.filter(
     (item) => item.status === "running" && (!item.leaseExpiresAt || item.leaseExpiresAt > now)
-  );
-  if (activelyRunning) return { selected: null, reason: "already_running" };
+  ).length;
+  if (activeCount >= maxConcurrentWorkItems) return { selected: null, reason: "already_running" };
 
   const completedKinds = new Set(
     items.filter((candidate) => candidate.status === "completed").map((candidate) => candidate.kind)

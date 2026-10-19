@@ -20,6 +20,42 @@ const context: InventionContext = {
 const sectionOrder = ["validationPlan", "customerSegments"] as ValidationSectionKey[];
 
 describe("validation orchestration stall regression", () => {
+  it("runs independent sections concurrently while persisting progress in order", async () => {
+    let active = 0;
+    let peak = 0;
+    const persisted: PersistValidationSectionArgs[] = [];
+    const sections = ["validationPlan", "customerSegments", "competitorAnalysis", "marketSizing"] as ValidationSectionKey[];
+    const summary = await runValidationSections({
+      sectionOrder: sections,
+      inventionContext: context,
+      now: () => 789,
+      provider: {
+        generateSection: async (_ctx, sectionKey) => {
+          active += 1;
+          peak = Math.max(peak, active);
+          await new Promise((resolve) => setTimeout(resolve, 0));
+          active -= 1;
+          return {
+            sectionKey,
+            generatedContent: `Generated ${sectionKey}`,
+            confidence: { score: 0.4, level: "low", evidenceSummary: "test", assumptions: [], missingInformation: [] },
+            evidenceSummary: "test",
+            assumptions: [],
+            missingInformation: [],
+            generatedAt: 789,
+            providerVersion: "test",
+          };
+        },
+      },
+      persistCompletedSection: async (args) => { persisted.push(args); },
+      persistFailedSection: async (args) => { persisted.push(args); },
+    });
+
+    expect(peak).toBe(3);
+    expect(summary.completedCount).toBe(4);
+    expect(persisted.map((item) => item.completedSectionCount)).toEqual([1, 2, 3, 4]);
+  });
+
   it("completes only after generated sections are persisted", async () => {
     const persisted: PersistValidationSectionArgs[] = [];
 

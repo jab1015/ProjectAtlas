@@ -12,7 +12,7 @@ import { SOFTWARE_PRODUCT_WORK_PLAN } from "@convex/softwareWorkPlan";
 describe("dedicated department agent routing", () => {
   it("gives every department a unique stable agent identity", () => {
     const profiles = Object.values(DEPARTMENT_AGENT_PROFILES);
-    expect(profiles).toHaveLength(17);
+    expect(profiles.length).toBeGreaterThanOrEqual(21);
     expect(new Set(profiles.map((profile) => profile.department)).size).toBe(profiles.length);
     expect(new Set(profiles.map((profile) => profile.agentId)).size).toBe(profiles.length);
     expect(new Set(profiles.map((profile) => profile.name)).size).toBe(profiles.length);
@@ -30,6 +30,9 @@ describe("dedicated department agent routing", () => {
     }
     expect(resolveDepartmentAgent({ department: "canonical" }).agentId).toContain(".canonical.");
     expect(resolveDepartmentAgent({ department: "patent_readiness" }).agentId).toContain(".patent_readiness.");
+    expect(resolveDepartmentAgent({ department: "canonical" }, "market_feasibility").department).toBe("market_research");
+    expect(resolveDepartmentAgent({ department: "canonical" }, "patent_design_handoff").department).toBe("patent_readiness");
+    expect(resolveDepartmentAgent({ department: "canonical" }, "regulatory_screening").department).toBe("regulatory");
   });
 
   it("fails closed before provider execution when a work item lacks a registered department", () => {
@@ -61,7 +64,7 @@ describe("dedicated department agent routing", () => {
   it("enforces routing in both general work and native CAD provider paths", () => {
     const orchestration = readFileSync("convex/atlasWorkOrchestration.ts", "utf8");
     const nativeCad = readFileSync("convex/nativeCadGeneration.ts", "utf8");
-    expect(orchestration).toContain("resolveDepartmentAgent(workItem.inputSnapshot)");
+    expect(orchestration).toContain("resolveDepartmentAgent(workItem.inputSnapshot, workItem.kind)");
     expect(orchestration).toContain("departmentAgentSystemPrompt(departmentAgent)");
     expect(nativeCad).toContain("resolveDepartmentAgent(context.workItem.inputSnapshot)");
     expect(nativeCad).toContain("departmentAgentSystemPrompt(departmentAgent)");

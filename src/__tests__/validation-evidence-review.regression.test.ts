@@ -31,7 +31,7 @@ describe("visible validation evidence review", () => {
   it("keeps the session cache version aligned with the provider implementation", () => {
     const session = read("convex/validationResearchSessionMutations.ts");
     const provider = read("convex/openaiValidationResearchProvider.ts");
-    expect(session).toContain('const PROVIDER_VERSION = "2.0.0"');
-    expect(provider).toContain('private static readonly VERSION = "2.0.0"');
+    expect(session).toContain('const PROVIDER_VERSION = "2.1.0"');
+    expect(provider).toContain('private static readonly VERSION = "2.1.0"');
   });
 });
