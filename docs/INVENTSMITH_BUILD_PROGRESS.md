@@ -6,7 +6,7 @@
 **Current continuation checkpoint:** `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`  
 **Active build branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified checkpoint:** Local checks passed for the October 19 fixes (123 test files / 682 tests; web and Convex TypeScript; Next.js build). Fix commit `ff481791afc424a4656c96daa82d41953744caa5` is on the active branch. GitHub reports its Netlify `deploy-preview` check as **pending**; no matching preview build or exact-head CI run is yet confirmed. Earlier isolated test-deploy run `39311119875` passed for its then-current source, not this exact commit.
+**Latest verified checkpoint:** Commit `b5d13713fc4e4489c3d2d36544a52682d60a3156` is on the active branch. Local verification passed (124 test files / 685 tests, web and Convex TypeScript, Next.js build 36/36). Isolated Convex deployment workflow `39314672344` passed, and Netlify's matching `deploy-preview` status succeeded at `https://deploy-preview-24--inventsmith.netlify.app`. Authenticated live acceptance on the protected preview remains outstanding.
 
 ## October 19 progress and outstanding acceptance
 
@@ -16,7 +16,7 @@ The owner’s active request is to fix the rest of today’s reported issues: au
 
 Current implementation inspection finds code for automatic refresh, survey-aware validation, a short validation summary, profile/workspace rename, selected-account access/credits, and admin navigation sign-out. These have not yet been counted as accepted because the owner reported visible failures and the current Netlify preview/head pairing is unverified. The support/operations module’s earlier `openAiConfigured` crash also requires live acceptance even though a compatibility fallback is present in code.
 
-The support-case gap is now implemented in the current working tree: authenticated users can submit and track reports, admins can filter/update status and add private investigation notes, and an optional invention link is checked against the reporter's access. Admin access through the case view does not bypass normal invention permissions. Focused support security/UI regression tests pass. This support module is not yet on the remote branch or deployed; live admin/customer acceptance remains outstanding.
+The support-case workflow is implemented and deployed to the isolated test backend: authenticated users can submit and track reports; admins can filter/update status and add private investigation notes; and optional invention links are checked against the reporter's access. A support case does not grant access to private invention evidence. Live admin/customer acceptance remains outstanding.
 
 The survey evidence is inventor-provided and unverified. A useful validation update must state the reported respondent count and which extracted observations were used, preserve provenance, and explain score movement (or why the score does not move); a 100-person sample does not automatically justify higher confidence or prove demand.
 
@@ -24,7 +24,7 @@ The suggested survey/customer-research flow may prepare a draft page and questio
 
 Deployment boundary: `quick-fox-785` is the dedicated InventSmith test project. `agile-seahorse-379` remains limited to the already-verified password-recovery backend scope; `fiery-gazelle-628` is another app and must remain untouched. PR #24 stays open/unmerged; do not publish the whole unverified product.
 
-October 19 verification: the local combined fix set passes web and Convex TypeScript, the full Vitest suite (**124 files / 685 tests**), `git diff --check`, and the Next.js production build (**36/36** pages). The support module and latest status update are not yet pushed/deployed. Pushed code commit `ff481791afc424a4656c96daa82d41953744caa5` had a pending Netlify check; its live preview remains unconfirmed.
+October 19 verification: commit `b5d13713fc4e4489c3d2d36544a52682d60a3156` passes web/Convex TypeScript, full Vitest (**124 files / 685 tests**), `git diff --check`, and Next.js production build (**36/36** pages). Isolated Convex test deploy run `39314672344` passed; the matching Netlify deploy-preview status succeeded. Live authenticated acceptance remains outstanding.
 
 ## Current status snapshot
 
