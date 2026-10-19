@@ -1,10 +1,23 @@
 import { describe, expect, it } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
+import { getValidationCompletionLabel } from "@/lib/validationResearchView";
 
 const read = (file: string) => fs.readFileSync(path.join(process.cwd(), file), "utf8");
 
 describe("visible validation evidence review", () => {
+  it("labels the completed snapshot as previous while changed evidence is refreshing", () => {
+    expect(getValidationCompletionLabel(false, 11, 11)).toBe(
+      "Previous report — 11 of 11 sections complete; refreshing with new evidence"
+    );
+    expect(getValidationCompletionLabel(true, 11, 11)).toBe(
+      "Validation complete — 11 of 11 sections"
+    );
+    expect(getValidationCompletionLabel(undefined, 9, 11)).toBe(
+      "Validation complete — 9 of 11 sections"
+    );
+  });
+
   it("returns current survey source details and marks reports stale against changed evidence", () => {
     const query = read("convex/validationMutations.ts");
     expect(query).toContain("readValidationEvidence(ctx, inventionId)");

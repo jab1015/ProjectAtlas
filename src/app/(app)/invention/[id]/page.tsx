@@ -18,7 +18,7 @@ import { ArrowLeft, ArrowRight, Lock, PartyPopper, RefreshCw } from "lucide-reac
 import Link from "next/link";
 import { trackStageCompleted, trackContinueClicked, trackUpgradePromptShown } from "@/lib/analytics";
 import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
-import { getSafeValidationFailureMessage, getValidationResearchViewState } from "@/lib/validationResearchView";
+import { getSafeValidationFailureMessage, getValidationCompletionLabel, getValidationResearchViewState } from "@/lib/validationResearchView";
 
 // ── Congratulations screen (Stage 4 completion) ──────────────────────────────
 
@@ -461,7 +461,7 @@ export default function InventionWorkspacePage() {
                     </span>
                   ) : (
                     <span className="text-primary font-medium">
-                      Validation complete — {completedSections.length} of {TOTAL_SECTIONS} sections
+                      {getValidationCompletionLabel(evidenceReview?.currentEvidenceMatchesRun, completedSections.length, TOTAL_SECTIONS)}
                     </span>
                   )}
                   {isGenerating && (

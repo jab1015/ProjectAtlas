@@ -44,6 +44,22 @@ export function getSafeValidationFailureMessage(rawMessage: string): string {
   return "The AI provider could not generate this section. Check the operations status for this environment, then retry.";
 }
 
+/**
+ * Explain when a completed snapshot is still being replaced because evidence
+ * changed. The previous section count remains useful, but must not imply that
+ * the current evidence has already been included.
+ */
+export function getValidationCompletionLabel(
+  currentEvidenceMatchesRun: boolean | undefined,
+  completedSections: number,
+  totalSections: number
+): string {
+  if (currentEvidenceMatchesRun === false) {
+    return `Previous report — ${completedSections} of ${totalSections} sections complete; refreshing with new evidence`;
+  }
+  return `Validation complete — ${completedSections} of ${totalSections} sections`;
+}
+
 export function getValidationResearchViewState(
   validationResearch: ValidationResearchViewInput | null | undefined,
   rebuilding: boolean,
