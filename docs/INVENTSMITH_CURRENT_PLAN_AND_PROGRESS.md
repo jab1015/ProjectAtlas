@@ -1,3 +1,11 @@
+### InventSmith test Convex deployment — October 19, 2026, 6:45 PM ET
+
+The owner authorized Convex deployment as part of this approval and confirmed the target is InventSmith test, `quick-fox-785` (`dev/inventsmith-test`, Convex project `decideforusapp:projectatlas`). Deployed with authenticated Convex CLI using explicit `CONVEX_DEPLOYMENT=dev:quick-fox-785`; no deploy key was used. CLI confirmed the exact target, added the evidence request/response and support-case indexes, and reported **Convex functions ready**. It did not target `agile-seahorse-379` or `fiery-gazelle-628`.
+
+Post-deploy read-only verification: the protected Netlify Preview now loads the previously uploaded `Data_All_260313.pdf` evidence record (100-user survey summary, structured extraction complete) in Evidence Locker; Support loads and shows no submitted cases. The survey-link list has no visible error. No support case, survey, or evidence was submitted; no AI credits were spent. Validation remains at 36% and survey impact/automatic refresh plus broader department workflows still need separate verification. The website Preview remains the already-successful website-only deployment; production website publication and PR merge were not performed.
+
+This successful account-authorized test deployment supersedes prior notes that `quick-fox-785` deployment was unverified or blocked pending a development deploy key. The permanent key constraint remains: the owner has only a production-scoped deploy key; never use it for test or production backend deployment. Test Convex deployment can use this authenticated CLI account flow when explicitly authorized.
+
 # InventSmith Current Plan and Progress
 
 ## Current acceptance checkpoint — October 19, 2026
