@@ -2,22 +2,21 @@
  * InventSmith auth helper functions.
  * These are thin wrappers called from queries/mutations that need
  * role/tier checks.
+ *
+ * During the organization migration, legacy user-scoped invention creation
+ * deliberately routes through the same plan-capacity policy that will become
+ * organization-scoped. This keeps single-user behavior stable while removing
+ * a second source of truth for active-invention limits.
  */
 
 import { QueryCtx, MutationCtx } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { query } from "./_generated/server";
 import { ConvexError } from "convex/values";
+import { canCreateActiveInvention } from "./organizationPolicyLogic";
 
 type AuthCtx = QueryCtx | MutationCtx;
 type SubscriptionTier = "free" | "inventor" | "pro" | "enterprise";
-
-const ACTIVE_INVENTION_LIMITS: Record<SubscriptionTier, number> = {
-  free: 1,
-  inventor: 3,
-  pro: 10,
-  enterprise: 25,
-};
 
 function normalizeSubscriptionTier(tier: unknown): SubscriptionTier {
   switch (tier) {
@@ -40,10 +39,6 @@ function normalizeSubscriptionTier(tier: unknown): SubscriptionTier {
 function canTierAccessPaidStages(tier: unknown): boolean {
   const normalizedTier = normalizeSubscriptionTier(tier);
   return normalizedTier === "pro" || normalizedTier === "enterprise";
-}
-
-function getActiveInventionLimit(tier: unknown): number {
-  return ACTIVE_INVENTION_LIMITS[normalizeSubscriptionTier(tier)];
 }
 
 export async function isAdmin(ctx: AuthCtx): Promise<boolean> {
@@ -69,7 +64,7 @@ export async function canAccessStage(ctx: AuthCtx, stageId: number): Promise<boo
   // Stages 1–4: available to all tiers
   if (stageId <= 4) return true;
 
-  // Stages 5+: require Pro or Enterprise.
+  // Stages 5+: require Pro or Enterprise while legacy user billing remains active.
   return canTierAccessPaidStages(user.subscriptionTier);
 }
 
@@ -81,7 +76,6 @@ export async function canCreateInvention(ctx: AuthCtx): Promise<boolean> {
 
   // Admin bypass
   if (user.role === "admin") return true;
-  const inventionLimit = getActiveInventionLimit(user.subscriptionTier);
 
   const existing = await ctx.db
     .query("inventions")
@@ -90,7 +84,10 @@ export async function canCreateInvention(ctx: AuthCtx): Promise<boolean> {
     )
     .collect();
 
-  return existing.length < inventionLimit;
+  // Legacy user subscriptionTier aliases normalize inside the organization policy.
+  // Once organization rows are introduced, callers can supply organization planKey
+  // and organization-scoped active counts to the same policy function.
+  return canCreateActiveInvention(user.subscriptionTier, existing.length);
 }
 
 // ── Public query for current user with role/tier ─────────────────────────────

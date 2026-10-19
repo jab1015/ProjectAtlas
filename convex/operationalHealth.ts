@@ -2,6 +2,16 @@ import { internalQuery, query } from "./_generated/server";
 import { requireAdmin } from "./authHelpers";
 import { classifyWorkHealth, operationalSeverity } from "./operationalHealthLogic";
 
+function getAiConfiguration() {
+  const chatModel = process.env.ATLAS_OPENAI_MODEL?.trim() || "gpt-5.4-mini";
+  const validationModel = process.env.ATLAS_VALIDATION_MODEL?.trim() || chatModel;
+  return {
+    openAiConfigured: Boolean(process.env.OPENAI_API_KEY?.trim()),
+    chatModel,
+    validationModel,
+  };
+}
+
 export const healthProbe = internalQuery({
   args: {},
   handler: async (ctx) => {
@@ -15,6 +25,7 @@ export const healthProbe = internalQuery({
       sampledUser: users.length > 0,
       hasQueuedWork: queuedWork.length > 0,
       hasFailedWork: failedWork.length > 0,
+      ai: getAiConfiguration(),
       checkedAt: Date.now(),
     };
   },
@@ -57,6 +68,7 @@ export const getSnapshot = query({
     const todayUsage = usage.filter((row) => row.dateKey === today);
     return {
       generatedAt: now,
+      ai: getAiConfiguration(),
       counts: {
         failed: issues.filter((item) => item.health === "failed").length,
         expired: issues.filter((item) => item.health === "expired").length,

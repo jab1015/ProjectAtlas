@@ -24,13 +24,19 @@ const getConversation = makeFunctionReference<
   { invention: { _id: Id<"inventions">; title: string }; messages: ChatMessage[] }
 >("atlasChat:getConversation");
 
-const askAtlas = makeFunctionReference<
+const askInventSmith = makeFunctionReference<
   "mutation",
   { inventionId: Id<"inventions">; content: string },
   Id<"conversationMessages">
 >("atlasChat:ask");
 
-export default function AtlasChatPage() {
+const captureInventorChatEvidence = makeFunctionReference<
+  "mutation",
+  { inventionId: Id<"inventions">; content: string },
+  { captured: boolean; reason: "not_material" | "duplicate" | "captured"; sourceId?: Id<"evidenceSources"> }
+>("chatEvidenceCapture:captureInventorChatEvidence");
+
+export default function InventSmithChatPage() {
   const params = useParams();
   const router = useRouter();
   const inventionId = params.id as Id<"inventions">;
@@ -39,7 +45,8 @@ export default function AtlasChatPage() {
     getConversation,
     isAuthenticated && inventionId ? { inventionId } : "skip"
   );
-  const ask = useMutation(askAtlas);
+  const ask = useMutation(askInventSmith);
+  const captureEvidence = useMutation(captureInventorChatEvidence);
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +69,9 @@ export default function AtlasChatPage() {
     setMessage("");
     try {
       await ask({ inventionId, content });
+      // Material inventor facts, evidence links, test results, quotes and status observations
+      // become governed project evidence. Capture failure never prevents the saved chat question.
+      void captureEvidence({ inventionId, content }).catch(() => undefined);
     } catch (reason) {
       setMessage(content);
       setError(reason instanceof Error ? reason.message : "InventSmith could not save your message.");
@@ -71,7 +81,7 @@ export default function AtlasChatPage() {
   }
 
   if (isLoading || !isAuthenticated || conversation === undefined) {
-    return <div className="min-h-screen bg-background"><AppNav /><main className="mx-auto max-w-3xl px-4 py-12 text-sm text-muted-foreground">Loading InventSmith chat…</main></div>;
+    return <div className="min-h-screen bg-background"><AppNav /><main className="mx-auto max-w-3xl px-4 py-12 text-sm text-muted-foreground">Loading Ask InventSmith…</main></div>;
   }
 
   return (
@@ -85,7 +95,7 @@ export default function AtlasChatPage() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Ask InventSmith</p>
             <h1 className="text-2xl font-semibold">{conversation.invention.title}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Answers use this invention’s structured record, evidence, and latest work. Draft evidence is identified as draft.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Ask across the complete invention project: evidence, research, departments, work queues, handoffs, design, CAD, reviews, decisions, deliverables, risks, and next steps. InventSmith distinguishes verified evidence from drafts and inventor-provided inputs.</p>
           </div>
         </div>
 
@@ -94,7 +104,7 @@ export default function AtlasChatPage() {
             <div className="rounded-2xl border border-dashed border-border p-8 text-center">
               <Bot className="mx-auto h-8 w-8 text-primary" />
               <h2 className="mt-3 font-semibold">What would you like to know?</h2>
-              <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">Ask about InventSmith’s research, risks, next steps, product choices, or what still needs your decision.</p>
+              <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">Ask what InventSmith has completed, what each department is doing, what evidence supports a conclusion, what is blocked, or what happens next. If you supply material project facts, URLs, test results, quotes, survey/interview findings, or patent-status observations, InventSmith records them as inventor-provided evidence for the project to evaluate.</p>
             </div>
           )}
           {conversation.messages.map((item) => (
@@ -124,7 +134,7 @@ export default function AtlasChatPage() {
                 }
               }}
               maxLength={4000}
-              placeholder="Ask InventSmith about this invention…"
+              placeholder="Ask InventSmith about any part of this invention…"
               className="min-h-12 resize-none"
               aria-label="Message InventSmith"
             />
@@ -132,7 +142,7 @@ export default function AtlasChatPage() {
               <Send className="h-4 w-4" />
             </Button>
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">InventSmith assists with preparation and research; it does not guarantee patentability, compliance, funding, or market success.</p>
+          <p className="mt-2 text-xs text-muted-foreground">Material inventor input can become project evidence, but remains unverified until checked. Professional/legal/engineering approval remains gated where required.</p>
         </form>
       </main>
     </div>

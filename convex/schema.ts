@@ -33,16 +33,135 @@ export default defineSchema({
     billingCustomerId: v.optional(v.string()),
     subscriptionCurrentPeriodEnd: v.optional(v.number()),
     subscriptionUpdatedAt: v.optional(v.number()),
+    personalOrganizationId: v.optional(v.id("organizations")),
     // Extension point: Inventor Twin
     inventorTwin: v.optional(v.null()),
   })
     .index("email", ["email"])
     .index("by_role", ["role"]),
 
+  // ── InventSmith: Organization-native tenancy ───────────────────────────────
+  organizations: defineTable({
+    name: v.string(),
+    kind: v.union(v.literal("personal"), v.literal("company"), v.literal("studio")),
+    planKey: v.union(
+      v.literal("explorer"),
+      v.literal("inventor"),
+      v.literal("pro"),
+      v.literal("enterprise"),
+      v.literal("studio_3"),
+      v.literal("studio_6"),
+      v.literal("studio_custom")
+    ),
+    status: v.union(v.literal("active"), v.literal("suspended"), v.literal("closed")),
+    createdByUserId: v.id("users"),
+    billingCustomerId: v.optional(v.string()),
+    subscriptionId: v.optional(v.string()),
+    subscriptionStatus: v.optional(v.union(
+      v.literal("trialing"), v.literal("active"), v.literal("past_due"), v.literal("canceled"),
+      v.literal("unpaid"), v.literal("incomplete"), v.literal("paused")
+    )),
+    subscriptionCurrentPeriodEnd: v.optional(v.number()),
+    subscriptionUpdatedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_createdByUserId", ["createdByUserId"])
+    .index("by_kind", ["kind"])
+    .index("by_status", ["status"]),
+
+  // Audited, time-bounded entitlement overrides for beta testers and other
+  // explicitly approved complimentary access. The base plan remains intact so
+  // future Explorer pricing changes do not erase the exception history.
+  organizationEntitlementOverrides: defineTable({
+    organizationId: v.id("organizations"),
+    planKey: v.union(
+      v.literal("explorer"),
+      v.literal("inventor"),
+      v.literal("pro"),
+      v.literal("enterprise"),
+      v.literal("studio_3"),
+      v.literal("studio_6"),
+      v.literal("studio_custom")
+    ),
+    startsAt: v.number(),
+    expiresAt: v.optional(v.number()),
+    reason: v.string(),
+    grantedByUserId: v.id("users"),
+    createdAt: v.number(),
+    revokedAt: v.optional(v.number()),
+    revokedByUserId: v.optional(v.id("users")),
+    revokedReason: v.optional(v.string()),
+  })
+    .index("by_organizationId", ["organizationId"])
+    .index("by_organizationId_createdAt", ["organizationId", "createdAt"]),
+
+  // Signed credit-unit ledger. Positive entries grant capacity; negative
+  // entries debit/refund/adjust it. Never edit daily usage rows to change a
+  // customer's allowance.
+  organizationCreditLedger: defineTable({
+    organizationId: v.id("organizations"),
+    deltaUnits: v.number(),
+    kind: v.union(v.literal("grant"), v.literal("debit"), v.literal("refund"), v.literal("adjustment")),
+    reason: v.string(),
+    actorUserId: v.optional(v.id("users")),
+    referenceId: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_organizationId", ["organizationId"])
+    .index("by_organizationId_createdAt", ["organizationId", "createdAt"]),
+
+  organizationMemberships: defineTable({
+    organizationId: v.id("organizations"),
+    userId: v.id("users"),
+    role: v.union(
+      v.literal("owner"),
+      v.literal("admin"),
+      v.literal("member"),
+      v.literal("viewer"),
+      v.literal("professional")
+    ),
+    status: v.union(v.literal("active"), v.literal("invited"), v.literal("suspended"), v.literal("removed")),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_organizationId", ["organizationId"])
+    .index("by_userId", ["userId"])
+    .index("by_organizationId_userId", ["organizationId", "userId"])
+    .index("by_userId_status", ["userId", "status"]),
+
+  organizationInvitations: defineTable({
+    organizationId: v.id("organizations"),
+    email: v.string(),
+    role: v.union(
+      v.literal("admin"),
+      v.literal("member"),
+      v.literal("viewer"),
+      v.literal("professional")
+    ),
+    status: v.union(v.literal("pending"), v.literal("accepted"), v.literal("revoked"), v.literal("expired")),
+    invitedByUserId: v.id("users"),
+    acceptedByUserId: v.optional(v.id("users")),
+    expiresAt: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_organizationId", ["organizationId"])
+    .index("by_organizationId_email", ["organizationId", "email"])
+    .index("by_email_status", ["email", "status"]),
+
   subscriptionEvents: defineTable({
     providerEventId: v.string(),
     customerEmail: v.string(),
     tier: v.union(v.literal("inventor"), v.literal("pro"), v.literal("enterprise")),
+    organizationPlanKey: v.optional(v.union(
+      v.literal("inventor"),
+      v.literal("pro"),
+      v.literal("enterprise"),
+      v.literal("studio_3"),
+      v.literal("studio_6"),
+      v.literal("studio_custom")
+    )),
     status: v.union(
       v.literal("trialing"), v.literal("active"), v.literal("past_due"), v.literal("canceled"),
       v.literal("unpaid"), v.literal("incomplete"), v.literal("paused")
@@ -52,10 +171,12 @@ export default defineSchema({
     currentPeriodEnd: v.optional(v.number()),
     occurredAt: v.number(),
     appliedUserId: v.optional(v.id("users")),
+    appliedOrganizationId: v.optional(v.id("organizations")),
     receivedAt: v.number(),
   })
     .index("by_providerEventId", ["providerEventId"])
-    .index("by_customerEmail", ["customerEmail"]),
+    .index("by_customerEmail", ["customerEmail"])
+    .index("by_appliedOrganizationId", ["appliedOrganizationId"]),
 
   privacyRequests: defineTable({
     userId: v.id("users"),
@@ -80,12 +201,28 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
     status: v.union(v.literal("active"), v.literal("archived")),
-    // Extension point: Team workspaces
-    organizationId: v.optional(v.string()),
+    // Optional during migration; all new inventions should be organization-owned.
+    organizationId: v.optional(v.id("organizations")),
   })
     .index("by_userId", ["userId"])
     .index("by_userId_status", ["userId", "status"])
-    .index("by_status", ["status"]),
+    .index("by_status", ["status"])
+    .index("by_organizationId", ["organizationId"])
+    .index("by_organizationId_status", ["organizationId", "status"]),
+
+  inventionAccessGrants: defineTable({
+    inventionId: v.id("inventions"),
+    organizationId: v.id("organizations"),
+    userId: v.id("users"),
+    access: v.union(v.literal("manage"), v.literal("edit"), v.literal("view"), v.literal("review")),
+    grantedByUserId: v.id("users"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_inventionId", ["inventionId"])
+    .index("by_userId", ["userId"])
+    .index("by_inventionId_userId", ["inventionId", "userId"])
+    .index("by_organizationId_userId", ["organizationId", "userId"]),
 
   // Canonical structured memory for an invention. Chat and generated
   // deliverables read from this record instead of treating conversation
@@ -183,6 +320,32 @@ export default defineSchema({
     .index("by_inventionId", ["inventionId"])
     .index("by_inventionId_status", ["inventionId", "status"]),
 
+  evidenceRequests: defineTable({
+    inventionId: v.id("inventions"),
+    createdByUserId: v.id("users"),
+    token: v.string(),
+    kind: v.union(v.literal("survey"), v.literal("interview")),
+    title: v.string(),
+    introduction: v.string(),
+    questions: v.array(v.object({ id: v.string(), prompt: v.string() })),
+    status: v.union(v.literal("active"), v.literal("closed")),
+    responseCount: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_token", ["token"])
+    .index("by_inventionId", ["inventionId"]),
+
+  evidenceResponses: defineTable({
+    requestId: v.id("evidenceRequests"),
+    inventionId: v.id("inventions"),
+    answers: v.array(v.object({ questionId: v.string(), answer: v.string() })),
+    respondentName: v.optional(v.string()),
+    submittedAt: v.number(),
+  })
+    .index("by_requestId", ["requestId"])
+    .index("by_inventionId", ["inventionId"]),
+
   inventionAssumptions: defineTable({
     inventionId: v.id("inventions"),
     statement: v.string(),
@@ -272,6 +435,8 @@ export default defineSchema({
     attemptCount: v.number(),
     estimatedCostUnits: v.optional(v.number()),
     reservedCostUnits: v.optional(v.number()),
+    reservedDailyCostUnits: v.optional(v.number()),
+    reservedCreditUnits: v.optional(v.number()),
     reservationDateKey: v.optional(v.string()),
     actualCostUnits: v.optional(v.number()),
     maxAttempts: v.optional(v.number()),
@@ -339,6 +504,22 @@ export default defineSchema({
   })
     .index("by_userId", ["userId"])
     .index("by_userId_dateKey", ["userId", "dateKey"]),
+
+  // Additive organization-native usage ledger. Legacy user rows remain intact
+  // for inventions that have not yet been migrated to an organization.
+  organizationDailyUsage: defineTable({
+    organizationId: v.id("organizations"),
+    dateKey: v.string(),
+    autonomousCostUnits: v.number(),
+    reservedAutonomousCostUnits: v.optional(v.number()),
+    completedWorkItems: v.number(),
+    chatQuestions: v.number(),
+    legacyBaselineCapturedAt: v.optional(v.number()),
+    legacyMemberCount: v.optional(v.number()),
+    updatedAt: v.number(),
+  })
+    .index("by_organizationId", ["organizationId"])
+    .index("by_organizationId_dateKey", ["organizationId", "dateKey"]),
 
   atlasDeliverables: defineTable({
     inventionId: v.id("inventions"),
@@ -494,6 +675,7 @@ export default defineSchema({
     lastRefreshAt: v.optional(v.number()),
     providerVersion: v.optional(v.string()),
     researchVersion: v.optional(v.number()),
+    evidenceFingerprint: v.optional(v.string()),
     // ── Progress tracking fields (Phase 1C-3) ───────────────────────────────
     // Set at session start; incremented by the orchestrator as each section lands.
     overallStatus: v.optional(v.string()), // "PENDING"|"IN_PROGRESS"|"COMPLETED"|"FAILED"

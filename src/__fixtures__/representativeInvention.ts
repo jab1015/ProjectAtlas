@@ -14,6 +14,7 @@ export const representativeEvaluationTime = Date.UTC(2026, 7, 14);
 
 export function makeRepresentativePilotEvaluationInput(): PilotEvaluationInput {
   const sourceId = "representative-primary-source";
+  const sourceUrl = "https://www.uspto.gov/patents/search";
   return {
     deliverables: REQUIRED_PILOT_DELIVERABLE_KINDS.map((kind) => ({
       kind,
@@ -30,8 +31,13 @@ export function makeRepresentativePilotEvaluationInput(): PilotEvaluationInput {
     sources: [{
       _id: sourceId,
       reliability: "primary",
-      locator: "https://www.uspto.gov/patents/search",
-      metadata: { verifiedAt: representativeEvaluationTime },
+      locator: sourceUrl,
+      metadata: {
+        verifiedAt: representativeEvaluationTime,
+        retrievalRecordedAt: representativeEvaluationTime,
+        retrievalSourceUrl: sourceUrl,
+        claimSupportExcerpt: "Controlled fixture records a real retrieval event and claim-level support rather than trusting a model-supplied verification label.",
+      },
     }],
     workItems: [{ status: "completed" }],
   };

@@ -19,18 +19,17 @@
 
 import { mutation, type MutationCtx } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
-import { getAuthUserId } from "@convex-dev/auth/server";
 import type { Id } from "./_generated/dataModel";
-
-// ── Constants ────────────────────────────────────────────────────────────────
+import { requireInventionEditAccess } from "./organizations";
 
 const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
 
+/**
+ * Kept under the legacy helper name for API/test compatibility, but access is
+ * now organization-aware: authorized editors/managers may work on Validation.
+ */
 async function requireOwnedInvention(ctx: MutationCtx, inventionId: Id<"inventions">) {
-  const userId = await getAuthUserId(ctx);
-  if (!userId) throw new ConvexError("NOT_AUTHENTICATED");
-  const invention = await ctx.db.get(inventionId);
-  if (!invention || invention.userId !== userId) throw new ConvexError("INVENTION_NOT_FOUND");
+  const { userId } = await requireInventionEditAccess(ctx, inventionId);
   return userId;
 }
 
@@ -40,8 +39,6 @@ async function requireOwnedResearch(ctx: MutationCtx, researchId: Id<"validation
   const userId = await requireOwnedInvention(ctx, record.inventionId);
   return { record, userId };
 }
-
-// ── Section entry type (in-memory only — not imported from types to keep runtime clean) ──
 
 interface SectionEntry {
   sectionKey: string;
@@ -65,16 +62,6 @@ interface SectionsMap {
   [sectionKey: string]: SectionEntry;
 }
 
-// ── MUTATION 1: triggerValidationResearch ────────────────────────────────────
-
-/**
- * Create or retrieve a validation research session.
- *
- * Idempotent: if a COMPLETED record exists within the last 24 hours, return it.
- * Otherwise insert a new PENDING row with empty sections map.
- *
- * Does NOT call any research provider. Does NOT generate content.
- */
 export const triggerValidationResearch = mutation({
   args: {
     inventionId: v.id("inventions"),
@@ -87,7 +74,6 @@ export const triggerValidationResearch = mutation({
     await requireOwnedInvention(ctx, inventionId);
     const now = Date.now();
 
-    // Check for a completed record within the last 24 hours
     const existing = await ctx.db
       .query("validationResearch")
       .withIndex("by_inventionId_status", (q) =>
@@ -104,7 +90,6 @@ export const triggerValidationResearch = mutation({
       return { status: "existing", researchId: existing._id };
     }
 
-    // Insert a new PENDING research row
     const researchId = await ctx.db.insert("validationResearch", {
       inventionId,
       stageId,
@@ -119,12 +104,6 @@ export const triggerValidationResearch = mutation({
   },
 });
 
-// ── MUTATION 2: approveValidationSection ─────────────────────────────────────
-
-/**
- * Mark a generated validation section as APPROVED.
- * Records approvedAt timestamp and approvedBy (user ID or "system").
- */
 export const approveValidationSection = mutation({
   args: {
     researchId: v.id("validationResearch"),
@@ -135,40 +114,22 @@ export const approveValidationSection = mutation({
 
     const sections: SectionsMap = (record.sections as SectionsMap) ?? {};
     const section = sections[sectionKey];
-    if (!section) {
-      throw new ConvexError("SECTION_NOT_FOUND");
-    }
-
-    const approvedBy: string = userId;
-    const now = Date.now();
+    if (!section) throw new ConvexError("SECTION_NOT_FOUND");
 
     const updatedSection: SectionEntry = {
       ...section,
       approvalStatus: "approved",
-      approvedAt: now,
-      approvedBy,
+      approvedAt: Date.now(),
+      approvedBy: String(userId),
     };
 
-    const updatedSections: SectionsMap = {
-      ...sections,
-      [sectionKey]: updatedSection,
-    };
-
-    await ctx.db.patch(researchId, { sections: updatedSections });
-
+    await ctx.db.patch(researchId, {
+      sections: { ...sections, [sectionKey]: updatedSection },
+    });
     return updatedSection;
   },
 });
 
-// ── MUTATION 3: editValidationSection ────────────────────────────────────────
-
-/**
- * Save founder edits to a validation section.
- *
- * NEVER overwrites InventSmith-generated content (generatedContent is immutable).
- * On first edit: copies generatedContent → originalGeneratedContent.
- * Sets currentFounderVersion to the edited content.
- */
 export const editValidationSection = mutation({
   args: {
     researchId: v.id("validationResearch"),
@@ -183,14 +144,8 @@ export const editValidationSection = mutation({
 
     const sections: SectionsMap = (record.sections as SectionsMap) ?? {};
     const section = sections[sectionKey];
-    if (!section) {
-      throw new ConvexError("SECTION_NOT_FOUND");
-    }
+    if (!section) throw new ConvexError("SECTION_NOT_FOUND");
 
-    const lastEditedBy: string = userId;
-    const now = Date.now();
-
-    // Preserve InventSmith-generated content on first edit
     const originalGeneratedContent =
       section.originalGeneratedContent !== undefined
         ? section.originalGeneratedContent
@@ -198,34 +153,20 @@ export const editValidationSection = mutation({
 
     const updatedSection: SectionEntry = {
       ...section,
-      // generatedContent is intentionally NOT changed
       originalGeneratedContent,
       currentFounderVersion: editedContent,
-      lastEditedAt: now,
-      lastEditedBy,
+      lastEditedAt: Date.now(),
+      lastEditedBy: String(userId),
       approvalStatus: "edited",
     };
 
-    const updatedSections: SectionsMap = {
-      ...sections,
-      [sectionKey]: updatedSection,
-    };
-
-    await ctx.db.patch(researchId, { sections: updatedSections });
-
+    await ctx.db.patch(researchId, {
+      sections: { ...sections, [sectionKey]: updatedSection },
+    });
     return updatedSection;
   },
 });
 
-// ── MUTATION 4: refreshValidationSection ────────────────────────────────────
-
-/**
- * Request regeneration of a single validation section.
- *
- * Marks the section sectionStatus = "REFRESH_REQUESTED" and sets the
- * top-level researchStatus = "REFRESH_REQUESTED" so a future provider
- * action can pick it up. Does NOT regenerate content.
- */
 export const refreshValidationSection = mutation({
   args: {
     researchId: v.id("validationResearch"),
@@ -236,28 +177,19 @@ export const refreshValidationSection = mutation({
 
     const sections: SectionsMap = (record.sections as SectionsMap) ?? {};
     const section = sections[sectionKey];
-    if (!section) {
-      throw new ConvexError("SECTION_NOT_FOUND");
-    }
+    if (!section) throw new ConvexError("SECTION_NOT_FOUND");
 
     const now = Date.now();
-
     const updatedSection: SectionEntry = {
       ...section,
       sectionStatus: "REFRESH_REQUESTED",
       refreshRequestedAt: now,
     };
 
-    const updatedSections: SectionsMap = {
-      ...sections,
-      [sectionKey]: updatedSection,
-    };
-
     await ctx.db.patch(researchId, {
-      sections: updatedSections,
+      sections: { ...sections, [sectionKey]: updatedSection },
       researchStatus: "REFRESH_REQUESTED",
     });
-
     return updatedSection;
   },
 });

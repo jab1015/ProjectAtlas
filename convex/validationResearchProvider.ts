@@ -28,6 +28,7 @@ export interface InventionContext {
   inventionDescription: string;
   founderNotes?: string;
   existingResearch?: Record<string, unknown>;
+  inventorEvidence?: Array<{ sourceId: string; title: string; evidenceKind?: string; provenance: string; extraction: unknown }>;
 }
 
 // ── SectionGenerationResult ───────────────────────────────────────────────────

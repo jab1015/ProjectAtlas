@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 const ROOT = process.cwd();
@@ -29,6 +29,15 @@ describe("InventSmith customer-facing brand", () => {
     expect(layout).toContain("/Logo.png");
     expect(logo).toContain("/Logo.png");
     expect(logo).toContain("InventSmith — The Inventor OS");
+    expect(existsSync(join(ROOT, "public/Logo.png"))).toBe(true);
+  });
+
+  it("does not keep legacy Atlas logo or favicon assets that a deployment could accidentally reuse", () => {
+    expect(existsSync(join(ROOT, "public/logo.svg"))).toBe(false);
+    expect(existsSync(join(ROOT, "public/logo-mark.svg"))).toBe(false);
+    expect(existsSync(join(ROOT, "src/app/icon.svg"))).toBe(false);
+    const layout = readFileSync(join(ROOT, "src/app/layout.tsx"), "utf8");
+    expect(layout).toContain('{ icon: "/Logo.png", shortcut: "/Logo.png", apple: "/Logo.png" }');
   });
 
   it("does not expose Atlas as the current customer-facing product name", () => {

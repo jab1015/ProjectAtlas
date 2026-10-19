@@ -7,10 +7,12 @@ function read(path: string) {
 }
 
 describe("structured account export", () => {
-  it("requires authentication and exports invention-owned structured data", () => {
+  it("requires authentication and exports only personal/legacy invention-owned structured data", () => {
     const source = read("convex/privacyExport.ts");
     expect(source).toContain("getAuthUserId(ctx)");
-    expect(source).toContain('query("inventions").withIndex("by_userId"');
+    expect(source).toContain('query("inventions")');
+    expect(source).toContain('.withIndex("by_userId", (q) => q.eq("userId", userId))');
+    expect(source).toContain("personalOrganizationIds.has(String(invention.organizationId))");
     expect(source).toContain('query("atlasDeliverables")');
     expect(source).toContain('query("conversationMessages")');
   });

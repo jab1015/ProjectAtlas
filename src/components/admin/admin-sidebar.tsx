@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuthActions } from "@convex-dev/auth/react";
 import {
   LayoutDashboard,
   Package,
@@ -13,8 +14,10 @@ import {
   ArrowLeft,
   Menu,
   X,
+  LogOut,
   ShieldCheck,
   Activity,
+  Gift,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -33,12 +36,25 @@ const navItems = [
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/privacy", label: "Privacy requests", icon: ShieldCheck },
   { href: "/admin/operations", label: "InventSmith operations", icon: Activity },
+  { href: "/admin/beta-access", label: "Beta access & credits", icon: Gift },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 export function AdminSidebar({ storeName }: AdminSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { signOut } = useAuthActions();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  async function handleSignOut() {
+    try {
+      await signOut();
+    } finally {
+      setMobileOpen(false);
+      router.replace("/sign-in");
+      router.refresh();
+    }
+  }
 
   function isActive(href: string) {
     if (href === "/admin") {
@@ -94,6 +110,14 @@ export function AdminSidebar({ storeName }: AdminSidebarProps) {
           <ArrowLeft className="h-4 w-4" />
           Back to InventSmith
         </Link>
+        <Button
+          variant="ghost"
+          className="mt-1 w-full justify-start gap-2 px-3 text-sm font-normal text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+          onClick={() => void handleSignOut()}
+        >
+          <LogOut className="h-4 w-4" />
+          Sign out
+        </Button>
       </div>
     </div>
   );

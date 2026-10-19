@@ -1,8 +1,7 @@
 "use client";
 
 import { useAuthActions } from "@convex-dev/auth/react";
-import { useConvexAuth } from "convex/react";
-import { useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -10,32 +9,65 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MadeThisBadge } from "@/components/atlas/made-this-badge";
 import { AtlasLogo } from "@/components/atlas/atlas-logo";
 import { trackSignedIn } from "@/lib/analytics";
 
 export default function SignInPage() {
   const { signIn } = useAuthActions();
   const { isAuthenticated } = useConvexAuth();
+  const ensureUserProfile = useMutation(api.users.ensureUserProfile);
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [profileReady, setProfileReady] = useState(false);
 
-  // Redirect after auth
   const activeInvention = useQuery(
     api.journeyEngine.getActiveInvention,
     isAuthenticated ? {} : "skip"
   );
+  const currentUser = useQuery(
+    api.authHelpers.getCurrentUser,
+    isAuthenticated ? {} : "skip"
+  );
 
   useEffect(() => {
-    if (!isAuthenticated) return;
-    if (activeInvention === undefined) return; // loading
-    if (activeInvention) {
-      router.push("/dashboard");
-    } else {
-      router.push("/onboarding");
+    if (!isAuthenticated) {
+      setProfileReady(false);
+      return;
     }
-  }, [isAuthenticated, activeInvention, router]);
+
+    let cancelled = false;
+    void ensureUserProfile()
+      .then(() => {
+        if (!cancelled) setProfileReady(true);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setError("Signed in, but InventSmith could not finish loading your account profile. Please refresh and try again.");
+          setProfileReady(true);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ensureUserProfile, isAuthenticated]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !profileReady) return;
+    if (currentUser === undefined || activeInvention === undefined) return;
+
+    if (currentUser?.role === "admin") {
+      router.replace("/admin");
+      return;
+    }
+
+    if (activeInvention) {
+      router.replace("/dashboard");
+    } else {
+      router.replace("/onboarding");
+    }
+  }, [isAuthenticated, profileReady, currentUser, activeInvention, router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -56,7 +88,6 @@ export default function SignInPage() {
     <div className="min-h-screen flex flex-col bg-background">
       <div className="flex-1 flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-sm space-y-8">
-          {/* Logo */}
           <div className="flex justify-center">
             <Link href="/" className="no-underline hover:opacity-80 transition-opacity">
               <AtlasLogo size="md" className="text-primary" />
@@ -89,7 +120,15 @@ export default function SignInPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-center justify-between gap-4">
+                <Label htmlFor="password">Password</Label>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs font-medium text-foreground underline-offset-4 hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <Input
                 id="password"
                 name="password"
@@ -115,7 +154,6 @@ export default function SignInPage() {
           </p>
         </div>
       </div>
-      <MadeThisBadge />
     </div>
   );
 }

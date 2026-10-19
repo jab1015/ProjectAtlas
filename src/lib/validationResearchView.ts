@@ -1,4 +1,9 @@
-export type ValidationResearchStatus = "running" | "complete" | "failed" | undefined;
+export type ValidationResearchStatus =
+  | "running"
+  | "complete"
+  | "partial"
+  | "failed"
+  | undefined;
 
 export interface ValidationResearchSectionView {
   sectionId?: string;
@@ -25,10 +30,18 @@ export interface ValidationResearchViewState {
   failedSections: ValidationResearchSectionView[];
   isGenerating: boolean;
   isFailed: boolean;
+  isPartial: boolean;
   allSectionsError: boolean;
   progressCount: number;
   progressPct: number;
   statusLabel: string;
+}
+
+export function getSafeValidationFailureMessage(rawMessage: string): string {
+  if (/\b401\b|incorrect api key|invalid api key|unauthorized/i.test(rawMessage)) {
+    return "The AI provider rejected its configured credentials. Ask an administrator to check the OpenAI API key for this environment, then retry. No key is displayed here.";
+  }
+  return "The AI provider could not generate this section. Check the operations status for this environment, then retry.";
 }
 
 export function getValidationResearchViewState(
@@ -41,6 +54,18 @@ export function getValidationResearchViewState(
   const failedSections = finishedSections.filter((section) => section.status === "failed");
   const isFailed = validationResearch?.status === "failed";
   const isGenerating = rebuilding || validationResearch?.status === "running";
+
+  // The orchestration layer can persist a true partial result while older query
+  // normalization paths may omit that status. Infer partial from observable
+  // section outcomes so a mixed success/failure run can never be presented as
+  // fully complete merely because the status field was lost in translation.
+  const isPartial =
+    validationResearch?.status === "partial" ||
+    (!isGenerating &&
+      !isFailed &&
+      failedSections.length > 0 &&
+      finishedSections.some((section) => section.status !== "failed"));
+
   const progressCount = finishedSections.length;
   const progressPct =
     totalSections > 0
@@ -62,6 +87,8 @@ export function getValidationResearchViewState(
     statusLabel = "Validation failed";
   } else if (isGenerating) {
     statusLabel = "Research in progress";
+  } else if (isPartial) {
+    statusLabel = "Validation partially complete";
   } else if (validationResearch?.status === "complete") {
     statusLabel =
       failedSections.length > 0
@@ -74,6 +101,7 @@ export function getValidationResearchViewState(
     failedSections,
     isGenerating,
     isFailed,
+    isPartial,
     allSectionsError,
     progressCount,
     progressPct,

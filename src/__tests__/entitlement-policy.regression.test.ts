@@ -19,7 +19,11 @@ describe("autonomous work entitlements", () => {
     expect(canTierRunWorkKind("inventor", "feasibility_recommendation")).toBe(true);
     expect(canTierRunWorkKind("inventor", "concept_image_generation")).toBe(false);
     expect(canTierRunWorkKind("pro", "concept_image_generation")).toBe(true);
+    expect(canTierRunWorkKind("pro", "design_candidate_generation")).toBe(true);
+    expect(canTierRunWorkKind("pro", "cad_model_specification")).toBe(true);
+    expect(canTierRunWorkKind("inventor", "design_candidate_generation")).toBe(false);
     expect(minimumTierForWorkKind("engineering_handoff")).toBe("pro");
+    expect(minimumTierForWorkKind("manufacturing_drawing_specification")).toBe("pro");
   });
 
   it("cannot select a higher-tier job even when it has higher priority and budget", () => {
@@ -34,7 +38,7 @@ describe("autonomous work entitlements", () => {
 
   it("reports an entitlement stop when only paid work is dependency-eligible", () => {
     const result = selectNextWorkItem(
-      [item("concept_image_generation")],
+      [item("design_candidate_generation")],
       100,
       Date.now(),
       (kind) => canTierRunWorkKind("free", kind)

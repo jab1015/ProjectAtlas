@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
-import { Activity, AlertTriangle, Clock3, Coins, FlaskConical, OctagonX } from "lucide-react";
+import { Activity, AlertTriangle, Bot, Clock3, Coins, FlaskConical, OctagonX } from "lucide-react";
 import { AdminHeader, StatsCard } from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +13,10 @@ import { REPRESENTATIVE_PILOT_INTAKE } from "@/lib/representativePilot";
 
 interface Snapshot {
   generatedAt: number;
+  // The limited production deployment may return the older snapshot shape.
+  // Keep the operations console readable while that backend is intentionally
+  // narrower than the branch frontend.
+  ai?: { openAiConfigured: boolean; chatModel: string; validationModel: string };
   counts: { failed: number; expired: number; blocked: number; reservedCostUnits: number; usedCostUnits: number };
   issues: Array<{
     _id: string; inventionId: string; inventionTitle: string; title: string; kind: string;
@@ -57,9 +61,12 @@ export default function AtlasOperationsPage() {
 
   if (snapshot === undefined) return <div className="space-y-6"><AdminHeader title="InventSmith operations" /><Skeleton className="h-28" /><Skeleton className="h-72" /></div>;
 
+  const ai = snapshot.ai;
+  const aiConfigurationAvailable = ai !== undefined;
+
   return (
     <div className="space-y-8">
-      <AdminHeader title="InventSmith operations" description="Pilot health, autonomous work exceptions, and daily cost activity" />
+      <AdminHeader title="InventSmith operations" description="Pilot health, AI backend readiness, autonomous work exceptions, and daily cost activity" />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatsCard title="Failed work" value={String(snapshot.counts.failed)} icon={OctagonX} />
         <StatsCard title="Expired leases" value={String(snapshot.counts.expired)} icon={Clock3} />
@@ -68,9 +75,27 @@ export default function AtlasOperationsPage() {
       </div>
 
       <Card>
+        <CardHeader><CardTitle className="flex items-center gap-2 text-lg"><Bot className="h-5 w-5" />AI backend</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-lg border p-4"><p className="text-xs uppercase tracking-wider text-muted-foreground">OpenAI credentials</p><p className="mt-2 font-medium">{ai?.openAiConfigured ? "Configured" : aiConfigurationAvailable ? "Missing" : "Unavailable"}</p></div>
+            <div className="rounded-lg border p-4"><p className="text-xs uppercase tracking-wider text-muted-foreground">Ask InventSmith model</p><p className="mt-2 break-all font-medium">{ai?.chatModel ?? "Unavailable from this deployment"}</p></div>
+            <div className="rounded-lg border p-4"><p className="text-xs uppercase tracking-wider text-muted-foreground">Validation model</p><p className="mt-2 break-all font-medium">{ai?.validationModel ?? "Unavailable from this deployment"}</p></div>
+          </div>
+          {!aiConfigurationAvailable && (
+            <p className="text-sm text-muted-foreground">AI configuration details are not exposed by this limited deployment. This does not reveal whether the server credential is present; the operations page remains available for health and work monitoring.</p>
+          )}
+          {aiConfigurationAvailable && !ai.openAiConfigured && (
+            <p className="text-sm text-muted-foreground">OPENAI_API_KEY is not configured in this Convex deployment. AI requests will remain unavailable until the production deployment has that secret.</p>
+          )}
+          <p className="text-xs text-muted-foreground">For security, InventSmith reports only whether the credential exists. The API key value is never returned to the browser.</p>
+        </CardContent>
+      </Card>
+
+      <Card>
         <CardHeader><CardTitle className="flex items-center gap-2 text-lg"><FlaskConical className="h-5 w-5" />Controlled-pilot launcher</CardTitle></CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-sm text-muted-foreground">Creates the standard adjustable produce-rinsing rack case used by InventSmith regression evaluation, then starts whatever autonomous work the signed-in administrator's plan and daily budget permit.</p>
+          <p className="text-sm text-muted-foreground">Creates the standard adjustable produce-rinsing rack case used by InventSmith regression evaluation, then starts eligible autonomous work. Administrator execution is exempt from customer plan limits, daily usage caps, and AI-credit consumption.</p>
           <div className="flex flex-wrap items-center gap-3">
             <Button onClick={() => void launchRepresentativePilot()} disabled={pilotState.creating}>{pilotState.creating ? "Creating…" : "Create representative pilot"}</Button>
             {pilotState.inventionId && <Button asChild variant="outline"><Link href={`/invention/${pilotState.inventionId}/work`}>Open pilot work</Link></Button>}

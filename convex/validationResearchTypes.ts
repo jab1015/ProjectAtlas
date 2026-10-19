@@ -14,6 +14,7 @@ export type ValidationResearchStatus =
   | "pending"
   | "running"
   | "completed"
+  | "partial"
   | "failed"
   | "stale";
 
@@ -73,7 +74,7 @@ export interface ValidationResearch {
   sections: ValidationSection[];
   /** Unix ms — when research run was started */
   startedAt?: number;
-  /** Unix ms — when research run completed */
+  /** Unix ms — when research run completed or settled partially */
   completedAt?: number;
   /** Unix ms — last time any section was refreshed */
   lastRefreshAt?: number;

@@ -1,4 +1,4 @@
-# Engineering Test Standards
+# InventSmith Engineering Test Standards
 
 ## Standing Rule: Regression Testing
 
@@ -21,7 +21,7 @@ All six Definition of Done gates must pass, AND a regression test must exist for
 
 ## Test Framework
 
-**Atlas uses [Vitest](https://vitest.dev/)** — installed as a dev dependency in `package.json`.
+**InventSmith uses [Vitest](https://vitest.dev/)** — installed as a dev dependency in `package.json`.
 
 | Command | Purpose |
 |---------|---------|
@@ -36,18 +36,22 @@ Pure business logic is extracted to `src/lib/journeyLogic.ts` so it can be teste
 
 ## Automated Tests
 
-List all automated regression tests here as they are added.
+This document is a standards/reference document, not the authoritative inventory of every current test file. The repository test suite under `src/__tests__/` and exact-head CI are the source of truth for current automated coverage. Representative long-lived regressions include:
 
-| Test | File | Covers |
+| Test area | Representative file | Covers |
 |------|------|--------|
-| New Inventor Onboarding | `src/__tests__/onboarding.regression.test.ts` | Full onboarding flow: payload validation → invention fields → Stage 1 initialized at 100% readiness |
-| Stage 2 Validation — Provider section completeness | `src/__tests__/validation.regression.test.ts` | MockValidationResearchProvider returns all 11 required sections with correct shape |
-| Stage 2 Validation — No hardcoded content | `src/__tests__/validation.regression.test.ts` | Verifies invention title from context appears in content; no Rise Jars or hardcoded product names |
-| Stage 2 Validation — Status transitions | `src/__tests__/validation.regression.test.ts` | Simulates running → complete row state transitions |
-| Stage 2 Validation — approveValidationSection | `src/__tests__/validation.regression.test.ts` | applyApproval sets status to "approved", records approvedAt, does not affect other sections |
-| Stage 2 Validation — editValidationSection | `src/__tests__/validation.regression.test.ts` | applyEdit persists editedContent, editedAt, status "edited"; original content preserved |
-| Stage 2 Validation — refreshValidationSection | `src/__tests__/validation.regression.test.ts` | applyRefresh updates only the target section; all others unchanged; status reset to "generated" |
-| Stage 2 Validation — ALL_SECTION_IDS completeness | `src/__tests__/validation.regression.test.ts` | Confirms all 11 section IDs are present; buildSectionById works for all; throws for unknown IDs |
+| New Inventor Onboarding | `src/__tests__/onboarding.regression.test.ts` | Full onboarding flow and invention initialization |
+| Stage 2 Validation | `src/__tests__/validation.regression.test.ts` | Provider section shape, state transitions, approval/edit/refresh behavior |
+| Partial validation/recovery | validation recovery regression suite | Partial truth, preservation of successful sections, failed-only recovery |
+| Evidence trust | evidence integrity/retrieval regression suite | Fail-closed promotion and retrieval-source binding |
+| Worker reliability | orchestration/lease/CAD regression suite | Attempt identity, stale/late work, lease validity, cleanup |
+| Usage settlement | usage settlement regression suite | Known incurred cost, unknown conservative settlement, idempotency |
+| Product-type acceptance | representative product-type regression suite | Physical/software/hybrid/regulated routing and dependency closure |
+| Artifact handoff/versioning | artifact/deliverable persistence regression suite | Newest-version selection, review state, artifact handoff |
+| Real-world evidence gates | real-world evidence gate behavior suite | Manufacturer quote and launch/sales evidence gates |
+| Professional review | professional-review regression suite | Auditable review decisions and required-review promotion |
+
+Do not infer current coverage solely from this table; inspect the live test directory and exact-head CI for authoritative coverage.
 
 ---
 
@@ -60,64 +64,64 @@ List all automated regression tests here as they are added.
 **Trigger**: Run after any change to onboarding, Convex mutations (inventions, stageProgress, userProfiles), Journey Engine initialization, or auth flow
 
 **Steps**:
-1. Create a new account (email + password) at `/sign-up`
-2. Sign in
-3. Complete Onboarding Step 1 (inventor name / context)
-4. Complete Onboarding Step 2
-5. Complete Onboarding Step 3
-6. Enter a valid invention title (e.g. "Rise Jars") on Step 4
-7. Click **Create Invention**
+1. Create a new account using a supported authentication method.
+2. Sign in.
+3. Complete Onboarding Steps 1–3.
+4. Enter a valid invention title on Step 4.
+5. Click **Create Invention**.
 
 **Expected results**:
 - [ ] Invention is created in the Convex `inventions` table
-- [ ] User is redirected to the Inventor Dashboard (`/dashboard` or `/invention/[id]`)
-- [ ] Stage 1 is initialized in `stageProgress` for the new invention
-- [ ] No errors in the browser console
-- [ ] No failed network requests
-- [ ] Onboarding marked complete on the user profile
+- [ ] User is redirected to the inventor workspace/dashboard
+- [ ] Initial journey state is created for the invention
+- [ ] No unexpected browser-console errors
+- [ ] No failed required network requests
+- [ ] Onboarding is marked complete on the user profile
 
-**Pass criteria**: All six checkboxes satisfied with no errors.
+**Pass criteria**: All six checkboxes satisfied with no unexpected errors.
 
 ---
 
 ### MRT-002: Delete Invention Project (Critical)
 
 **Date added**: 2026-07-05
-**Covers**: Delete invention from dashboard card context menu and invention workspace
-**Trigger**: Run after any change to `deleteInvention` mutation, `InventionCardMenu` component, dashboard page, inventions list page, or invention workspace page
+**Covers**: Delete invention from dashboard/workspace entry points
+**Trigger**: Run after changes to deletion authorization, invention menu/workspace deletion UI, or related storage/cleanup behavior
 
 **Steps**:
-1. Sign in and navigate to `/dashboard`
-2. Click the ⋮ (three-dot) icon on the primary project card
-3. Select **Delete**
-4. Verify the confirmation dialog appears with the correct invention name
-5. Click **Cancel** — verify the dialog closes and the invention is unchanged
-6. Click the ⋮ icon again and select **Delete**
-7. Click **Delete Project** (red button) to confirm
-8. Verify the dashboard redirects to `/onboarding` immediately
-9. Navigate to `/inventions` — verify the deleted project is no longer listed
-10. Optionally verify in Convex dashboard: no `inventions`, `stageProgress`, `validationResearch`, `conversations`, `documents`, or `notifications` rows remain for the deleted `inventionId`
+1. Sign in and navigate to an invention listing/dashboard.
+2. Open the invention's action menu and select **Delete**.
+3. Verify the confirmation dialog appears with the correct invention name.
+4. Cancel and verify the invention remains unchanged.
+5. Repeat and confirm deletion.
+6. Verify the invention disappears from authorized listings/workspaces.
+7. Verify related cleanup according to current deletion/privacy semantics.
+8. Verify unauthorized users cannot delete the invention.
 
 **Expected results**:
-- [ ] ⋮ icon appears on the card (always on mobile, on hover on desktop)
-- [ ] Confirmation dialog shows correct invention title
+- [ ] Confirmation identifies the correct invention
 - [ ] Cancel preserves the invention
-- [ ] Successful delete shows "Project deleted successfully." toast
-- [ ] Dashboard redirects to `/onboarding` after delete
-- [ ] No orphan records in any related table
-- [ ] Unauthorized users cannot delete (mutation throws ConvexError)
-- [ ] Build passes; no TypeScript errors
+- [ ] Authorized delete completes successfully
+- [ ] Deleted invention is no longer accessible through normal listings
+- [ ] Related records/storage follow current documented deletion semantics
+- [ ] Cross-tenant/unauthorized delete is rejected server-side
+- [ ] No unexpected console/backend errors
+- [ ] Exact relevant automated checks/build still pass
 
-**Pass criteria**: All eight checkboxes satisfied with no console errors.
+**Pass criteria**: All eight checkboxes satisfied.
 
 ---
 
 ### Writing New Manual Regression Tests
 
-When automation isn't feasible, add an entry here following the MRT-001 template. Include: date added, what it covers, what changes should trigger a re-run, numbered steps, and explicit pass criteria.
+When automation isn't feasible, add an entry following the MRT-001 pattern. Include: date added, what it covers, what changes should trigger a re-run, numbered steps, and explicit pass criteria.
 
 ---
 
+## Naming note
+
+Historical test names, workflow filenames, environment identifiers, or commit references may retain the former InventSmith / ProjectAtlas working name where changing them would break compatibility or falsify history. Current product prose uses **InventSmith**.
+
 ## Note on DEFINITION_OF_DONE.md
 
-`/DEFINITION_OF_DONE.md` exists at the project root. The regression gate has been appended to that file as gate 6.
+`/DEFINITION_OF_DONE.md` exists at the project root. Regression coverage remains part of the Definition of Done.

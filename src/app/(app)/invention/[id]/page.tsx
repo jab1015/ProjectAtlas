@@ -18,7 +18,7 @@ import { ArrowLeft, ArrowRight, Lock, PartyPopper, RefreshCw } from "lucide-reac
 import Link from "next/link";
 import { trackStageCompleted, trackContinueClicked, trackUpgradePromptShown } from "@/lib/analytics";
 import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
-import { getValidationResearchViewState } from "@/lib/validationResearchView";
+import { getSafeValidationFailureMessage, getValidationResearchViewState } from "@/lib/validationResearchView";
 
 // ── Congratulations screen (Stage 4 completion) ──────────────────────────────
 
@@ -174,6 +174,7 @@ export default function InventionWorkspacePage() {
   const updateInventionField = useMutation(api.journeyEngine.updateInventionField);
   const advanceStage = useMutation(api.journeyEngine.advanceStage);
   const forceRegenerateValidation = useMutation(api.validationResearchSessionMutations.forceRegenerateValidation);
+  const retryFailedValidation = useMutation(api.validationResearchSessionMutations.retryFailedValidationSections);
 
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
   const [advancing, setAdvancing] = useState(false);
@@ -226,7 +227,8 @@ export default function InventionWorkspacePage() {
     if (rebuildTimeoutRef.current) clearTimeout(rebuildTimeoutRef.current);
     rebuildTimeoutRef.current = setTimeout(() => setRebuilding(false), 120_000);
     try {
-      await forceRegenerateValidation({ inventionId });
+      const retry = await retryFailedValidation({ inventionId });
+      if (!retry.queued) await forceRegenerateValidation({ inventionId });
       // Keep rebuilding=true — the reactive query will update as sections come in
     } catch (err) {
       console.error("Rebuild failed:", err);
@@ -235,7 +237,7 @@ export default function InventionWorkspacePage() {
       setRebuilding(false);
       if (rebuildTimeoutRef.current) clearTimeout(rebuildTimeoutRef.current);
     }
-  }, [forceRegenerateValidation, inventionId]);
+  }, [forceRegenerateValidation, inventionId, retryFailedValidation]);
 
   const TOTAL_SECTIONS = 11;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -259,7 +261,7 @@ export default function InventionWorkspacePage() {
 
   if (isLoading || !isAuthenticated || inventionState === undefined) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
+      <div className="min-h-screen min-w-0 flex flex-col bg-background">
         <AppNav />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-muted-foreground text-sm">Loading…</div>
@@ -304,6 +306,9 @@ export default function InventionWorkspacePage() {
     const sectionsWithConf = completedSections.filter(
       (s) => typeof s.confidence?.score === "number"
     );
+    const surveyEvidenceIncluded = completedSections.some((section) =>
+      /survey evidence|survey observations strengthen/i.test(section.confidence?.evidenceSummary ?? "")
+    );
     const avgConfidence =
       sectionsWithConf.length > 0
         ? `${Math.round(
@@ -329,10 +334,10 @@ export default function InventionWorkspacePage() {
       : "—";
 
     return (
-      <div className="min-h-screen flex flex-col bg-background">
+      <div className="min-h-screen min-w-0 flex flex-col bg-background">
         <AppNav />
-        <main className="flex-1">
-          <div className="mx-auto max-w-5xl px-4 sm:px-6 py-10">
+        <main className="min-w-0 flex-1">
+          <div className="mx-auto w-full min-w-0 max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
             <Link
               href="/dashboard"
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
@@ -361,8 +366,10 @@ export default function InventionWorkspacePage() {
               </h1>
               <p className="text-muted-foreground">
                 {isGenerating
-                  ? "Research is running. Sections will appear as they complete."
-                  : "Research has completed. Click Rebuild to regenerate with updated information."}
+                  ? "Your research is being prepared. You can come back when it finishes."
+                  : allSectionsError
+                  ? "This attempt did not produce usable research."
+                  : "Here is the short version first. You can open the full report if you want more detail."}
               </p>
               <p className="text-sm text-foreground">
                 Status: <span className="font-medium">{statusLabel}</span>
@@ -372,11 +379,11 @@ export default function InventionWorkspacePage() {
                   variant="outline"
                   size="sm"
                   onClick={handleRebuildValidation}
-                  disabled={rebuilding}
+                  disabled={isGenerating}
                   className="gap-1.5 text-sm w-fit"
                 >
                   <RefreshCw className={`h-3.5 w-3.5${rebuilding ? " animate-spin" : ""}`} />
-                  {rebuilding ? "Rebuilding…" : "Rebuild Validation"}
+                  {isGenerating ? "Researching…" : failedSections.length > 0 ? "Retry failed sections" : "Refresh validation"}
                 </Button>
                 {rebuildError && (
                   <p className="text-xs text-destructive">{rebuildError}</p>
@@ -384,47 +391,37 @@ export default function InventionWorkspacePage() {
               </div>
             </div>
 
-            {/* Validation Summary card — appears only when research data exists */}
+            {/* Plain-language summary: keep the next action visible and the report optional. */}
             {validationResearch && (
-              <div className="mt-8 rounded-lg border border-border bg-muted/30 p-5 space-y-4 max-w-xl">
-                <h2
-                  className="text-base font-semibold text-foreground"
-                  style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
-                >
-                  Validation Summary
-                </h2>
-                <p className="text-sm text-muted-foreground">
+              <div className="mt-8 max-w-xl rounded-lg border border-border bg-muted/30 p-5 space-y-4">
+                <h2 className="text-lg font-semibold text-foreground">The short version</h2>
+                <p className="text-sm leading-relaxed text-foreground">
                   {isGenerating
-                    ? "InventSmith is researching your invention. New sections will appear automatically."
+                    ? "Your research is still running. You do not need to review anything yet. Wait for it to finish, then check this summary."
                     : allSectionsError
-                    ? "Validation encountered errors. Click Rebuild to try again."
-                    : "InventSmith has completed the first round of validation research for your invention."}
+                    ? "This attempt could not create the research. The full report contains the error details; the repeated section-by-section messages are optional."
+                    : failedSections.length > 0
+                    ? "Some sections are ready and some need another try. Your completed research is saved."
+                    : "This is an early idea-check, not proof that customers will buy or that the market is confirmed. Some content may be AI-generated hypotheses."}
                 </p>
-                <dl className="grid grid-cols-2 gap-3">
-                  <div>
-                    <dt className="text-xs text-muted-foreground">Research Status</dt>
-                    <dd className="text-sm font-medium text-foreground mt-0.5">{statusLabel}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-muted-foreground">Overall Confidence</dt>
-                    <dd className="text-sm font-medium text-foreground mt-0.5">{avgConfidence}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-muted-foreground">Sections Completed</dt>
-                    <dd className="text-sm font-medium text-foreground mt-0.5">
-                      {completedSections.length} of {TOTAL_SECTIONS}
-                      {failedSections.length > 0 ? ` (${failedSections.length} failed)` : ""}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-muted-foreground">Research Date</dt>
-                    <dd className="text-sm font-medium text-foreground mt-0.5">{researchDateStr}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-muted-foreground">Provider</dt>
-                    <dd className="text-sm font-medium text-foreground mt-0.5">InventSmith Research Engine</dd>
-                  </div>
-                </dl>
+                <div className="rounded-md border bg-background p-4">
+                  <p className="text-sm font-semibold">What to do next</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    {isGenerating
+                      ? `Wait for the research to finish (${completedSections.length} of ${TOTAL_SECTIONS} sections processed so far).`
+                      : allSectionsError || failedSections.length > 0
+                      ? "If a retry is already running, wait for it to finish. Otherwise, after the AI connection is fixed, tap Retry failed sections."
+                      : surveyEvidenceIncluded
+                      ? "Your uploaded survey was included in this validation run. The next useful step is to add a few direct customer conversations or other evidence that addresses the remaining gaps."
+                      : "Talk with a few people who use thick foods in jars. Ask what they do with the last portion, and save their real answers as evidence."}
+                  </p>
+                </div>
+                {surveyEvidenceIncluded && !isGenerating && !allSectionsError && failedSections.length === 0 && (
+                  <p className="text-xs text-primary">Survey evidence was included in the customer-validation sections.</p>
+                )}
+                {!isGenerating && !allSectionsError && failedSections.length === 0 && (
+                  <p className="text-xs text-muted-foreground">Confidence: {avgConfidence}. Research date: {researchDateStr}.</p>
+                )}
               </div>
             )}
 
@@ -438,7 +435,7 @@ export default function InventionWorkspacePage() {
                     </span>
                   ) : allSectionsError ? (
                     <span className="text-destructive font-medium">
-                      Validation failed. Click Rebuild to regenerate.
+                      Some sections need another try.
                     </span>
                   ) : (
                     <span className="text-primary font-medium">
@@ -464,31 +461,18 @@ export default function InventionWorkspacePage() {
               </div>
             )}
 
-            {/* Research section cards */}
+            {/* Keep the generated report available without making it the default reading experience. */}
             {completedSections.length > 0 && (
-              <div className="mt-10 space-y-4">
-                <div className="flex items-center justify-between gap-4">
-                  <h2
-                    className="text-lg font-semibold text-foreground"
-                    style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
-                  >
-                    Validation Research
-                  </h2>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleRebuildValidation}
-                    disabled={rebuilding}
-                    className="gap-1.5 text-sm"
-                  >
-                    <RefreshCw className={`h-3.5 w-3.5${rebuilding ? " animate-spin" : ""}`} />
-                    {rebuilding ? "Rebuilding…" : "Rebuild Validation"}
-                  </Button>
-                </div>
+              <details className="mt-8 min-w-0 max-w-3xl rounded-lg border border-border bg-card p-4 sm:p-5">
+                <summary className="cursor-pointer text-base font-semibold text-foreground">
+                  View full research ({completedSections.length} sections)
+                  <span className="mt-1 block text-sm font-normal text-muted-foreground">Optional details, assumptions, confidence, and evidence gaps</span>
+                </summary>
+                <div className="mt-5 min-w-0 space-y-4">
                 {completedSections.map((section) => (
                   <div
                     key={section.sectionId ?? section.title ?? "validation-section"}
-                    className="rounded-lg border border-border bg-muted/20 p-5 space-y-3"
+                    className="min-w-0 overflow-hidden rounded-lg border border-border bg-muted/20 p-4 sm:p-5 space-y-3"
                   >
                     <h3
                       className="text-base font-semibold text-foreground"
@@ -497,8 +481,10 @@ export default function InventionWorkspacePage() {
                       {section.title ?? section.sectionId ?? "Validation Section"}
                     </h3>
 
-                    <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
-                      {section.editedContent ?? section.content ?? ""}
+                    <p className="break-words text-sm text-foreground [overflow-wrap:anywhere] whitespace-pre-wrap leading-relaxed">
+                      {section.status === "failed"
+                        ? getSafeValidationFailureMessage(section.editedContent ?? section.content ?? "")
+                        : section.editedContent ?? section.content ?? ""}
                     </p>
 
                     {section.confidence && (
@@ -520,18 +506,18 @@ export default function InventionWorkspacePage() {
                             <p className="text-xs font-medium text-foreground mb-1">Assumptions</p>
                             <ul className="list-disc list-inside space-y-0.5">
                               {section.confidence.assumptions.map((a: string, i: number) => (
-                                <li key={i} className="text-xs text-muted-foreground">{a}</li>
+                                <li key={i} className="break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">{a}</li>
                               ))}
                             </ul>
                           </div>
                         )}
 
-                        {section.confidence.missingInformation?.length > 0 && (
+                        {section.status !== "failed" && section.confidence.missingInformation?.length > 0 && (
                           <div>
                             <p className="text-xs font-medium text-foreground mb-1">Missing Information</p>
                             <ul className="list-disc list-inside space-y-0.5">
                               {section.confidence.missingInformation.map((m: string, i: number) => (
-                                <li key={i} className="text-xs text-muted-foreground">{m}</li>
+                                <li key={i} className="break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">{m}</li>
                               ))}
                             </ul>
                           </div>
@@ -540,7 +526,8 @@ export default function InventionWorkspacePage() {
                     )}
                   </div>
                 ))}
-              </div>
+                </div>
+              </details>
             )}
 
             <div className="mt-12 pt-8 border-t border-border">
