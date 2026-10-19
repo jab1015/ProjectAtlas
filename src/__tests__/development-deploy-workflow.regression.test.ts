@@ -7,9 +7,10 @@ const netlifyConfig = readFileSync(join(process.cwd(), "netlify.toml"), "utf8");
 
 describe("InventSmith Convex development deployment workflow", () => {
   it("keeps all Netlify builds from deploying Convex", () => {
-    const buildCommand = netlifyConfig.match(/^\s*command\s*=\s*"([^"]+)"/m)?.[1];
-    expect(buildCommand).toBe("npm run build");
-    expect(netlifyConfig).not.toContain("convex deploy");
+    const buildCommands = Array.from(netlifyConfig.matchAll(/^\s*command\s*=\s*"([^"]+)"/gm), (match) => match[1]);
+    expect(buildCommands.length).toBeGreaterThan(0);
+    expect(buildCommands.every((command) => command === "npx next build")).toBe(true);
+    expect(buildCommands.every((command) => !/\bconvex\b/i.test(command))).toBe(true);
     expect(netlifyConfig).toContain('[context.deploy-preview]');
     expect(netlifyConfig).toContain('command = "npx next build"');
   });

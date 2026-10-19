@@ -1,13 +1,12 @@
 [build]
-  command = "npm run build"
+  command = "npx next build"
 
 # Netlify's native Next.js support handles the publish output automatically.
-# Netlify builds must never deploy Convex functions. Convex deployments use the
-# explicit, manually dispatched GitHub development workflow with a dev-scoped
-# key verified for quick-fox-785.
+# Netlify builds must never run Convex CLI commands. Even `convex codegen` can
+# upload functions when a deployment key is present. Convex deployments use
+# the explicit, manually dispatched GitHub development workflow.
 
-# All Netlify contexts are compile-only; the production context must not deploy
-# Convex as a side effect of building the website.
+# All Netlify contexts use the compile-only Next.js build, with no Convex CLI.
 # Recreate Preview #24 when its deploy artifact has been deleted; changing this
 # file creates a real configuration commit for Netlify's Git-based deploy hook.
 [context.deploy-preview]
