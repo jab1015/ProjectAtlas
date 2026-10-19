@@ -25,6 +25,8 @@ import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { internal } from "./_generated/api";
 import type { ValidationSection, ValidationSectionConfidence } from "./validation/researchProvider";
+import { requireInventionReadAccess } from "./organizations";
+import { readValidationEvidence } from "./validationEvidence";
 
 // ── Helper: 24h window check ─────────────────────────────────────────────────
 
@@ -249,9 +251,13 @@ export const getValidationResearch = query({
   handler: async (ctx, { inventionId }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
+    try {
+      await requireInventionReadAccess(ctx, inventionId);
+    } catch {
+      return null;
+    }
 
-    const invention = await ctx.db.get(inventionId);
-    if (!invention || invention.userId !== userId) return null;
+    const evidenceSnapshot = await readValidationEvidence(ctx, inventionId);
 
     const row = await ctx.db
       .query("validationResearch")
@@ -281,6 +287,10 @@ export const getValidationResearch = query({
         normalisedStatus = "running";
       } else if (row.researchStatus === "failed") {
         normalisedStatus = "failed";
+      } else if (row.researchStatus === "stale") {
+        // Keep the stale report from being presented as current while the
+        // automatic evidence refresh is queued.
+        normalisedStatus = "running";
       }
     } else if (row.status) {
       // Legacy path — pass through unchanged
@@ -381,6 +391,31 @@ export const getValidationResearch = query({
       status: normalisedStatus,
       sections,
       error: row.error,
+      evidenceReview: {
+        currentEvidenceMatchesRun: Boolean(row.evidenceFingerprint) && row.evidenceFingerprint === evidenceSnapshot.fingerprint,
+        surveys: evidenceSnapshot.evidence
+          .filter((source) => source.evidenceKind === "survey")
+          .map((source) => {
+            const extraction = source.extraction && typeof source.extraction === "object"
+              ? source.extraction as Record<string, unknown>
+              : {};
+            const sampleSize = typeof extraction.sampleSize === "string" ? extraction.sampleSize : undefined;
+            const findings = Array.isArray(extraction.keyFindings)
+              ? extraction.keyFindings
+                  .filter((finding): finding is Record<string, unknown> => Boolean(finding) && typeof finding === "object")
+                  .map((finding) => typeof finding.statement === "string" ? finding.statement.trim() : "")
+                  .filter(Boolean)
+                  .slice(0, 5)
+              : [];
+            return {
+              title: source.title,
+              sampleSize,
+              summary: typeof extraction.summary === "string" ? extraction.summary : "",
+              findings,
+              provenance: "Inventor-uploaded; not independently verified",
+            };
+          }),
+      },
     };
   },
 });

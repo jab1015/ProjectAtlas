@@ -1,12 +1,39 @@
 # InventSmith Current Plan and Progress
 
-**Updated:** October 18, 2026 (America/New_York)
+**Updated:** October 19, 2026 (America/New_York)
 **Product:** InventSmith — The Inventor OS  
 **Company:** Modern Methods  
 **Repository:** `jab1015/ProjectAtlas` (historical repository slug)  
 **Active branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified CI checkpoint:** `93744db1fdf2772925f96dbc4d33ed1823192f86` (CI #226). Later operations-console compatibility changes were preview-accepted and await exact-head CI.
+**Latest verified CI checkpoint:** Isolated test-deploy workflow run `39311119875` passed its build, test, audit, and deployment gates for the InventSmith branch source. Exact branch-head CI qualification for the current documentation/code head remains required; do not treat the older CI #226 checkpoint as covering later work.
+
+## October 19 owner-request checkpoint
+
+Password recovery is **already tested successfully** and is not the active task. The narrow production password-recovery backend deployment to `agile-seahorse-379` remains the only permitted InventSmith production change. Do not merge PR #24, publish the full product, or touch `fiery-gazelle-628`.
+
+The dedicated InventSmith test Convex project is `quick-fox-785` (`dev/inventsmith-test`). The isolated test deployment workflow (run `39311119875`) completed successfully, including web/Convex type checks, regression tests (122 files / 678 tests), audit, production build, and the dedicated test-backend deployment. Its deployment key is scoped to this separate test project despite its `prod:` prefix. This does not authorize deployment to the real production project.
+
+The new October 19 changes have now passed web TypeScript, Convex TypeScript, the full Vitest suite (**123 files / 682 tests**), and `next build` (**34/34** static pages). These checks apply to the current local changes, not yet to a pushed branch head or a new Netlify preview/Convex deployment.
+
+Code already present on the active work line includes automatic department invalidation/requeue on invention input changes, validation evidence fingerprinting and survey-aware evidence scoring/display, PDF structured extraction, simplified validation summary UI, account/profile and personal-workspace rename controls, selected-existing-user beta access and audited credit controls, and admin navigation/sign-out affordances. The operations UI also handles an older health response that omits AI configuration details. These are **implementation claims only** until exact-head checks and authenticated acceptance on the currently served preview/test backend pass.
+
+### Owner-reported acceptance gaps still to resolve
+
+- RiseJars' uploaded SurveyMonkey PDF reports 100 respondents (roughly 95–100 answers per question), but validation confidence remained at 36%. The UI must show which survey findings were actually extracted and considered, explain how evidence affects the score, and refresh affected validation/departments after upload. Do not inflate a heuristic score or describe unverified self-reported survey data as independent proof.
+- Confirm the account profile name and personal workspace rename controls are visible and save correctly for the signed-in account; the user previously saw “Name not set” and an unwanted default workspace name.
+- Verify the existing-user admin access/credit console, admin exemption from daily/AI limits, operations/support modules, and an always-accessible sign-out action. Report any missing function or permission gap instead of calling it fixed.
+- Repository audit found an admin operations route but **no support-case/complaint console route or support-case data model**. The support investigation workflow (case list, complaint-to-invention link, and controlled evidence inspection) remains unimplemented and must be built before calling the support console available.
+- Verify automatic downstream department refresh and that research/survey collection produces an inventor-reviewable draft. External publication, invitations, or outreach must remain approval-gated until destination, audience, and consent are defined.
+- A usable fresh Netlify preview for the current branch head has not yet been confirmed. Earlier preview builds failed on an incomplete JSX file and then an undefined validation helper; those are historical logs, not evidence that the current head builds or that a new preview exists.
+
+### Immediate continuation
+
+1. Keep this checkpoint and the build-progress document synchronized with actual code, workflow, and preview status.
+2. Audit the current remote branch head and the affected code paths; fix any remaining gaps before deployment.
+3. Run focused regression tests, TypeScript, and the production build; then qualify the exact source head through CI.
+4. Deploy only to `quick-fox-785` and obtain/confirm the matching Netlify preview. Leave `agile-seahorse-379`, `fiery-gazelle-628`, and PR merge/publication untouched.
+5. Give the owner one short acceptance checklist and update these documents with results.
 
 ## Product destination
 

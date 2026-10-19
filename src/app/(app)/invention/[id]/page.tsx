@@ -309,6 +309,8 @@ export default function InventionWorkspacePage() {
     const surveyEvidenceIncluded = completedSections.some((section) =>
       /survey evidence|survey observations strengthen/i.test(section.confidence?.evidenceSummary ?? "")
     );
+    const evidenceReview = (validationResearch as { evidenceReview?: { currentEvidenceMatchesRun: boolean; surveys: Array<{ title: string; sampleSize?: string; summary: string; findings: string[]; provenance: string }> } } | null)?.evidenceReview;
+    const uploadedSurveys = evidenceReview?.surveys ?? [];
     const avgConfidence =
       sectionsWithConf.length > 0
         ? `${Math.round(
@@ -416,8 +418,20 @@ export default function InventionWorkspacePage() {
                       : "Talk with a few people who use thick foods in jars. Ask what they do with the last portion, and save their real answers as evidence."}
                   </p>
                 </div>
-                {surveyEvidenceIncluded && !isGenerating && !allSectionsError && failedSections.length === 0 && (
-                  <p className="text-xs text-primary">Survey evidence was included in the customer-validation sections.</p>
+                {(surveyEvidenceIncluded || uploadedSurveys.length > 0) && !allSectionsError && failedSections.length === 0 && (
+                  <div className="space-y-2 rounded-md border border-primary/30 bg-primary/5 p-3 text-sm">
+                    <p className="font-medium text-primary">Survey evidence considered</p>
+                    {uploadedSurveys.length > 0 ? uploadedSurveys.map((survey, index) => (
+                      <div key={`${survey.title}-${index}`} className="space-y-1 text-foreground">
+                        <p className="font-medium">{survey.title}{survey.sampleSize ? ` · ${survey.sampleSize} reported` : ""}</p>
+                        {survey.summary && <p className="text-muted-foreground">{survey.summary}</p>}
+                        {survey.findings.length > 0 && <ul className="list-disc space-y-1 pl-5 text-muted-foreground">{survey.findings.map((finding, findingIndex) => <li key={findingIndex}>{finding}</li>)}</ul>}
+                        <p className="text-xs text-muted-foreground">{survey.provenance}</p>
+                      </div>
+                    )) : <p className="text-muted-foreground">A survey was referenced in this report, but its extracted source details are not available in the current evidence record.</p>}
+                    <p className="text-xs text-muted-foreground">The survey informs customer-validation sections, not independently sourced market facts. {evidenceReview?.currentEvidenceMatchesRun ? "This report matches the current evidence." : "New evidence is present; this report is stale or its refresh is still running."}</p>
+                    <p className="text-xs text-muted-foreground">The overall confidence is an evidence-support score, not the chance of success. A survey can strengthen relevant customer sections, but does not by itself verify demand, market size, or the product’s performance.</p>
+                  </div>
                 )}
                 {!isGenerating && !allSectionsError && failedSections.length === 0 && (
                   <p className="text-xs text-muted-foreground">Confidence: {avgConfidence}. Research date: {researchDateStr}.</p>

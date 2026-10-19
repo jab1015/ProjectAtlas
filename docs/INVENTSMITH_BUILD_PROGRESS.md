@@ -1,12 +1,30 @@
 # InventSmith Build Progress
 
-**Last updated:** October 18, 2026 (America/New_York)
+**Last updated:** October 19, 2026 (America/New_York)
 **Product destination:** Complete Idea-to-Market Inventor OS  
 **Authoritative product specification:** `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`  
 **Current continuation checkpoint:** `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`  
 **Active build branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified CI checkpoint:** `93744db1fdf2772925f96dbc4d33ed1823192f86` (CI #226). Later operations-console compatibility changes were locally verified and preview-accepted; their documentation head still requires exact-head CI.
+**Latest verified checkpoint:** Isolated test-deploy workflow run `39311119875` passed for the InventSmith branch source, including regression, audit, production build, and deployment to the separate InventSmith test Convex project. The exact current branch/documentation head still needs CI qualification and a matching Netlify preview confirmation.
+
+## October 19 progress and outstanding acceptance
+
+Password recovery has already been tested successfully. Do not spend more work re-testing it unless a later change regresses authentication.
+
+The owner’s active request is to fix the rest of today’s reported issues: automatic dependency-aware department refresh after changed inputs/evidence, visible use of the 100-person RiseJars survey in validation and downstream work, concise “what matters/what next” summaries, editable profile/workspace names, selected-user admin access and credit controls (including the ability to grant lasting access deliberately), admin usage-limit exemption, working operations/support views, and a visible sign-out control.
+
+Current implementation inspection finds code for automatic refresh, survey-aware validation, a short validation summary, profile/workspace rename, selected-account access/credits, and admin navigation sign-out. These have not yet been counted as accepted because the owner reported visible failures and the current Netlify preview/head pairing is unverified. The support/operations module’s earlier `openAiConfigured` crash also requires live acceptance even though a compatibility fallback is present in code.
+
+Additional audit finding: there is an InventSmith operations page, but no support-case/complaint console route or support-case data model in the repository. The admin support investigation workflow (including a safe link from a complaint to the authorized invention/evidence) is still a build gap, not a deployed module.
+
+The survey evidence is inventor-provided and unverified. A useful validation update must state the reported respondent count and which extracted observations were used, preserve provenance, and explain score movement (or why the score does not move); a 100-person sample does not automatically justify higher confidence or prove demand.
+
+The suggested survey/customer-research flow may prepare a draft page and questions automatically. Sending messages, publishing a page, or contacting third parties remains a separate human-approved action; no external side effect is represented as complete without evidence.
+
+Deployment boundary: `quick-fox-785` is the dedicated InventSmith test project. `agile-seahorse-379` remains limited to the already-verified password-recovery backend scope; `fiery-gazelle-628` is another app and must remain untouched. PR #24 stays open/unmerged; do not publish the whole unverified product.
+
+October 19 verification of the current local fix set: web TypeScript passed; Convex TypeScript passed; full test suite passed (**123 files / 682 tests**); Next.js production build passed with **34/34** static pages generated. This does not yet certify or deploy a pushed commit, and no new Netlify preview has yet been confirmed.
 
 ## Current status snapshot
 

@@ -44,4 +44,12 @@ describe("InventSmith beta access and credit controls", () => {
     expect(page).not.toContain("beta tester email");
     expect(sidebar).toContain("/admin/beta-access");
   });
+
+  it("returns unmetered usage presentation to administrator accounts", () => {
+    const usage = convex("atlasUsage.ts");
+    expect(usage).toContain('isAdmin: user?.role === "admin"');
+    expect(usage).toContain('limits: user?.role === "admin" ? null : limits');
+    expect(usage).toContain('remainingAutonomousCostUnits: user?.role === "admin"');
+    expect(usage).toContain('creditBalance: user?.role === "admin" ? null : creditBalance');
+  });
 });

@@ -1,5 +1,5 @@
 import { internalMutation } from "./_generated/server";
-import type { MutationCtx } from "./_generated/server";
+import type { MutationCtx, QueryCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { makeFunctionReference } from "convex/server";
 import { v } from "convex/values";
@@ -16,7 +16,7 @@ export async function scheduleAffectedDepartments(ctx: MutationCtx, inventionId:
   }
 }
 
-export async function readValidationEvidence(ctx: Pick<MutationCtx, "db">, inventionId: Id<"inventions">) {
+export async function readValidationEvidence(ctx: QueryCtx | MutationCtx, inventionId: Id<"inventions">) {
   const [sources, progress] = await Promise.all([
     ctx.db.query("evidenceSources").withIndex("by_inventionId", q => q.eq("inventionId", inventionId)).collect(),
     ctx.db.query("stageProgress").withIndex("by_inventionId", q => q.eq("inventionId", inventionId)).collect(),

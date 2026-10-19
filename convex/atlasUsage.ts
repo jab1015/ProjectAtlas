@@ -53,10 +53,15 @@ export const getCurrentUsage = query({
       scope,
       organizationId: organizationId ?? null,
       usage: usage ?? { autonomousCostUnits: 0, reservedAutonomousCostUnits: 0, completedWorkItems: 0, chatQuestions: 0 },
-      limits,
-      creditBalance,
+      // Administrators are intentionally unmetered. Null communicates
+      // unbounded access without rendering a misleading large numeric cap.
+      isAdmin: user?.role === "admin",
+      limits: user?.role === "admin" ? null : limits,
+      creditBalance: user?.role === "admin" ? null : creditBalance,
       complimentaryAccess,
-      remainingAutonomousCostUnits: remainingAutonomousCostUnitsAfterReservations(tier, usage?.autonomousCostUnits ?? 0, usage?.reservedAutonomousCostUnits ?? 0),
+      remainingAutonomousCostUnits: user?.role === "admin"
+        ? null
+        : remainingAutonomousCostUnitsAfterReservations(tier, usage?.autonomousCostUnits ?? 0, usage?.reservedAutonomousCostUnits ?? 0),
     };
   },
 });
