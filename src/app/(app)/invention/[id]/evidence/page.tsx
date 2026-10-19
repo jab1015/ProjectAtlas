@@ -3,7 +3,7 @@
 import { ChangeEvent, FormEvent, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useConvexAuth, useMutation, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQueries } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
@@ -66,11 +66,31 @@ export default function InventionEvidencePage() {
   const removeEvidence = useMutation(api.files.removeInventionEvidence);
   const retryExtraction = useMutation(retryEvidenceExtraction);
   const createRequest = useMutation(createEvidenceRequest);
-  const evidence = useQuery(
-    api.files.listInventionEvidence,
-    isAuthenticated && inventionId ? { inventionId } : "skip"
-  );
-  const requests = useQuery(listEvidenceRequests, isAuthenticated && inventionId ? { inventionId } : "skip");
+  const queryResults = useQueries(isAuthenticated && inventionId ? {
+    evidence: { query: api.files.listInventionEvidence, args: { inventionId } },
+    requests: { query: listEvidenceRequests, args: { inventionId } },
+  } : {});
+  const evidence = queryResults.evidence as Array<{
+    _id: Id<"evidenceSources">;
+    title: string;
+    notes?: string;
+    createdAt: number;
+    fileName: string;
+    fileSize: number | null;
+    evidenceKind: string;
+    extractionStatus?: string | null;
+    extractionSummary?: string | null;
+    extractionError?: string | null;
+    downloadUrl?: string | null;
+  }> | undefined | Error;
+  const requests = queryResults.requests as Array<{
+    _id: string;
+    token: string;
+    kind: "survey" | "interview";
+    title: string;
+    responseCount: number;
+    status: string;
+  }> | undefined | Error;
 
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
@@ -83,6 +103,7 @@ export default function InventionEvidencePage() {
   const [error, setError] = useState<string | null>(null);
   const [requestKind, setRequestKind] = useState<"survey" | "interview">("survey");
   const [shareLink, setShareLink] = useState<string | null>(null);
+  const [creatingRequest, setCreatingRequest] = useState(false);
 
   const kindLabels = useMemo(
     () => Object.fromEntries(EVIDENCE_KINDS.map(([value, label]) => [value, label])),
@@ -250,9 +271,10 @@ export default function InventionEvidencePage() {
 
         <section className="rounded-xl border border-primary/20 bg-primary/5 p-6 space-y-4">
           <div><p className="text-xs font-medium uppercase tracking-widest text-primary">Need evidence?</p><h2 className="mt-1 text-xl font-semibold">Let InventSmith collect it for you</h2><p className="mt-1 text-sm text-muted-foreground">Create a tailored survey or interview page, share the link, and responses will automatically become inventor-provided evidence and refresh affected departments.</p></div>
-          <div className="flex flex-wrap items-center gap-3"><select value={requestKind} onChange={e => setRequestKind(e.target.value as "survey" | "interview")} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="survey">Create survey</option><option value="interview">Create interview page</option></select><Button type="button" variant="outline" onClick={async () => { const result = await createRequest({ inventionId, kind: requestKind }); setShareLink(`${window.location.origin}/respond/${result.token}`); }}><ExternalLink className="mr-2 h-4 w-4" />Create shareable page</Button></div>
+          <div className="flex flex-wrap items-center gap-3"><select value={requestKind} onChange={e => setRequestKind(e.target.value as "survey" | "interview")} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="survey">Create survey</option><option value="interview">Create interview page</option></select><Button type="button" variant="outline" disabled={creatingRequest} onClick={async () => { setError(null); setCreatingRequest(true); try { const result = await createRequest({ inventionId, kind: requestKind }); setShareLink(`${window.location.origin}/respond/${result.token}`); } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not create the survey link."); } finally { setCreatingRequest(false); } }}><ExternalLink className="mr-2 h-4 w-4" />{creatingRequest ? "Creating page…" : "Create shareable page"}</Button></div>
           {shareLink && <div className="rounded-lg border border-border bg-background p-3 text-sm"><p className="font-medium">Share this link</p><p className="mt-1 break-all text-muted-foreground">{shareLink}</p><Button type="button" size="sm" variant="secondary" className="mt-2" onClick={() => void navigator.clipboard?.writeText(shareLink)}>Copy link</Button></div>}
-          {requests && requests.length > 0 && <div className="space-y-2">{requests.map(request => <p key={request._id} className="text-sm text-muted-foreground">{request.kind === "survey" ? "Survey" : "Interview"}: {request.responseCount} response{request.responseCount === 1 ? "" : "s"} · {request.status}</p>)}</div>}
+          {requests instanceof Error && <p role="alert" className="text-sm text-destructive">Previously created survey links could not be loaded. The evidence upload form remains available.</p>}
+          {requests && !(requests instanceof Error) && requests.length > 0 && <div className="space-y-2">{requests.map(request => <p key={request._id} className="text-sm text-muted-foreground">{request.kind === "survey" ? "Survey" : "Interview"}: {request.responseCount} response{request.responseCount === 1 ? "" : "s"} · {request.status}</p>)}</div>}
         </section>
 
         <section className="space-y-4">
@@ -261,7 +283,7 @@ export default function InventionEvidencePage() {
             <p className="text-sm text-muted-foreground">Uploaded evidence can refresh affected research and design work, but remains inventor-provided and unverified until InventSmith or a qualified reviewer evaluates its provenance and relevance.</p>
           </div>
 
-          {evidence === undefined ? <p className="text-sm text-muted-foreground">Loading evidence…</p> : evidence.length === 0 ? (
+          {evidence instanceof Error ? <p role="alert" className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">Evidence files could not be loaded. You can still use the upload form above; if this continues, copy the browser console error so we can identify the backend failure.</p> : evidence === undefined ? <p className="text-sm text-muted-foreground">Loading evidence…</p> : evidence.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border p-8 text-center text-muted-foreground">No evidence uploaded yet.</div>
           ) : (
             <div className="space-y-3">

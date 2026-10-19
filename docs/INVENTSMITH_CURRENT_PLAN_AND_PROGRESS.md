@@ -6,15 +6,33 @@
 **Repository:** `jab1015/ProjectAtlas` (historical repository slug)  
 **Active branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified checkpoint:** Commit `b5d13713fc4e4489c3d2d36544a52682d60a3156` is pushed. Local verification passed (124 test files / 685 tests, web and Convex TypeScript, Next.js build 36/36). Isolated Convex test deploy `39314672344` passed. The matching Netlify `deploy-preview` check succeeded at `https://deploy-preview-24--inventsmith.netlify.app`; authenticated live acceptance remains outstanding.
+**Latest verified checkpoint:** Branch source head at start of this work was `cdb02c3`. GitHub Action logs for runs `39311119875` and `39314672344` show they deployed to `agile-seahorse-379` (InventSmith production), not `quick-fox-785`, despite earlier docs/workflow claims. Both logs report no deleted indexes, but do not establish that existing runtime behavior was preserved. The current local UI fixes pass web/Convex TypeScript, full Vitest (**124 files / 686 tests**), `git diff --check`, and Next.js production build (**36/36** pages); current local fixes are not pushed or deployed.
 
 ## October 19 owner-request checkpoint
 
+### Live preview acceptance sweep — October 19, 2026, 4:25 PM ET
+
+The authenticated Netlify PR #24 preview was inspected as the signed-in `jerry@modernmethods.it.com` account, using RiseJars. This was a read-only sweep; no AI generation, upload, survey creation, support submission, profile change, or production action was triggered.
+
+- **Evidence Locker:** The first visit showed the generic “Something went wrong” screen. A later visit rendered the upload form and “Create shareable page” control, but the browser console recorded Convex query failure `evidenceRequests:list`: “Could not find public function.” The repository source at this checkpoint exports that query. Existing survey-request listings therefore do not work against the backend currently reached by the preview. Upload itself and share-link creation were not submitted during this sweep.
+- **Support:** `/support` consistently showed the generic error screen. Convex reports missing public function `supportCases:listMine`; this function is present in repository source. Customer support-case creation and tracking are blocked until the preview frontend and its Convex backend are aligned.
+- **Backend alignment:** The two missing functions (`evidenceRequests:list`, `supportCases:listMine`) are present in source but absent from the Convex deployment reached by the preview. This indicates frontend/backend version or target mismatch; the exact cause and target deployment still need confirmation. Do not infer that the source implementation itself is absent.
+- **Validation:** RiseJars remains “Validation complete” at **36%**, with the next-step recommendation to interview more users. The page does not visibly state which findings from the uploaded SurveyMonkey PDF were included or why the survey did not change the score. Survey-aware refresh and score attribution are not accepted.
+- **Market Research:** The page renders, but reports **0 market deliverables**, **1 inventor evidence file**, and **1 research source**. It says completed research will appear automatically; no completed market deliverable is present.
+- **Departments:** Stage pages 6–15 render and expose “Continue department”; their work remains queued. The Design + CAD page renders and offers “Continue design work” and “Generate native CAD”; no generation was invoked. This confirms page availability only, not that any AI agent executes successfully.
+- **Journey navigation:** The Stage 1 “Idea” card and Stage 2 “Validation” card both expose the same destination (`/invention/{id}`), which renders Stage 2 Validation. Stage 1 therefore has no distinct destination from the Journey Center and requires a routing fix or an explicit decision that Idea is represented only by the shared invention view.
+- **Work Library:** It reports **2 autonomous work items failed**, **19 required deliverables missing**, and missing concept-visualization media. The user-facing page does not identify the failed work items or explain their failure, so the failures cannot be diagnosed from this view.
+- **Profile / organization:** Account controls for saving the inventor name and personal workspace name are visible. The current profile name appears blank; save behavior was not tested to avoid changing account data. The organization currently appears as “RiseJars Personal Organization.”
+- **Admin access:** `/admin`, `/admin/operations`, `/admin/support`, and `/admin/beta-access` show “Administrator access required.” The active session is `jerry@modernmethods.it.com`, so the owner’s intended admin account/role was not verified and these consoles could not be functionally tested.
+- **Other routes:** Invention access, review, chat, organization, and account pages rendered during this sweep. Chat was not submitted. A visible Sign Out button is present.
+
+**Conclusion:** This preview is not ready for broad functional acceptance. Immediate fix order: align the preview with the correct current Convex test deployment; restore Evidence Locker and Support queries; expose names/reasons for failed work; then verify the survey evidence linkage and downstream invalidation. After that, use an authorized admin session to test operations, beta access, support administration, profile/workspace saves, and one bounded AI action per applicable agent before considering broader generation. Preserve the prior deployment boundaries: do not touch `agile-seahorse-379` beyond the already-tested password-recovery scope, do not touch `fiery-gazelle-628`, and do not merge PR #24 or publish the full product.
+
 Password recovery is **already tested successfully** and is not the active task. The narrow production password-recovery backend deployment to `agile-seahorse-379` remains the only permitted InventSmith production change. Do not merge PR #24, publish the full product, or touch `fiery-gazelle-628`.
 
-The dedicated InventSmith test Convex project is `quick-fox-785` (`dev/inventsmith-test`). The isolated test deployment workflow (run `39311119875`) completed successfully, including web/Convex type checks, regression tests (122 files / 678 tests), audit, production build, and the dedicated test-backend deployment. Its deployment key is scoped to this separate test project despite its `prod:` prefix. This does not authorize deployment to the real production project.
+The intended dedicated InventSmith test Convex project is `quick-fox-785` (`dev/inventsmith-test`), but its current deployed state is unverified. Runs `39311119875` and `39314672344` both targeted `agile-seahorse-379`. The workflow now rejects production-scoped `prod:` keys; configure and verify a `dev:` key specifically for `quick-fox-785` before deploying there.
 
-The October 19 fix set passes web/Convex TypeScript, full Vitest (**124 files / 685 tests**), `git diff --check`, and Next.js production build (**36/36** pages). Support module commit `b5d13713fc4e4489c3d2d36544a52682d60a3156` was deployed to `quick-fox-785` by run `39314672344`; its matching Netlify deploy-preview status succeeded. Authenticated acceptance remains outstanding.
+The prior source checkpoint `b5d13713...` passed web/Convex TypeScript, full Vitest (**124 files / 685 tests**), audit, and Next.js build (**36/36**), but the Action logs show Convex was deployed to `agile-seahorse-379`. Current local changes pass web/Convex TypeScript, full Vitest (**124 files / 686 tests**), `git diff --check`, and Next.js build (**36/36**); preview acceptance remains pending.
 
 Code already present on the active work line includes automatic department invalidation/requeue on invention input changes, validation evidence fingerprinting and survey-aware evidence scoring/display, PDF structured extraction, simplified validation summary UI, account/profile and personal-workspace rename controls, selected-existing-user beta access and audited credit controls, and admin navigation/sign-out affordances. The operations UI also handles an older health response that omits AI configuration details. These are **implementation claims only** until exact-head checks and authenticated acceptance on the currently served preview/test backend pass.
 
@@ -62,22 +80,22 @@ This documentation refresh creates a newer branch head. The final documentation 
 
 ## Current limited deployment and acceptance status
 
-The owner-controlled Convex production deployment `agile-seahorse-379` was updated only with the password-recovery backend scope. Existing production functions and data were preserved. PR #24 remains unmerged, and the full unverified product was not published to production.
+GitHub Action logs show that the development workflow deployed branch Convex functions to `agile-seahorse-379` in runs `39311119875` and `39314672344`. The key was bound to production; the workflow title and prior status notes were inaccurate. Logs confirm successful schema validation and no deleted indexes, but cannot establish that existing function behavior was unchanged. Do not use this workflow again with the current key. It now rejects `prod:` keys. `quick-fox-785` remains unverified; PR #24 remains unmerged and the full product was not published through Netlify production.
 
 The Netlify PR #24 preview at `deploy-preview-24--inventsmith.netlify.app` has been used for authenticated acceptance. Password recovery is live-functionally verified: the reset email was delivered, the recovery code was received, and sign-in succeeded. The first test email was routed to spam.
 
-The refreshed preview's **InventSmith operations** page is usable. Its frontend now tolerates the limited production response without the newer `ai` field and labels AI details unavailable while preserving health/work monitoring. This does not indicate loss of production data or failure of password recovery.
+An earlier preview build contained an operations compatibility fallback for a health response without the newer `ai` field. The current live browser session was not an authorized admin, and GitHub logs show branch-function deployments reached production; operational and data impact have not been independently assessed.
 
 The branch now includes an admin-only **Beta access & credits** console. An administrator can grant a selected existing account a dated organization-level plan override, revoke it, and grant/debit/refund credits through an append-only ledger. Overrides preserve the base plan, require a reason, expire automatically, and do not create lifetime free access. The highest plan can be used for full-premium beta access while Explorer remains changeable later without rewriting account history.
 
 ## Source, Convex, hosting, and deployment boundary
 
-GitHub remains source/CI authority. Convex is a core InventSmith backend, not an optional add-on. The Convex deployment `fiery-gazelle-628` belongs to another application and must not be used or modified for InventSmith. The dedicated InventSmith test deployment `dev/inventsmith-test` (`quick-fox-785`) contains the branch Convex code and required auth configuration; support-case commit `b5d13713...` was deployed by run `39314672344`.
+GitHub remains source/CI authority. Convex is a core InventSmith backend, not an optional add-on. The Convex deployment `fiery-gazelle-628` belongs to another application and must not be used or modified for InventSmith. The intended dedicated InventSmith test deployment is `dev/inventsmith-test` (`quick-fox-785`), but repository code and auth configuration there are not verified. Runs `39311119875` and `39314672344` targeted `agile-seahorse-379` instead.
 
 That does **not** mean the current code head is deployed or live accepted. Current truth remains:
 
-- repository/local verification: commit `b5d13713...`, 124 test files / 685 tests, TypeScript, and Next.js build 36/36;
-- InventSmith Convex test infrastructure: `dev/inventsmith-test` / `quick-fox-785` configured and updated to commit `b5d13713...`;
+- repository/local verification: prior checkpoint `b5d13713...` passed 124 test files / 685 tests, TypeScript, and Next.js build 36/36; the current local fixes pass TypeScript/tests but still need a production build;
+- InventSmith Convex test infrastructure: intended target `dev/inventsmith-test` / `quick-fox-785`; deployment and auth state are unverified;
 - Netlify: matching deploy-preview status succeeded; protected-page acceptance remains pending;
 - Modern Methods-owned Vercel/frontend deployment: not yet verified complete;
 - authenticated browser acceptance: not yet complete;
@@ -124,7 +142,7 @@ Professional review, external-use authorization, consequential approval, manufac
 4. Continue specialized artifact/package and generated-format quality acceptance, including rendered document and CAD-format checks where feasible.
 5. Preserve the no-executor boundary until an outside-world executor is deliberately implemented with execution-time revalidation and separate execution evidence.
 6. Continue low-risk InventSmith naming cleanup while preserving compatibility/historical identifiers that still require tested migration.
-7. Verify the full invention journey and selected-account beta access/credit controls in `dev/inventsmith-test` / `quick-fox-785` using the PR preview configured to use it while production remains limited.
+7. Verify the full invention journey and selected-account beta access/credit controls only after `quick-fox-785` is confirmed as the backend target and deployed with a test-scoped key. No further deployment to `agile-seahorse-379`.
 8. Complete live authenticated multi-user/multi-invention acceptance, provider failure/retry, concurrency, billing/webhooks, professional-review, and representative lifecycle acceptance after owner-controlled infrastructure is ready.
 9. Plan the Lucia v3 authentication migration separately.
 10. Calibrate commercial limits from measured provider/runtime economics.

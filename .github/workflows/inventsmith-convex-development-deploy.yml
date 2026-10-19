@@ -38,11 +38,15 @@ jobs:
             echo "Refusing deployment: CONVEX_DEPLOY_KEY is not configured in the inventsmith-development GitHub environment."
             exit 1
           fi
-          # quick-fox-785 is the production deployment of the separate
-          # InventSmith test project, so its deployment-scoped key may use
-          # Convex's prod: prefix. It is not agile-seahorse-379.
-          if [[ "$CONVEX_DEPLOY_KEY" != dev:* && "$CONVEX_DEPLOY_KEY" != prod:* ]]; then
-            echo "Refusing deployment: use the deploy key generated from the isolated InventSmith test deployment."
+          # `convex deploy` targets the deployment embedded in the key. A
+          # `prod:` key previously pointed at agile-seahorse-379 despite this
+          # workflow's test label. Never accept production-scoped keys here.
+          if [[ "$CONVEX_DEPLOY_KEY" == prod:* ]]; then
+            echo "Refusing deployment: this workflow cannot use a prod-scoped key. The prior key targeted agile-seahorse-379."
+            exit 1
+          fi
+          if [[ "$CONVEX_DEPLOY_KEY" != dev:* ]]; then
+            echo "Refusing deployment: use a dev-scoped key explicitly generated for quick-fox-785, the isolated InventSmith test deployment."
             exit 1
           fi
 

@@ -4,16 +4,23 @@ import { FormEvent, Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { api } from "@convex/_generated/api";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, useQueries } from "convex/react";
+import { makeFunctionReference } from "convex/server";
+import type { Id } from "@convex/_generated/dataModel";
 import { AppNav } from "@/components/atlas/app-nav";
 import { Button } from "@/components/ui/button";
 
 const STATUS_LABELS = { open: "Open", investigating: "Being investigated", waiting_on_user: "Waiting on you", resolved: "Resolved" } as const;
+const listMyCases = makeFunctionReference<"query", Record<string, never>, Array<{
+  _id: Id<"supportCases">; subject: string; category: keyof typeof STATUS_LABELS | "bug" | "other" | "account" | "billing" | "invention";
+  status: keyof typeof STATUS_LABELS; createdAt: number; description: string; inventionId?: Id<"inventions">;
+}>>("supportCases:listMine");
 
 function SupportForm() {
   const searchParams = useSearchParams();
   const initialInventionId = searchParams.get("inventionId") ?? "";
-  const cases = useQuery(api.supportCases.listMine);
+  const queryResults = useQueries({ cases: { query: listMyCases, args: {} } });
+  const cases = queryResults.cases as Array<{ _id: Id<"supportCases">; subject: string; category: string; status: keyof typeof STATUS_LABELS; createdAt: number; description: string; inventionId?: Id<"inventions"> }> | undefined | Error;
   const createCase = useMutation(api.supportCases.create);
   const [category, setCategory] = useState<"account" | "billing" | "invention" | "bug" | "other">("bug");
   const [subject, setSubject] = useState("");
@@ -41,7 +48,7 @@ function SupportForm() {
       {message && <p role="status" className="text-sm text-muted-foreground">{message}</p>}
       <Button type="submit" disabled={saving}>{saving ? "Submitting…" : "Submit support case"}</Button>
     </form>
-    <section className="space-y-3"><h2 className="text-xl font-semibold">Your reports</h2>{cases === undefined ? <p className="text-sm text-muted-foreground">Loading…</p> : cases.length === 0 ? <p className="text-sm text-muted-foreground">You have not submitted a support case yet.</p> : cases.map(item => <article key={String(item._id)} className="rounded-lg border p-4"><div className="flex flex-wrap justify-between gap-2"><h3 className="font-medium">{item.subject}</h3><span className="text-sm text-muted-foreground">{STATUS_LABELS[item.status]}</span></div><p className="mt-1 text-xs text-muted-foreground">{item.category} · {new Date(item.createdAt).toLocaleString()}</p><p className="mt-3 whitespace-pre-wrap text-sm">{item.description}</p>{item.inventionId && <Link className="mt-2 inline-block text-sm text-primary underline" href={`/invention/${item.inventionId}/evidence`}>Open related invention workspace</Link>}</article>)}</section>
+    <section className="space-y-3"><h2 className="text-xl font-semibold">Your reports</h2>{cases === undefined ? <p className="text-sm text-muted-foreground">Loading…</p> : cases instanceof Error ? <p role="alert" className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">Your reports could not be loaded. You can still submit a support case; if this continues, share the error with InventSmith support.</p> : cases.length === 0 ? <p className="text-sm text-muted-foreground">You have not submitted a support case yet.</p> : cases.map(item => <article key={String(item._id)} className="rounded-lg border p-4"><div className="flex flex-wrap justify-between gap-2"><h3 className="font-medium">{item.subject}</h3><span className="text-sm text-muted-foreground">{STATUS_LABELS[item.status]}</span></div><p className="mt-1 text-xs text-muted-foreground">{item.category} · {new Date(item.createdAt).toLocaleString()}</p><p className="mt-3 whitespace-pre-wrap text-sm">{item.description}</p>{item.inventionId && <Link className="mt-2 inline-block text-sm text-primary underline" href={`/invention/${item.inventionId}/evidence`}>Open related invention workspace</Link>}</article>)}</section>
     <Link href="/dashboard" className="text-sm text-primary underline">Back to dashboard</Link>
   </main></>;
 }

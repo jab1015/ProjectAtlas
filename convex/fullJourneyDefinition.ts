@@ -50,6 +50,7 @@ export function journeyStagesForProductType(productType: InventionProductType): 
 }
 
 export function routeForJourneyStage(inventionId: string, stage: FullJourneyStageDefinition): string {
+  if (stage.id === 1) return `/invention/${inventionId}/idea`;
   if (stage.routeType === "market") return `/invention/${inventionId}/market`;
   if (stage.routeType === "patent") return `/invention/${inventionId}/patent`;
   if (stage.routeType === "design") return `/invention/${inventionId}/design`;

@@ -35,7 +35,7 @@ Lucia `3.2.2` remains deprecated and should be migrated only through a separatel
 
 ## 3. Current Convex status
 
-A Convex deployment named `fiery-gazelle-628` exists but belongs to another application and is not an InventSmith environment. A separate owner-controlled **production** deployment is `agile-seahorse-379`. InventSmith's dedicated test/development deployment is now `dev/inventsmith-test` (`quick-fox-785`); the branch Convex code and required auth configuration are deployed there for account-creation testing.
+A Convex deployment named `fiery-gazelle-628` exists but belongs to another application and is not an InventSmith environment. A separate owner-controlled **production** deployment is `agile-seahorse-379`. InventSmith's intended test/development deployment is `dev/inventsmith-test` (`quick-fox-785`), but its current code and auth configuration are unverified. GitHub Action logs for the purported test runs show they deployed to production `agile-seahorse-379`; the workflow now rejects `prod:` keys. Obtain a `dev:` key for `quick-fox-785` before test deployment.
 
 Production currently contains only the intentionally limited password-recovery backend scope. Existing production functions and data were preserved. PR #24 was not merged and the full unverified product was not deployed.
 

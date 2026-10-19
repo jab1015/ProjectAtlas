@@ -6,7 +6,7 @@ import {
   riskClassForClassification,
 } from "../../convex/inventionClassificationLogic";
 import { buildInventionWorkPlan } from "../../convex/inventionWorkPlanLogic";
-import { journeyStagesForProductType } from "../../convex/fullJourneyDefinition";
+import { journeyStagesForProductType, routeForJourneyStage } from "../../convex/fullJourneyDefinition";
 import { canTierRunWorkKind } from "../../convex/entitlementPolicyLogic";
 
 function convexSource(file: string) {
@@ -14,6 +14,13 @@ function convexSource(file: string) {
 }
 
 describe("InventSmith invention classification and journey routing", () => {
+  it("routes Stage 1 Idea to its own view instead of the current Validation page", () => {
+    const idea = journeyStagesForProductType("physical").find((stage) => stage.id === 1)!;
+    const validation = journeyStagesForProductType("physical").find((stage) => stage.id === 2)!;
+    expect(routeForJourneyStage("invention-1", idea)).toBe("/invention/invention-1/idea");
+    expect(routeForJourneyStage("invention-1", validation)).toBe("/invention/invention-1");
+  });
+
   it("keeps ordinary physical inventions on the physical development path", () => {
     const classification = classifyInvention({
       title: "Adjustable kitchen jar opener",

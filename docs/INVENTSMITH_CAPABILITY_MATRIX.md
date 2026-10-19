@@ -22,7 +22,7 @@ No overall completion percentage is asserted.
 
 Customer-facing product: **InventSmith — The Inventor OS** by **Modern Methods**. The historical repository slug `jab1015/ProjectAtlas` and selected `atlas*` / `ATLAS_*` compatibility identifiers remain only where tested migration has not yet occurred.
 
-MadeThis is retired/historical. The Convex deployment `fiery-gazelle-628` belongs to another application and is excluded from InventSmith work. The dedicated InventSmith test deployment `dev/inventsmith-test` (`quick-fox-785`) contains the branch Convex code and required auth configuration. Modern Methods-owned Vercel/frontend deployment and authenticated browser acceptance remain separate acceptance dimensions.
+MadeThis is retired/historical. The Convex deployment `fiery-gazelle-628` belongs to another application and is excluded from InventSmith work. The intended InventSmith test deployment is `dev/inventsmith-test` (`quick-fox-785`); its current code and auth configuration are unverified. Prior purported test deploy runs actually targeted production `agile-seahorse-379`. Modern Methods-owned Vercel/frontend deployment and authenticated browser acceptance remain separate acceptance dimensions.
 
 ### Limited production checkpoint
 
@@ -63,7 +63,7 @@ Convex production `agile-seahorse-379` has a deliberately limited password-recov
 | Development dependency audit boundary | implemented | only known Next/ESLint lint-chain advisories accepted | repository-only state | upstream fixes or safe migration |
 | Exact-head CI integrity | implemented | PR head checkout/assertion; pinned actions; no persisted credentials | repository-only state | keep enforced |
 | Authentication dependency modernization | Lucia v3 currently in use | current auth/type/build gates pass | migration not performed | deliberately plan/test replacement |
-| Owner-controlled Convex path | partially executed | dedicated test deployment `quick-fox-785` created and branch code deployed; `fiery-gazelle-628` is another app | production remains limited; newest local head not claimed deployed | perform authenticated acceptance |
+| Owner-controlled Convex path | partially executed | dedicated test deployment `quick-fox-785` exists but current code is unverified; workflow logs show prior runs targeted `agile-seahorse-379`; `fiery-gazelle-628` is another app | production received unintended broader function deployment; no further deployment allowed; newest local head not deployed | perform authenticated acceptance |
 | Owner-controlled Convex production path | limited deployment | password-recovery backend deployed and health/auth acceptance verified | limited live acceptance only | preserve existing functions/data while expanding scope deliberately |
 | Owner-controlled Vercel/frontend path | preview exists | repository build passes | PR #24 preview authenticated; password recovery and operations console preview-verified | point a test preview at the dedicated InventSmith test deployment |
 | InventSmith operations console | implemented | page code and compatibility fallback verified locally | refreshed preview works; AI details intentionally unavailable from limited production response | verify against full test deployment and exercise a controlled failed work item |

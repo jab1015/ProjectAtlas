@@ -6,9 +6,26 @@
 **Current continuation checkpoint:** `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`  
 **Active build branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified checkpoint:** Commit `b5d13713fc4e4489c3d2d36544a52682d60a3156` is on the active branch. Local verification passed (124 test files / 685 tests, web and Convex TypeScript, Next.js build 36/36). Isolated Convex deployment workflow `39314672344` passed, and Netlify's matching `deploy-preview` status succeeded at `https://deploy-preview-24--inventsmith.netlify.app`. Authenticated live acceptance on the protected preview remains outstanding.
+**Correction (October 19):** GitHub Action runs `39311119875` and `39314672344` both deployed to `agile-seahorse-379`, not the intended test backend. The deployment workflow now rejects `prod:` keys. Local fixes pass web/Convex TypeScript, Vitest (**124 files / 686 tests**), `git diff --check`, and Next.js build (**36/36**). Preview deploy and live acceptance are pending.
 
 ## October 19 progress and outstanding acceptance
+
+### Live preview test notes — October 19, 2026, 4:25 PM ET
+
+Read-only authenticated sweep of the protected PR #24 preview, signed in as `jerry@modernmethods.it.com` with the RiseJars invention:
+
+- Stage pages 3–15 and the Validation view rendered. Most stage work remains queued; page rendering does not prove the corresponding AI agent can execute. No generation was started in this conservative pass.
+- Journey Center's Stage 1 Idea and Stage 2 Validation cards both point to `/invention/{id}`, and that route renders Stage 2. Stage 1 does not have a distinct destination from the Journey Center; correct the route or document the intended shared-view behavior.
+- The Work Library reports **2 autonomous work item failures**, **19 missing required deliverables**, and missing concept visualization. It does not identify the failed items or show failure reasons.
+- Validation remains **36%** and recommends interviewing more users, while the uploaded SurveyMonkey PDF is already inventor evidence. The report does not show which survey findings were applied or explain the unchanged score.
+- Market Research renders with **0 deliverables**, **1 inventor evidence file**, and **1 research source**.
+- Evidence Locker initially showed the generic error page, then rendered its form. The browser logged missing Convex public query `evidenceRequests:list`, despite that query existing in repository source. Existing share-request listing is therefore broken against the backend reached by the preview; upload and link creation were not submitted.
+- Customer Support shows the generic error page. The browser logged missing Convex public query `supportCases:listMine`, also present in repository source. Support creation/tracking is not live-accepted.
+- Account page exposes name and workspace rename controls; the profile name appears blank. Save was not tested to avoid mutating the owner's account.
+- Admin operations, support, and beta-access routes are blocked by “Administrator access required.” The active account is `jerry@modernmethods.it.com`; the intended admin identity/role remains unverified.
+- Invention access, review, chat, organization, and account pages rendered; no chat was sent and no account, survey, support, or external action was submitted. A Sign Out control is visible.
+
+The pair of missing Convex functions means the currently served frontend and the backend it reaches are out of alignment, or the preview points at a different deployment than intended. Confirm the preview's exact Convex target and deploy the matching test backend before further authenticated acceptance. Keep production and unrelated Convex projects untouched. After alignment, diagnose the two failed work items, verify evidence/validation refresh and shareable survey response flow, then run bounded AI checks with the owner-authorized admin session. Do not label the departments “working” until generated results are saved and reviewed.
 
 Password recovery has already been tested successfully. Do not spend more work re-testing it unless a later change regresses authentication.
 
@@ -22,9 +39,9 @@ The survey evidence is inventor-provided and unverified. A useful validation upd
 
 The suggested survey/customer-research flow may prepare a draft page and questions automatically. Sending messages, publishing a page, or contacting third parties remains a separate human-approved action; no external side effect is represented as complete without evidence.
 
-Deployment boundary: `quick-fox-785` is the dedicated InventSmith test project. `agile-seahorse-379` remains limited to the already-verified password-recovery backend scope; `fiery-gazelle-628` is another app and must remain untouched. PR #24 stays open/unmerged; do not publish the whole unverified product.
+Deployment boundary: `quick-fox-785` is the intended test project, but its current code state is unverified. `agile-seahorse-379` received broader function deployments in runs `39311119875` and `39314672344`; no further deployment there. `fiery-gazelle-628` is another app and must remain untouched. PR #24 stays open/unmerged; do not publish the whole unverified product.
 
-October 19 verification: commit `b5d13713fc4e4489c3d2d36544a52682d60a3156` passes web/Convex TypeScript, full Vitest (**124 files / 685 tests**), `git diff --check`, and Next.js production build (**36/36** pages). Isolated Convex test deploy run `39314672344` passed; the matching Netlify deploy-preview status succeeded. Live authenticated acceptance remains outstanding.
+Historical note: commit `b5d13713...` passed web/Convex TypeScript, full Vitest (**124 files / 685 tests**), `git diff --check`, and Next.js production build (**36/36** pages). Its Convex workflow runs `39311119875` and `39314672344` targeted production, not the test deployment. Current local fixes pass the checks reported above; no new deployment has been made.
 
 ## Current status snapshot
 
@@ -34,7 +51,7 @@ The retired controlled-pilot 80% figure must never be used as overall InventSmit
 
 ## Current limited deployment checkpoint
 
-The owner-controlled Convex production deployment `agile-seahorse-379` received only the password-recovery backend scope required for acceptance. Existing production functions and data were preserved; PR #24 was not merged and the full unverified product was not deployed.
+GitHub Action logs show Convex function deployments to `agile-seahorse-379` in runs `39311119875` and `39314672344`, contrary to prior documentation. Logs report no indexes deleted, but do not prove function behavior/data were unchanged. Deployment to production is paused; the workflow now rejects `prod:` keys. The isolated test deployment `quick-fox-785` is not yet verified.
 
 The password-recovery flow was live-functionally verified on the Netlify PR #24 preview at `deploy-preview-24--inventsmith.netlify.app`: reset email delivery succeeded, the recovery code was received, and authenticated sign-in succeeded. The email initially landed in spam during testing.
 
@@ -112,7 +129,7 @@ PR #24 remains draft/open/unmerged. `main` remains untouched.
 4. Continue specialized artifact content, rendered export, and generated-format quality acceptance.
 5. Preserve the no-executor boundary until a deliberate executor exists with execution-time revalidation and separate execution evidence.
 6. Finish low-risk InventSmith naming cleanup without destabilizing compatibility identifiers.
-7. Verify the full invention journey plus selected-account beta access/credit controls in the dedicated InventSmith Convex test deployment `dev/inventsmith-test` (`quick-fox-785`). The branch code and auth configuration are deployed and the PR preview is configured to use it. Do not touch `fiery-gazelle-628`; it belongs to another application. Keep `agile-seahorse-379` limited to the verified password-recovery scope.
+7. Obtain and verify a deployment key explicitly scoped to `quick-fox-785`, then deploy only after local verification. Do not touch `fiery-gazelle-628`; it belongs to another application. No further deployment to `agile-seahorse-379`.
 8. Validate real provider/concurrency behavior and calibrate commercial limits from measured economics.
 9. Plan/test a Lucia v3 migration separately from routine hardening.
 
