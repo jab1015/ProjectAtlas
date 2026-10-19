@@ -11,10 +11,11 @@ describe("InventSmith Convex development deployment workflow", () => {
     expect(workflow).toContain("DEPLOY INVENTSMITH DEV");
   });
 
-  it("rejects missing or non-development deploy keys", () => {
+  it("rejects missing or non-Convex deploy keys while allowing isolated test deployment scopes", () => {
     expect(workflow).toContain("CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}");
     expect(workflow).toContain('if [[ -z "$CONVEX_DEPLOY_KEY" ]]');
-    expect(workflow).toContain('if [[ "$CONVEX_DEPLOY_KEY" != dev:* ]]');
+    expect(workflow).toContain('if [[ "$CONVEX_DEPLOY_KEY" != dev:* && "$CONVEX_DEPLOY_KEY" != prod:* ]]');
+    expect(workflow).toContain("quick-fox-785");
   });
 
   it("verifies the app and operational scripts before calling Convex deploy", () => {
