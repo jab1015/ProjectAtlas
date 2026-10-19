@@ -12,7 +12,7 @@ import type { Id } from "./_generated/dataModel";
 import { v, ConvexError } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { internal } from "./_generated/api";
-import { materiallyChanged, shouldRequeueWorkKind, staleReasonForField } from "./stalenessLogic";
+import { materiallyChanged, staleReasonForField } from "./stalenessLogic";
 import { CANONICAL_WORK_PLAN } from "./canonicalWorkPlan";
 import { FULL_JOURNEY_STAGES } from "./fullJourneyDefinition";
 import { POST_CANONICAL_WORK_PLAN } from "./fullProductWorkPlan";
@@ -23,7 +23,7 @@ import {
 } from "./organizations";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { ensureOrganizationDailyUsage } from "./organizationDailyUsage";
-import { scheduleAffectedDepartments } from "./validationEvidence";
+import { queueInventionRefresh } from "./inventionRefresh";
 
 interface StageConfigEntry {
   id: number;
@@ -282,6 +282,7 @@ export const updateStageProgress = mutation({
     const now = Date.now();
     const existing = await ctx.db.query("stageProgress").withIndex("by_inventionId_stageId", (q) => q.eq("inventionId", inventionId).eq("stageId", stageId)).first();
     const shouldMark = value.trim().length > 0;
+    const previousValue = existing?.completedFields?.includes(field) ? "present" : "";
     let completedFields = existing?.completedFields ? [...existing.completedFields] : [];
     if (shouldMark && !completedFields.includes(field)) completedFields.push(field);
     if (!shouldMark) completedFields = completedFields.filter((item) => item !== field);
@@ -292,6 +293,9 @@ export const updateStageProgress = mutation({
       await ctx.db.insert("stageProgress", { inventionId, stageId, readinessScore, completedFields, completedAt: readinessScore === 100 ? now : undefined, updatedAt: now });
     }
     await ctx.db.patch(inventionId, { updatedAt: now });
+    if (materiallyChanged(previousValue, shouldMark ? "present" : "")) {
+      await queueInventionRefresh(ctx, inventionId, `Stage ${stageId} input changed (${field}); all dependent departments were queued for automatic refresh.`, now);
+    }
   },
 });
 
@@ -316,27 +320,7 @@ export const updateInventionField = mutation({
       await ctx.db.patch(record._id, { structuredBrief: { ...structuredBrief, [field]: value }, updatedAt: now });
     }
 
-    const reason = staleReasonForField(field);
-    const [deliverables, findings, workItems] = await Promise.all([
-      ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
-      ctx.db.query("evidenceFindings").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
-      ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
-    ]);
-    for (const deliverable of deliverables) await ctx.db.patch(deliverable._id, { staleReason: reason, updatedAt: now });
-    for (const finding of findings) if (finding.status !== "stale") await ctx.db.patch(finding._id, { status: "stale", updatedAt: now });
-    for (const item of workItems) {
-      if (!shouldRequeueWorkKind(item.kind) || ["running", "blocked", "cancelled"].includes(item.status)) continue;
-      await ctx.db.patch(item._id, { status: "queued", attemptCount: 0, completedAt: undefined, blockedReason: undefined, humanGateType: undefined, lastError: undefined, updatedAt: now });
-    }
-    await ctx.db.insert("atlasExecutionEvents", {
-      inventionId,
-      eventType: "invention_changed",
-      actorType: "inventor",
-      summary: `${field} changed; downstream work was marked stale and queued for refresh.`,
-      metadata: { field, staleDeliverables: deliverables.length, staleFindings: findings.length },
-      createdAt: now,
-    });
-    await scheduleAffectedDepartments(ctx, inventionId);
+    await queueInventionRefresh(ctx, inventionId, `${staleReasonForField(field)} All dependent departments were queued for automatic refresh.`, now);
   },
 });
 

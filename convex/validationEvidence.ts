@@ -17,12 +17,19 @@ export async function scheduleAffectedDepartments(ctx: MutationCtx, inventionId:
 }
 
 export async function readValidationEvidence(ctx: Pick<MutationCtx, "db">, inventionId: Id<"inventions">) {
-  const sources = await ctx.db.query("evidenceSources").withIndex("by_inventionId", q => q.eq("inventionId", inventionId)).collect();
+  const [sources, progress] = await Promise.all([
+    ctx.db.query("evidenceSources").withIndex("by_inventionId", q => q.eq("inventionId", inventionId)).collect(),
+    ctx.db.query("stageProgress").withIndex("by_inventionId", q => q.eq("inventionId", inventionId)).collect(),
+  ]);
   const ready = sources.filter(s => s.metadata?.provenance === "inventor_upload" && (s.metadata?.extractionStatus === "completed" || s.metadata?.evidenceOrigin === "chat"));
   const invention = await ctx.db.get(inventionId);
   ready.sort((a, b) => String(a._id).localeCompare(String(b._id)));
   return {
-    fingerprint: JSON.stringify({ inputs: [invention?.title, invention?.problemStatement, invention?.targetAudience, invention?.solutionDescription], sources: ready.map(s => [s._id, s.metadata?.extractedAt ?? s.metadata?.uploadedAt ?? s.createdAt]) }),
+    fingerprint: JSON.stringify({
+      inputs: [invention?.title, invention?.problemStatement, invention?.targetAudience, invention?.solutionDescription],
+      stageInputs: progress.map(row => [row.stageId, row.completedFields, row.readinessScore, row.updatedAt]),
+      sources: ready.map(s => [s._id, s.metadata?.extractedAt ?? s.metadata?.uploadedAt ?? s.createdAt]),
+    }),
     evidence: ready.map(s => ({ sourceId: String(s._id), title: s.title, evidenceKind: s.metadata?.evidenceKind ?? "other", provenance: "inventor_upload", extraction: s.metadata?.extraction ?? { text: s.excerpt } })),
   };
 }

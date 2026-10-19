@@ -58,4 +58,26 @@ describe("context-only validation confidence", () => {
     expect(customer.evidenceSummary).toContain("Survey observations strengthen customer-validation evidence support");
     expect(patent.score).toBe(assessContextOnlyValidationConfidence(context, "competitorAnalysis").score);
   });
+
+  it("recognizes a SurveyMonkey/PDF extraction when it contains a sample size and summary", () => {
+    const withPdfSurvey: InventionContext = {
+      ...context,
+      inventorEvidence: [{
+        sourceId: "survey-pdf",
+        title: "Data_All_260313",
+        evidenceKind: "survey",
+        provenance: "inventor_upload",
+        extraction: {
+          mode: "ai_file",
+          documentType: "Survey / SurveyMonkey results",
+          sampleSize: "100 users",
+          summary: "Two survey result sections with responses about RiseJars.",
+          keyFindings: [],
+        },
+      }],
+    };
+    const assessment = assessContextOnlyValidationConfidence(withPdfSurvey, "customerSegments");
+    expect(assessment.score).toBeGreaterThan(0.3);
+    expect(assessment.evidenceSummary).toContain("100 reported respondents");
+  });
 });

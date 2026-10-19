@@ -306,6 +306,9 @@ export default function InventionWorkspacePage() {
     const sectionsWithConf = completedSections.filter(
       (s) => typeof s.confidence?.score === "number"
     );
+    const surveyEvidenceIncluded = completedSections.some((section) =>
+      /survey evidence|survey observations strengthen/i.test(section.confidence?.evidenceSummary ?? "")
+    );
     const avgConfidence =
       sectionsWithConf.length > 0
         ? `${Math.round(
@@ -408,9 +411,14 @@ export default function InventionWorkspacePage() {
                       ? `Wait for the research to finish (${completedSections.length} of ${TOTAL_SECTIONS} sections processed so far).`
                       : allSectionsError || failedSections.length > 0
                       ? "If a retry is already running, wait for it to finish. Otherwise, after the AI connection is fixed, tap Retry failed sections."
+                      : surveyEvidenceIncluded
+                      ? "Your uploaded survey was included in this validation run. The next useful step is to add a few direct customer conversations or other evidence that addresses the remaining gaps."
                       : "Talk with a few people who use thick foods in jars. Ask what they do with the last portion, and save their real answers as evidence."}
                   </p>
                 </div>
+                {surveyEvidenceIncluded && !isGenerating && !allSectionsError && failedSections.length === 0 && (
+                  <p className="text-xs text-primary">Survey evidence was included in the customer-validation sections.</p>
+                )}
                 {!isGenerating && !allSectionsError && failedSections.length === 0 && (
                   <p className="text-xs text-muted-foreground">Confidence: {avgConfidence}. Research date: {researchDateStr}.</p>
                 )}
