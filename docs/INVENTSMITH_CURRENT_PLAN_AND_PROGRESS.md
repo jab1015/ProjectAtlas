@@ -6,7 +6,7 @@
 **Repository:** `jab1015/ProjectAtlas` (historical repository slug)  
 **Active branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified CI checkpoint:** Isolated test-deploy workflow run `39311119875` passed its build, test, audit, and deployment gates for the InventSmith branch source. Exact branch-head CI qualification for the current documentation/code head remains required; do not treat the older CI #226 checkpoint as covering later work.
+**Latest verified checkpoint:** Local verification passed (web and Convex TypeScript, 123 test files / 682 tests, Next.js build). Code commit `ff481791afc424a4656c96daa82d41953744caa5` is pushed to this branch. GitHub currently reports its Netlify `deploy-preview` check as **pending**; exact-head CI and a usable matching preview are not yet confirmed. Isolated deploy run `39311119875` succeeded for an earlier source revision only.
 
 ## October 19 owner-request checkpoint
 
@@ -14,7 +14,7 @@ Password recovery is **already tested successfully** and is not the active task.
 
 The dedicated InventSmith test Convex project is `quick-fox-785` (`dev/inventsmith-test`). The isolated test deployment workflow (run `39311119875`) completed successfully, including web/Convex type checks, regression tests (122 files / 678 tests), audit, production build, and the dedicated test-backend deployment. Its deployment key is scoped to this separate test project despite its `prod:` prefix. This does not authorize deployment to the real production project.
 
-The new October 19 changes have now passed web TypeScript, Convex TypeScript, the full Vitest suite (**123 files / 682 tests**), and `next build` (**34/34** static pages). These checks apply to the current local changes, not yet to a pushed branch head or a new Netlify preview/Convex deployment.
+The October 19 fixes passed web TypeScript, Convex TypeScript, the full Vitest suite (**123 files / 682 tests**), and `next build` (**34/34** static pages). Code commit `ff481791afc424a4656c96daa82d41953744caa5` is pushed. Netlify's `deploy-preview` status for that commit is pending; exact-head CI, a matching new preview, and deployment of this code to the isolated Convex test project remain unconfirmed.
 
 Code already present on the active work line includes automatic department invalidation/requeue on invention input changes, validation evidence fingerprinting and survey-aware evidence scoring/display, PDF structured extraction, simplified validation summary UI, account/profile and personal-workspace rename controls, selected-existing-user beta access and audited credit controls, and admin navigation/sign-out affordances. The operations UI also handles an older health response that omits AI configuration details. These are **implementation claims only** until exact-head checks and authenticated acceptance on the currently served preview/test backend pass.
 
@@ -25,15 +25,15 @@ Code already present on the active work line includes automatic department inval
 - Verify the existing-user admin access/credit console, admin exemption from daily/AI limits, operations/support modules, and an always-accessible sign-out action. Report any missing function or permission gap instead of calling it fixed.
 - Repository audit found an admin operations route but **no support-case/complaint console route or support-case data model**. The support investigation workflow (case list, complaint-to-invention link, and controlled evidence inspection) remains unimplemented and must be built before calling the support console available.
 - Verify automatic downstream department refresh and that research/survey collection produces an inventor-reviewable draft. External publication, invitations, or outreach must remain approval-gated until destination, audience, and consent are defined.
-- A usable fresh Netlify preview for the current branch head has not yet been confirmed. Earlier preview builds failed on an incomplete JSX file and then an undefined validation helper; those are historical logs, not evidence that the current head builds or that a new preview exists.
+- A usable fresh Netlify preview for the current branch head has not yet been confirmed. The current commit's Netlify status is pending. Earlier preview builds failed on an incomplete JSX file and then an undefined validation helper; those logs concern earlier revisions, not the current local build.
 
 ### Immediate continuation
 
 1. Keep this checkpoint and the build-progress document synchronized with actual code, workflow, and preview status.
-2. Audit the current remote branch head and the affected code paths; fix any remaining gaps before deployment.
-3. Run focused regression tests, TypeScript, and the production build; then qualify the exact source head through CI.
-4. Deploy only to `quick-fox-785` and obtain/confirm the matching Netlify preview. Leave `agile-seahorse-379`, `fiery-gazelle-628`, and PR merge/publication untouched.
-5. Give the owner one short acceptance checklist and update these documents with results.
+2. Wait for the matching Netlify preview build and exact-head CI; inspect any new failure output and fix before acceptance.
+3. Deploy the matching Convex backend only to `quick-fox-785`, then verify the preview points to that test deployment.
+4. Run authenticated acceptance for survey refresh/evidence display, profile/workspace naming, admin access/credits and unlimited admin usage, sign-out, and operations/support. Clearly distinguish the missing support-case console as still unimplemented.
+5. Leave `agile-seahorse-379`, `fiery-gazelle-628`, and PR merge/publication untouched; record acceptance outcomes here.
 
 ## Product destination
 
