@@ -309,8 +309,467 @@ export default function InventionWorkspacePage() {
     const surveyEvidenceIncluded = completedSections.some((section) =>
       /survey evidence|survey observations strengthen/i.test(section.confidence?.evidenceSummary ?? "")
     );
-    const evidenceReview = (validationResearch as { evidenceReview?: { currentEvidenceMatchesRun: boolean; surveys: Array<{ title: string; sampleSize?: string; summary: string; findings: string[]; provenance: string }>; pendingSurveys: Array<{ title: string; status: "processing" | "failed" }> } } | null)?.evidenceReview;
+    const evidenceReview = (validationResearch as { evidenceReview?: { currentEvidenceMatchesRun: boolean; surveys: Array<{ title: string; sampleSize?: string; summary: string; findings: string[]; provenance: string }>; pendingSurveys?: Array<{ title: string; status: "processing" | "failed" }> } } | null)?.evidenceReview;
     const uploadedSurveys = evidenceReview?.surveys ?? [];
-    const pendingSurveys = evidenceReview?.pendingSurveys ?? [];
-    const reportMatchesCurrentEvidence = evidenceReview?.currentEvidenceMatchesRun === true;
-    const avgConfidencnùÒÚ$z{-®éÜj×µÕÑ•µ™½É•É½Õ¹ˆùQ¡”½Ù•É…±°½¹™¥‘•¹”¥Ì…¸•Ù¥‘•¹”µÍÕÁÁ½ÉÐÍ½É”°¹½ÐÑ¡”¡…¹”½˜ÍÕ•ÍÌ¸ÍÕÉÙ•ä…¸ÍÑÉ•¹Ñ¡•¸É•±•Ù…¹ÐÕÍÑ½µ•ÈÍ•Ñ¥½¹Ì°‰ÕÐ‘½•Ì¹½Ð‰ä¥ÑÍ•±˜Ù•É¥™ä‘•µ…¹°µ…É­•ÐÍ¥é”°½ÈÑ¡”ÁÉ½‘ÕÓŠeÌÁ•É™½Éµ…¹”¸ð½Àø(€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€ì…¥Í•¹•É…Ñ¥¹œ€˜˜€……±±M•Ñ¥½¹ÍÉÉ½È€˜˜™…¥±•‘M•Ñ¥½¹Ì¹±•¹Ñ €ôôô€À€˜˜É•Á½ÉÑ5…Ñ¡•ÍÕÉÉ•¹ÑÙ¥‘•¹”€˜˜€ (€€€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áÐµáÌÑ•áÐµµÕÑ•µ™½É•É½Õ¹ˆù½¹™¥‘•¹”èí…Ù½¹™¥‘•¹•ô¸I•Í•…É ‘…Ñ”èíÉ•Í•…É¡…Ñ•MÑÉô¸ð½Àø(€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€ì…¥Í•¹•É…Ñ¥¹œ€˜˜€……±±M•Ñ¥½¹ÍÉÉ½È€˜˜™…¥±•‘M•Ñ¥½¹Ì¹±•¹Ñ €ôôô€À€˜˜€…É•Á½ÉÑ5…Ñ¡•ÍÕÉÉ•¹ÑÙ¥‘•¹”€˜˜€ (€€€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áÐµáÌ™½¹Ðµµ•‘¥Õ´Ñ•áÐµ…µ‰•È´ÜÀÀˆùUÁ‘…Ñ¥¹œ½¹™¥‘•¹”™É½´ÕÉÉ•¹Ð•Ù¥‘•¹”¸Q¡”ÁÉ•Ù¥½ÕÌÍ½É”¥Ì½ÕÐ½˜‘…Ñ”¸ð½Àø(€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€¥ô((€€€€€€€€€€€ì¼¨ƒŠRŠR AÉ½É•ÍÌÍÑ…ÑÕÌ‰…ÈƒŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠR €¨½ô(€€€€€€€€€€€íÙ…±¥‘…Ñ¥½¹I•Í•…É €˜˜€ (€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰µÐ´Øµ…àµÜµá°ÍÁ…”µä´Èˆø(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ‰•ÑÝ••¸Ñ•áÐµáÌÑ•áÐµµÕÑ•µ™½É•É½Õ¹ˆø(€€€€€€€€€€€€€€€€€í¥Í•¹•É…Ñ¥¹œ€ü€ (€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰™½¹Ðµµ•‘¥Õ´Ñ•áÐµ™½É•É½Õ¹ˆø(€€€€€€€€€€€€€€€€€€€€€•¹•É…Ñ¥¹œÙ…±¥‘…Ñ¥½¸É•Í•…É£Š˜íÁÉ½É•ÍÍ½Õ¹Ñô½˜íQ=Q1}MQ%=9MôÍ•Ñ¥½¹Ì½µÁ±•Ñ”(€€€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€¤€è…±±M•Ñ¥½¹ÍÉÉ½È€ü€ (€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµ‘•ÍÑÉÕÑ¥Ù”™½¹Ðµµ•‘¥Õ´ˆø(€€€€€€€€€€€€€€€€€€€€€M½µ”Í•Ñ¥½¹Ì¹••…¹½Ñ¡•ÈÑÉä¸(€€€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€¤€è€ (€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµÁÉ¥µ…Éä™½¹Ðµµ•‘¥Õ´ˆø(€€€€€€€€€€€€€€€€€€€€€Y…±¥‘…Ñ¥½¸½µÁ±•Ñ”ƒŠPí½µÁ±•Ñ•‘M•Ñ¥½¹Ì¹±•¹Ñ¡ô½˜íQ=Q1}MQ%=9MôÍ•Ñ¥½¹Ì(€€€€€€€€€€€€€€€€€€€€ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€€€í¥Í•¹•É…Ñ¥¹œ€˜˜€ (€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸ùíÁÉ½É•ÍÍAÑô”ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Üµ™Õ±° ´ÈÉ½Õ¹‘•µ™Õ±°‰œµµÕÑ•½Ù•É™±½Üµ¡¥‘‘•¸ˆø(€€€€€€€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”õí ´ÈÉ½Õ¹‘•µ™Õ±°ÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÌÀÀ€‘ì(€€€€€€€€€€€€€€€€€€€€€…±±M•Ñ¥½¹ÍÉÉ½È(€€€€€€€€€€€€€€€€€€€€€€€€ü€‰‰œµ‘•ÍÑÉÕÑ¥Ù”ˆ(€€€€€€€€€€€€€€€€€€€€€€€€è¥Í•¹•É…Ñ¥¹œ(€€€€€€€€€€€€€€€€€€€€€€€€ü€‰‰œµÁÉ¥µ…Éäˆ(€€€€€€€€€€€€€€€€€€€€€€€€è€‰‰œµÁÉ¥µ…Éäˆ(€€€€€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€€€€€€ÍÑå±”õíìÝ¥‘Ñ è€‘íÁÉ½É•ÍÍAÑô•€õô(€€€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€¥ô((€€€€€€€€€€€ì¼¨-••ÀÑ¡”•¹•É…Ñ•É•Á½ÉÐ…Ù…¥±…‰±”Ý¥Ñ¡½ÕÐµ…­¥¹œ¥ÐÑ¡”‘•™…Õ±ÐÉ•…‘¥¹œ•áÁ•É¥•¹”¸€¨½ô(€€€€€€€€€€€í½µÁ±•Ñ•‘M•Ñ¥½¹Ì¹±•¹Ñ €ø€À€˜˜€ (€€€€€€€€€€€€€€ñ‘•Ñ…¥±Ì±…ÍÍ9…µ”ô‰µÐ´àµ¥¸µÜ´Àµ…àµÜ´Íá°É½Õ¹‘•µ±œ‰½É‘•È‰½É‘•Èµ‰½É‘•È‰œµ…ÉÀ´ÐÍ´éÀ´Ôˆø(€€€€€€€€€€€€€€€€ñÍÕµµ…Éä±…ÍÍ9…µ”ô‰ÕÉÍ½ÈµÁ½¥¹Ñ•ÈÑ•áÐµ‰…Í”™½¹ÐµÍ•µ¥‰½±Ñ•áÐµ™½É•É½Õ¹ˆø(€€€€€€€€€€€€€€€€€Y¥•Ü™Õ±°É•Í•…É €¡í½µÁ±•Ñ•‘M•Ñ¥½¹Ì¹±•¹Ñ¡ôÍ•Ñ¥½¹Ì¤(€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰µÐ´Ä‰±½¬Ñ•áÐµÍ´™½¹Ðµ¹½Éµ…°Ñ•áÐµµÕÑ•µ™½É•É½Õ¹ˆù=ÁÑ¥½¹…°‘•Ñ…¥±Ì°…ÍÍÕµÁÑ¥½¹Ì°½¹™¥‘•¹”°…¹•Ù¥‘•¹”…ÁÌð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€ð½ÍÕµµ…Éäø(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰µÐ´Ôµ¥¸µÜ´ÀÍÁ…”µä´Ðˆø(€€€€€€€€€€€€€€€í½µÁ±•Ñ•‘M•Ñ¥½¹Ì¹µ…À ¡Í•Ñ¥½¸¤€ôø€ (€€€€€€€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€€€€€­•äõíÍ•Ñ¥½¸¹Í•Ñ¥½¹%€üüÍ•Ñ¥½¸¹Ñ¥Ñ±”€üü€‰Ù…±¥‘…Ñ¥½¸µÍ•Ñ¥½¸‰ô(€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰µ¥¸µÜ´À½Ù•É™±½Üµ¡¥‘‘•¸É½Õ¹‘•µ±œ‰½É‘•È‰½É‘•Èµ‰½É‘•È‰œµµÕÑ•¼ÈÀÀ´ÐÍ´éÀ´ÔÍÁ…”µä´Ìˆ(€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€€ñ Ì(€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Ñ•áÐµ‰…Í”™½¹ÐµÍ•µ¥‰½±Ñ•áÐµ™½É•É½Õ¹ˆ(€€€€€€€€€€€€€€€€€€€€€ÍÑå±”õíì™½¹Ñ…µ¥±äè€‰Ù…È ´µ™½¹Ðµ¡•…‘¥¹œ¤°Õ¤µÍ…¹ÌµÍ•É¥˜°ÍåÍÑ•´µÕ¤°Í…¹ÌµÍ•É¥˜ˆõô(€€€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€€€íÍ•Ñ¥½¸¹Ñ¥Ñ±”€üüÍ•Ñ¥½¸¹Í•Ñ¥½¹%€üü€‰Y…±¥‘…Ñ¥½¸M•Ñ¥½¸‰ô(€€€€€€€€€€€€€€€€€€€€ð½ Ìø((€€€€€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰‰É•…¬µÝ½É‘ÌÑ•áÐµÍ´Ñ•áÐµ™½É•É½Õ¹m½Ù•É™±½ÜµÝÉ…Àé…¹åÝ¡•É•tÝ¡¥Ñ•ÍÁ…”µÁÉ”µÝÉ…À±•…‘¥¹œµÉ•±…á•ˆø(€€€€€€€€€€€€€€€€€€€€€íÍ•Ñ¥½¸¹ÍÑ…ÑÕÌ€ôôô€‰™…¥±•ˆ(€€€€€€€€€€€€€€€€€€€€€€€€ü•ÑM…™•Y…±¥‘…Ñ¥½¹…¥±ÕÉ•5•ÍÍ…”¡Í•Ñ¥½¸¹•‘¥Ñ•‘½¹Ñ•¹Ð€üüÍ•Ñ¥½¸¹½¹Ñ•¹Ð€üü€ˆˆ¤(€€€€€€€€€€€€€€€€€€€€€€€€èÍ•Ñ¥½¸¹•‘¥Ñ•‘½¹Ñ•¹Ð€üüÍ•Ñ¥½¸¹½¹Ñ•¹Ð€üü€ˆ‰ô(€€€€€€€€€€€€€€€€€€€€ð½Àø((€€€€€€€€€€€€€€€€€€€íÍ•Ñ¥½¸¹½¹™¥‘•¹”€˜˜€ (€€€€€€€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰ÍÁ…”µä´ÈÁÐ´È‰½É‘•ÈµÐ‰½É‘•Èµ‰½É‘•È¼ØÀˆø(€€€€€€€€€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áÐµáÌÑ•áÐµµÕÑ•µ™½É•É½Õ¹ˆø(€€€€€€€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰™½¹Ðµµ•‘¥Õ´Ñ•áÐµ™½É•É½Õ¹ˆù½¹™¥‘•¹”èð½ÍÁ…¸ùìˆ€‰ô(€€€€€€€€€€€€€€€€€€€€€€€€€ì¡Í•Ñ¥½¸¹½¹™¥‘•¹”¹±•Ù•°€üü€‰±½Üˆ¤¹É•Á±…” ‰|ˆ°€ˆ€ˆ¥ô€¡í5…Ñ ¹É½Õ¹ ¡Í•Ñ¥½¸¹½¹™¥‘•¹”¹Í½É”€üü€À¤€¨€ÄÀÀ¥ô”¤(€€€€€€€€€€€€€€€€€€€€€€€€ð½Àø((€€€€€€€€€€€€€€€€€€€€€€€íÍ•Ñ¥½¸¹½¹™¥‘•¹”¹•Ù¥‘•¹•MÕµµ…Éä€˜˜€ (€€€€€€€€€€€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áÐµáÌÑ•áÐµµÕÑ•µ™½É•É½Õ¹ˆø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰™½¹Ðµµ•‘¥Õ´Ñ•áÐµ™½É•É½Õ¹ˆùÙ¥‘•¹”èð½ÍÁ…¸ùìˆ€‰ô(€€€€€€€€€€€€€€€€€€€€€€€€€€€íÍ•Ñ¥½¸¹½¹™¥‘•¹”¹•Ù¥‘•¹•MÕµµ…Éåô(€€€€€€€€€€€€€€€€€€€€€€€€€€ð½Àø(€€€€€€€€€€€€€€€€€€€€€€€€¥ô((€€€€€€€€€€€€€€€€€€€€€€€íÍ•Ñ¥½¸¹½¹™¥‘•¹”¹…ÍÍÕµÁÑ¥½¹Ìü¹±•¹Ñ €ø€À€˜˜€ (€€€€€€€€€€€€€€€€€€€€€€€€€€ñ‘¥Øø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áÐµáÌ™½¹Ðµµ•‘¥Õ´Ñ•áÐµ™½É•É½Õ¹µˆ´ÄˆùÍÍÕµÁÑ¥½¹Ìð½Àø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñÕ°±…ÍÍ9…µ”ô‰±¥ÍÐµ‘¥ÍŒ±¥ÍÐµ¥¹Í¥‘”ÍÁ…”µä´À¸Ôˆø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€íÍ•Ñ¥½¸¹½¹™¥‘•¹”¹…ÍÍÕµÁÑ¥½¹Ì¹µ…À ¡„èÍÑÉ¥¹œ°¤è¹Õµ‰•È¤€ôø€ (€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñ±¤­•äõí¥ô±…ÍÍ9…µ”ô‰‰É•…¬µÝ½É‘ÌÑ•áÐµáÌÑ•áÐµµÕÑ•µ™½É•É½Õ¹m½Ù•É™±½ÜµÝÉ…Àé…¹åÝ¡•É•tˆùí…ôð½±¤ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€¤¥ô(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ð½Õ°ø(€€€€€€€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€€€€€€€¥ô((€€€€€€€€€€€€€€€€€€€€€€€íÍ•Ñ¥½¸¹ÍÑ…ÑÕÌ€„ôô€‰™…¥±•ˆ€˜˜Í•Ñ¥½¸¹½¹™¥‘•¹”¹µ¥ÍÍ¥¹%¹™½Éµ…Ñ¥½¸ü¹±•¹Ñ €ø€À€˜˜€ (€€€€€€€€€€€€€€€€€€€€€€€€€€ñ‘¥Øø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áÐµáÌ™½¹Ðµµ•‘¥Õ´Ñ•áÐµ™½É•É½Õ¹µˆ´Äˆù5¥ÍÍ¥¹œ%¹™½Éµ…Ñ¥½¸ð½Àø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñÕ°±…ÍÍ9…µ”ô‰±¥ÍÐµ‘¥ÍŒ±¥ÍÐµ¥¹Í¥‘”ÍÁ…”µä´À¸Ôˆø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€íÍ•Ñ¥½¸¹½¹™¥‘•¹”¹µ¥ÍÍ¥¹%¹™½Éµ…Ñ¥½¸¹µ…À ¡´èÍÑÉ¥¹œ°¤è¹Õµ‰•È¤€ôø€ (€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€ñ±¤­•äõí¥ô±…ÍÍ9…µ”ô‰‰É•…¬µÝ½É‘ÌÑ•áÐµáÌÑ•áÐµµÕÑ•µ™½É•É½Õ¹m½Ù•É™±½ÜµÝÉ…Àé…¹åÝ¡•É•tˆùíµôð½±¤ø(€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€¤¥ô(€€€€€€€€€€€€€€€€€€€€€€€€€€€€ð½Õ°ø(€€€€€€€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€¤¥ô(€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€ð½‘•Ñ…¥±Ìø(€€€€€€€€€€€€¥ô((€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰µÐ´ÄÈÁÐ´à‰½É‘•ÈµÐ‰½É‘•Èµ‰½É‘•Èˆø(€€€€€€€€€€€€€€ñ)½ÕÉ¹•å5…ÀÕÉÉ•¹ÑMÑ…•%õíÍÑ…•%‘ô¥¹Ù•¹Ñ¥½¹%õí¥¹Ù•¹Ñ¥½¹%‘ô€¼ø(€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€ð½‘¥Øø(€€€€€€€€ð½µ…¥¸ø(€€€€€€€€ñ™½½Ñ•È±…ÍÍ9…µ”ô‰‰½É‘•ÈµÐ‰½É‘•Èµ‰½É‘•Èˆø(€€€€€€€€€€ñ5…‘•Q¡¥Í	…‘”€¼ø(€€€€€€€€ð½™½½Ñ•Èø(€€€€€€ð½‘¥Øø(€€€€¤ì(€ô((€€¼¼M¡½Ü½¹É…ÑÕ±…Ñ¥½¹Ì…™Ñ•È½µÁ±•Ñ¥¹œ…±°•¹…‰±•ÍÑ…•Ì(€¥˜€¡Í¡½Ý½¹É…ÑÌ¤ì(€€€É•ÑÕÉ¸€ñ½¹É…ÑÕ±…Ñ½ÉåMÉ••¸¥¹Ù•¹Ñ¥½¹Q¥Ñ±”õí¥¹Ù•¹Ñ¥½¸¹Ñ¥Ñ±•ô€¼øì(€ô((€€¼¼MÑ…•Ì€Ô¬èÍ¡½Ü½µ¥¹œÍ½½¸(€¥˜€ …ÕÉÉ•¹ÑMÑ…”¹•¹…‰±•ñðÍÑ…•%€ø€Ð¤ì(€€€É•ÑÕÉ¸€ñ½µ¥¹M½½¹MÑ…”ÍÑ…•%õíÍÑ…•%‘ôÍÑ…•9…µ”õíÕÉÉ•¹ÑMÑ…”¹¹…µ•ô€¼øì(€ô((€€¼¼ƒŠRŠR !…¹‘±•ÉÌƒŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠR ((€½¹ÍÐ¡…¹‘±•	±ÕÈ€ô…Íå¹Œ€¡™¥•±è¥•±‘•˜¤€ôøì(€€€½¹ÍÐÙ…±Õ”€ô™¥•±‘Y…±Õ•Ím™¥•±¹­•åt€üü€ˆˆì(€€€ÑÉäì(€€€€€¥˜€¡ÍÑ…•%€ôôô€Ä¤ì(€€€€€€€€¼¼MÑ…”€ÄèÕÁ‘…Ñ”¥¹Ù•¹Ñ¥½¸É•½É‘¥É•Ñ±ä(€€€€€€€¥˜€ (€€€€€€€€€™¥•±¹­•ä€ôôô€‰Ñ¥Ñ±”ˆñð(€€€€€€€€€™¥•±¹­•ä€ôôô€‰ÁÉ½‰±•µMÑ…Ñ•µ•¹Ðˆñð(€€€€€€€€€™¥•±¹­•ä€ôôô€‰Ñ…É•ÑÕ‘¥•¹”ˆñð(€€€€€€€€€™¥•±¹­•ä€ôôô€‰Í½±ÕÑ¥½¹•ÍÉ¥ÁÑ¥½¸ˆ(€€€€€€€€¤ì(€€€€€€€€€…Ý…¥ÐÕÁ‘…Ñ•%¹Ù•¹Ñ¥½¹¥•±¡ì(€€€€€€€€€€€¥¹Ù•¹Ñ¥½¹%°(€€€€€€€€€€€™¥•±è™¥•±¹­•ä…Ì€‰Ñ¥Ñ±”ˆð€‰ÁÉ½‰±•µMÑ…Ñ•µ•¹Ðˆð€‰Ñ…É•ÑÕ‘¥•¹”ˆð€‰Í½±ÕÑ¥½¹•ÍÉ¥ÁÑ¥½¸ˆ°(€€€€€€€€€€€Ù…±Õ”°(€€€€€€€€€ô¤ì(€€€€€€€ô(€€€€€ô•±Í”ì(€€€€€€€…Ý…¥ÐÕÁ‘…Ñ•MÑ…•AÉ½É•ÍÌ¡ì¥¹Ù•¹Ñ¥½¹%°ÍÑ…•%°™¥•±è™¥•±¹­•ä°Ù…±Õ”ô¤ì(€€€€€ô(€€€ô…Ñ ì(€€€€€€¼¼Í¥±•¹Ñ±ä¡…¹‘±”ì¹•áÐÍ…Ù”Ý¥±°É•ÑÉä(€€€ô(€ôì((€½¹ÍÐ¡…¹‘±•‘Ù…¹”€ô…Íå¹Œ€ ¤€ôøì(€€€Í•Ñ‘Ù…¹¥¹œ¡ÑÉÕ”¤ì(€€€ÑÉäì(€€€€€ÑÉ…­½¹Ñ¥¹Õ•±¥­•¡ÍÑ…•%°ÕÉÉ•¹ÑMÑ…”¹¹…µ”°¥¹Ù•¹Ñ¥½¹%¤ì(€€€€€¥˜€¡É•…‘¥¹•ÍÍMÑ…Ñ”€ôôô€‰I•…‘äÑ¼5½Ù”½ÉÝ…Éˆ¤ì(€€€€€€€ÑÉ…­MÑ…•½µÁ±•Ñ•¡ÍÑ…•%°ÕÉÉ•¹ÑMÑ…”¹¹…µ”°¥¹Ù•¹Ñ¥½¹%¤ì(€€€€€€€½¹ÍÐ¹•áÑMÑ…•%€ô…Ý…¥Ð…‘Ù…¹•MÑ…”¡ì¥¹Ù•¹Ñ¥½¹%ô¤ì(€€€€€€€€¼¼¹Õ±°µ•…¹Ì¹¼¹•áÐ•¹…‰±•ÍÑ…”ƒŠPÝ”É”‘½¹”Ý¥Ñ …±°…Ñ¥Ù”ÍÑ…•Ì(€€€€€€€¥˜€¡¹•áÑMÑ…•%€ôôô¹Õ±°¤ì(€€€€€€€€€Í•ÑM¡½Ý½¹É…ÑÌ¡ÑÉÕ”¤ì(€€€€€€€€€É•ÑÕÉ¸ì(€€€€€€€ô(€€€€€ô(€€€€€É½ÕÑ•È¹ÁÕÍ  ˆ½‘…Í¡‰½…Éˆ¤ì(€€€ô…Ñ ì(€€€€€Í•Ñ‘Ù…¹¥¹œ¡™…±Í”¤ì(€€€ô(€ôì((€É•ÑÕÉ¸€ (€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰µ¥¸µ µÍÉ••¸™±•à™±•àµ½°‰œµ‰…­É½Õ¹ˆø(€€€€€€ñÁÁ9…Ø€¼ø((€€€€€€ñµ…¥¸±…ÍÍ9…µ”ô‰™±•à´Äˆø(€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰µàµ…ÕÑ¼µ…àµÜ´Õá°Áà´ÐÍ´éÁà´ØÁä´ÄÀˆø(€€€€€€€€€ì¼¨	…¬±¥¹¬€¨½ô(€€€€€€€€€€ñ1¥¹¬(€€€€€€€€€€€¡É•˜ôˆ½‘…Í¡‰½…Éˆ(€€€€€€€€€€€±…ÍÍ9…µ”ô‰¥¹±¥¹”µ™±•à¥Ñ•µÌµ•¹Ñ•È…À´Ä¸ÔÑ•áÐµÍ´Ñ•áÐµµÕÑ•µ™½É•É½Õ¹¡½Ù•ÈéÑ•áÐµ™½É•É½Õ¹ÑÉ…¹Í¥Ñ¥½¸µ½±½ÉÌµˆ´àˆ(€€€€€€€€€€ø(€€€€€€€€€€€€ñÉÉ½Ý1•™Ð±…ÍÍ9…µ”ô‰ ´ÐÜ´Ðˆ€¼ø(€€€€€€€€€€€	…¬Ñ¼…Í¡‰½…É(€€€€€€€€€€ð½1¥¹¬ø((€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰É¥…À´à±œéÉ¥µ½±ÌµlÅ™É|É™Étˆø(€€€€€€€€€€€ì¼¨ƒŠRŠR 1•™ÐÁ…¹•°èÍÑ…ÑÕÌƒŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠR €¨½ô(€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰ÍÁ…”µä´Øˆø(€€€€€€€€€€€€€€ñ‘¥Øø(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•à¥Ñ•µÌµ•¹Ñ•È©ÕÍÑ¥™äµ‰•ÑÝ••¸µˆ´Äˆø(€€€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áÐµáÌ™½¹Ðµµ•‘¥Õ´ÕÁÁ•É…Í”ÑÉ…­¥¹œµÝ¥‘•ÍÐÑ•áÐµÁÉ¥µ…Éäˆø(€€€€€€€€€€€€€€€€€€€MÑ…”íÍÑ…•%‘ô(€€€€€€€€€€€€€€€€€€ð½Àø(€€€€€€€€€€€€€€€€€€ñ%¹Ù•¹Ñ¥½¹…É‘5•¹Ô(€€€€€€€€€€€€€€€€€€€¥¹Ù•¹Ñ¥½¹%õí¥¹Ù•¹Ñ¥½¹%‘ô(€€€€€€€€€€€€€€€€€€€¥¹Ù•¹Ñ¥½¹Q¥Ñ±”õí¥¹Ù•¹Ñ¥½¸¹Ñ¥Ñ±•ô(€€€€€€€€€€€€€€€€€€€½¹•±•Ñ•õì ¤€ôøÉ½ÕÑ•È¹ÁÕÍ  ˆ½½¹‰½…É‘¥¹œˆ¥ô(€€€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€ñ Ä(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Ñ•áÐ´Éá°™½¹Ðµ‰½±Ñ•áÐµ™½É•É½Õ¹ˆ(€€€€€€€€€€€€€€€€€ÍÑå±”õíì™½¹Ñ…µ¥±äè€‰Ù…È ´µ™½¹Ðµ¡•…‘¥¹œ¤°Õ¤µÍ…¹ÌµÍ•É¥˜°ÍåÍÑ•´µÕ¤°Í…¹ÌµÍ•É¥˜ˆõô(€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€íÕÉÉ•¹ÑMÑ…”¹¹…µ•ô(€€€€€€€€€€€€€€€€ð½ Äø(€€€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€€€ñI•…‘¥¹•ÍÍ	…‘”ÍÑ…Ñ”õíÉ•…‘¥¹•ÍÍMÑ…Ñ•ô€¼ø((€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áÐµÍ´Ñ•áÐµµÕÑ•µ™½É•É½Õ¹¥Ñ…±¥Œ±•…‘¥¹œµÉ•±…á•‰½É‘•Èµ°´È‰½É‘•ÈµÁÉ¥µ…Éä¼ÌÀÁ°´Ìˆø(€€€€€€€€€€€€€€€í¹•áÑÑ¥½¹ô(€€€€€€€€€€€€€€ð½Àø((€€€€€€€€€€€€€€ñ‘¥Øø(€€€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áÐµáÌÑ•áÐµµÕÑ•µ™½É•É½Õ¹µˆ´Èˆø(€€€€€€€€€€€€€€€€€í½µÁ±•Ñ•‘¥•±‘Ì¹±•¹Ñ¡ô½™ìˆ€‰ô(€€€€€€€€€€€€€€€€€íÕÉÉ•¹ÑMÑ…”¹½µÁ±•Ñ¥½¹É¥Ñ•É¥„ü¹±•¹Ñ €üü€Áô™¥•±‘Ì½µÁ±•Ñ”(€€€€€€€€€€€€€€€€ð½Àø(€€€€€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰Üµ™Õ±° ´Ä¸ÔÉ½Õ¹‘•µ™Õ±°‰œµµÕÑ•½Ù•É™±½Üµ¡¥‘‘•¸ˆø(€€€€€€€€€€€€€€€€€€ñ‘¥Ø(€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰ µ™Õ±°‰œµÁÉ¥µ…ÉäÉ½Õ¹‘•µ™Õ±°ÑÉ…¹Í¥Ñ¥½¸µ…±°‘ÕÉ…Ñ¥½¸´ÔÀÀˆ(€€€€€€€€€€€€€€€€€€€ÍÑå±”õíì(€€€€€€€€€€€€€€€€€€€€€Ý¥‘Ñ è€‘ì(€€€€€€€€€€€€€€€€€€€€€€€ÕÉÉ•¹ÑMÑ…”¹½µÁ±•Ñ¥½¹É¥Ñ•É¥„ü¹±•¹Ñ (€€€€€€€€€€€€€€€€€€€€€€€€€€ü€¡½µÁ±•Ñ•‘¥•±‘Ì¹±•¹Ñ €¼ÕÉÉ•¹ÑMÑ…”¹½µÁ±•Ñ¥½¹É¥Ñ•É¥„¹±•¹Ñ ¤€¨€ÄÀÀ(€€€€€€€€€€€€€€€€€€€€€€€€€€è€À(€€€€€€€€€€€€€€€€€€€€€ô•€°(€€€€€€€€€€€€€€€€€€€õô(€€€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€€€íÉ•…‘¥¹•ÍÍMÑ…Ñ”€ôôô€‰I•…‘äÑ¼5½Ù”½ÉÝ…Éˆ€ü€ (€€€€€€€€€€€€€€€€ñ	ÕÑÑ½¸(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Üµ™Õ±°…À´Èˆ(€€€€€€€€€€€€€€€€€½¹±¥¬õí¡…¹‘±•‘Ù…¹•ô(€€€€€€€€€€€€€€€€€‘¥Í…‰±•õí…‘Ù…¹¥¹ô(€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€í…‘Ù…¹¥¹œ€ü€‰5½Ù¥¹œ™½ÉÝ…É“Š˜ˆ€è€‰½¹Ñ¥¹Õ”ƒŠH‰ô(€€€€€€€€€€€€€€€€€ì……‘Ù…¹¥¹œ€˜˜€ñÉÉ½ÝI¥¡Ð±…ÍÍ9…µ”ô‰ ´ÐÜ´Ðˆ€¼ùô(€€€€€€€€€€€€€€€€ð½	ÕÑÑ½¸ø(€€€€€€€€€€€€€€¤€è€ (€€€€€€€€€€€€€€€€ñ	ÕÑÑ½¸(€€€€€€€€€€€€€€€€€Ù…É¥…¹Ðô‰½ÕÑ±¥¹”ˆ(€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Üµ™Õ±°…À´Èˆ(€€€€€€€€€€€€€€€€€½¹±¥¬õí¡…¹‘±•‘Ù…¹•ô(€€€€€€€€€€€€€€€€€‘¥Í…‰±•õí…‘Ù…¹¥¹ô(€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€M…Ù”€˜…Í¡‰½…É(€€€€€€€€€€€€€€€€ð½	ÕÑÑ½¸ø(€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€€€ì¼¨ƒŠRŠR I¥¡ÐÁ…¹•°è™¥•±‘ÌƒŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠR €¨½ô(€€€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰ÍÁ…”µä´Øˆø(€€€€€€€€€€€€€€ñ È(€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰Ñ•áÐµ±œ™½¹ÐµÍ•µ¥‰½±Ñ•áÐµ™½É•É½Õ¹ˆ(€€€€€€€€€€€€€€€ÍÑå±”õíì™½¹Ñ…µ¥±äè€‰Ù…È ´µ™½¹Ðµ¡•…‘¥¹œ¤°Õ¤µÍ…¹ÌµÍ•É¥˜°ÍåÍÑ•´µÕ¤°Í…¹ÌµÍ•É¥˜ˆõô(€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€í¥¹Ù•¹Ñ¥½¸¹Ñ¥Ñ±•ô(€€€€€€€€€€€€€€ð½ Èø((€€€€€€€€€€€€€í™¥•±‘Ìü¹µ…À ¡™¥•±¤€ôøì(€€€€€€€€€€€€€€€½¹ÍÐ¥Í½¹”€ô½µÁ±•Ñ•‘¥•±‘Ì¹¥¹±Õ‘•Ì¡™¥•±¹­•ä¤ì(€€€€€€€€€€€€€€€É•ÑÕÉ¸€ (€€€€€€€€€€€€€€€€€€ñ‘¥Ø­•äõí™¥•±¹­•åô±…ÍÍ9…µ”ô‰ÍÁ…”µä´Èˆø(€€€€€€€€€€€€€€€€€€€€ñ1…‰•°(€€€€€€€€€€€€€€€€€€€€€¡Ñµ±½Èõí™¥•±¹­•åô(€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”õí¥Í½¹”€ü€‰Ñ•áÐµ™½É•É½Õ¹ˆ€è€‰Ñ•áÐµµÕÑ•µ™½É•É½Õ¹‰ô(€€€€€€€€€€€€€€€€€€€€ø(€€€€€€€€€€€€€€€€€€€€€í™¥•±¹±…‰•±ô(€€€€€€€€€€€€€€€€€€€€€í¥Í½¹”€˜˜€ (€€€€€€€€€€€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰µ°´ÈÑ•áÐµÁÉ¥µ…ÉäÑ•áÐµáÌ™½¹Ðµ¹½Éµ…°ˆûŠrLÍ…Ù•ð½ÍÁ…¸ø(€€€€€€€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€€€€€€ð½1…‰•°ø(€€€€€€€€€€€€€€€€€€€í™¥•±¹ÑåÁ”€ôôô€‰Ñ•áÑ…É•„ˆ€ü€ (€€€€€€€€€€€€€€€€€€€€€€ñQ•áÑ…É•„(€€€€€€€€€€€€€€€€€€€€€€€¥õí™¥•±¹­•åô(€€€€€€€€€€€€€€€€€€€€€€€Ù…±Õ”õí™¥•±‘Y…±Õ•Ím™¥•±¹­•åt€üü€ˆ‰ô(€€€€€€€€€€€€€€€€€€€€€€€½¹¡…¹”õì¡”¤€ôø(€€€€€€€€€€€€€€€€€€€€€€€€€Í•Ñ¥•±‘Y…±Õ•Ì ¡Ø¤€ôø€¡ì€¸¸¹Ø°m™¥•±¹­•åtè”¹Ñ…É•Ð¹Ù…±Õ”ô¤¤(€€€€€€€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€€€€€€€€€½¹	±ÕÈõì ¤€ôø¡…¹‘±•	±ÕÈ¡™¥•±¥ô(€€€€€€€€€€€€€€€€€€€€€€€Á±…•¡½±‘•Èõí™¥•±¹Á±…•¡½±‘•Éô(€€€€€€€€€€€€€€€€€€€€€€€É½ÝÌõìÑô(€€€€€€€€€€€€€€€€€€€€€€€±…ÍÍ9…µ”ô‰É•Í¥é”µ¹½¹”ˆ(€€€€€€€€€€€€€€€€€€€€€€€€¼¼MÑ…”€Ä™¥•±‘Ì…É”•‘¥Ñ…‰±”€¡¥¹±¥¹”•‘¥Ð¤(€€€€€€€€€€€€€€€€€€€€€€€É•…‘=¹±äõíÍÑ…•%€ôôô€Ä€˜˜€…l‰ÁÉ½‰±•µMÑ…Ñ•µ•¹Ðˆ°€‰Ñ…É•ÑÕ‘¥•¹”ˆ°€‰Í½±ÕÑ¥½¹•ÍÉ¥ÁÑ¥½¸ˆ°€‰Ñ¥Ñ±”‰t¹¥¹±Õ‘•Ì¡™¥•±¹­•ä¥ô(€€€€€€€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€€€€€€€¤€è€ (€€€€€€€€€€€€€€€€€€€€€€ñ%¹ÁÕÐ(€€€€€€€€€€€€€€€€€€€€€€€¥õí™¥•±¹­•åô(€€€€€€€€€€€€€€€€€€€€€€€Ù…±Õ”õí™¥•±‘Y…±Õ•Ím™¥•±¹­•åt€üü€ˆ‰ô(€€€€€€€€€€€€€€€€€€€€€€€½¹¡…¹”õì¡”¤€ôø(€€€€€€€€€€€€€€€€€€€€€€€€€Í•Ñ¥•±‘Y…±Õ•Ì ¡Ø¤€ôø€¡ì€¸¸¹Ø°m™¥•±¹­•åtè”¹Ñ…É•Ð¹Ù…±Õ”ô¤¤(€€€€€€€€€€€€€€€€€€€€€€€ô(€€€€€€€€€€€€€€€€€€€€€€€½¹	±ÕÈõì ¤€ôø¡…¹‘±•	±ÕÈ¡™¥•±¥ô(€€€€€€€€€€€€€€€€€€€€€€€Á±…•¡½±‘•Èõí™¥•±¹Á±…•¡½±‘•Éô(€€€€€€€€€€€€€€€€€€€€€€¼ø(€€€€€€€€€€€€€€€€€€€€¥ô(€€€€€€€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€€€€€€€¤ì(€€€€€€€€€€€€€ô¥ô((€€€€€€€€€€€€€€ñÀ±…ÍÍ9…µ”ô‰Ñ•áÐµáÌÑ•áÐµµÕÑ•µ™½É•É½Õ¹ˆø(€€€€€€€€€€€€€€€¥•±‘ÌÍ…Ù”…ÕÑ½µ…Ñ¥…±±äÝ¡•¸å½Ôµ½Ù”Ñ¼Ñ¡”¹•áÐ½¹”¸(€€€€€€€€€€€€€€ð½Àø(€€€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€ð½‘¥Øø((€€€€€€€€€ì¼¨)½ÕÉ¹•äµ…À€¨½ô(€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰µÐ´ÄÈÁÐ´à‰½É‘•ÈµÐ‰½É‘•Èµ‰½É‘•Èˆø(€€€€€€€€€€€€ñ)½ÕÉ¹•å5…ÀÕÉÉ•¹ÑMÑ…•%õíÍÑ…•%‘ô¥¹Ù•¹Ñ¥½¹%õí¥¹Ù•¹Ñ¥½¹%‘ô€¼ø(€€€€€€€€€€ð½‘¥Øø(€€€€€€€€ð½‘¥Øø(€€€€€€ð½µ…¥¸ø((€€€€€€ñ™½½Ñ•È±…ÍÍ9…µ”ô‰‰½É‘•ÈµÐ‰½É‘•Èµ‰½É‘•Èˆø(€€€€€€€€ñ5…‘•Q¡¥Í	…‘”€¼ø(€€€€€€ð½™½½Ñ•Èø(€€€€ð½‘¥Øø(€€¤ì)ô(
+    const avgConfidence =
+      sectionsWithConf.length > 0
+        ? `${Math.round(
+            (sectionsWithConf.reduce(
+              (sum, s) => sum + (s.confidence?.score ?? 0),
+              0
+            ) /
+              sectionsWithConf.length) *
+              100
+          )}%`
+        : "â€”";
+    const researchTs =
+      (validationResearch as { completedAt?: number; triggeredAt?: number } | null)
+        ?.completedAt ??
+      (validationResearch as { completedAt?: number; triggeredAt?: number } | null)
+        ?.triggeredAt;
+    const researchDateStr = researchTs
+      ? new Date(researchTs).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })
+      : "â€”";
+
+    return (
+      <div className="min-h-screen min-w-0 flex flex-col bg-background">
+        <AppNav />
+        <main className="min-w-0 flex-1">
+          <div className="mx-auto w-full min-w-0 max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Dashboard
+            </Link>
+
+            {/* Status screen */}
+            <div className="space-y-4 max-w-xl">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium uppercase tracking-widest text-primary">
+                  Stage 2 â€” Validation
+                </p>
+                <InventionCardMenu
+                  inventionId={inventionId}
+                  inventionTitle={invention.title}
+                  onDeleted={() => router.push("/onboarding")}
+                />
+              </div>
+              <h1
+                className="text-2xl font-bold text-foreground"
+                style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
+              >
+                InventSmith is validating your invention.
+              </h1>
+              <p className="text-muted-foreground">
+                {isGenerating
+                  ? "Your research is being prepared. You can come back when it finishes."
+                  : allSectionsError
+                  ? "This attempt did not produce usable research."
+                  : "Here is the short version first. You can open the full report if you want more detail."}
+              </p>
+              <p className="text-sm text-foreground">
+                Status: <span className="font-medium">{statusLabel}</span>
+              </p>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRebuildValidation}
+                  disabled={isGenerating}
+                  className="gap-1.5 text-sm w-fit"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5${rebuilding ? " animate-spin" : ""}`} />
+                  {isGenerating ? "Researchingâ€¦" : failedSections.length > 0 ? "Retry failed sections" : "Refresh validation"}
+                </Button>
+                {rebuildError && (
+                  <p className="text-xs text-destructive">{rebuildError}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Plain-language summary: keep the next action visible and the report optional. */}
+            {validationResearch && (
+              <div className="mt-8 max-w-xl rounded-lg border border-border bg-muted/30 p-5 space-y-4">
+                <h2 className="text-lg font-semibold text-foreground">The short version</h2>
+                <p className="text-sm leading-relaxed text-foreground">
+                  {isGenerating
+                    ? "Your research is still running. You do not need to review anything yet. Wait for it to finish, then check this summary."
+                    : allSectionsError
+                    ? "This attempt could not create the research. The full report contains the error details; the repeated section-by-section messages are optional."
+                    : failedSections.length > 0
+                    ? "Some sections are ready and some need another try. Your completed research is saved."
+                    : "This is an early idea-check, not proof that customers will buy or that the market is confirmed. Some content may be AI-generated hypotheses."}
+                </p>
+                <div className="rounded-md border bg-background p-4">
+                  <p className="text-sm font-semibold">What to do next</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    {isGenerating
+                      ? `Wait for the research to finish (${completedSections.length} of ${TOTAL_SECTIONS} sections processed so far).`
+                      : allSectionsError || failedSections.length > 0
+                      ? "If a retry is already running, wait for it to finish. Otherwise, after the AI connection is fixed, tap Retry failed sections."
+                      : surveyEvidenceIncluded
+                      ? "Your uploaded survey was included in this validation run. The next useful step is to add a few direct customer conversations or other evidence that addresses the remaining gaps."
+                      : "Talk with a few people who use thick foods in jars. Ask what they do with the last portion, and save their real answers as evidence."}
+                  </p>
+                </div>
+                {(surveyEvidenceIncluded || uploadedSurveys.length > 0 || (evidenceReview?.pendingSurveys?.length ?? 0) > 0) && !allSectionsError && failedSections.length === 0 && (
+                  <div className="space-y-2 rounded-md border border-primary/30 bg-primary/5 p-3 text-sm">
+                    <p className="font-medium text-primary">Survey evidence and refresh status</p>
+                    {uploadedSurveys.length > 0 ? uploadedSurveys.map((survey, index) => (
+                      <div key={`${survey.title}-${index}`} className="space-y-1 text-foreground">
+                        <p className="font-medium">{survey.title}{survey.sampleSize ? ` Â· ${survey.sampleSize} reported` : ""}</p>
+                        {survey.summary && <p className="text-muted-foreground">{survey.summary}</p>}
+                        {survey.findings.length > 0 && <ul className="list-disc space-y-1 pl-5 text-muted-foreground">{survey.findings.map((finding, findingIndex) => <li key={findingIndex}>{finding}</li>)}</ul>}
+                        <p className="text-xs text-muted-foreground">{survey.provenance}</p>
+                      </div>
+                    )) : <p className="text-muted-foreground">A survey was referenced in this report, but its extracted source details are not available in the current evidence record.</p>}
+                    {evidenceReview?.pendingSurveys?.map((survey, index) => (
+                      <p key={survey.title + "-pending-" + index} className={survey.status === "failed" ? "text-destructive" : "text-muted-foreground"}>
+                        {survey.title}: {survey.status === "failed" ? "extraction needs retry" : "extraction is still processing; its results are not included yet"}.
+                      </p>
+                    ))}
+                    <p className="text-xs text-muted-foreground">Survey results support customer-validation sections. They do not independently verify market size or prove demand. {evidenceReview?.currentEvidenceMatchesRun ? "This report matches the current evidence." : "New evidence is present; this report is stale or its refresh is still running."}</p>
+                    <p className="text-xs text-muted-foreground">The overall confidence is an evidence-support score, not the chance of success. A survey can strengthen relevant customer sections, but does not by itself verify demand, market size, or the productâ€™s performance.</p>
+                  </div>
+                )}
+                {!isGenerating && !allSectionsError && failedSections.length === 0 && evidenceReview?.currentEvidenceMatchesRun !== false && (
+                  <p className="text-xs text-muted-foreground">Confidence: {avgConfidence}. Research date: {researchDateStr}.</p>
+                )}
+                {!isGenerating && evidenceReview?.currentEvidenceMatchesRun === false && (
+                  <p className="text-xs font-medium text-amber-800">New evidence has arrived since this report. InventSmith is refreshing validation. Its confidence score is hidden until the automatic refresh finishes.</p>
+                )}
+              </div>
+            )}
+
+            {/* â”€â”€ Progress status bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            {validationResearch && (
+              <div className="mt-6 max-w-xl space-y-2">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  {isGenerating ? (
+                    <span className="font-medium text-foreground">
+                      Generating validation researchâ€¦ {progressCount} of {TOTAL_SECTIONS} sections complete
+                    </span>
+                  ) : allSectionsError ? (
+                    <span className="text-destructive font-medium">
+                      Some sections need another try.
+                    </span>
+                  ) : (
+                    <span className="text-primary font-medium">
+                      Validation complete â€” {completedSections.length} of {TOTAL_SECTIONS} sections
+                    </span>
+                  )}
+                  {isGenerating && (
+                    <span>{progressPct}%</span>
+                  )}
+                </div>
+                <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      allSectionsError
+                        ? "bg-destructive"
+                        : isGenerating
+                        ? "bg-primary"
+                        : "bg-primary"
+                    }`}
+                    style={{ width: `${progressPct}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Keep the generated report available without making it the default reading experience. */}
+            {completedSections.length > 0 && (
+              <details className="mt-8 min-w-0 max-w-3xl rounded-lg border border-border bg-card p-4 sm:p-5">
+                <summary className="cursor-pointer text-base font-semibold text-foreground">
+                  View full research ({completedSections.length} sections)
+                  <span className="mt-1 block text-sm font-normal text-muted-foreground">Optional details, assumptions, confidence, and evidence gaps</span>
+                </summary>
+                <div className="mt-5 min-w-0 space-y-4">
+                {completedSections.map((section) => (
+                  <div
+                    key={section.sectionId ?? section.title ?? "validation-section"}
+                    className="min-w-0 overflow-hidden rounded-lg border border-border bg-muted/20 p-4 sm:p-5 space-y-3"
+                  >
+                    <h3
+                      className="text-base font-semibold text-foreground"
+                      style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
+                    >
+                      {section.title ?? section.sectionId ?? "Validation Section"}
+                    </h3>
+
+                    <p className="break-words text-sm text-foreground [overflow-wrap:anywhere] whitespace-pre-wrap leading-relaxed">
+                      {section.status === "failed"
+                        ? getSafeValidationFailureMessage(section.editedContent ?? section.content ?? "")
+                        : section.editedContent ?? section.content ?? ""}
+                    </p>
+
+                    {section.confidence && (
+                      <div className="space-y-2 pt-2 border-t border-border/60">
+                        <p className="text-xs text-muted-foreground">
+                          <span className="font-medium text-foreground">Confidence:</span>{" "}
+                          {(section.confidence.level ?? "low").replace("_", " ")} ({Math.round((section.confidence.score ?? 0) * 100)}%)
+                        </p>
+
+                        {section.confidence.evidenceSummary && (
+                          <p className="text-xs text-muted-foreground">
+                            <span className="font-medium text-foreground">Evidence:</span>{" "}
+                            {section.confidence.evidenceSummary}
+                          </p>
+                        )}
+
+                        {section.confidence.assumptions?.length > 0 && (
+                          <div>
+                            <p className="text-xs font-medium text-foreground mb-1">Assumptions</p>
+                            <ul className="list-disc list-inside space-y-0.5">
+                              {section.confidence.assumptions.map((a: string, i: number) => (
+                                <li key={i} className="break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">{a}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {section.status !== "failed" && section.confidence.missingInformation?.length > 0 && (
+                          <div>
+                            <p className="text-xs font-medium text-foreground mb-1">Missing Information</p>
+                            <ul className="list-disc list-inside space-y-0.5">
+                              {section.confidence.missingInformation.map((m: string, i: number) => (
+                                <li key={i} className="break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">{m}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+                </div>
+              </details>
+            )}
+
+            <div className="mt-12 pt-8 border-t border-border">
+              <JourneyMap currentStageId={stageId} inventionId={inventionId} />
+            </div>
+          </div>
+        </main>
+        <footer className="border-t border-border">
+          <MadeThisBadge />
+        </footer>
+      </div>
+    );
+  }
+
+  // Show congratulations after completing all enabled stages
+  if (showCongrats) {
+    return <CongratulatoryScreen inventionTitle={invention.title} />;
+  }
+
+  // Stages 5+: show coming soon
+  if (!currentStage.enabled || stageId > 4) {
+    return <ComingSoonStage stageId={stageId} stageName={currentStage.name} />;
+  }
+
+  // â”€â”€ Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+  const handleBlur = async (field: FieldDef) => {
+    const value = fieldValues[field.key] ?? "";
+    try {
+      if (stageId === 1) {
+        // Stage 1: update invention record directly
+        if (
+          field.key === "title" ||
+          field.key === "problemStatement" ||
+          field.key === "targetAudience" ||
+          field.key === "solutionDescription"
+        ) {
+          await updateInventionField({
+            inventionId,
+            field: field.key as "title" | "problemStatement" | "targetAudience" | "solutionDescription",
+            value,
+          });
+        }
+      } else {
+        await updateStageProgress({ inventionId, stageId, field: field.key, value });
+      }
+    } catch {
+      // silently handle; next save will retry
+    }
+  };
+
+  const handleAdvance = async () => {
+    setAdvancing(true);
+    try {
+      trackContinueClicked(stageId, currentStage.name, inventionId);
+      if (readinessState === "Ready to Move Forward") {
+        trackStageCompleted(stageId, currentStage.name, inventionId);
+        const nextStageId = await advanceStage({ inventionId });
+        // null means no next enabled stage â€” we're done with all active stages
+        if (nextStageId === null) {
+          setShowCongrats(true);
+          return;
+        }
+      }
+      router.push("/dashboard");
+    } catch {
+      setAdvancing(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      <AppNav />
+
+      <main className="flex-1">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 py-10">
+          {/* Back link */}
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Link>
+
+          <div className="grid gap-8 lg:grid-cols-[1fr_2fr]">
+            {/* â”€â”€ Left panel: status â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            <div className="space-y-6">
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-xs font-medium uppercase tracking-widest text-primary">
+                    Stage {stageId}
+                  </p>
+                  <InventionCardMenu
+                    inventionId={inventionId}
+                    inventionTitle={invention.title}
+                    onDeleted={() => router.push("/onboarding")}
+                  />
+                </div>
+                <h1
+                  className="text-2xl font-bold text-foreground"
+                  style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
+                >
+                  {currentStage.name}
+                </h1>
+              </div>
+
+              <ReadinessBadge state={readinessState} />
+
+              <p className="text-sm text-muted-foreground italic leading-relaxed border-l-2 border-primary/30 pl-3">
+                {nextAction}
+              </p>
+
+              <div>
+                <p className="text-xs text-muted-foreground mb-2">
+                  {completedFields.length} of{" "}
+                  {currentStage.completionCriteria?.length ?? 0} fields complete
+                </p>
+                <div className="w-full h-1.5 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full transition-all duration-500"
+                    style={{
+                      width: `${
+                        currentStage.completionCriteria?.length
+                          ? (completedFields.length / currentStage.completionCriteria.length) * 100
+                          : 0
+                      }%`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              {readinessState === "Ready to Move Forward" ? (
+                <Button
+                  className="w-full gap-2"
+                  onClick={handleAdvance}
+                  disabled={advancing}
+                >
+                  {advancing ? "Moving forwardâ€¦" : "Continue â†’"}
+                  {!advancing && <ArrowRight className="h-4 w-4" />}
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="w-full gap-2"
+                  onClick={handleAdvance}
+                  disabled={advancing}
+                >
+                  Save & Dashboard
+                </Button>
+              )}
+            </div>
+
+            {/* â”€â”€ Right panel: fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            <div className="space-y-6">
+              <h2
+                className="text-lg font-semibold text-foreground"
+                style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
+              >
+                {invention.title}
+              </h2>
+
+              {fields?.map((field) => {
+                const isDone = completedFields.includes(field.key);
+                return (
+                  <div key={field.key} className="space-y-2">
+                    <Label
+                      htmlFor={field.key}
+                      className={isDone ? "text-foreground" : "text-muted-foreground"}
+                    >
+                      {field.label}
+                      {isDone && (
+                        <span className="ml-2 text-primary text-xs font-normal">âœ“ saved</span>
+                      )}
+                    </Label>
+                    {field.type === "textarea" ? (
+                      <Textarea
+                        id={field.key}
+                        value={fieldValues[field.key] ?? ""}
+                        onChange={(e) =>
+                          setFieldValues((v) => ({ ...v, [field.key]: e.target.value }))
+                        }
+                        onBlur={() => handleBlur(field)}
+                        placeholder={field.placeholder}
+                        rows={4}
+                        className="resize-none"
+                        // Stage 1 fields are editable (inline edit)
+                        readOnly={stageId === 1 && !["problemStatement", "targetAudience", "solutionDescription", "title"].includes(field.key)}
+                      />
+                    ) : (
+                      <Input
+                        id={field.key}
+                        value={fieldValues[field.key] ?? ""}
+                        onChange={(e) =>
+                          setFieldValues((v) => ({ ...v, [field.key]: e.target.value }))
+                        }
+                        onBlur={() => handleBlur(field)}
+                        placeholder={field.placeholder}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+
+              <p className="text-xs text-muted-foreground">
+                Fields save automatically when you move to the next one.
+              </p>
+            </div>
+          </div>
+
+          {/* Journey map */}
+          <div className="mt-12 pt-8 border-t border-border">
+            <JourneyMap currentStageId={stageId} inventionId={inventionId} />
+          </div>
+        </div>
+      </main>
+
+      <footer className="border-t border-border">
+        <MadeThisBadge />
+      </footer>
+    </div>
+  );
+}

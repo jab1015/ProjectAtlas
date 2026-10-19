@@ -1,6 +1,6 @@
 # InventSmith Capability Matrix
 
-**Updated:** October 18, 2026 (America/New_York)
+**Updated:** October 19, 2026 (America/New_York)
 **Branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
 **Latest verified CI checkpoint:** `93744db1fdf2772925f96dbc4d33ed1823192f86` (CI #226). Later operations-console compatibility changes were preview-accepted but await exact-head CI.
@@ -17,6 +17,10 @@
 - **External action executed** — an outside-world side effect actually occurred and was separately recorded.
 
 No overall completion percentage is asserted.
+
+### Current preview checkpoint — October 19, 2026
+
+Branch head `6b6becb` has a failed Netlify Deploy Preview. The build log reports invalid UTF-8 in `src/app/(app)/invention/[id]/page.tsx`; the broken source blob is being repaired and a fresh preview remains pending. The existing successful preview is still serving the earlier commit, so the new fixes are not yet available to test. No full-product Convex deployment or provider-backed AI acceptance is claimed.
 
 ## Naming / infrastructure
 

@@ -6,9 +6,13 @@
 **Current continuation checkpoint:** `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`  
 **Active build branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Correction (October 19):** GitHub Action runs `39311119875` and `39314672344` both deployed to `agile-seahorse-379`, not the intended test backend. The deployment workflow now rejects `prod:` keys. Local fixes pass web/Convex TypeScript, Vitest (**124 files / 686 tests**), `git diff --check`, and Next.js build (**36/36**). Preview deploy and live acceptance are pending.
+**Correction (October 19):** GitHub Action runs `39311119875` and `39314672344` both deployed to `agile-seahorse-379`, not the intended test backend. The deployment workflow now rejects `prod:` keys. The earlier source checkpoint passed web/Convex TypeScript, Vitest, `git diff --check`, and Next.js build. The current GitHub head `6b6becb` produced a failed Netlify preview because the pushed Validation page blob is invalid UTF-8; a corrected source file is being rebuilt and must pass Netlify before preview testing continues.
 
 ## October 19 progress and outstanding acceptance
+
+### Latest build blocker — 4:52 PM ET
+
+Netlify deploy `6ad6827f323028ef5f5376e1` failed during Next.js compilation: `stream did not contain valid UTF-8` in `src/app/(app)/invention/[id]/page.tsx`. The last valid page source has been restored in an isolated repair worktree, preserving the existing survey evidence display and adding processing/failure status for survey extraction plus hiding the old confidence score while evidence is stale. The restored UTF-8 candidate now passes **125 test files / 688 tests**, web and Convex TypeScript, and Next.js build (**36/36** pages). The corrected commit is not yet pushed, so no preview update is available yet.
 
 ### Live retest — October 19, 2026, 4:45 PM ET
 

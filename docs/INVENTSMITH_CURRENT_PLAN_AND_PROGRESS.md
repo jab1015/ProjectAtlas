@@ -6,9 +6,14 @@
 **Repository:** `jab1015/ProjectAtlas` (historical repository slug)  
 **Active branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest branch checkpoint:** `0a90b9f` is pushed to `inventsmith/full-product-build`; PR #24 remains draft/open/unmerged. Netlify deploy `6ad68041` ran against that head. Additional local fixes for React render loops and stale validation scores are not yet pushed. GitHub Action runs `39311119875` and `39314672344` targeted production `agile-seahorse-379`, not `quick-fox-785`. Both report no deleted indexes, which does not establish that runtime behavior was preserved. No further Convex deployment is permitted until a dev-scoped key for `quick-fox-785` is confirmed.
+**Latest branch checkpoint:** `6b6becb` is pushed to `inventsmith/full-product-build`; PR #24 remains draft/open/unmerged. Netlify deploy `6ad6827f323028ef5f5376e1` failed during compilation because the GitHub blob for `src/app/(app)/invention/[id]/page.tsx` contains invalid UTF-8. The last valid source is restored in an isolated repair worktree and the survey-processing/stale-confidence UI is reapplied. The candidate passes all **688 tests**, web and Convex TypeScript, and the Next.js build (**36/36** pages). The repair commit has not yet been pushed; no Convex deployment has been run and no production or unrelated Convex environment has been touched.
 
 ## October 19 owner-request checkpoint
+
+### Latest build blocker — 4:52 PM ET
+
+Netlify deploy `6ad6827f323028ef5f5376e1` failed before deployment. Its build log states `stream did not contain valid UTF-8` while reading `src/app/(app)/invention/[id]/page.tsx`. The corrupt file blob came from commit `6b6becb`; the repair restores the preceding valid version and reapplies only survey extraction status and stale-confidence display. A fresh preview is still required. The repaired candidate now passes **688 tests**, both TypeScript checks, and a **36/36** Next.js build. No data-changing app tests or AI-generation calls were made.
+
 
 ### Live retest — October 19, 2026, 4:45 PM ET
 
