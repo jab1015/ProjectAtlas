@@ -6,6 +6,7 @@ import { buildStatusBriefing } from "./statusBriefingLogic";
 import { canResolveDecision } from "./reviewLogic";
 import { MAX_AUTONOMOUS_RUN_BUDGET, remainingAutonomousCostUnitsAfterReservations, utcDateKey } from "./usagePolicyLogic";
 import { evaluatePilotPackage } from "./pilotEvaluationLogic";
+import { safeWorkFailureSummary } from "./workFailureSummary";
 import {
   requireInventionEditAccess,
   requireInventionManageAccess,
@@ -125,11 +126,12 @@ export const getDeliverableLibrary = query({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
     const { invention } = await getAccessibleInvention(ctx, inventionId);
-    const [deliverables, sources, reviews, executionEvents] = await Promise.all([
+    const [deliverables, sources, reviews, executionEvents, workItems] = await Promise.all([
       ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
       ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
       ctx.db.query("professionalReviews").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
       ctx.db.query("atlasExecutionEvents").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
     ]);
 
     const deliverablesWithMedia = await Promise.all(
@@ -147,6 +149,16 @@ export const getDeliverableLibrary = query({
       sources,
       reviews,
       executionEvents: executionEvents.sort((a, b) => b.createdAt - a.createdAt).slice(0, 50),
+      failedWork: workItems
+        .filter((item) => item.status === "failed")
+        .sort((a, b) => b.updatedAt - a.updatedAt)
+        .map((item) => ({
+          kind: item.kind,
+          title: item.title,
+          attemptCount: item.attemptCount,
+          updatedAt: item.updatedAt,
+          summary: safeWorkFailureSummary(item.lastError),
+        })),
     };
   },
 });

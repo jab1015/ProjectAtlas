@@ -3,8 +3,17 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const workflow = readFileSync(join(process.cwd(), ".github", "workflows", "inventsmith-convex-development-deploy.yml"), "utf8");
+const netlifyConfig = readFileSync(join(process.cwd(), "netlify.toml"), "utf8");
 
 describe("InventSmith Convex development deployment workflow", () => {
+  it("keeps all Netlify builds from deploying Convex", () => {
+    const buildCommand = netlifyConfig.match(/^\s*command\s*=\s*"([^"]+)"/m)?.[1];
+    expect(buildCommand).toBe("npm run build");
+    expect(netlifyConfig).not.toContain("convex deploy");
+    expect(netlifyConfig).toContain('[context.deploy-preview]');
+    expect(netlifyConfig).toContain('command = "npx next build"');
+  });
+
   it("is manual-only and requires explicit confirmation", () => {
     expect(workflow).toContain("workflow_dispatch:");
     expect(workflow).not.toMatch(/\npush:\s*$/m);

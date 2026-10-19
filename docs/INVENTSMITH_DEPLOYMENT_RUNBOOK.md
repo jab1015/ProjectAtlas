@@ -1,6 +1,6 @@
 # InventSmith Owner-Controlled Deployment and Acceptance Runbook
 
-**Status:** Repository implementation active; limited Convex production deployment and password-recovery acceptance complete; no verified `quick-fox-785` code deployment; current Netlify preview attempt failed on invalid UTF-8 in the Validation page; full-product acceptance remains pending
+**Status:** Repository implementation active; password-recovery acceptance complete; PR #24 preview `6ad6853b072c128eb3df13a6` is available; full-product acceptance pending. Netlify Production-context build deployed Convex functions to `agile-seahorse-379` on October 19, 2026; do not trigger further production-context builds until the deploy command is guarded.
 **Product:** InventSmith — The Inventor OS by Modern Methods  
 **Updated:** October 19, 2026 (America/New_York)
 **Active branch:** `inventsmith/full-product-build`  
@@ -18,9 +18,15 @@ MadeThis is historical only. Do not synchronize back to it, deploy to it, migrat
 
 Do not call InventSmith deployed, production-ready, or live-verified until the exact intended code/config has actually been deployed to owner-controlled infrastructure and representative authenticated acceptance has passed there.
 
-### Current preview build blocker — October 19, 2026
+### October 19, 2026 — preview and production-build finding
 
-Netlify deployment `6ad6827f323028ef5f5376e1` failed during compilation because the pushed `src/app/(app)/invention/[id]/page.tsx` blob is not valid UTF-8. Restore the last valid page source and reapply only the intended survey status/stale-confidence changes using UTF-8, then verify a fresh PR #24 preview. The repair candidate has passed 125 test files / 688 tests, web and Convex TypeScript, and a 36/36 Next.js build. Repair commit `672156c` is pushed; wait for its PR #24 Netlify build to finish, then verify the fresh preview. No Convex deployment or production change is part of this repair.
+Netlify deployment `6ad6827f323028ef5f5376e1` failed because `src/app/(app)/invention/[id]/page.tsx` was invalid UTF-8. Repair commit `672156c` passed 125 test files / 688 tests, web and Convex TypeScript, and a 36/36 Next.js build. PR #24 head `7d9ecc0` has a successful protected Deploy Preview, deployment `6ad6853b072c128eb3df13a6`.
+
+**Production command safeguard:** Auto Publishing being locked prevents publication of the website but does not prevent Production-context builds. Netlify's `netlify.toml` build command invokes `npx convex deploy --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL --cmd 'npm run build'`. A Production-context build for `672156c` successfully pushed Convex functions to `agile-seahorse-379` at approximately 2:02 PM on October 19. The build log says no indexes were deleted; it does not establish that existing function behavior or stored data remained unchanged. A later queued Production-context build for `7d9ecc0` was cancelled before its deploy phase. Stop all pushes/triggered Production-context builds until the Production command is disabled or safely overridden and verified. Do not run a rollback or another Convex production deploy as part of acceptance testing.
+
+**Preview acceptance:** The PR preview frontend is configured for `quick-fox-785`. The Evidence Locker and Support pages render, but their existing survey-link and support-report lists fail to load (`evidenceRequests:list` and `supportCases:listMine` were reported missing in the backend). Validation remains at 36% despite the completed extraction record for `Data_All_260313.pdf` reporting approximately 100 survey respondents; the report does not show findings-level attribution. Market Research has zero deliverables; inspected downstream department queues have no completed outputs. Keep AI/CAD generation off until the intended test backend is safely aligned and the owner explicitly chooses a bounded acceptance budget.
+
+**October 19 continuation:** Read-only inspection completed for Launch and Growth. Both render; all 11 work items remain queued (6 Launch, 5 Growth), with no deliverables. Journey Center reports Stage 2 current, one unverified inventor evidence source, and zero listed attention items or professional reviews. Console again confirms the preview backend lacks public `evidenceRequests:list` and `supportCases:listMine`. All 15 stage routes have now been visually checked, but agent execution, evidence-triggered department regeneration, and survey-link workflows remain unverified. No new usage-consuming or mutating operation was attempted.
 
 ## 2. Latest repository gate
 
@@ -41,7 +47,7 @@ Lucia `3.2.2` remains deprecated and should be migrated only through a separatel
 
 A Convex deployment named `fiery-gazelle-628` exists but belongs to another application and is not an InventSmith environment. A separate owner-controlled **production** deployment is `agile-seahorse-379`. InventSmith's intended test/development deployment is `dev/inventsmith-test` (`quick-fox-785`), but its current code and auth configuration are unverified. GitHub Action logs for the purported test runs show they deployed to production `agile-seahorse-379`; the workflow now rejects `prod:` keys. Obtain a `dev:` key for `quick-fox-785` before test deployment.
 
-Production currently contains only the intentionally limited password-recovery backend scope. Existing production functions and data were preserved. PR #24 was not merged and the full unverified product was not deployed.
+The October 19 Netlify Production-context build for commit `672156c` successfully ran `npx convex deploy` and pushed the branch's Convex functions to production deployment `agile-seahorse-379`. The build log reports no indexes deleted. That does not prove existing functions or data were unaffected. The live website itself was not published, and PR #24 remains unmerged. Treat this as an unintended backend expansion beyond the earlier limited password-recovery scope. Do not deploy, roll back, or otherwise modify `agile-seahorse-379` without explicit review and authorization.
 
 Password recovery was live-functionally verified through the Netlify PR #24 preview: reset email delivery, recovery-code entry, and sign-in succeeded. This does not constitute full-product production acceptance.
 
@@ -85,7 +91,7 @@ Never place real secret values in source, docs, issues, logs, screenshots, or ch
 
 ## 6. Current frontend preview status
 
-The current Netlify PR #24 preview is `https://deploy-preview-24--inventsmith.netlify.app`. Its deploy-preview context now points the frontend at `https://quick-fox-785.convex.cloud`; it is still not a full-product production release. The isolated backend is now configured for authenticated full-journey testing.
+The current Netlify PR #24 preview is `https://deploy-preview-24--inventsmith.netlify.app` (deployment `6ad6853b072c128eb3df13a6`, branch head `7d9ecc0`). Its deploy-preview context points the frontend at `https://quick-fox-785.convex.cloud`. This does not establish that the backend has the matching functions: Evidence Locker share requests and Support report queries fail to load. The isolated backend is not accepted for full-journey testing until that mismatch is corrected and verified.
 
 ## 7. Fresh Vercel/frontend procedure
 
@@ -170,3 +176,11 @@ Before public production release establish tested procedures for uptime, spend a
 Keep these states separate: implemented; automated verification passed; deployed; live functionally verified; professional review completed; real-world evidence present; external action executed.
 
 Do not collapse them into one completion percentage or production-ready claim.
+
+### Follow-up verification — October 19, 2026, 5:34 PM ET
+
+Local Netlify configuration now uses `npm run build` globally and a compile-only `npx next build` for Deploy Previews; no Netlify context deploys Convex. Regression check, full tests (125 files / 689 tests), web/Convex typechecks, compile-only Next build (36/36), and diff check pass. Convex deploy remains an explicit manual development workflow only. The preview mismatch is pending a verified `dev:` key for `quick-fox-785`; never substitute the known production-scoped key. `npm run build` locally also runs Convex codegen and requires `CONVEX_DEPLOYMENT`; do not initialize a target for convenience.
+
+### Continued no-credit repair pass — October 19, 2026
+
+The local Netlify config now runs website build commands only; Deploy Preview uses compile-only `npx next build`. Added a regression assertion that Netlify does not invoke `convex deploy`. Added sanitized work-failure summaries in the invention work library. Latest verification: **126 test files / 692 tests**, web/Convex typechecks, and Next build **36/36** pass. No AI credits were used. Changes are not pushed or deployed. Before backend alignment or live functional testing, verify a development-scoped key targets exactly `quick-fox-785`; never use the production key or modify `agile-seahorse-379` or `fiery-gazelle-628`.

@@ -1,20 +1,19 @@
 [build]
-  command = "npx convex deploy --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL --cmd 'npm run build'"
+  command = "npm run build"
 
 # Netlify's native Next.js support handles the publish output automatically.
-# CONVEX_DEPLOY_KEY must be configured in Netlify's environment variables and
-# must be a production deploy key for the intended InventSmith Convex project.
+# Netlify builds must never deploy Convex functions. Convex deployments use the
+# explicit, manually dispatched GitHub development workflow with a dev-scoped
+# key verified for quick-fox-785.
 
-# PR deploy previews are compile-only. They must never receive or use the
-# production Convex deploy key. The committed generated Convex client types are
-# sufficient for a Next.js preview build; production remains the only context
-# that deploys Convex functions.
+# All Netlify contexts are compile-only; the production context must not deploy
+# Convex as a side effect of building the website.
 # Recreate Preview #24 when its deploy artifact has been deleted; changing this
 # file creates a real configuration commit for Netlify's Git-based deploy hook.
 [context.deploy-preview]
   command = "npx next build"
 
-# Keep PR previews isolated from production while exercising the full test backend.
+# Keep PR previews isolated from production while exercising the test backend.
 # This public Convex URL contains no credentials; production deploys remain unchanged.
 [context.deploy-preview.environment]
   NEXT_PUBLIC_CONVEX_URL = "https://quick-fox-785.convex.cloud"
