@@ -6,7 +6,7 @@
 **Repository:** `jab1015/ProjectAtlas` (historical repository slug)  
 **Active branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified checkpoint:** Local verification passed (web and Convex TypeScript, 123 test files / 682 tests, Next.js build). Code commit `ff481791afc424a4656c96daa82d41953744caa5` is pushed to this branch. GitHub currently reports its Netlify `deploy-preview` check as **pending**; exact-head CI and a usable matching preview are not yet confirmed. Isolated deploy run `39311119875` succeeded for an earlier source revision only.
+**Latest verified checkpoint:** Commit `b5d13713fc4e4489c3d2d36544a52682d60a3156` is pushed. Local verification passed (124 test files / 685 tests, web and Convex TypeScript, Next.js build 36/36). Isolated Convex test deploy `39314672344` passed. The matching Netlify `deploy-preview` check succeeded at `https://deploy-preview-24--inventsmith.netlify.app`; authenticated live acceptance remains outstanding.
 
 ## October 19 owner-request checkpoint
 
@@ -14,7 +14,7 @@ Password recovery is **already tested successfully** and is not the active task.
 
 The dedicated InventSmith test Convex project is `quick-fox-785` (`dev/inventsmith-test`). The isolated test deployment workflow (run `39311119875`) completed successfully, including web/Convex type checks, regression tests (122 files / 678 tests), audit, production build, and the dedicated test-backend deployment. Its deployment key is scoped to this separate test project despite its `prod:` prefix. This does not authorize deployment to the real production project.
 
-The October 19 fixes passed web TypeScript, Convex TypeScript, the full Vitest suite (**123 files / 682 tests**), and `next build` (**34/34** static pages). Code commit `ff481791afc424a4656c96daa82d41953744caa5` is pushed. Netlify's `deploy-preview` status for that commit is pending; exact-head CI, a matching new preview, and deployment of this code to the isolated Convex test project remain unconfirmed.
+The October 19 fix set passes web/Convex TypeScript, full Vitest (**124 files / 685 tests**), `git diff --check`, and Next.js production build (**36/36** pages). Support module commit `b5d13713fc4e4489c3d2d36544a52682d60a3156` was deployed to `quick-fox-785` by run `39314672344`; its matching Netlify deploy-preview status succeeded. Authenticated acceptance remains outstanding.
 
 Code already present on the active work line includes automatic department invalidation/requeue on invention input changes, validation evidence fingerprinting and survey-aware evidence scoring/display, PDF structured extraction, simplified validation summary UI, account/profile and personal-workspace rename controls, selected-existing-user beta access and audited credit controls, and admin navigation/sign-out affordances. The operations UI also handles an older health response that omits AI configuration details. These are **implementation claims only** until exact-head checks and authenticated acceptance on the currently served preview/test backend pass.
 
@@ -23,17 +23,16 @@ Code already present on the active work line includes automatic department inval
 - RiseJars' uploaded SurveyMonkey PDF reports 100 respondents (roughly 95–100 answers per question), but validation confidence remained at 36%. The UI must show which survey findings were actually extracted and considered, explain how evidence affects the score, and refresh affected validation/departments after upload. Do not inflate a heuristic score or describe unverified self-reported survey data as independent proof.
 - Confirm the account profile name and personal workspace rename controls are visible and save correctly for the signed-in account; the user previously saw “Name not set” and an unwanted default workspace name.
 - Verify the existing-user admin access/credit console, admin exemption from daily/AI limits, operations/support modules, and an always-accessible sign-out action. Report any missing function or permission gap instead of calling it fixed.
-- A support-case workflow is now implemented in the local working tree: user-submitted and user-visible cases; admin filtering, status updates, and private notes; optional invention linking with reporter-access validation. Support-case access does not bypass invention permissions. Full local verification passes (124 test files / 685 tests, web and Convex TypeScript, Next.js build 36/36 pages); the module is not yet pushed/deployed or live-accepted. Avoid promising support staff direct evidence access until a separate consented, audited access path exists.
+- A support-case workflow is implemented and deployed to the isolated test backend: user-submitted and user-visible cases; admin filtering, status updates, private notes; and optional invention linking with reporter-access validation. Support-case access does not bypass invention permissions. Full local verification passes; live acceptance remains outstanding. Avoid promising support staff direct evidence access until a separate consented, audited access path exists.
 - Verify automatic downstream department refresh and that research/survey collection produces an inventor-reviewable draft. External publication, invitations, or outreach must remain approval-gated until destination, audience, and consent are defined.
-- A usable fresh Netlify preview for the pushed branch head has not yet been confirmed. The pushed code commit's Netlify status was pending. The newly implemented support module and latest status update are still local; they need a push and new preview/backend deployment before acceptance. Earlier preview failures concern older revisions.
+- Netlify's matching preview status succeeded for commit `b5d13713fc4e4489c3d2d36544a52682d60a3156`. The preview is access-protected, so authenticated acceptance of account, validation, admin, operations, and support flows remains outstanding. Earlier preview failures concern older revisions.
 
 ### Immediate continuation
 
 1. Keep this checkpoint and the build-progress document synchronized with actual code, workflow, and preview status.
-2. Push the locally verified support module and refreshed status docs.
-3. Wait for exact-head CI and a matching Netlify preview; deploy the matching Convex backend only to `quick-fox-785` and confirm the preview targets it.
-4. Run authenticated acceptance for survey refresh/evidence display, profile/workspace naming, admin access/credits and unlimited admin usage, sign-out, and operations/support. Keep direct invention-evidence access behind existing permissions.
-5. Leave `agile-seahorse-379`, `fiery-gazelle-628`, and PR merge/publication untouched; record acceptance outcomes here.
+2. Perform authenticated acceptance on the protected preview for survey refresh/evidence display, profile/workspace naming, admin access/credits and unlimited admin usage, sign-out, operations, and support.
+3. Verify the preview uses `quick-fox-785`; test support case creation/status/notes with separate user/admin accounts. Keep invention evidence behind existing permissions.
+4. Leave `agile-seahorse-379`, `fiery-gazelle-628`, and PR merge/publication untouched; record acceptance outcomes here.
 
 ## Product destination
 
@@ -73,13 +72,13 @@ The branch now includes an admin-only **Beta access & credits** console. An admi
 
 ## Source, Convex, hosting, and deployment boundary
 
-GitHub remains source/CI authority. Convex is a core InventSmith backend, not an optional add-on. The Convex deployment `fiery-gazelle-628` belongs to another application and must not be used or modified for InventSmith. The dedicated InventSmith test deployment `dev/inventsmith-test` (`quick-fox-785`) contains the branch Convex code and required auth configuration and is ready for account-creation testing.
+GitHub remains source/CI authority. Convex is a core InventSmith backend, not an optional add-on. The Convex deployment `fiery-gazelle-628` belongs to another application and must not be used or modified for InventSmith. The dedicated InventSmith test deployment `dev/inventsmith-test` (`quick-fox-785`) contains the branch Convex code and required auth configuration; support-case commit `b5d13713...` was deployed by run `39314672344`.
 
 That does **not** mean the current code head is deployed or live accepted. Current truth remains:
 
-- repository/CI: verified through exact code head `93744db1...`;
-- InventSmith Convex test infrastructure: `dev/inventsmith-test` / `quick-fox-785` created, code deployed, and auth configured;
-- beta-access/credit implementation: present in the branch and deployed to the isolated test backend for verification; the newest uncommitted local head is not claimed deployed;
+- repository/local verification: commit `b5d13713...`, 124 test files / 685 tests, TypeScript, and Next.js build 36/36;
+- InventSmith Convex test infrastructure: `dev/inventsmith-test` / `quick-fox-785` configured and updated to commit `b5d13713...`;
+- Netlify: matching deploy-preview status succeeded; protected-page acceptance remains pending;
 - Modern Methods-owned Vercel/frontend deployment: not yet verified complete;
 - authenticated browser acceptance: not yet complete;
 - production billing/webhooks: not owner-live accepted;
