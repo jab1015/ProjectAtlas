@@ -23,16 +23,16 @@ Code already present on the active work line includes automatic department inval
 - RiseJars' uploaded SurveyMonkey PDF reports 100 respondents (roughly 95–100 answers per question), but validation confidence remained at 36%. The UI must show which survey findings were actually extracted and considered, explain how evidence affects the score, and refresh affected validation/departments after upload. Do not inflate a heuristic score or describe unverified self-reported survey data as independent proof.
 - Confirm the account profile name and personal workspace rename controls are visible and save correctly for the signed-in account; the user previously saw “Name not set” and an unwanted default workspace name.
 - Verify the existing-user admin access/credit console, admin exemption from daily/AI limits, operations/support modules, and an always-accessible sign-out action. Report any missing function or permission gap instead of calling it fixed.
-- Repository audit found an admin operations route but **no support-case/complaint console route or support-case data model**. The support investigation workflow (case list, complaint-to-invention link, and controlled evidence inspection) remains unimplemented and must be built before calling the support console available.
+- A support-case workflow is now implemented in the local working tree: user-submitted and user-visible cases; admin filtering, status updates, and private notes; optional invention linking with reporter-access validation. Support-case access does not bypass invention permissions. Full local verification passes (124 test files / 685 tests, web and Convex TypeScript, Next.js build 36/36 pages); the module is not yet pushed/deployed or live-accepted. Avoid promising support staff direct evidence access until a separate consented, audited access path exists.
 - Verify automatic downstream department refresh and that research/survey collection produces an inventor-reviewable draft. External publication, invitations, or outreach must remain approval-gated until destination, audience, and consent are defined.
-- A usable fresh Netlify preview for the current branch head has not yet been confirmed. The current commit's Netlify status is pending. Earlier preview builds failed on an incomplete JSX file and then an undefined validation helper; those logs concern earlier revisions, not the current local build.
+- A usable fresh Netlify preview for the pushed branch head has not yet been confirmed. The pushed code commit's Netlify status was pending. The newly implemented support module and latest status update are still local; they need a push and new preview/backend deployment before acceptance. Earlier preview failures concern older revisions.
 
 ### Immediate continuation
 
 1. Keep this checkpoint and the build-progress document synchronized with actual code, workflow, and preview status.
-2. Wait for the matching Netlify preview build and exact-head CI; inspect any new failure output and fix before acceptance.
-3. Deploy the matching Convex backend only to `quick-fox-785`, then verify the preview points to that test deployment.
-4. Run authenticated acceptance for survey refresh/evidence display, profile/workspace naming, admin access/credits and unlimited admin usage, sign-out, and operations/support. Clearly distinguish the missing support-case console as still unimplemented.
+2. Push the locally verified support module and refreshed status docs.
+3. Wait for exact-head CI and a matching Netlify preview; deploy the matching Convex backend only to `quick-fox-785` and confirm the preview targets it.
+4. Run authenticated acceptance for survey refresh/evidence display, profile/workspace naming, admin access/credits and unlimited admin usage, sign-out, and operations/support. Keep direct invention-evidence access behind existing permissions.
 5. Leave `agile-seahorse-379`, `fiery-gazelle-628`, and PR merge/publication untouched; record acceptance outcomes here.
 
 ## Product destination

@@ -107,6 +107,7 @@ import type * as softwareWorkPlan from "../softwareWorkPlan.js";
 import type * as stalenessLogic from "../stalenessLogic.js";
 import type * as statusBriefingLogic from "../statusBriefingLogic.js";
 import type * as subscriptionMutations from "../subscriptionMutations.js";
+import type * as supportCases from "../supportCases.js";
 import type * as subscriptionPolicyLogic from "../subscriptionPolicyLogic.js";
 import type * as subscriptionWebhook from "../subscriptionWebhook.js";
 import type * as tabularExportLogic from "../tabularExportLogic.js";
@@ -237,6 +238,7 @@ declare const fullApi: ApiFromModules<{
   stalenessLogic: typeof stalenessLogic;
   statusBriefingLogic: typeof statusBriefingLogic;
   subscriptionMutations: typeof subscriptionMutations;
+  supportCases: typeof supportCases;
   subscriptionPolicyLogic: typeof subscriptionPolicyLogic;
   subscriptionWebhook: typeof subscriptionWebhook;
   tabularExportLogic: typeof tabularExportLogic;

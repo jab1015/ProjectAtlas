@@ -816,4 +816,22 @@ export default defineSchema({
     sortOrder: v.optional(v.number()),
     createdAt: v.number(),
   }).index("by_productId", ["productId"]),
+
+  supportCases: defineTable({
+    userId: v.id("users"),
+    email: v.string(),
+    category: v.union(v.literal("account"), v.literal("billing"), v.literal("invention"), v.literal("bug"), v.literal("other")),
+    subject: v.string(),
+    description: v.string(),
+    inventionId: v.optional(v.id("inventions")),
+    status: v.union(v.literal("open"), v.literal("investigating"), v.literal("waiting_on_user"), v.literal("resolved")),
+    adminNotes: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    resolvedAt: v.optional(v.number()),
+    updatedByAdminId: v.optional(v.id("users")),
+  })
+    .index("by_userId_createdAt", ["userId", "createdAt"])
+    .index("by_status_updatedAt", ["status", "updatedAt"])
+    .index("by_createdAt", ["createdAt"]),
 });

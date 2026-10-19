@@ -16,7 +16,7 @@ The owner’s active request is to fix the rest of today’s reported issues: au
 
 Current implementation inspection finds code for automatic refresh, survey-aware validation, a short validation summary, profile/workspace rename, selected-account access/credits, and admin navigation sign-out. These have not yet been counted as accepted because the owner reported visible failures and the current Netlify preview/head pairing is unverified. The support/operations module’s earlier `openAiConfigured` crash also requires live acceptance even though a compatibility fallback is present in code.
 
-Additional audit finding: there is an InventSmith operations page, but no support-case/complaint console route or support-case data model in the repository. The admin support investigation workflow (including a safe link from a complaint to the authorized invention/evidence) is still a build gap, not a deployed module.
+The support-case gap is now implemented in the current working tree: authenticated users can submit and track reports, admins can filter/update status and add private investigation notes, and an optional invention link is checked against the reporter's access. Admin access through the case view does not bypass normal invention permissions. Focused support security/UI regression tests pass. This support module is not yet on the remote branch or deployed; live admin/customer acceptance remains outstanding.
 
 The survey evidence is inventor-provided and unverified. A useful validation update must state the reported respondent count and which extracted observations were used, preserve provenance, and explain score movement (or why the score does not move); a 100-person sample does not automatically justify higher confidence or prove demand.
 
@@ -24,7 +24,7 @@ The suggested survey/customer-research flow may prepare a draft page and questio
 
 Deployment boundary: `quick-fox-785` is the dedicated InventSmith test project. `agile-seahorse-379` remains limited to the already-verified password-recovery backend scope; `fiery-gazelle-628` is another app and must remain untouched. PR #24 stays open/unmerged; do not publish the whole unverified product.
 
-October 19 verification of the fix set: web TypeScript passed; Convex TypeScript passed; full test suite passed (**123 files / 682 tests**); Next.js production build passed with **34/34** static pages generated. Fix commit `ff481791afc424a4656c96daa82d41953744caa5` is pushed to `inventsmith/full-product-build`. Its Netlify `deploy-preview` status is **pending** as of this update; a new preview is not yet confirmed as built or usable. The prior successful isolated deploy is not evidence that this commit reached Convex test or Netlify.
+October 19 verification: the local combined fix set passes web and Convex TypeScript, the full Vitest suite (**124 files / 685 tests**), `git diff --check`, and the Next.js production build (**36/36** pages). The support module and latest status update are not yet pushed/deployed. Pushed code commit `ff481791afc424a4656c96daa82d41953744caa5` had a pending Netlify check; its live preview remains unconfirmed.
 
 ## Current status snapshot
 

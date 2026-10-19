@@ -18,6 +18,7 @@ import {
   ShieldCheck,
   Activity,
   Gift,
+  LifeBuoy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,7 @@ const navItems = [
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/privacy", label: "Privacy requests", icon: ShieldCheck },
   { href: "/admin/operations", label: "InventSmith operations", icon: Activity },
+  { href: "/admin/support", label: "Support cases", icon: LifeBuoy },
   { href: "/admin/beta-access", label: "Beta access & credits", icon: Gift },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
