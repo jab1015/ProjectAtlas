@@ -1,5 +1,14 @@
 # InventSmith Build Progress
 
+## Latest controlled verification — October 19, 2026
+
+- Source head `45f1cd401ab845701774dd1335e7ee8518b91d93` passes **127 Vitest files / 694 tests** and compile-only `npx next build` (**36/36 pages**). Focused checks for validation confidence, automatic evidence refresh, PDF ingestion, and stable Convex query subscriptions pass (4 files / 12 tests).
+- Netlify Deploy Preview `6ad696b5133e4f3f729431c7` built successfully for that head. It is a website-only build; its paired Production-context deployment was canceled before deployment. PR #24 remains draft and unmerged.
+- Authenticated, read-only checks of Evidence Locker and Support show their forms, including the shareable survey/interview page action, but both remain stuck loading existing records. The Preview is configured for `quick-fox-785`; live Convex errors report missing `evidenceRequests:list` and `supportCases:listMine` there. No evidence, support case, or survey was submitted.
+- The current Validation page still shows **36%** without the uploaded 100-user SurveyMonkey evidence being visibly explained. Do not spend more AI credits on broad regeneration until the isolated-backend/data-path mismatch is resolved and the report can show what evidence it actually used.
+- The owner-confirmed only deploy key is production-scoped. Do not use it against `quick-fox-785`, `agile-seahorse-379`, or any other backend. The frontend is verified to build; end-to-end backend and AI-department acceptance is still blocked. Keep `fiery-gazelle-628` untouched and do not merge PR #24 or publish the full product.
+- Next safe work: preserve this verified Preview; improve automated integration coverage using controlled local/test fixtures; investigate whether the isolated Convex backend can be aligned without using the production key. Only after backend parity is proven, run one bounded Validation acceptance and verify survey attribution, refresh, evidence links, Support cases, and department outputs.
+
 **Last updated:** October 19, 2026 (America/New_York)
 **Product destination:** Complete Idea-to-Market Inventor OS  
 **Authoritative product specification:** `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`  

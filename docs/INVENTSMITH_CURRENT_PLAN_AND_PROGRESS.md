@@ -1,5 +1,13 @@
 # InventSmith Current Plan and Progress
 
+## Current acceptance checkpoint — October 19, 2026
+
+At branch head `45f1cd401ab845701774dd1335e7ee8518b91d93`, the full automated suite passes (**127 files / 694 tests**) and compile-only Next build passes (**36/36 pages**). Netlify Preview `6ad696b5133e4f3f729431c7` is available; PR #24 remains draft/unmerged, and no full-product publication occurred.
+
+Live authenticated inspection is still failing at the backend boundary: Evidence Locker and Support forms render, but existing evidence-request and support-case lists remain in loading state because `evidenceRequests:list` and `supportCases:listMine` are missing from the Preview's configured `quick-fox-785` Convex deployment. Validation still displays 36% without transparent attribution to the uploaded 100-user SurveyMonkey results. No new AI work or state-changing test was run in this checkpoint.
+
+The only available Convex deploy key is production-scoped. It must not be used to deploy `quick-fox-785` or to test the Preview. Therefore code/build verification is complete for this head, but live backend and department acceptance is not. Preserve production data and functions; leave `agile-seahorse-379` and `fiery-gazelle-628` untouched. Continue with fixture-backed integration tests and determine a safe, non-production-key path for test-backend parity before any further AI-consuming acceptance.
+
 **Updated:** October 19, 2026 (America/New_York)
 **Product:** InventSmith — The Inventor OS  
 **Company:** Modern Methods  
