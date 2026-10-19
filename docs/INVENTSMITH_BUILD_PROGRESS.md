@@ -12,7 +12,7 @@
 
 ### Latest build blocker — 4:52 PM ET
 
-Netlify deploy `6ad6827f323028ef5f5376e1` failed during Next.js compilation: `stream did not contain valid UTF-8` in `src/app/(app)/invention/[id]/page.tsx`. The last valid page source has been restored in an isolated repair worktree, preserving the existing survey evidence display and adding processing/failure status for survey extraction plus hiding the old confidence score while evidence is stale. The restored UTF-8 candidate now passes **125 test files / 688 tests**, web and Convex TypeScript, and Next.js build (**36/36** pages). The corrected commit is not yet pushed, so no preview update is available yet.
+Netlify deploy `6ad6827f323028ef5f5376e1` failed during Next.js compilation: `stream did not contain valid UTF-8` in `src/app/(app)/invention/[id]/page.tsx`. The last valid page source has been restored in an isolated repair worktree, preserving the existing survey evidence display and adding processing/failure status for survey extraction plus hiding the old confidence score while evidence is stale. The restored UTF-8 candidate now passes **125 test files / 688 tests**, web and Convex TypeScript, and Next.js build (**36/36** pages). Repair commit `672156c` is pushed to the PR branch; its Netlify build is pending, so the preview is not yet available for retest.
 
 ### Live retest — October 19, 2026, 4:45 PM ET
 

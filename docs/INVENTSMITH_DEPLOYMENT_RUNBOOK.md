@@ -20,7 +20,7 @@ Do not call InventSmith deployed, production-ready, or live-verified until the e
 
 ### Current preview build blocker — October 19, 2026
 
-Netlify deployment `6ad6827f323028ef5f5376e1` failed during compilation because the pushed `src/app/(app)/invention/[id]/page.tsx` blob is not valid UTF-8. Restore the last valid page source and reapply only the intended survey status/stale-confidence changes using UTF-8, then verify a fresh PR #24 preview. The repair candidate has passed 125 test files / 688 tests, web and Convex TypeScript, and a 36/36 Next.js build. Push only after recording these checks; then verify the fresh PR #24 preview. No Convex deployment or production change is part of this repair.
+Netlify deployment `6ad6827f323028ef5f5376e1` failed during compilation because the pushed `src/app/(app)/invention/[id]/page.tsx` blob is not valid UTF-8. Restore the last valid page source and reapply only the intended survey status/stale-confidence changes using UTF-8, then verify a fresh PR #24 preview. The repair candidate has passed 125 test files / 688 tests, web and Convex TypeScript, and a 36/36 Next.js build. Repair commit `672156c` is pushed; wait for its PR #24 Netlify build to finish, then verify the fresh preview. No Convex deployment or production change is part of this repair.
 
 ## 2. Latest repository gate
 

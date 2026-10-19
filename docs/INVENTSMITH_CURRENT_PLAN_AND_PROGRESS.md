@@ -6,13 +6,13 @@
 **Repository:** `jab1015/ProjectAtlas` (historical repository slug)  
 **Active branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest branch checkpoint:** `6b6becb` is pushed to `inventsmith/full-product-build`; PR #24 remains draft/open/unmerged. Netlify deploy `6ad6827f323028ef5f5376e1` failed during compilation because the GitHub blob for `src/app/(app)/invention/[id]/page.tsx` contains invalid UTF-8. The last valid source is restored in an isolated repair worktree and the survey-processing/stale-confidence UI is reapplied. The candidate passes all **688 tests**, web and Convex TypeScript, and the Next.js build (**36/36** pages). The repair commit has not yet been pushed; no Convex deployment has been run and no production or unrelated Convex environment has been touched.
+**Latest branch checkpoint:** Repair commit `672156c` is pushed to `inventsmith/full-product-build`; PR #24 remains draft/open/unmerged. It restores valid UTF-8 Validation page source and reapplies survey extraction status and stale-confidence display. Candidate verification: **125 test files / 688 tests**, web and Convex TypeScript, Next.js build (**36/36** pages), and `git diff --check` passed. Netlify build for this repair is pending. No Convex deployment has been run; no production or unrelated Convex environment has been touched.
 
 ## October 19 owner-request checkpoint
 
 ### Latest build blocker — 4:52 PM ET
 
-Netlify deploy `6ad6827f323028ef5f5376e1` failed before deployment. Its build log states `stream did not contain valid UTF-8` while reading `src/app/(app)/invention/[id]/page.tsx`. The corrupt file blob came from commit `6b6becb`; the repair restores the preceding valid version and reapplies only survey extraction status and stale-confidence display. A fresh preview is still required. The repaired candidate now passes **688 tests**, both TypeScript checks, and a **36/36** Next.js build. No data-changing app tests or AI-generation calls were made.
+Netlify deploy `6ad6827f323028ef5f5376e1` failed before deployment. Its build log states `stream did not contain valid UTF-8` while reading `src/app/(app)/invention/[id]/page.tsx`. The corrupt file blob came from commit `6b6becb`; the repair restores the preceding valid version and reapplies only survey extraction status and stale-confidence display. Repair commit `672156c` has been pushed; its Netlify build and fresh preview are pending. The candidate passes **688 tests**, both TypeScript checks, and a **36/36** Next.js build. No data-changing app tests or AI-generation calls were made.
 
 
 ### Live retest — October 19, 2026, 4:45 PM ET
