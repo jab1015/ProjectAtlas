@@ -6,7 +6,7 @@
 **Current continuation checkpoint:** `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`  
 **Active build branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified checkpoint:** Isolated test-deploy workflow run `39311119875` passed for the InventSmith branch source, including regression, audit, production build, and deployment to the separate InventSmith test Convex project. The exact current branch/documentation head still needs CI qualification and a matching Netlify preview confirmation.
+**Latest verified checkpoint:** Local checks passed for the October 19 fixes (123 test files / 682 tests; web and Convex TypeScript; Next.js build). Fix commit `ff481791afc424a4656c96daa82d41953744caa5` is on the active branch. GitHub reports its Netlify `deploy-preview` check as **pending**; no matching preview build or exact-head CI run is yet confirmed. Earlier isolated test-deploy run `39311119875` passed for its then-current source, not this exact commit.
 
 ## October 19 progress and outstanding acceptance
 
@@ -24,7 +24,7 @@ The suggested survey/customer-research flow may prepare a draft page and questio
 
 Deployment boundary: `quick-fox-785` is the dedicated InventSmith test project. `agile-seahorse-379` remains limited to the already-verified password-recovery backend scope; `fiery-gazelle-628` is another app and must remain untouched. PR #24 stays open/unmerged; do not publish the whole unverified product.
 
-October 19 verification of the current local fix set: web TypeScript passed; Convex TypeScript passed; full test suite passed (**123 files / 682 tests**); Next.js production build passed with **34/34** static pages generated. This does not yet certify or deploy a pushed commit, and no new Netlify preview has yet been confirmed.
+October 19 verification of the fix set: web TypeScript passed; Convex TypeScript passed; full test suite passed (**123 files / 682 tests**); Next.js production build passed with **34/34** static pages generated. Fix commit `ff481791afc424a4656c96daa82d41953744caa5` is pushed to `inventsmith/full-product-build`. Its Netlify `deploy-preview` status is **pending** as of this update; a new preview is not yet confirmed as built or usable. The prior successful isolated deploy is not evidence that this commit reached Convex test or Netlify.
 
 ## Current status snapshot
 
