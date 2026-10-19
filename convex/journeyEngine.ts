@@ -23,6 +23,7 @@ import {
 } from "./organizations";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { ensureOrganizationDailyUsage } from "./organizationDailyUsage";
+import { scheduleAffectedDepartments } from "./validationEvidence";
 
 interface StageConfigEntry {
   id: number;
@@ -324,7 +325,7 @@ export const updateInventionField = mutation({
     for (const deliverable of deliverables) await ctx.db.patch(deliverable._id, { staleReason: reason, updatedAt: now });
     for (const finding of findings) if (finding.status !== "stale") await ctx.db.patch(finding._id, { status: "stale", updatedAt: now });
     for (const item of workItems) {
-      if (!shouldRequeueWorkKind(item.kind) || item.status === "running") continue;
+      if (!shouldRequeueWorkKind(item.kind) || ["running", "blocked", "cancelled"].includes(item.status)) continue;
       await ctx.db.patch(item._id, { status: "queued", attemptCount: 0, completedAt: undefined, blockedReason: undefined, humanGateType: undefined, lastError: undefined, updatedAt: now });
     }
     await ctx.db.insert("atlasExecutionEvents", {
@@ -335,6 +336,7 @@ export const updateInventionField = mutation({
       metadata: { field, staleDeliverables: deliverables.length, staleFindings: findings.length },
       createdAt: now,
     });
+    await scheduleAffectedDepartments(ctx, inventionId);
   },
 });
 

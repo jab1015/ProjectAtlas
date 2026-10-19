@@ -76,25 +76,28 @@ export function buildFailedSectionEntry(
   generatedAt: number
 ): ValidationSectionEntry {
   const message = getErrorMessage(error);
+  const safeMessage = /\b401\b|incorrect api key|invalid api key|unauthorized/i.test(message)
+    ? "The AI provider rejected its configured credentials. Ask an administrator to check the OpenAI API key for this environment, then retry. No key is displayed here."
+    : "The AI provider could not generate this section. Check the operations status for this environment, then retry.";
 
   return {
     sectionKey,
     title: sectionKey,
-    generatedContent: `Section generation failed: ${message}`,
+    generatedContent: `Section generation failed: ${safeMessage}`,
     confidence: {
       score: 0,
       level: "very_low",
       evidenceSummary: "Section generation failed.",
       assumptions: [],
-      missingInformation: [message],
+      missingInformation: [safeMessage],
     },
     evidenceSummary: "Section generation failed.",
     assumptions: [],
-    missingInformation: [message],
+    missingInformation: [safeMessage],
     approvalStatus: "pending",
     sectionStatus: "FAILED",
     lastGeneratedAt: generatedAt,
-    error: message,
+    error: safeMessage,
   };
 }
 

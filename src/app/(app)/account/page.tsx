@@ -49,6 +49,8 @@ const renamePersonalOrganization = makeFunctionReference<"mutation", { organizat
 const migrateMyLegacyInventions = makeFunctionReference<"mutation", Record<string, never>, { organizationId: string; migrated: number }>("organizations:migrateMyLegacyInventions");
 const listPrivacyRequests = makeFunctionReference<"query", Record<string, never>, PrivacyRequest[]>("privacyRequests:listMine");
 const createPrivacyRequest = makeFunctionReference<"mutation", { requestType: "data_export" | "account_deletion" }, { requestId: string; duplicate: boolean }>("privacyRequests:request");
+const updateMyProfileName = makeFunctionReference<"mutation", { name: string }, { name: string }>("users:updateMyProfileName");
+// Equivalent generated reference: api.users.updateMyProfileName.
 
 const PLAN_LABELS: Record<OrganizationPlanKey, { name: string; price: string }> = {
   explorer: { name: "Explorer", price: "Free" },
@@ -85,6 +87,8 @@ export default function AccountPage() {
   const [organizationNameDrafts, setOrganizationNameDrafts] = useState<Record<string, string>>({});
   const [renamingOrganizationId, setRenamingOrganizationId] = useState<string | null>(null);
   const [organizationNameMessage, setOrganizationNameMessage] = useState<string | null>(null);
+  const [profileName, setProfileName] = useState("");
+  const [profileNameMessage, setProfileNameMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.push("/sign-in");
@@ -97,6 +101,7 @@ export default function AccountPage() {
   const renameOrganization = useMutation(renamePersonalOrganization);
   const migrateLegacy = useMutation(migrateMyLegacyInventions);
   const requestPrivacyAction = useMutation(createPrivacyRequest);
+  const saveProfileNameMutation = useMutation(updateMyProfileName);
 
   useEffect(() => {
     if (!isAuthenticated || organizations === undefined || organizations.length > 0) return;
@@ -160,6 +165,9 @@ export default function AccountPage() {
   if (profile === undefined || organizations === undefined || privacyRequests === undefined) {
     return <div className="min-h-screen bg-background"><AppNav /><AccountSkeleton /></div>;
   }
+  const saveProfileName = async () => {
+    try { const result = await saveProfileNameMutation({ name: profileName.trim() }); setProfileName(result.name); setProfileNameMessage("Profile name saved."); } catch (error) { setProfileNameMessage(error instanceof Error ? error.message : "Could not save profile name."); }
+  };
 
   if (profile === null) {
     return (
@@ -197,7 +205,7 @@ export default function AccountPage() {
               <CardTitle className="text-xl">Inventor details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
-              <div><p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Name</p><p className="mt-1 font-medium">{profile.name ?? "Name not set"}</p></div>
+               <div><label htmlFor="profile-name" className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Name</label><Input id="profile-name" value={profileName || profile.name || ""} onChange={event => setProfileName(event.target.value)} className="mt-1" placeholder="Your name" /><Button type="button" variant="outline" className="mt-2" onClick={() => void saveProfileName()}>Save profile name</Button>{profileNameMessage && <p role="status" className="mt-2 text-sm text-muted-foreground">{profileNameMessage}</p>}</div>
               <div><p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Email</p><p className="mt-1 break-words font-medium">{profile.email ?? "Email not set"}</p></div>
             </CardContent>
           </Card>

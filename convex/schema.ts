@@ -320,6 +320,32 @@ export default defineSchema({
     .index("by_inventionId", ["inventionId"])
     .index("by_inventionId_status", ["inventionId", "status"]),
 
+  evidenceRequests: defineTable({
+    inventionId: v.id("inventions"),
+    createdByUserId: v.id("users"),
+    token: v.string(),
+    kind: v.union(v.literal("survey"), v.literal("interview")),
+    title: v.string(),
+    introduction: v.string(),
+    questions: v.array(v.object({ id: v.string(), prompt: v.string() })),
+    status: v.union(v.literal("active"), v.literal("closed")),
+    responseCount: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_token", ["token"])
+    .index("by_inventionId", ["inventionId"]),
+
+  evidenceResponses: defineTable({
+    requestId: v.id("evidenceRequests"),
+    inventionId: v.id("inventions"),
+    answers: v.array(v.object({ questionId: v.string(), answer: v.string() })),
+    respondentName: v.optional(v.string()),
+    submittedAt: v.number(),
+  })
+    .index("by_requestId", ["requestId"])
+    .index("by_inventionId", ["inventionId"]),
+
   inventionAssumptions: defineTable({
     inventionId: v.id("inventions"),
     statement: v.string(),
@@ -649,6 +675,7 @@ export default defineSchema({
     lastRefreshAt: v.optional(v.number()),
     providerVersion: v.optional(v.string()),
     researchVersion: v.optional(v.number()),
+    evidenceFingerprint: v.optional(v.string()),
     // ── Progress tracking fields (Phase 1C-3) ───────────────────────────────
     // Set at session start; incremented by the orchestrator as each section lands.
     overallStatus: v.optional(v.string()), // "PENDING"|"IN_PROGRESS"|"COMPLETED"|"FAILED"

@@ -1,6 +1,7 @@
 import type { MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { evidenceGateRootKind, impactedWorkKindsForEvidence } from "./evidenceImpactScopeLogic";
+import { scheduleAffectedDepartments } from "./validationEvidence";
 
 const PRESERVE_WORK_KINDS = new Set(["idea_capture"]);
 
@@ -284,4 +285,8 @@ export async function applyInventorEvidenceChange(
     },
     createdAt: input.now,
   });
+  const extraction = input.extraction as { mode?: string } | undefined;
+  if (input.action === "removed" || (extraction && extraction.mode !== "metadata_only")) {
+    await scheduleAffectedDepartments(ctx, inventionId);
+  }
 }

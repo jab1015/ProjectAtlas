@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { v } from "convex/values";
 import { effectiveTierForSubscription } from "./subscriptionPolicyLogic";
 
 const ADMIN_EMAIL = "jerry.brown1015@gmail.com";
@@ -29,6 +30,18 @@ export const getCurrent = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
     return await ctx.db.get(userId);
+  },
+});
+
+export const updateMyProfileName = mutation({
+  args: { name: v.string() },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Authentication required");
+    const name = args.name.trim();
+    if (name.length < 1 || name.length > 80) throw new Error("Name must be between 1 and 80 characters");
+    await ctx.db.patch(userId, { name });
+    return { name };
   },
 });
 

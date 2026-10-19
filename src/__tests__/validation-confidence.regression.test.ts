@@ -37,4 +37,25 @@ describe("context-only validation confidence", () => {
     );
     expect(assessment.assumptions.join(" ")).toContain("hypotheses pending evidence");
   });
+
+  it("credits an extracted inventor survey for customer-validation sections only", () => {
+    const withSurvey: InventionContext = {
+      ...context,
+      inventorEvidence: [{
+        sourceId: "survey-1",
+        title: "RiseJar SurveyMonkey results",
+        evidenceKind: "survey",
+        provenance: "inventor_upload",
+        extraction: {
+          keyFindings: [{ statement: "100 respondents answered RiseJar questions.", confidence: 0.9, basis: "document_observation" }],
+        },
+      }],
+    };
+    const customer = assessContextOnlyValidationConfidence(withSurvey, "customerSegments");
+    const patent = assessContextOnlyValidationConfidence(withSurvey, "competitorAnalysis");
+    expect(customer.score).toBeGreaterThan(assessContextOnlyValidationConfidence(context, "customerSegments").score);
+    expect(customer.level).toBe("moderate");
+    expect(customer.evidenceSummary).toContain("Survey observations strengthen customer-validation evidence support");
+    expect(patent.score).toBe(assessContextOnlyValidationConfidence(context, "competitorAnalysis").score);
+  });
 });

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { applyInventorEvidenceChange } from "@convex/evidenceImpact";
 
 type Row = Record<string, any> & { _id: string };
@@ -44,7 +44,7 @@ function fakeContext(initial: Tables) {
     }),
   };
 
-  return { ctx: { db } as any, tables, inserts };
+  return { ctx: { db, scheduler: { runAfter: vi.fn() } } as any, tables, inserts };
 }
 
 describe("inventor evidence impact behavior", () => {

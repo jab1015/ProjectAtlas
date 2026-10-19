@@ -16,6 +16,8 @@ import { AlertTriangle, ArrowLeft, DatabaseZap, ExternalLink, FileText, RefreshC
 import { extractEvidenceFromFile, type EvidenceExtraction } from "@/lib/evidenceIngestion";
 
 const retryEvidenceExtraction = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; evidenceSourceId: Id<"evidenceSources"> }, { scheduled: boolean; reason: "queued" | "already_queued" }>("evidenceExtractionControl:retryEvidenceExtraction");
+const createEvidenceRequest = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; kind: "survey" | "interview" }, { requestId: string; token: string }>("evidenceRequests:create");
+const listEvidenceRequests = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, Array<{ _id: string; token: string; kind: "survey" | "interview"; title: string; responseCount: number; status: string }>>("evidenceRequests:list");
 
 const MAX_FILE_BYTES = 25 * 1024 * 1024;
 const ACCEPTED_FILE_TYPES = [
@@ -63,10 +65,12 @@ export default function InventionEvidencePage() {
   const registerEvidence = useMutation(api.files.registerInventionEvidence);
   const removeEvidence = useMutation(api.files.removeInventionEvidence);
   const retryExtraction = useMutation(retryEvidenceExtraction);
+  const createRequest = useMutation(createEvidenceRequest);
   const evidence = useQuery(
     api.files.listInventionEvidence,
     isAuthenticated && inventionId ? { inventionId } : "skip"
   );
+  const requests = useQuery(listEvidenceRequests, isAuthenticated && inventionId ? { inventionId } : "skip");
 
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
@@ -77,6 +81,8 @@ export default function InventionEvidencePage() {
   const [uploading, setUploading] = useState(false);
   const [retryingId, setRetryingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [requestKind, setRequestKind] = useState<"survey" | "interview">("survey");
+  const [shareLink, setShareLink] = useState<string | null>(null);
 
   const kindLabels = useMemo(
     () => Object.fromEntries(EVIDENCE_KINDS.map(([value, label]) => [value, label])),
@@ -240,6 +246,13 @@ export default function InventionEvidencePage() {
               <Upload className="h-4 w-4" />{uploading ? "Uploading evidence…" : "Upload evidence"}
             </Button>
           </form>
+        </section>
+
+        <section className="rounded-xl border border-primary/20 bg-primary/5 p-6 space-y-4">
+          <div><p className="text-xs font-medium uppercase tracking-widest text-primary">Need evidence?</p><h2 className="mt-1 text-xl font-semibold">Let InventSmith collect it for you</h2><p className="mt-1 text-sm text-muted-foreground">Create a tailored survey or interview page, share the link, and responses will automatically become inventor-provided evidence and refresh affected departments.</p></div>
+          <div className="flex flex-wrap items-center gap-3"><select value={requestKind} onChange={e => setRequestKind(e.target.value as "survey" | "interview")} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="survey">Create survey</option><option value="interview">Create interview page</option></select><Button type="button" variant="outline" onClick={async () => { const result = await createRequest({ inventionId, kind: requestKind }); setShareLink(`${window.location.origin}/respond/${result.token}`); }}><ExternalLink className="mr-2 h-4 w-4" />Create shareable page</Button></div>
+          {shareLink && <div className="rounded-lg border border-border bg-background p-3 text-sm"><p className="font-medium">Share this link</p><p className="mt-1 break-all text-muted-foreground">{shareLink}</p><Button type="button" size="sm" variant="secondary" className="mt-2" onClick={() => void navigator.clipboard?.writeText(shareLink)}>Copy link</Button></div>}
+          {requests && requests.length > 0 && <div className="space-y-2">{requests.map(request => <p key={request._id} className="text-sm text-muted-foreground">{request.kind === "survey" ? "Survey" : "Interview"}: {request.responseCount} response{request.responseCount === 1 ? "" : "s"} · {request.status}</p>)}</div>}
         </section>
 
         <section className="space-y-4">

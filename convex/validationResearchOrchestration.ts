@@ -54,13 +54,15 @@ function buildContext(
   inventionId: Id<"inventions">,
   inventionTitle: string,
   problemStatement: string,
-  inventionDescription: string
+  inventionDescription: string,
+  inventorEvidence?: InventionContext["inventorEvidence"]
 ): InventionContext {
   return {
     inventionId: inventionId as string,
     title: inventionTitle,
     problemStatement,
     inventionDescription,
+    inventorEvidence,
   };
 }
 
@@ -83,7 +85,8 @@ export const runValidationResearchOrchestration = internalAction({
         inventionId,
         initResult.inventionTitle,
         initResult.problemStatement,
-        initResult.inventionDescription
+        initResult.inventionDescription,
+        initResult.inventorEvidence
       );
 
       await ctx.runMutation(
@@ -182,7 +185,8 @@ export const retryFailedValidationResearchSections = internalAction({
         inventionId,
         prepared.inventionTitle,
         prepared.problemStatement,
-        prepared.inventionDescription
+        prepared.inventionDescription,
+        prepared.inventorEvidence
       );
       const sectionSummary = await runValidationSections({
         sectionOrder: failedSectionKeys,

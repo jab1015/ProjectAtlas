@@ -9,6 +9,7 @@ import { internalMutation, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { requireInventionEditAccess } from "./organizations";
+import { readValidationEvidence, scheduleValidationEvidenceRefresh } from "./validationEvidence";
 
 // Must match OpenAIValidationResearchProvider.VERSION. A version change prevents
 // older confidence/research semantics from being silently reused by the 24h cache.
@@ -115,6 +116,7 @@ export const initValidationResearchSession = internalMutation({
       inventionTitle: v.string(),
       problemStatement: v.string(),
       inventionDescription: v.string(),
+      inventorEvidence: v.any(),
     })
   ),
   handler: async (ctx, { inventionId }) => {
@@ -122,6 +124,12 @@ export const initValidationResearchSession = internalMutation({
     const now = Date.now();
     const invention = await ctx.db.get(inventionId);
     if (!invention) throw new Error("Invention not found");
+
+    const snapshot = await readValidationEvidence(ctx, inventionId);
+    const latest = await ctx.db.query("validationResearch").withIndex("by_inventionId", q => q.eq("inventionId", inventionId)).order("desc").first();
+    if (latest && ["pending", "running"].includes(latest.researchStatus ?? "")) {
+      return { status: "existing" as const, researchId: latest._id };
+    }
 
     const existing = await ctx.db
       .query("validationResearch")
@@ -133,6 +141,7 @@ export const initValidationResearchSession = internalMutation({
 
     if (
       existing &&
+      (existing.evidenceFingerprint ?? "[]") === snapshot.fingerprint &&
       existing.completedAt !== undefined &&
       existing.completedAt >= now - TWENTY_FOUR_HOURS_MS &&
       existing.providerVersion === PROVIDER_VERSION
@@ -153,6 +162,7 @@ export const initValidationResearchSession = internalMutation({
       updatedAt: now,
       providerVersion: PROVIDER_VERSION,
       researchVersion: 1,
+      evidenceFingerprint: snapshot.fingerprint,
     });
 
     return {
@@ -161,6 +171,7 @@ export const initValidationResearchSession = internalMutation({
       inventionTitle: invention.title,
       problemStatement: invention.problemStatement ?? "",
       inventionDescription: invention.solutionDescription ?? "",
+      inventorEvidence: snapshot.evidence,
     };
   },
 });
@@ -177,6 +188,7 @@ export const prepareValidationResearchRetry = internalMutation({
       ctx.db.get(researchId),
     ]);
     if (!invention) throw new Error("Invention not found");
+    const snapshot = await readValidationEvidence(ctx, inventionId);
     if (!research || research.inventionId !== inventionId) {
       throw new Error("Validation research not found for invention");
     }
@@ -202,6 +214,7 @@ export const prepareValidationResearchRetry = internalMutation({
       inventionTitle: invention.title,
       problemStatement: invention.problemStatement ?? "",
       inventionDescription: invention.solutionDescription ?? "",
+      inventorEvidence: snapshot.evidence,
     };
   },
 });
@@ -255,6 +268,8 @@ export const finaliseValidationResearch = internalMutation({
       completedAt,
       updatedAt: completedAt,
     });
+    const research = await ctx.db.get(researchId);
+    if (research) await scheduleValidationEvidenceRefresh(ctx, research.inventionId);
   },
 });
 
@@ -274,6 +289,7 @@ export const recordValidationResearchFailure = internalMutation({
         completedAt: failedAt,
         updatedAt: failedAt,
       });
+      await scheduleValidationEvidenceRefresh(ctx, inventionId);
       return researchId;
     }
 
