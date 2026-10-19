@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { contentToReadableText, getDeliverableTrustLabel, isDeliverableReadyForExternalUse } from "@convex/deliverableLogic";
 import { selectLatestDeliverablesWithAmbiguity, validatePackageExportSafety } from "@/lib/packageExportLogic";
 import type { AtlasPackageExport } from "@/lib/packageExport";
+import { getFailedWorkItems, type FailedWorkSummary } from "@/lib/workFailureView";
 
 interface DeliverableLibrary {
   invention: { _id: Id<"inventions">; title: string };
@@ -21,7 +22,7 @@ interface DeliverableLibrary {
   sources: Doc<"evidenceSources">[];
   reviews: Doc<"professionalReviews">[];
   executionEvents: Doc<"atlasExecutionEvents">[];
-  failedWork: Array<{ kind: string; title: string; attemptCount: number; updatedAt: number; summary: string }>;
+  failedWork?: FailedWorkSummary[];
 }
 const getDeliverableLibrary = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, DeliverableLibrary>("inventionWorkspace:getDeliverableLibrary");
 interface PilotEvaluation { score: number; passed: boolean; blockers: string[]; metrics: { requiredDeliverables: number; missingDeliverables: number; evidenceCheckedRatio: number }; }
@@ -46,6 +47,9 @@ export default function InventionWorkPage() {
   if (isLoading || !isAuthenticated || library === undefined || evaluation === undefined) return <div className="min-h-screen bg-background"><AppNav /><WorkSkeleton /></div>;
   if (!library) return null;
 
+  // Preview/backend versions can roll forward independently. Older query
+  // responses do not include the optional failure summaries yet.
+  const failedWork = getFailedWorkItems(library);
   const sourcesById = new Map(library.sources.map((source) => [String(source._id), source]));
   const latestSelection = selectLatestDeliverablesWithAmbiguity(library.deliverables);
   const latestDeliverables = latestSelection.deliverables;
@@ -89,7 +93,7 @@ export default function InventionWorkPage() {
       {exportError && <p role="alert" className="text-sm text-destructive">{exportError}</p>}
       {authorizationError && <p role="alert" className="text-sm text-destructive">{authorizationError}</p>}
     </header>
-    {library.failedWork.length > 0 && <section className="rounded-xl border border-destructive/30 bg-destructive/5 p-5" aria-labelledby="failed-work-title"><h2 id="failed-work-title" className="text-lg font-semibold">Work that needs attention</h2><p className="mt-1 text-sm text-muted-foreground">InventSmith hides raw system errors here to protect credentials and technical details.</p><ul className="mt-4 space-y-3">{library.failedWork.map((item) => <li key={`${item.kind}-${item.updatedAt}`} className="rounded-lg border bg-background p-4"><p className="font-medium">{item.title}</p><p className="mt-1 text-sm text-muted-foreground">{item.summary}</p><p className="mt-2 text-xs text-muted-foreground">{item.attemptCount} attempt{item.attemptCount === 1 ? "" : "s"} · Updated {new Date(item.updatedAt).toLocaleString()}</p></li>)}</ul></section>}
+    {failedWork.length > 0 && <section className="rounded-xl border border-destructive/30 bg-destructive/5 p-5" aria-labelledby="failed-work-title"><h2 id="failed-work-title" className="text-lg font-semibold">Work that needs attention</h2><p className="mt-1 text-sm text-muted-foreground">InventSmith hides raw system errors here to protect credentials and technical details.</p><ul className="mt-4 space-y-3">{failedWork.map((item) => <li key={`${item.kind}-${item.updatedAt}`} className="rounded-lg border bg-background p-4"><p className="font-medium">{item.title}</p><p className="mt-1 text-sm text-muted-foreground">{item.summary}</p><p className="mt-2 text-xs text-muted-foreground">{item.attemptCount} attempt{item.attemptCount === 1 ? "" : "s"} · Updated {new Date(item.updatedAt).toLocaleString()}</p></li>)}</ul></section>}
     {library.deliverables.length === 0 ? <section className="rounded-2xl border border-border bg-card p-8 text-center"><BookOpen className="mx-auto h-9 w-9 text-primary" aria-hidden="true" /><h2 className="mt-4 text-xl font-semibold">InventSmith is preparing the first deliverables</h2><p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">Finished work will appear here automatically. InventSmith will show its evidence and limitations rather than asking you to assemble the report.</p><Button asChild variant="outline" className="mt-6"><Link href="/dashboard">Return to briefing</Link></Button></section> : <div className="space-y-5">{library.deliverables.map((deliverable) => {
       const sources = deliverable.sourceIds.flatMap((sourceId) => { const source = sourcesById.get(String(sourceId)); return source ? [source] : []; });
       const reviews = library.reviews.filter((review) => review.deliverableId === deliverable._id); const readyForUse = isDeliverableReadyForExternalUse(deliverable.trustState, deliverable.staleReason); const readableContent = contentToReadableText(deliverable.content); const isLatestRevision = latestDeliverableIds.has(String(deliverable._id)); const canRequestExternalAuthorization = isLatestRevision && !deliverable.staleReason && !readyForUse && deliverable.trustState !== "professional_review_required";
