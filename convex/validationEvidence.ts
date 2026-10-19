@@ -31,6 +31,12 @@ export async function readValidationEvidence(ctx: QueryCtx | MutationCtx, invent
       sources: ready.map(s => [s._id, s.metadata?.extractedAt ?? s.metadata?.uploadedAt ?? s.createdAt]),
     }),
     evidence: ready.map(s => ({ sourceId: String(s._id), title: s.title, evidenceKind: s.metadata?.evidenceKind ?? "other", provenance: "inventor_upload", extraction: s.metadata?.extraction ?? { text: s.excerpt } })),
+    pendingSurveys: sources
+      .filter(s => s.metadata?.provenance === "inventor_upload" && s.metadata?.evidenceKind === "survey" && s.metadata?.extractionStatus !== "completed")
+      .map(s => ({
+        title: s.title,
+        status: s.metadata?.extractionStatus === "failed" ? "failed" as const : "processing" as const,
+      })),
   };
 }
 

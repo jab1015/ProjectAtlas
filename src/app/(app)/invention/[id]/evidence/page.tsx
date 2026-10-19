@@ -1,9 +1,9 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useConvexAuth, useMutation, useQueries } from "convex/react";
+import { useConvexAuth, useMutation, useQueries, type RequestForQueries } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
@@ -66,10 +66,14 @@ export default function InventionEvidencePage() {
   const removeEvidence = useMutation(api.files.removeInventionEvidence);
   const retryExtraction = useMutation(retryEvidenceExtraction);
   const createRequest = useMutation(createEvidenceRequest);
-  const queryResults = useQueries(isAuthenticated && inventionId ? {
-    evidence: { query: api.files.listInventionEvidence, args: { inventionId } },
-    requests: { query: listEvidenceRequests, args: { inventionId } },
-  } : {});
+  const evidenceQueries = useMemo<RequestForQueries>(() => {
+    if (!isAuthenticated || !inventionId) return {} as RequestForQueries;
+    return {
+      evidence: { query: api.files.listInventionEvidence, args: { inventionId } },
+      requests: { query: listEvidenceRequests, args: { inventionId } },
+    };
+  }, [inventionId, isAuthenticated]);
+  const queryResults = useQueries(evidenceQueries);
   const evidence = queryResults.evidence as Array<{
     _id: Id<"evidenceSources">;
     title: string;
@@ -110,7 +114,9 @@ export default function InventionEvidencePage() {
     []
   );
 
-  if (!isLoading && !isAuthenticated) router.replace("/sign-in");
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) router.replace("/sign-in");
+  }, [isAuthenticated, isLoading, router]);
 
   const onFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const selected = event.target.files?.[0] ?? null;

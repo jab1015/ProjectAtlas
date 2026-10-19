@@ -12,15 +12,20 @@ describe("visible validation evidence review", () => {
     expect(query).toContain("sampleSize,");
     expect(query).toContain("findings,");
     expect(query).toContain("Inventor-uploaded; not independently verified");
+    expect(query).toContain("pendingSurveys: evidenceSnapshot.pendingSurveys");
     expect(query).toContain('row.researchStatus === "stale"');
   });
 
   it("shows the cited survey and provenance in the short validation summary", () => {
     const page = read("src/app/(app)/invention/[id]/page.tsx");
-    expect(page).toContain("Survey evidence considered");
+    expect(page).toContain("Survey evidence and refresh status");
     expect(page).toContain("uploadedSurveys");
     expect(page).toContain("This report matches the current evidence.");
     expect(page).toContain("survey.provenance");
+    expect(page).toContain("Its confidence score is hidden until the automatic refresh finishes.");
+    expect(page).toContain("Survey results support customer-validation sections");
+    expect(page).toContain("Its confidence score is hidden until the automatic refresh finishes.");
+    expect(page).toContain("Survey results support customer-validation sections");
   });
 
   it("keeps the session cache version aligned with the provider implementation", () => {

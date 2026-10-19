@@ -6,9 +6,20 @@
 **Repository:** `jab1015/ProjectAtlas` (historical repository slug)  
 **Active branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
-**Latest verified checkpoint:** Branch source head at start of this work was `cdb02c3`. GitHub Action logs for runs `39311119875` and `39314672344` show they deployed to `agile-seahorse-379` (InventSmith production), not `quick-fox-785`, despite earlier docs/workflow claims. Both logs report no deleted indexes, but do not establish that existing runtime behavior was preserved. The current local UI fixes pass web/Convex TypeScript, full Vitest (**124 files / 686 tests**), `git diff --check`, and Next.js production build (**36/36** pages); current local fixes are not pushed or deployed.
+**Latest branch checkpoint:** `0a90b9f` is pushed to `inventsmith/full-product-build`; PR #24 remains draft/open/unmerged. Netlify deploy `6ad68041` ran against that head. Additional local fixes for React render loops and stale validation scores are not yet pushed. GitHub Action runs `39311119875` and `39314672344` targeted production `agile-seahorse-379`, not `quick-fox-785`. Both report no deleted indexes, which does not establish that runtime behavior was preserved. No further Convex deployment is permitted until a dev-scoped key for `quick-fox-785` is confirmed.
 
 ## October 19 owner-request checkpoint
+
+### Live retest — October 19, 2026, 4:45 PM ET
+
+Read-only retest against Netlify deploy `6ad68041` (branch head `0a90b9f`):
+
+- The Journey Center and Stage 2 load; RiseJars still displays **36%** and gives no survey attribution.
+- Evidence Locker and Support both crash into “Something went wrong.” The browser records minified React error **#301** (“Too many re-renders”). Source inspection found three new `useQueries` calls receiving newly allocated request objects on every render. This is the immediate crash cause; the new local fix memoizes those objects. The backend query result remains unverified until the fixed pages render.
+- The uploaded survey is present in the Journey Center evidence count, but the current Validation view does not show the survey. A local UI fix now hides confidence while the report fingerprint does not match current evidence and shows extraction/refresh status.
+- Netlify generated a successful check for branch head `0a90b9f`; the subsequent local fixes are not included in that deployment yet.
+- No upload, survey-page creation, support submission, account mutation, or AI generation was triggered.
+
 
 ### Live preview acceptance sweep — October 19, 2026, 4:25 PM ET
 
@@ -41,9 +52,9 @@ Code already present on the active work line includes automatic department inval
 - RiseJars' uploaded SurveyMonkey PDF reports 100 respondents (roughly 95–100 answers per question), but validation confidence remained at 36%. The UI must show which survey findings were actually extracted and considered, explain how evidence affects the score, and refresh affected validation/departments after upload. Do not inflate a heuristic score or describe unverified self-reported survey data as independent proof.
 - Confirm the account profile name and personal workspace rename controls are visible and save correctly for the signed-in account; the user previously saw “Name not set” and an unwanted default workspace name.
 - Verify the existing-user admin access/credit console, admin exemption from daily/AI limits, operations/support modules, and an always-accessible sign-out action. Report any missing function or permission gap instead of calling it fixed.
-- A support-case workflow is implemented and deployed to the isolated test backend: user-submitted and user-visible cases; admin filtering, status updates, private notes; and optional invention linking with reporter-access validation. Support-case access does not bypass invention permissions. Full local verification passes; live acceptance remains outstanding. Avoid promising support staff direct evidence access until a separate consented, audited access path exists.
+- A support-case workflow is implemented in source; deployment to `quick-fox-785` is not verified: user-submitted and user-visible cases; admin filtering, status updates, private notes; and optional invention linking with reporter-access validation. Support-case access does not bypass invention permissions. Full local verification passes; live acceptance remains outstanding. Avoid promising support staff direct evidence access until a separate consented, audited access path exists.
 - Verify automatic downstream department refresh and that research/survey collection produces an inventor-reviewable draft. External publication, invitations, or outreach must remain approval-gated until destination, audience, and consent are defined.
-- Netlify's matching preview status succeeded for commit `b5d13713fc4e4489c3d2d36544a52682d60a3156`. The preview is access-protected, so authenticated acceptance of account, validation, admin, operations, and support flows remains outstanding. Earlier preview failures concern older revisions.
+- Netlify deploy `6ad68041` succeeded for commit `0a90b9f`; read-only retest found React #301 crashes on Evidence Locker and Support, and Validation still shows 36% without survey attribution. Local fixes are not yet deployed; no Convex test deployment is verified.
 
 ### Immediate continuation
 
@@ -94,7 +105,7 @@ GitHub remains source/CI authority. Convex is a core InventSmith backend, not an
 
 That does **not** mean the current code head is deployed or live accepted. Current truth remains:
 
-- repository/local verification: prior checkpoint `b5d13713...` passed 124 test files / 685 tests, TypeScript, and Next.js build 36/36; the current local fixes pass TypeScript/tests but still need a production build;
+- repository/local verification: prior checkpoint `b5d13713...` passed 124 test files / 685 tests, TypeScript, and Next.js build 36/36; the latest local fixes pass 125 files / 688 tests, web/Convex TypeScript, Convex TypeScript, and Next.js build 36/36; a fresh preview is pending;
 - InventSmith Convex test infrastructure: intended target `dev/inventsmith-test` / `quick-fox-785`; deployment and auth state are unverified;
 - Netlify: matching deploy-preview status succeeded; protected-page acceptance remains pending;
 - Modern Methods-owned Vercel/frontend deployment: not yet verified complete;

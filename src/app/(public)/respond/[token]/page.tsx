@@ -2,7 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
-import { useMutation, useQueries } from "convex/react";
+import { useMutation, useQueries, type RequestForQueries } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,7 +31,11 @@ const submitResponse = makeFunctionReference<
 export default function PublicEvidenceResponsePage() {
   const params = useParams<{ token: string }>();
   const token = params.token;
-  const queryResults = useQueries(token ? { request: { query: getRequest, args: { token } } } : {});
+  const requestQueries = useMemo<RequestForQueries>(() => {
+    if (!token) return {} as RequestForQueries;
+    return { request: { query: getRequest, args: { token } } };
+  }, [token]);
+  const queryResults = useQueries(requestQueries);
   const request = queryResults.request as PublicSurvey | null | undefined | Error;
   const submit = useMutation(submitResponse);
   const [name, setName] = useState("");

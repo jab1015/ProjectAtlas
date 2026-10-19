@@ -80,4 +80,27 @@ describe("context-only validation confidence", () => {
     expect(assessment.score).toBeGreaterThan(0.3);
     expect(assessment.evidenceSummary).toContain("100 reported respondents");
   });
+
+  it("moves the overall 11-section evidence-support score when a survey is included", () => {
+    const sections = [
+      "validationPlan", "customerSegments", "competitorAnalysis", "marketSizing",
+      "validationMethods", "timeline", "surveyQuestions", "landingPageDraft",
+      "interviewQuestions", "riskAssessment", "recommendations",
+    ] as const;
+    const withoutSurvey = sections.reduce((sum, section) => sum + assessContextOnlyValidationConfidence(context, section).score, 0) / sections.length;
+    const withSurveyContext: InventionContext = {
+      ...context,
+      inventorEvidence: [{
+        sourceId: "risejars-survey",
+        title: "SurveyMonkey survey results",
+        evidenceKind: "survey",
+        provenance: "inventor_upload",
+        extraction: { documentType: "SurveyMonkey results", sampleSize: "100 users", summary: "Questions about RiseJars." },
+      }],
+    };
+    const withSurvey = sections.reduce((sum, section) => sum + assessContextOnlyValidationConfidence(withSurveyContext, section).score, 0) / sections.length;
+
+    expect(Math.round(withoutSurvey * 100)).toBe(36);
+    expect(Math.round(withSurvey * 100)).toBeGreaterThan(Math.round(withoutSurvey * 100));
+  });
 });

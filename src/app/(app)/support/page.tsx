@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, Suspense, useState } from "react";
+import { FormEvent, Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { api } from "@convex/_generated/api";
@@ -19,7 +19,8 @@ const listMyCases = makeFunctionReference<"query", Record<string, never>, Array<
 function SupportForm() {
   const searchParams = useSearchParams();
   const initialInventionId = searchParams.get("inventionId") ?? "";
-  const queryResults = useQueries({ cases: { query: listMyCases, args: {} } });
+  const supportQueries = useMemo(() => ({ cases: { query: listMyCases, args: {} } }), []);
+  const queryResults = useQueries(supportQueries);
   const cases = queryResults.cases as Array<{ _id: Id<"supportCases">; subject: string; category: string; status: keyof typeof STATUS_LABELS; createdAt: number; description: string; inventionId?: Id<"inventions"> }> | undefined | Error;
   const createCase = useMutation(api.supportCases.create);
   const [category, setCategory] = useState<"account" | "billing" | "invention" | "bug" | "other">("bug");

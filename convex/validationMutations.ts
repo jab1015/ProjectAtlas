@@ -415,6 +415,7 @@ export const getValidationResearch = query({
               provenance: "Inventor-uploaded; not independently verified",
             };
           }),
+        pendingSurveys: evidenceSnapshot.pendingSurveys,
       },
     };
   },

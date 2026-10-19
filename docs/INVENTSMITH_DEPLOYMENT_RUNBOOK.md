@@ -1,6 +1,6 @@
 # InventSmith Owner-Controlled Deployment and Acceptance Runbook
 
-**Status:** Repository implementation active; limited Convex production deployment, password-recovery acceptance, preview operations-console compatibility acceptance, isolated test-backend code deployment, and test auth configuration complete; full-product acceptance remains pending
+**Status:** Repository implementation active; limited Convex production deployment and password-recovery acceptance complete; no verified `quick-fox-785` code deployment; full-product acceptance remains pending
 **Product:** InventSmith — The Inventor OS by Modern Methods  
 **Updated:** October 18, 2026 (America/New_York)
 **Active branch:** `inventsmith/full-product-build`  
@@ -43,7 +43,7 @@ Password recovery was live-functionally verified through the Netlify PR #24 prev
 
 The refreshed preview's InventSmith operations page works against the limited production response by treating the absent `snapshot.ai` field as unavailable. Do not expand production deployment merely to expose AI configuration or to test the full product.
 
-The isolated test backend also contains the admin-only Beta access & credits controls. Use them only with selected test accounts: grant a dated plan override with a written reason, optionally adjust credits with a written reason, and revoke the override when testing ends. These controls preserve the account's base plan and append audit records; they are not a lifetime-free-account mechanism.
+The repository contains the admin-only Beta access & credits controls; their deployment to the isolated test backend is not verified. Use them only with selected test accounts: grant a dated plan override with a written reason, optionally adjust credits with a written reason, and revoke the override when testing ends. These controls preserve the account's base plan and append audit records; they are not a lifetime-free-account mechanism.
 
 The new InventSmith test deployment workflow must remain manual and guarded by explicit confirmation, `CONVEX_DEPLOY_KEY`, and a deployment-specific key/prefix check. Never use `fiery-gazelle-628` credentials or deployment settings for InventSmith.
 

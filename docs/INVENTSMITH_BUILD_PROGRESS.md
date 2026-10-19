@@ -10,6 +10,16 @@
 
 ## October 19 progress and outstanding acceptance
 
+### Live retest — October 19, 2026, 4:45 PM ET
+
+Read-only on Netlify deploy `6ad68041` / branch commit `0a90b9f`:
+
+- Journey Center and Stage 2 load; RiseJars remains at 36% with no visible survey attribution.
+- Evidence Locker and Support both hit the generic error page; browser console shows minified React #301 (too many re-renders).
+- Root cause found in source: each page passed an inline object to Convex `useQueries`, changing the subscription input on every render. The public survey response page used the same pattern. Local fixes now memoize the query specs; these changes still need full verification and a fresh preview.
+- Backend query behavior is still unverified because the page crash occurs before results can be inspected.
+- No user data was changed and no AI calls were triggered.
+
 ### Live preview test notes — October 19, 2026, 4:25 PM ET
 
 Read-only authenticated sweep of the protected PR #24 preview, signed in as `jerry@modernmethods.it.com` with the RiseJars invention:
@@ -33,7 +43,7 @@ The owner’s active request is to fix the rest of today’s reported issues: au
 
 Current implementation inspection finds code for automatic refresh, survey-aware validation, a short validation summary, profile/workspace rename, selected-account access/credits, and admin navigation sign-out. These have not yet been counted as accepted because the owner reported visible failures and the current Netlify preview/head pairing is unverified. The support/operations module’s earlier `openAiConfigured` crash also requires live acceptance even though a compatibility fallback is present in code.
 
-The support-case workflow is implemented and deployed to the isolated test backend: authenticated users can submit and track reports; admins can filter/update status and add private investigation notes; and optional invention links are checked against the reporter's access. A support case does not grant access to private invention evidence. Live admin/customer acceptance remains outstanding.
+The support-case workflow is implemented in source; deployment to `quick-fox-785` is not verified: authenticated users can submit and track reports; admins can filter/update status and add private investigation notes; and optional invention links are checked against the reporter's access. A support case does not grant access to private invention evidence. Live admin/customer acceptance remains outstanding.
 
 The survey evidence is inventor-provided and unverified. A useful validation update must state the reported respondent count and which extracted observations were used, preserve provenance, and explain score movement (or why the score does not move); a 100-person sample does not automatically justify higher confidence or prove demand.
 
@@ -41,7 +51,7 @@ The suggested survey/customer-research flow may prepare a draft page and questio
 
 Deployment boundary: `quick-fox-785` is the intended test project, but its current code state is unverified. `agile-seahorse-379` received broader function deployments in runs `39311119875` and `39314672344`; no further deployment there. `fiery-gazelle-628` is another app and must remain untouched. PR #24 stays open/unmerged; do not publish the whole unverified product.
 
-Historical note: commit `b5d13713...` passed web/Convex TypeScript, full Vitest (**124 files / 685 tests**), `git diff --check`, and Next.js production build (**36/36** pages). Its Convex workflow runs `39311119875` and `39314672344` targeted production, not the test deployment. Current local fixes pass the checks reported above; no new deployment has been made.
+Historical note: commit `b5d13713...` passed web/Convex TypeScript, full Vitest (**124 files / 685 tests**), `git diff --check`, and Next.js production build (**36/36** pages). Its Convex workflow runs `39311119875` and `39314672344` targeted production, not the test deployment. Commit `0a90b9f` has a successful Netlify check (`6ad68041`). New local query-stability and stale-score fixes pass the full suite (**125 files / 688 tests**), web/Convex TypeScript, Convex TypeScript, and Next.js build (**36/36**); a fresh preview is pending.
 
 ## Current status snapshot
 
