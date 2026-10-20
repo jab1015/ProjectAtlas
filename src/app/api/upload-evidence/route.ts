@@ -28,20 +28,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Files must be 25 MB or smaller." }, { status: 413 });
   }
 
-  const response = await fetch(target, {
-    method: "POST",
-    headers: {
-      "Content-Type": request.headers.get("content-type") ?? "application/octet-stream",
-    },
-    body,
-    cache: "no-store",
-  });
+  let response: Response;
+  try {
+    response = await fetch(target, {
+      method: "POST",
+      headers: {
+        "Content-Type": request.headers.get("content-type") ?? "application/octet-stream",
+        "Content-Length": String(body.byteLength),
+      },
+      body,
+      cache: "no-store",
+    });
+  } catch (error) {
+    console.error("Convex evidence upload proxy failed", error);
+    return NextResponse.json({ error: "The server could not reach the Convex upload service." }, { status: 502 });
+  }
 
-  const responseBody = await response.arrayBuffer();
-  return new NextResponse(responseBody, {
-    status: response.status,
-    headers: {
-      "Content-Type": response.headers.get("content-type") ?? "application/json",
-    },
-  });
-}
