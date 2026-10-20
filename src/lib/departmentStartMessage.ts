@@ -1,13 +1,12 @@
 export function getDepartmentStartMessage(
   stageName: string,
   created: number,
-  scheduled: boolean,
-  alreadyInitializedMessage?: string
+  scheduled: boolean
 ): string {
   if (scheduled) {
     return created > 0
-      ? `${stageName} opened with ${created} new work items. InventSmith started the next eligible work.`
-      : alreadyInitializedMessage ?? `${stageName} is already initialized. InventSmith started the next eligible work.`;
+      ? `${stageName} opened with ${created} new work items. InventSmith queued a background check for eligible work.`
+      : `${stageName} is already initialized. InventSmith queued a background check for eligible work.`;
   }
 
   return created > 0
