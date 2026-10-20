@@ -235,6 +235,7 @@ export const getLifecycleDepartment = query({
       invention: { _id: invention._id, title: invention.title },
       initialized: stage.work.every((definition) => workItems.some((item: any) => item.kind === definition.kind)),
       workItems: workItems.filter((item: any) => stageKinds.has(item.kind)).sort((a: any, b: any) => b.priority - a.priority),
+      completedWorkKinds: workItems.filter((item: any) => item.status === "completed").map((item: any) => item.kind),
       deliverables: deliverables.filter((item: any) => deliverableKinds.has(item.kind)).sort((a: any, b: any) => b.updatedAt - a.updatedAt),
       evidenceCount: evidence.length,
       inventorEvidenceCount: evidence.filter((item: any) => item.metadata?.provenance === "inventor_upload").length,
