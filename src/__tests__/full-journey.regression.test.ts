@@ -46,6 +46,10 @@ describe("InventSmith full idea-to-market journey", () => {
     expect(routeForJourneyStage("risejar", patent!)).toBe("/invention/risejar/patent");
   });
 
+  it("counts the saved brief analysis as Idea-stage work and evidence", () => {
+    expectStageWork(1, ["idea_capture", "brief_analysis"]);
+  });
+
   it("locks the mandatory product-design and native-CAD destination into stage 5", () => {
     expectStageWork(5, [
       "design_candidate_generation",
