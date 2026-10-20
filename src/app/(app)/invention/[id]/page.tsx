@@ -367,7 +367,11 @@ export default function InventionWorkspacePage() {
                 InventSmith is validating your invention.
               </h1>
               <p className="text-muted-foreground">
-                {isGenerating
+                {evidenceReview?.currentEvidenceMatchesRun === false
+                  ? isGenerating
+                    ? "The report shown does not match the latest evidence. A refresh is running; confidence will stay hidden until the current evidence is reflected in a completed report."
+                    : "The report shown does not match the latest evidence. Use Refresh validation to generate an updated report; confidence will stay hidden until the current evidence is reflected."
+                  : isGenerating
                   ? "Your research is being prepared. You can come back when it finishes."
                   : allSectionsError
                   ? "This attempt did not produce usable research."
@@ -413,6 +417,8 @@ export default function InventionWorkspacePage() {
                       ? `Wait for the research to finish (${completedSections.length} of ${TOTAL_SECTIONS} sections processed so far).`
                       : allSectionsError || failedSections.length > 0
                       ? "If a retry is already running, wait for it to finish. Otherwise, after the AI connection is fixed, tap Retry failed sections."
+                      : evidenceReview?.currentEvidenceMatchesRun === false
+                      ? "This report does not match the latest evidence. Select Refresh validation to regenerate its sections and confidence using the current evidence."
                       : surveyEvidenceIncluded
                       ? "Your uploaded survey was included in this validation run. The next useful step is to add a few direct customer conversations or other evidence that addresses the remaining gaps."
                       : "Talk with a few people who use thick foods in jars. Ask what they do with the last portion, and save their real answers as evidence."}
@@ -434,7 +440,7 @@ export default function InventionWorkspacePage() {
                         {survey.title}: {survey.status === "failed" ? "extraction needs retry" : "extraction is still processing; its results are not included yet"}.
                       </p>
                     ))}
-                    <p className="text-xs text-muted-foreground">Survey results support customer-validation sections. They do not independently verify market size or prove demand. {evidenceReview?.currentEvidenceMatchesRun ? "This report matches the current evidence." : "New evidence is present; this report is stale or its refresh is still running."}</p>
+                    <p className="text-xs text-muted-foreground">Survey results support customer-validation sections. They do not independently verify market size or prove demand. {evidenceReview?.currentEvidenceMatchesRun ? "This report matches the current evidence." : isGenerating ? "This report does not match current evidence; a refresh is currently running." : "This report does not match current evidence, and no refresh is running. Select Refresh validation to update it."}</p>
                     <p className="text-xs text-muted-foreground">The overall confidence is an evidence-support score, not the chance of success. A survey can strengthen relevant customer sections, but does not by itself verify demand, market size, or the product’s performance.</p>
                   </div>
                 )}
@@ -442,7 +448,7 @@ export default function InventionWorkspacePage() {
                   <p className="text-xs text-muted-foreground">Confidence: {avgConfidence}. Research date: {researchDateStr}.</p>
                 )}
                 {!isGenerating && evidenceReview?.currentEvidenceMatchesRun === false && (
-                  <p className="text-xs font-medium text-amber-800">New evidence has arrived since this report. InventSmith is refreshing validation. Its confidence score is hidden until the automatic refresh finishes.</p>
+                  <p className="text-xs font-medium text-amber-800">This completed report does not match the latest evidence. Confidence is hidden until a report that matches current evidence is complete.</p>
                 )}
               </div>
             )}
