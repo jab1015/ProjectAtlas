@@ -46,7 +46,7 @@ const getLifecycleDepartment = makeFunctionReference<"query", { inventionId: Id<
 const getDepartmentExtensions = makeFunctionReference<"query", { inventionId: Id<"inventions">; stageId: number }, DepartmentExtensions>("departmentExtensions:getDepartmentExtensions");
 const getArtifactDownloads = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, ArtifactDownload[]>("deliverableDownloads:getInventionArtifactDownloads");
 const ensureLifecycleDepartment = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; stageId: number }, { created: number; total: number; stageName: string }>("lifecycleDepartments:ensureLifecycleDepartment");
-const kickAutonomousWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { scheduled: boolean; reason: string }>("inventionWorkspace:kickAutonomousWork");
+const kickAutonomousWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; departmentStageId?: number }, { scheduled: boolean; reason: string }>("inventionWorkspace:kickAutonomousWork");
 
 const STATUS_LABELS: Record<string, string> = {
   queued: "Queued",
@@ -136,7 +136,7 @@ export default function LifecycleDepartmentPage() {
     setStarting(true); setMessage(null); setError(null);
     try {
       const ensured = await ensureDepartment({ inventionId, stageId });
-      const scheduled = await kickWork({ inventionId });
+      const scheduled = await kickWork({ inventionId, departmentStageId: stageId });
       setMessage(getDepartmentStartMessage(ensured.stageName, ensured.created, scheduled.scheduled));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "InventSmith could not initialize this department.");

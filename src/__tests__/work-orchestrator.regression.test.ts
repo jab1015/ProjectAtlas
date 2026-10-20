@@ -57,6 +57,20 @@ describe("autonomous work selection", () => {
     const dependency = work({ _id: "dependency", kind: "competitors", status: "completed" });
     expect(selectNextWorkItem([blocked, dependency], 20, 100).selected?._id).toBe("dependent");
   });
+
+  it("scopes a department run to that stage while retaining invention-wide concurrency limits", () => {
+    const stageFive = work({ _id: "cad", inputSnapshot: { departmentStageId: 5 } });
+    const stageSix = work({ _id: "prototype", priority: 99, inputSnapshot: { departmentStageId: 6 } });
+    expect(selectNextWorkItem([stageFive, stageSix], 20, 100, undefined, undefined, undefined, 5).selected?._id).toBe("cad");
+    expect(selectNextWorkItem([stageFive, stageSix], 20, 100, undefined, undefined, undefined, 6).selected?._id).toBe("prototype");
+    expect(selectNextWorkItem([
+      stageFive,
+      stageSix,
+      work({ _id: "running-1", status: "running", leaseExpiresAt: 200 }),
+      work({ _id: "running-2", status: "running", leaseExpiresAt: 200 }),
+      work({ _id: "running-3", status: "running", leaseExpiresAt: 200 }),
+    ], 20, 100, undefined, undefined, undefined, 5).reason).toBe("already_running");
+  });
 });
 
 describe("autonomous work retry and cost controls", () => {

@@ -23,7 +23,7 @@ import {
 
 const runAvailableWork = makeFunctionReference<
   "action",
-  { inventionId: Id<"inventions">; costBudgetUnits?: number },
+  { inventionId: Id<"inventions">; costBudgetUnits?: number; departmentStageId?: number },
   unknown
 >("atlasWorkOrchestration:runAvailableWork");
 
@@ -211,9 +211,12 @@ export const ensureInventionRecord = mutation({
 
 /** Safely nudges the idempotent worker whenever an authorized collaborator opens InventSmith. */
 export const kickAutonomousWork = mutation({
-  args: { inventionId: v.id("inventions") },
-  handler: async (ctx, { inventionId }) => {
+  args: { inventionId: v.id("inventions"), departmentStageId: v.optional(v.number()) },
+  handler: async (ctx, { inventionId, departmentStageId }) => {
     await requireInventionEditAccess(ctx, inventionId);
+    if (departmentStageId !== undefined && (!Number.isInteger(departmentStageId) || departmentStageId < 1 || departmentStageId > 15)) {
+      throw new ConvexError("Invalid lifecycle department stage");
+    }
     const usageScope = await resolveInventionUsageScope(ctx, inventionId);
     if (!usageScope) throw new ConvexError("Invention not found");
     const dateKey = utcDateKey(Date.now());
@@ -234,6 +237,7 @@ export const kickAutonomousWork = mutation({
     await ctx.scheduler.runAfter(0, runAvailableWork, {
       inventionId,
       costBudgetUnits: Math.min(MAX_AUTONOMOUS_RUN_BUDGET, remaining),
+      departmentStageId,
     });
     return { scheduled: true, reason: "scheduled" as const };
   },

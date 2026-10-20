@@ -150,7 +150,7 @@ async function settleLateAttemptCostOnce(
 }
 
 export const claimNextWork = internalMutation({
-  args: { inventionId: v.id("inventions"), availableCostUnits: v.number(), now: v.number() },
+  args: { inventionId: v.id("inventions"), availableCostUnits: v.number(), now: v.number(), departmentStageId: v.optional(v.number()) },
   handler: async (ctx, args) => {
     const items = await ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect();
     const deliverables = await ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect();
@@ -184,7 +184,9 @@ export const claimNextWork = internalMutation({
       Math.min(args.availableCostUnits, serverAvailableUnits),
       args.now,
       (kind) => usageScope.isAdmin || canTierRunWorkKind(usageScope.plan, kind),
-      (kind) => isManufacturingMaturityEligible(kind, deliverables)
+      (kind) => isManufacturingMaturityEligible(kind, deliverables),
+      undefined,
+      args.departmentStageId
     );
     if (!selection.selected) return { workItemId: null, attemptNumber: null, reason: selection.reason };
 

@@ -13,12 +13,12 @@ import { buildPitchDeckArtifact } from "./pitchDeckArtifact";
 import { buildTraceableRetrievalRecords } from "./webRetrievalEvidenceLogic";
 import { departmentAgentSystemPrompt, resolveDepartmentAgent } from "./departmentAgentLogic";
 
-const claimNextWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; availableCostUnits: number; now: number }, { workItemId: Id<"atlasWorkItems"> | null; attemptNumber: number | null; reason: string }>("atlasWorkState:claimNextWork");
+const claimNextWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; availableCostUnits: number; now: number; departmentStageId?: number }, { workItemId: Id<"atlasWorkItems"> | null; attemptNumber: number | null; reason: string }>("atlasWorkState:claimNextWork");
 const getWorkContext = makeFunctionReference<"query", { workItemId: Id<"atlasWorkItems">; attemptNumber: number; now: number }, any>("atlasWorkState:getWorkContext");
 const completeWork = makeFunctionReference<"mutation", any, void>("atlasWorkState:completeWork");
 const failWork = makeFunctionReference<"mutation", { workItemId: Id<"atlasWorkItems">; attemptNumber: number; error: string; actualCostUnits: number; usageKnown: boolean; failedAt: number }, { willRetry: boolean; staleAttempt: boolean }>("atlasWorkState:failWork");
 const blockWorkForHuman = makeFunctionReference<"mutation", any, { accepted: boolean }>("atlasWorkState:blockWorkForHuman");
-const continueAvailableWork = makeFunctionReference<"action", { inventionId: Id<"inventions">; costBudgetUnits?: number; parallelWorker?: boolean }, unknown>("atlasWorkOrchestration:runAvailableWork");
+const continueAvailableWork = makeFunctionReference<"action", { inventionId: Id<"inventions">; costBudgetUnits?: number; parallelWorker?: boolean; departmentStageId?: number }, unknown>("atlasWorkOrchestration:runAvailableWork");
 const generateNativeCad = makeFunctionReference<"action", { inventionId: Id<"inventions">; workItemId: Id<"atlasWorkItems">; attemptNumber: number }, { discarded: boolean; failed: boolean; willRetry?: boolean; actualCostUnits: number }>("nativeCadGeneration:generateNativeCad");
 
 const resultSchema = {
@@ -95,13 +95,13 @@ function contextDeliverableLimit(kind: string) {
 }
 
 export const runAvailableWork = internalAction({
-  args: { inventionId: v.id("inventions"), costBudgetUnits: v.optional(v.number()), parallelWorker: v.optional(v.boolean()) },
-  handler: async (ctx, { inventionId, costBudgetUnits = MAX_AUTONOMOUS_RUN_BUDGET, parallelWorker = false }) => {
+  args: { inventionId: v.id("inventions"), costBudgetUnits: v.optional(v.number()), parallelWorker: v.optional(v.boolean()), departmentStageId: v.optional(v.number()) },
+  handler: async (ctx, { inventionId, costBudgetUnits = MAX_AUTONOMOUS_RUN_BUDGET, parallelWorker = false, departmentStageId }) => {
     // A single wake-up starts a small worker pool. Atomic claims and the
     // selector's active-work cap keep workers on distinct, dependency-ready jobs.
     if (!parallelWorker) {
       for (let worker = 1; worker < 3; worker += 1) {
-        await ctx.scheduler.runAfter(0, continueAvailableWork, { inventionId, costBudgetUnits, parallelWorker: true });
+        await ctx.scheduler.runAfter(0, continueAvailableWork, { inventionId, costBudgetUnits, parallelWorker: true, departmentStageId });
       }
     }
     const apiKey = process.env.OPENAI_API_KEY;
@@ -110,7 +110,7 @@ export const runAvailableWork = internalAction({
     let remainingBudget = costBudgetUnits;
 
     for (let completed = 0; completed < 2; completed += 1) {
-      const claim = await ctx.runMutation(claimNextWork, { inventionId, availableCostUnits: remainingBudget, now: Date.now() });
+      const claim = await ctx.runMutation(claimNextWork, { inventionId, availableCostUnits: remainingBudget, now: Date.now(), departmentStageId });
       if (!claim.workItemId || claim.attemptNumber === null) return { completed, stopReason: claim.reason, remainingBudget };
 
       const attemptNumber = claim.attemptNumber;
@@ -138,7 +138,7 @@ export const runAvailableWork = internalAction({
           const cadResult = await ctx.runAction(generateNativeCad, { inventionId, workItemId: claim.workItemId, attemptNumber });
           remainingBudget = Math.max(0, remainingBudget - (cadResult.actualCostUnits ?? 0));
           if (cadResult.failed) {
-            if (shouldScheduleAutonomousRetry(Boolean(cadResult.willRetry), remainingBudget)) await ctx.scheduler.runAfter(2_000, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget, parallelWorker: true });
+            if (shouldScheduleAutonomousRetry(Boolean(cadResult.willRetry), remainingBudget)) await ctx.scheduler.runAfter(2_000, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget, parallelWorker: true, departmentStageId });
             return { completed, stopReason: "native_cad_failed", remainingBudget };
           }
           continue;
@@ -264,14 +264,14 @@ export const runAvailableWork = internalAction({
         });
         remainingBudget = Math.max(0, remainingBudget - incurredCostUnits);
         if (!failure.staleAttempt && shouldScheduleAutonomousRetry(failure.willRetry, remainingBudget)) {
-          await ctx.scheduler.runAfter(2_000, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget, parallelWorker: true });
+          await ctx.scheduler.runAfter(2_000, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget, parallelWorker: true, departmentStageId });
         }
         return { completed, stopReason: failure.staleAttempt ? "stale_attempt" : "failed", remainingBudget };
       }
     }
 
     const stopReason = "turn_limit";
-    if (shouldContinueAutonomousRun(stopReason, remainingBudget)) await ctx.scheduler.runAfter(500, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget, parallelWorker: true });
+    if (shouldContinueAutonomousRun(stopReason, remainingBudget)) await ctx.scheduler.runAfter(500, continueAvailableWork, { inventionId, costBudgetUnits: remainingBudget, parallelWorker: true, departmentStageId });
     return { completed: 2, stopReason, remainingBudget };
   },
 });

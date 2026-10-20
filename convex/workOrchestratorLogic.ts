@@ -9,6 +9,7 @@ export interface SchedulableWorkItem {
   leaseExpiresAt?: number;
   kind?: string;
   dependsOnKinds?: string[];
+  inputSnapshot?: Record<string, unknown>;
 }
 
 export interface WorkSelectionResult<T> {
@@ -25,7 +26,8 @@ export function selectNextWorkItem<T extends SchedulableWorkItem>(
   now: number,
   canRunKind: (kind: string | undefined) => boolean = () => true,
   isMaturityEligible: (kind: string | undefined) => boolean = () => true,
-  maxConcurrentWorkItems = MAX_CONCURRENT_DEPARTMENT_WORK_ITEMS
+  maxConcurrentWorkItems = MAX_CONCURRENT_DEPARTMENT_WORK_ITEMS,
+  departmentStageId?: number
 ): WorkSelectionResult<T> {
   const activeCount = items.filter(
     (item) => item.status === "running" && (!item.leaseExpiresAt || item.leaseExpiresAt > now)
@@ -43,7 +45,8 @@ export function selectNextWorkItem<T extends SchedulableWorkItem>(
       const expiredLease = item.status === "running" && Boolean(item.leaseExpiresAt && item.leaseExpiresAt <= now);
       const dependenciesComplete = (item.dependsOnKinds ?? []).every((kind) => completedKinds.has(kind));
       return attemptsRemain && dependenciesComplete && (queued || expiredLease);
-    });
+    })
+    .filter((item) => departmentStageId === undefined || item.inputSnapshot?.departmentStageId === departmentStageId);
 
   const maturityEligible = dependencyEligible.filter((item) => isMaturityEligible(item.kind));
   const eligible = maturityEligible
