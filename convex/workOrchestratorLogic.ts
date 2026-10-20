@@ -46,7 +46,10 @@ export function selectNextWorkItem<T extends SchedulableWorkItem>(
       const dependenciesComplete = (item.dependsOnKinds ?? []).every((kind) => completedKinds.has(kind));
       return attemptsRemain && dependenciesComplete && (queued || expiredLease);
     })
-    .filter((item) => departmentStageId === undefined || item.inputSnapshot?.departmentStageId === departmentStageId);
+    .filter((item) => {
+      const itemStageId = item.inputSnapshot?.departmentStageId ?? item.inputSnapshot?.stageId;
+      return departmentStageId === undefined || itemStageId === departmentStageId;
+    });
 
   const maturityEligible = dependencyEligible.filter((item) => isMaturityEligible(item.kind));
   const eligible = maturityEligible

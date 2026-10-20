@@ -59,7 +59,7 @@ describe("autonomous work selection", () => {
   });
 
   it("scopes a department run to that stage while retaining invention-wide concurrency limits", () => {
-    const stageFive = work({ _id: "cad", inputSnapshot: { departmentStageId: 5 } });
+    const stageFive = work({ _id: "cad", inputSnapshot: { stageId: 5 } });
     const stageSix = work({ _id: "prototype", priority: 99, inputSnapshot: { departmentStageId: 6 } });
     expect(selectNextWorkItem([stageFive, stageSix], 20, 100, undefined, undefined, undefined, 5).selected?._id).toBe("cad");
     expect(selectNextWorkItem([stageFive, stageSix], 20, 100, undefined, undefined, undefined, 6).selected?._id).toBe("prototype");

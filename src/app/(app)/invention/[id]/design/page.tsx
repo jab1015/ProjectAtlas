@@ -40,7 +40,7 @@ interface NativeCadArtifact {
 
 const getProductDesignWorkspace = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, DesignWorkspace>("productDesign:getProductDesignWorkspace");
 const ensureProductDesignWorkspace = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { created: number; total: number }>("productDesign:ensureProductDesignWorkspace");
-const kickAutonomousWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { scheduled: boolean; reason: string }>("inventionWorkspace:kickAutonomousWork");
+const kickAutonomousWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; departmentStageId?: number }, { scheduled: boolean; reason: string }>("inventionWorkspace:kickAutonomousWork");
 const requestNativeCadGeneration = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { scheduled: boolean; reason: string; workItemId: Id<"atlasWorkItems"> }>("nativeCad:requestNativeCadGeneration");
 const getNativeCadArtifacts = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, NativeCadArtifact[]>("nativeCad:getNativeCadArtifacts");
 
@@ -101,7 +101,7 @@ export default function ProductDesignStudioPage() {
     setStarting(true); setMessage(null); setError(null);
     try {
       const ensured = await ensureWorkspace({ inventionId });
-      const scheduled = await kickWork({ inventionId });
+      const scheduled = await kickWork({ inventionId, departmentStageId: 5 });
       setMessage(getDepartmentStartMessage("Product Design", ensured.created, scheduled.scheduled));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "InventSmith could not start Product Design.");

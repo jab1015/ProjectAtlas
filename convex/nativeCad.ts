@@ -10,7 +10,7 @@ import { conservativeAttemptSettlementCost } from "./usageSettlementLogic";
 import { departmentAgentAuditMetadata } from "./departmentAgentLogic";
 import { recordCreditEntry } from "./betaAccessLogic";
 
-const runAvailableWork = makeFunctionReference<"action", { inventionId: Id<"inventions">; costBudgetUnits?: number }, unknown>("atlasWorkOrchestration:runAvailableWork");
+const runAvailableWork = makeFunctionReference<"action", { inventionId: Id<"inventions">; costBudgetUnits?: number; departmentStageId?: number }, unknown>("atlasWorkOrchestration:runAvailableWork");
 
 function dateKey(timestamp: number) {
   return new Date(timestamp).toISOString().slice(0, 10);
@@ -137,7 +137,7 @@ export const requestNativeCadGeneration = mutation({
       metadata: { maturity: "preliminary_cad", productDesignVersion: currentDesign.version, usageScope: usageScope.scope, usageUserId: String(usageScope.usageUserId) },
       createdAt: now,
     });
-    await ctx.scheduler.runAfter(0, runAvailableWork, { inventionId: args.inventionId });
+    await ctx.scheduler.runAfter(0, runAvailableWork, { inventionId: args.inventionId, departmentStageId: 5 });
     return { scheduled: true, reason: "queued_through_autonomy" as const, workItemId: current?._id ?? null };
   },
 });
