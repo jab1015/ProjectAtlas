@@ -172,3 +172,8 @@ Netlify Preview `6ad6cc30d1357a83bd6def1a` for app commit `56018db` completed su
 Latest app-source checks: focused next-step/journey tests **4/4 passed**, web TypeScript passed, and Netlify’s Next.js build completed. The full repository suite passed immediately before this small page-only compatibility correction (**130 files / 703 tests**); the focused regressions were rerun after it. The paired Production-context build was canceled, and Netlify Auto Publishing remains locked. PR #24 remains open/unmerged.
 
 Live department execution is still not established: Journey Center reports 1/15 stages done, Validation 0/2 tasks, Market Research needs a retry, and no saved results for downstream departments. The repository covers 21 department-agent profiles/routing with automated tests, but each department still needs controlled live output and handoff acceptance. The current browser account lacks admin access for operations review; no new agent batch, paid generation, or production backend deployment was run.
+
+## Retest safety boundary — 2026-10-19
+
+The signed-in Preview's prepared survey link is displayed for the inventor to share. This test did not send it to respondents, submit survey answers, start queued department agents, spend provider credits, make purchases, contact vendors, or file legal documents. Growth showed five queued prerequisite-dependent jobs and no completed outputs. Treat department execution, external actions, money, and physical work as unverified or approval-gated until individually tested under an authorized budget and conditions.
+

@@ -232,3 +232,12 @@ Netlify Preview `6ad6cc30d1357a83bd6def1a` for app commit `56018db` completed su
 Latest app-source checks: focused next-step/journey tests **4/4 passed**, web TypeScript passed, and Netlify’s Next.js build completed. The full repository suite passed immediately before this small page-only compatibility correction (**130 files / 703 tests**); the focused regressions were rerun after it. The paired Production-context build was canceled, and Netlify Auto Publishing remains locked. PR #24 remains open/unmerged.
 
 Live department execution is still not established: Journey Center reports 1/15 stages done, Validation 0/2 tasks, Market Research needs a retry, and no saved results for downstream departments. The repository covers 21 department-agent profiles/routing with automated tests, but each department still needs controlled live output and handoff acceptance. The current browser account lacks admin access for operations review; no new agent batch, paid generation, or production backend deployment was run.
+
+## Netlify Preview retest — 2026-10-19
+
+- Verified authenticated deploy Preview #24, deploy `6ad6ccd2ebf75c110beaae6d`. Validation report is current and credits `Data_All_260313`; 45% evidence-support score and prepared survey link are visible.
+- All 15 invention stage URLs smoke-rendered. This is navigation coverage only, not department agent execution acceptance.
+- 703 tests passed (130 files).
+- Local `npm run readiness` and `npm run build` are blocked before build by missing Convex target configuration (`CONVEX_DEPLOYMENT`, `NEXT_PUBLIC_CONVEX_URL`). The successful Netlify deploy is the hosted build check.
+- Preview/production separation remains in force; this retest did not publish production.
+

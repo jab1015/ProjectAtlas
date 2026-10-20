@@ -58,3 +58,12 @@ Netlify Preview `6ad6cc30d1357a83bd6def1a` for app commit `56018db` completed su
 Latest app-source checks: focused next-step/journey tests **4/4 passed**, web TypeScript passed, and Netlify’s Next.js build completed. The full repository suite passed immediately before this small page-only compatibility correction (**130 files / 703 tests**); the focused regressions were rerun after it. The paired Production-context build was canceled, and Netlify Auto Publishing remains locked. PR #24 remains open/unmerged.
 
 Live department execution is still not established: Journey Center reports 1/15 stages done, Validation 0/2 tasks, Market Research needs a retry, and no saved results for downstream departments. The repository covers 21 department-agent profiles/routing with automated tests, but each department still needs controlled live output and handoff acceptance. The current browser account lacks admin access for operations review; no new agent batch, paid generation, or production backend deployment was run.
+
+## Engineering retest evidence — 2026-10-19
+
+- Preview acceptance: authenticated Validation page correctly attributes inventor-uploaded survey findings, presents provenance/limitations, current evidence state, 45% evidence-support score, and prepared survey next step.
+- Route smoke: 15/15 stage URLs rendered. Not equivalent to successful stage-level agent execution. Growth showed 0/5 completed, five queued, and zero saved deliverables.
+- Regression suite: 130 files, 703 tests passed.
+- Local build reproducibility: blocked at Convex codegen due missing target env in checkout. Netlify Preview deploy build succeeded.
+- Remaining maturity gap: run safe, cost-bounded end-to-end agent execution tests per department with prerequisites satisfied; verify persisted artifact, evidence references, retry/idempotency and user-visible handoff for each.
+

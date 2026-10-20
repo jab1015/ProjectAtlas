@@ -124,3 +124,16 @@ Netlify Preview `6ad6cc30d1357a83bd6def1a` for app commit `56018db` completed su
 Latest app-source checks: focused next-step/journey tests **4/4 passed**, web TypeScript passed, and Netlify’s Next.js build completed. The full repository suite passed immediately before this small page-only compatibility correction (**130 files / 703 tests**); the focused regressions were rerun after it. The paired Production-context build was canceled, and Netlify Auto Publishing remains locked. PR #24 remains open/unmerged.
 
 Live department execution is still not established: Journey Center reports 1/15 stages done, Validation 0/2 tasks, Market Research needs a retry, and no saved results for downstream departments. The repository covers 21 department-agent profiles/routing with automated tests, but each department still needs controlled live output and handoff acceptance. The current browser account lacks admin access for operations review; no new agent batch, paid generation, or production backend deployment was run.
+
+## Live Preview evidence — 2026-10-19
+
+| Capability | Retest result | Boundary |
+|---|---|---|
+| Validation evidence attribution | Passed in signed-in Netlify Preview | Uploaded survey is credited with provenance and limits; inventor-provided and unverified status remains explicit. |
+| Validation refresh state | Passed | Report says it matches current evidence; confidence is visible at 45%. |
+| Follow-up survey preparation | Passed | Link is prepared and copyable. Inventor chooses distribution; responses are not fabricated or sent by the app. |
+| Stage routing | 15/15 URLs rendered the app shell in Preview | Route smoke test does not prove each department's agent can execute and save outputs. |
+| Department execution | Not fully verified | Growth showed 0/5 complete, five queued behind prerequisites, and no deliverables. No AI jobs were run in this retest. |
+| Automated tests | Passed | 703 tests across 130 files. |
+| Local deployment readiness/build | Blocked | Convex target and public backend URL are not configured in this checkout; hosted Netlify deploy is the build evidence. |
+
