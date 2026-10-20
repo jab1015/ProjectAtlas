@@ -1,3 +1,11 @@
+## Controlled hardening checkpoint — October 20, 2026
+
+- Branch head verified as `fa405d351746ed6f195e7bbc3666f3fbda1d104d`; PR #24 remains draft/open and unmerged.
+- Owner-controlled Vercel Preview deployment is green, and the public landing, sign-in, and password-recovery routes render successfully.
+- Convex production `agile-seahorse-379` health is green: database reachable, AI configuration present, and auth configuration present. The Authentication dashboard shows the `https://agile-seahorse-379.convex.site` provider with application ID `convex`.
+- The owner confirmed password recovery and sign-in now work. No AI generation, billing, upload, support submission, external message, or production feature deployment was triggered during this checkpoint.
+- Remaining acceptance boundary: authenticated Journey/Validation/Evidence/Support behavior and provider-backed department execution still require controlled live verification. The separate `fiery-gazelle-628` deployment remains untouched.
+
 ## Inventor next-step and low-confidence survey checkpoint — October 20, 2026
 
 - Updated the Validation page so a completed, current evidence-support score at or below 50% automatically creates a shareable survey through the existing `evidenceRequests:create` endpoint. The page waits for the existing-link query and reuses an active Validation follow-up link before creating another. Its introduction is tailored from the invention problem and solution; the existing questions remain short and general. The inventor sees the score, a plain-language instruction to share it with five people, the link, and a copy action. No one is contacted and nothing is posted externally.
