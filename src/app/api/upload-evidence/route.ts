@@ -44,3 +44,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "The server could not reach the Convex upload service." }, { status: 502 });
   }
 
+
+}
