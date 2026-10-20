@@ -158,7 +158,7 @@ export default function InventionEvidencePage() {
     try {
       const currentExtraction = extraction ?? await extractEvidenceFromFile(file, evidenceKind);
       const uploadUrl = await generateUploadUrl({ inventionId });
-      const response = await fetch("/api/upload-evidence", {
+      const response = await fetch("/api/evidence-proxy", {
         method: "POST",
         headers: {
           "Content-Type": file.type || "application/octet-stream",
