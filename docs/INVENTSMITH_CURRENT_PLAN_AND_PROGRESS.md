@@ -447,3 +447,13 @@ A fresh authenticated reload after the Convex deployment clarified the post-retr
 - After run **39373720916** deployed the mapping fix to `quick-fox-785`, the signed-in Work Library retry for the legacy `technical_feasibility` item succeeded through the existing Preview UI.
 - The failure card disappeared and a saved **RiseJars — Technical Feasibility and Product Risk Assessment** artifact appeared. It is correctly marked **Professional review required**; no engineering approval or external-use authorization was inferred.
 - Package quality checks improved from **18 to 17 required deliverables missing** and now show no autonomous work failure. The remaining work is still gated by missing upstream deliverables, concept visualization, and required professional/physical evidence.
+
+
+### Vercel login and Convex target checkpoint — October 20, 2026
+
+- The owner changed the GitHub default branch to `inventsmith/full-product-build`. The Vercel site `inventsmith.vercel.app` now serves the intended branch; its login page includes **Forgot password?**. This confirms branch selection and the correct frontend are live.
+- Live login is **not accepted**: the owner reports the sign-in button remains at “Signing in…”. No successful Vercel login has been verified.
+- Vercel's `NEXT_PUBLIC_CONVEX_URL` was shown as `https://quick-fox-785.convex.cloud/`, with type **Config** and scope **All Environments**. The owner then checked the working Netlify deployment and found it uses `agile-seahorse-379`. Therefore the Vercel/Netlify backend-target mismatch is the leading explanation for the stalled login, but the correction has not yet been confirmed by a successful sign-in.
+- To test against the same Convex data/auth as the working Netlify deployment, set Vercel `NEXT_PUBLIC_CONVEX_URL` to `https://agile-seahorse-379.convex.cloud/` (Config, All Environments), save, and create a fresh Production deployment. Then test sign-in. Do not change Convex data or deploy backend functions as part of this URL-only check.
+- Keep the separate test deployment `quick-fox-785` documented as an isolated test target; do not treat it as the backend containing the account that works on Netlify. Do not use or modify `fiery-gazelle-628`.
+- Status boundary: branch deployment and login-page rendering are verified by the owner's report/screenshots; Vercel authentication, post-change login, and backend end-to-end acceptance remain unverified. No credentials were entered or tested by the assistant.
