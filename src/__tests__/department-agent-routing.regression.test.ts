@@ -62,6 +62,7 @@ describe("dedicated department agent routing", () => {
     expect(resolveDepartmentAgent({ department: "canonical" }).agentId).toContain(".canonical.");
     expect(resolveDepartmentAgent({ department: "patent_readiness" }).agentId).toContain(".patent_readiness.");
     expect(resolveDepartmentAgent({ department: "canonical" }, "market_feasibility").department).toBe("market_research");
+    expect(resolveDepartmentAgent({ department: "unknown" }, "technical_feasibility").department).toBe("canonical");
     expect(resolveDepartmentAgent({ department: "canonical" }, "patent_design_handoff").department).toBe("patent_readiness");
     expect(resolveDepartmentAgent({ department: "canonical" }, "regulatory_screening").department).toBe("regulatory");
   });
