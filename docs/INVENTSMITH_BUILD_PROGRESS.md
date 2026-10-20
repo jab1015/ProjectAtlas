@@ -415,3 +415,11 @@ The Convex GitHub device authorization page reported “Device connected,” but
 - Verification: full regression suite **131 files / 709 tests passed**; TypeScript passed; Next production build passed (**36/36 pages**); production dependency audit reported **0 vulnerabilities**. The targeted retry tests cover authorization, legacy department routing, audit/scheduling, retry cap, unknown agents, and exhausted allowance.
 - The authenticated Preview #24 validated the current Validation report at **45%**, confirmed attribution to the inventor-uploaded survey, and opened the generated five-question follow-up survey page. No survey response was submitted or distributed.
 - Open: the retry change is implemented and passes local checks. After push, let the exact commit build in Netlify Preview, deploy the backend to isolated test Convex quick-fox-785, and use the logged-in Preview to execute the two failed jobs. Verify each saved deliverable and department-agent audit before claiming department acceptance. Production website and production Convex remain untouched.
+
+
+### Retry workflow CI follow-up — October 20, 2026
+
+- The first isolated development workflow for retry hardening passed both web and Convex typechecks, then stopped in the full Vitest run: 130 files / 708 tests passed and one existing product-acceptance assertion failed because the current progress note had dropped the required statement about the retired 80% pilot figure.
+- This is a documentation-contract failure. The workflow therefore skipped the dependency audit, production build, and test Convex deployment. No backend deployment occurred for this commit; production website and Convex remain untouched.
+- Restore and retain this product-status guardrail in this document: The retired controlled-pilot 80% figure must never be used as overall InventSmith completion.
+- Retry feature implementation is not yet Preview-tested or test-backend deployed. Re-run full CI, then deploy only to quick-fox-785 and exercise retry through the authenticated Preview before reporting a successful department recovery.
