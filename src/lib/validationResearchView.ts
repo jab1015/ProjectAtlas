@@ -23,6 +23,9 @@ export interface ValidationResearchSectionView {
 export interface ValidationResearchViewInput {
   status?: ValidationResearchStatus;
   sections?: ValidationResearchSectionView[];
+  evidenceReview?: {
+    currentEvidenceMatchesRun?: boolean;
+  };
 }
 
 export interface ValidationResearchViewState {
@@ -55,7 +58,10 @@ export function getValidationCompletionLabel(
   totalSections: number
 ): string {
   if (currentEvidenceMatchesRun === false) {
-    return `Previous report — ${completedSections} of ${totalSections} sections complete; refreshing with new evidence`;
+    return `Update needed — previous report has ${completedSections} of ${totalSections} sections; it does not match current evidence`;
+  }
+  if (completedSections < totalSections) {
+    return `Validation partially complete — ${completedSections} of ${totalSections} sections`;
   }
   return `Validation complete — ${completedSections} of ${totalSections} sections`;
 }
@@ -70,6 +76,7 @@ export function getValidationResearchViewState(
   const failedSections = finishedSections.filter((section) => section.status === "failed");
   const isFailed = validationResearch?.status === "failed";
   const isGenerating = rebuilding || validationResearch?.status === "running";
+  const evidenceIsStale = validationResearch?.evidenceReview?.currentEvidenceMatchesRun === false;
 
   // The orchestration layer can persist a true partial result while older query
   // normalization paths may omit that status. Infer partial from observable
@@ -102,7 +109,11 @@ export function getValidationResearchViewState(
   if (isFailed || allSectionsError) {
     statusLabel = "Validation failed";
   } else if (isGenerating) {
-    statusLabel = "Research in progress";
+    statusLabel = evidenceIsStale
+      ? "Refresh in progress — current evidence not reflected yet"
+      : "Research in progress";
+  } else if (evidenceIsStale) {
+    statusLabel = getValidationCompletionLabel(false, progressCount, totalSections);
   } else if (isPartial) {
     statusLabel = "Validation partially complete";
   } else if (validationResearch?.status === "complete") {
