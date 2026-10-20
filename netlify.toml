@@ -17,3 +17,5 @@
 [context.deploy-preview.environment]
   NEXT_PUBLIC_CONVEX_URL = "https://quick-fox-785.convex.cloud"
 
+# Trigger a fresh website-only Deploy Preview for the stale-validation UI repair.
+
