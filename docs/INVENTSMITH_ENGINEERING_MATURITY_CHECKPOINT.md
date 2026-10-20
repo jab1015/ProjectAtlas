@@ -116,3 +116,15 @@ The Convex GitHub device authorization page reported “Device connected,” but
 - After the retries, Work Library still reports **19/19 required deliverables missing**. The dashboard’s broad queued view is dominated by older backlog, and a specific saved output plus matching execution audit record has not yet been verified. Therefore independent department execution, deliverable persistence, evidence citations, and downstream handoffs remain **unaccepted**; do not mark all departments working or complete.
 - Validation acceptance remains: current 11/11 report; 45% evidence-support score; uploaded `Data_All_260313` survey attributed as inventor-provided/unverified; a follow-up survey is available because the score is below 50%. The evidence is credited as support, not independent market proof. No respondent answer was submitted/distributed.
 - Production Netlify remains unpublished/locked and Production Convex was not changed. Continue by tracing the two retried work-item IDs through their terminal status, saved deliverables, and execution events in `quick-fox-785`; if either failed again, use its recorded failure to repair the worker path before further broad department claims.
+
+
+### Audit-record correction — retried department work — October 20, 2026
+
+Read-only inspection of `atlasExecutionEvents` and `atlasDeliverables` on `quick-fox-785` now confirms the outcomes of the two manual retries:
+
+- **Idea / brief analysis** (`jn7d1ct7fyv5zmfk88tm01sgfs8ghjpp`): the retry event identifies `inventsmith.department.idea.v1`; the agent claimed and completed the item. A saved `invention_brief_analysis` deliverable is present and references that same work-item ID. This is verified completion for this one Idea task.
+- **Market Research / competing products** (`jn7ft3g8538eym3vwhcx8cdfhn8ggzy3`): the retry event identifies `inventsmith.department.market_research.v1` and the agent claimed it. Its next recorded event is `work_blocked` with a professional patent/FTO review requirement. No matching Market Research deliverable was present in the deliverables table at inspection. This agent is registered and routed correctly, but that job is not accepted as completed.
+- The signed-in Work Library showed no remaining terminal-failure cards after retry and still listed 19 required deliverables missing, consistent with downstream gaps. A blocked item must be surfaced as a review dependency and cannot count as successful department completion.
+- The execution-event table also confirms the inventor upload/extraction audit for `Data_All_260313` and its source ID; the authenticated Preview’s current Validation report credits the survey as inventor-provided/unverified. It is evidence support, not independent demand verification.
+
+Overall department acceptance remains partial: one Idea output is saved; Market Research correctly encountered a human/professional gate; no per-department end-to-end completion has been established for the remaining departments. Keep Production Netlify unpublished and Production Convex untouched.
