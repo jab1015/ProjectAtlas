@@ -80,7 +80,7 @@ export function resolveDepartmentAgent(inputSnapshot: unknown, workKind?: string
   const declaredDepartment = input?.department;
   // Older canonical jobs carried a single umbrella label. Route those by their
   // actual assignment so each department gets its own mission and audit identity.
-  const department = declaredDepartment === "canonical" && workKind && WORK_KIND_DEPARTMENT[workKind]
+  const department = (declaredDepartment === "canonical" || !isDepartmentAgentKey(declaredDepartment)) && workKind && WORK_KIND_DEPARTMENT[workKind]
     ? WORK_KIND_DEPARTMENT[workKind]
     : declaredDepartment;
   if (!isDepartmentAgentKey(department)) {
@@ -101,7 +101,7 @@ export function departmentAgentSystemPrompt(agent: DepartmentAgentProfile): stri
 export function departmentAgentAuditMetadata(inputSnapshot: unknown, workKind?: string) {
   const input = inputSnapshot && typeof inputSnapshot === "object" ? inputSnapshot as Record<string, unknown> : null;
   const declaredDepartment = input?.department;
-  const department = declaredDepartment === "canonical" && workKind && WORK_KIND_DEPARTMENT[workKind]
+  const department = (declaredDepartment === "canonical" || !isDepartmentAgentKey(declaredDepartment)) && workKind && WORK_KIND_DEPARTMENT[workKind]
     ? WORK_KIND_DEPARTMENT[workKind]
     : declaredDepartment;
   if (!isDepartmentAgentKey(department)) return { departmentAgentRegistered: false, department: typeof department === "string" ? department : undefined };
