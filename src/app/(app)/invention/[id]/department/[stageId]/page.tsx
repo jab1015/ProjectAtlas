@@ -8,6 +8,7 @@ import { makeFunctionReference } from "convex/server";
 import type { Doc, Id } from "@convex/_generated/dataModel";
 import { ArrowLeft, CheckCircle2, Download, FileUp, Play, RefreshCw, ShieldAlert, Sparkles } from "lucide-react";
 import { AppNav } from "@/components/atlas/app-nav";
+import { getDepartmentStartMessage } from "@/lib/departmentStartMessage";
 import { MadeThisBadge } from "@/components/atlas/made-this-badge";
 import { MarkdownContent } from "@/components/markdown-content";
 import { Button } from "@/components/ui/button";
@@ -129,11 +130,7 @@ export default function LifecycleDepartmentPage() {
     try {
       const ensured = await ensureDepartment({ inventionId, stageId });
       const scheduled = await kickWork({ inventionId });
-      setMessage(ensured.created > 0
-        ? `${ensured.stageName} opened with ${ensured.created} new work items. ${scheduled.scheduled ? "InventSmith started the next eligible work." : "The department is ready; dependencies or usage controls currently prevent another autonomous run."}`
-        : scheduled.scheduled
-        ? `${ensured.stageName} is already initialized. InventSmith started the next eligible work.`
-        : `${ensured.stageName} is initialized and waiting for its next dependency, evidence, approval, professional review, physical task, or usage capacity.`);
+      setMessage(getDepartmentStartMessage(ensured.stageName, ensured.created, scheduled.scheduled));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "InventSmith could not initialize this department.");
     } finally { setStarting(false); }
