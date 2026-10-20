@@ -9,7 +9,7 @@ export interface FullJourneyStageDefinition {
 }
 
 export const FULL_JOURNEY_STAGES: FullJourneyStageDefinition[] = [
-  { id: 1, name: "Idea", routeType: "foundation", requiredWorkKinds: ["idea_capture"], dependsOnStageIds: [] },
+  { id: 1, name: "Idea", routeType: "foundation", requiredWorkKinds: ["idea_capture", "brief_analysis"], dependsOnStageIds: [] },
   { id: 2, name: "Validation", routeType: "foundation", requiredWorkKinds: ["assumptions_unknowns", "market_feasibility"], dependsOnStageIds: [1] },
   { id: 3, name: "Market Research", routeType: "market", requiredWorkKinds: ["competitor_discovery", "market_feasibility"], dependsOnStageIds: [1, 2] },
   { id: 4, name: "Patent Readiness", routeType: "patent", requiredWorkKinds: ["preliminary_prior_art", "feature_prior_art_comparison", "distinguishing_features", "ip_readiness", "patent_design_handoff"], dependsOnStageIds: [1, 2, 3] },
