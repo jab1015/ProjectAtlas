@@ -158,9 +158,12 @@ export default function InventionEvidencePage() {
     try {
       const currentExtraction = extraction ?? await extractEvidenceFromFile(file, evidenceKind);
       const uploadUrl = await generateUploadUrl({ inventionId });
-      const response = await fetch(uploadUrl, {
+      const response = await fetch("/api/upload-evidence", {
         method: "POST",
-        headers: { "Content-Type": file.type || "application/octet-stream" },
+        headers: {
+          "Content-Type": file.type || "application/octet-stream",
+          "x-convex-upload-url": uploadUrl,
+        },
         body: file,
       });
       if (!response.ok) throw new Error("The file could not be uploaded.");
