@@ -13,6 +13,7 @@ import { ManufacturingReleaseAction } from "@/components/atlas/manufacturing-rel
 import { MarkdownContent } from "@/components/markdown-content";
 import { Button } from "@/components/ui/button";
 import { selectCurrentSynchronizedCadGeneration } from "@/lib/manufacturing-release-ui-logic";
+import { getDepartmentStartMessage } from "@/lib/departmentStartMessage";
 
 interface DesignWorkspace {
   invention: { _id: Id<"inventions">; title: string };
@@ -101,11 +102,7 @@ export default function ProductDesignStudioPage() {
     try {
       const ensured = await ensureWorkspace({ inventionId });
       const scheduled = await kickWork({ inventionId });
-      setMessage(ensured.created > 0
-        ? `Product Design opened with ${ensured.created} new work items. ${scheduled.scheduled ? "InventSmith started the next eligible work." : "The queue is ready and will continue when dependencies/usage allow."}`
-        : scheduled.scheduled
-        ? "Product Design is already initialized. InventSmith started the next eligible work."
-        : "Product Design is initialized. InventSmith is waiting for a dependency, entitlement, evidence, or daily usage capacity.");
+      setMessage(getDepartmentStartMessage("Product Design", ensured.created, scheduled.scheduled));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "InventSmith could not start Product Design.");
     } finally { setStarting(false); }
