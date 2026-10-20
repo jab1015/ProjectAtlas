@@ -181,3 +181,13 @@ The Convex GitHub device authorization page reported “Device connected,” but
 ### Convex GitHub device retry — October 19, 2026
 
 The Convex GitHub device authorization page reported “Device connected,” but the workspace CLI then failed because its request to `auth.convex.dev` was blocked by the environment network policy. No backend deployment occurred, no department provider work ran, and Production and other Convex deployments were not touched. Full department acceptance remains blocked until the authenticated CLI can reach Convex, deploy the matching PR code to `quick-fox-785`, and re-run each eligible department against its real upstream evidence and gates.
+
+
+### Vercel login and Convex target checkpoint — October 20, 2026
+
+- The owner changed the GitHub default branch to `inventsmith/full-product-build`. The Vercel site `inventsmith.vercel.app` now serves the intended branch; its login page includes **Forgot password?**. This confirms branch selection and the correct frontend are live.
+- Live login is **not accepted**: the owner reports the sign-in button remains at “Signing in…”. No successful Vercel login has been verified.
+- Vercel's `NEXT_PUBLIC_CONVEX_URL` was shown as `https://quick-fox-785.convex.cloud/`, with type **Config** and scope **All Environments**. The owner then checked the working Netlify deployment and found it uses `agile-seahorse-379`. Therefore the Vercel/Netlify backend-target mismatch is the leading explanation for the stalled login, but the correction has not yet been confirmed by a successful sign-in.
+- To test against the same Convex data/auth as the working Netlify deployment, set Vercel `NEXT_PUBLIC_CONVEX_URL` to `https://agile-seahorse-379.convex.cloud/` (Config, All Environments), save, and create a fresh Production deployment. Then test sign-in. Do not change Convex data or deploy backend functions as part of this URL-only check.
+- Keep the separate test deployment `quick-fox-785` documented as an isolated test target; do not treat it as the backend containing the account that works on Netlify. Do not use or modify `fiery-gazelle-628`.
+- Status boundary: branch deployment and login-page rendering are verified by the owner's report/screenshots; Vercel authentication, post-change login, and backend end-to-end acceptance remain unverified. No credentials were entered or tested by the assistant.
