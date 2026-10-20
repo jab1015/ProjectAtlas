@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import {
   DEPARTMENT_AGENT_PROFILES,
   departmentAgentAuditMetadata,
+  departmentAgentKeyFromDisplayName,
   departmentAgentSystemPrompt,
   resolveDepartmentAgent,
 } from "@convex/departmentAgentLogic";
@@ -21,6 +22,36 @@ describe("dedicated department agent routing", () => {
       expect(profile.mission.length).toBeGreaterThan(40);
       expect(profile.guardrails.length).toBeGreaterThanOrEqual(3);
     }
+  });
+
+  it("normalizes every lifecycle department label to its dedicated registered agent", () => {
+    const lifecycleDepartmentNames = [
+      "Prototype",
+      "Manufacturing",
+      "Branding",
+      "Intellectual Property / Legal",
+      "Pricing",
+      "Marketing",
+      "Sales",
+      "Funding",
+      "Launch",
+      "Growth",
+    ];
+    const lifecycleSource = readFileSync("convex/lifecycleDepartments.ts", "utf8");
+
+    for (const name of lifecycleDepartmentNames) {
+      const key = departmentAgentKeyFromDisplayName(name);
+      const agent = resolveDepartmentAgent({ department: key });
+      expect(agent.department).toBe(key);
+      expect(departmentAgentSystemPrompt(agent)).toContain(agent.mission);
+      expect(departmentAgentAuditMetadata({ department: key })).toMatchObject({
+        departmentAgentRegistered: true,
+        department: key,
+        departmentAgentId: `inventsmith.department.${key}.v1`,
+      });
+    }
+
+    expect(lifecycleSource).toContain("department: departmentAgentKeyFromDisplayName(stage.name)");
   });
 
   it("routes every physical, hybrid, and software work-plan item to a registered agent", () => {

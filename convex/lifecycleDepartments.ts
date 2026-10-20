@@ -3,6 +3,7 @@ import { mutation, query } from "./_generated/server";
 import { requireInventionEditAccess, requireInventionReadAccess } from "./organizations";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { getOrganizationPlanPolicy } from "./organizationPolicyLogic";
+import { departmentAgentKeyFromDisplayName } from "./departmentAgentLogic";
 
 interface LifecycleWorkDefinition {
   kind: string;
@@ -191,7 +192,7 @@ export const ensureLifecycleDepartment = mutation({
         title: item.title,
         status: "queued",
         priority: item.priority,
-        inputSnapshot: { departmentStageId: stage.id, department: stage.name, instructions: item.instructions, research: Boolean(item.research), professionalGate: item.professionalGate ?? null },
+        inputSnapshot: { departmentStageId: stage.id, department: departmentAgentKeyFromDisplayName(stage.name), instructions: item.instructions, research: Boolean(item.research), professionalGate: item.professionalGate ?? null },
         attemptCount: 0,
         maxAttempts: 3,
         estimatedCostUnits: item.estimatedCostUnits,

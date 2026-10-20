@@ -52,6 +52,15 @@ export function isDepartmentAgentKey(value: unknown): value is DepartmentAgentKe
   return typeof value === "string" && Object.prototype.hasOwnProperty.call(DEPARTMENT_AGENT_PROFILES, value);
 }
 
+/** Convert a lifecycle stage's display label into its registered agent key. */
+export function departmentAgentKeyFromDisplayName(name: string): DepartmentAgentKey {
+  const key = name.toLowerCase().replaceAll(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+  if (!isDepartmentAgentKey(key)) {
+    throw new Error(`Lifecycle department has no registered agent: ${name}`);
+  }
+  return key;
+}
+
 const WORK_KIND_DEPARTMENT: Readonly<Record<string, DepartmentAgentKey>> = {
   idea_capture: "idea",
   brief_analysis: "idea",

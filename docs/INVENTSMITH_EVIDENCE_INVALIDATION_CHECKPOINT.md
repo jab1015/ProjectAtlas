@@ -58,3 +58,9 @@ The signed-in Netlify Preview now renders `Data_All_260313` as included in the c
 ## Downstream department evidence audit — 2026-10-19
 
 The Validation report is current and credits inventor-uploaded `Data_All_260313`; it shows 11/11 sections and a 45% evidence-support score. This alone has not produced saved market/design deliverables: Market Research remains at zero deliverables, Patent Readiness is incomplete, Design has 17 queued items, and stages 6–15 wait on prerequisites. Therefore the evidence-crediting behavior passed on Validation, while downstream refresh/persistence behavior has not been live-verified. No worker was started in this audit.
+
+## Lifecycle agent-routing defect fixed — 2026-10-19
+
+The audit found that lifecycle initialization saved display labels (for example, `Prototype`) where provider routing requires registered keys (for example, `prototype`). Such work could fail at execution with “missing a registered department agent.” Lifecycle initialization now derives and validates the registered key from the stage label before queueing work. Regression coverage checks all 10 lifecycle departments resolve to their own stable agent identity, mission prompt, and audit metadata, and verifies the initializer uses this mapping.
+
+Verification after the fix: focused agent/lifecycle tests **18/18 passed**; full suite **130 files / 704 tests passed**; web TypeScript **passed**. This is not yet live provider acceptance: no workers were started because the signed-in account does not display remaining shared AI/research/CAD usage. A fresh Netlify Preview for the code fix is the next verification gate.

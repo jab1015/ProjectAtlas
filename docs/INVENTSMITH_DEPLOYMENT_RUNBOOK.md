@@ -244,3 +244,9 @@ Live department execution is still not established: Journey Center reports 1/15 
 ## Department Preview acceptance — 2026-10-19
 
 All 15 authenticated stage routes rendered without app-level errors. Validation is complete/current and includes uploaded survey evidence. Market Research has zero saved market deliverables; Patent Readiness is still running with handoff pending; Product Design + CAD has 17 queued items and zero complete; later stages show prerequisite waits. The work-plan/profile routing suite passes. For end-to-end acceptance, satisfy prerequisites in order, run bounded provider-backed work, and verify each saved artifact, evidence references, audit identity, retry behavior, and handoff. The account reports shared organization capacity but not its remaining balance; no live generation was launched in this pass.
+
+## Lifecycle agent-routing defect fixed — 2026-10-19
+
+The audit found that lifecycle initialization saved display labels (for example, `Prototype`) where provider routing requires registered keys (for example, `prototype`). Such work could fail at execution with “missing a registered department agent.” Lifecycle initialization now derives and validates the registered key from the stage label before queueing work. Regression coverage checks all 10 lifecycle departments resolve to their own stable agent identity, mission prompt, and audit metadata, and verifies the initializer uses this mapping.
+
+Verification after the fix: focused agent/lifecycle tests **18/18 passed**; full suite **130 files / 704 tests passed**; web TypeScript **passed**. This is not yet live provider acceptance: no workers were started because the signed-in account does not display remaining shared AI/research/CAD usage. A fresh Netlify Preview for the code fix is the next verification gate.
