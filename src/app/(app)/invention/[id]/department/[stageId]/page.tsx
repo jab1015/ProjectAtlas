@@ -9,6 +9,7 @@ import type { Doc, Id } from "@convex/_generated/dataModel";
 import { ArrowLeft, CheckCircle2, Download, FileUp, Play, RefreshCw, ShieldAlert, Sparkles } from "lucide-react";
 import { AppNav } from "@/components/atlas/app-nav";
 import { getDepartmentStartMessage } from "@/lib/departmentStartMessage";
+import { getNextUnmetWorkDependencies } from "@/lib/departmentWorkStatus";
 import { MadeThisBadge } from "@/components/atlas/made-this-badge";
 import { MarkdownContent } from "@/components/markdown-content";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ interface DepartmentState {
   invention: { _id: Id<"inventions">; title: string };
   initialized: boolean;
   workItems: Doc<"atlasWorkItems">[];
+  completedWorkKinds: string[];
   deliverables: Doc<"atlasDeliverables">[];
   evidenceCount: number;
   inventorEvidenceCount: number;
@@ -109,6 +111,11 @@ export default function LifecycleDepartmentPage() {
       .sort((a, b) => b.priority - a.priority || a.createdAt - b.createdAt);
   }, [department, extensions]);
 
+  const nextWorkDependencies = useMemo(
+    () => getNextUnmetWorkDependencies(departmentWork, department?.completedWorkKinds ?? []),
+    [departmentWork, department]
+  );
+
   const departmentDeliverables = useMemo(() => {
     if (!department) return [];
     return mergeById(department.deliverables, extensions?.deliverables ?? [])
@@ -168,10 +175,16 @@ export default function LifecycleDepartmentPage() {
 
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Work complete</p><p className="mt-2 text-2xl font-semibold">{counts.complete}/{fullWorkCount}</p></div>
-            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Active</p><p className="mt-2 text-2xl font-semibold">{counts.active}</p></div>
+            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Queued or running</p><p className="mt-2 text-2xl font-semibold">{counts.active}</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Needs action</p><p className="mt-2 text-2xl font-semibold">{counts.blocked}</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Inventor evidence</p><p className="mt-2 text-2xl font-semibold">{department.inventorEvidenceCount}</p><p className="mt-1 text-xs text-muted-foreground">of {department.evidenceCount} total sources</p></div>
           </section>
+
+          {nextWorkDependencies.length > 0 && <section role="status" className="rounded-2xl border border-warning/30 bg-warning/5 p-5">
+            <h2 className="font-semibold">Waiting for prerequisite work</h2>
+            <p className="mt-2 text-sm text-muted-foreground">The next queued task needs {nextWorkDependencies.map((kind) => kind.replaceAll("_", " ")).join(", ")} to be completed first. InventSmith will check the queue again after its prerequisites are complete.</p>
+            {stageId === 6 && nextWorkDependencies.includes("product_design_specification") && <Button asChild variant="outline" size="sm" className="mt-4"><Link href={`/invention/${inventionId}/design`}>Open Product Design + CAD</Link></Button>}
+          </section>}
 
           <section className="rounded-2xl border border-border bg-card p-6 sm:p-7">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="flex items-center gap-2 text-xl font-semibold"><FileUp className="h-5 w-5 text-primary" />Evidence follows the invention</h2><p className="mt-1 text-sm text-muted-foreground">Upload surveys, interviews, prototype tests, quotes, contracts, sales/launch data, or professional reports at any time. InventSmith preserves provenance and refreshes affected downstream work.</p></div><Button asChild variant="outline"><Link href={`/invention/${inventionId}/evidence`}>Evidence Locker</Link></Button></div>
