@@ -67,6 +67,9 @@ const WORK_KIND_DEPARTMENT: Readonly<Record<string, DepartmentAgentKey>> = {
   assumptions_unknowns: "idea",
   competitor_discovery: "market_research",
   market_feasibility: "market_research",
+  // The original feasibility work item predates department metadata. Keep it
+  // on the dedicated discovery/feasibility agent when a retry reconstructs it.
+  technical_feasibility: "canonical",
   preliminary_prior_art: "patent_readiness",
   feature_prior_art_comparison: "patent_readiness",
   distinguishing_features: "patent_readiness",
