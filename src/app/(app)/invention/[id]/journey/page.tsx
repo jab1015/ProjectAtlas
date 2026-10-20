@@ -37,6 +37,7 @@ interface JourneyCenterState {
 }
 
 const getJourneyCenter = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, JourneyCenterState>("journeyCenter:getJourneyCenter");
+const listEvidenceRequests = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, Array<{ kind: "survey" | "interview"; title: string; status: "active" | "closed" }>>("evidenceRequests:list");
 
 const STATUS: Record<JourneyStageRow["status"], { label: string; className: string }> = {
   complete: { label: "Done", className: "bg-success/10 text-success" },
@@ -66,6 +67,7 @@ export default function JourneyCenterPage() {
   const inventionId = params.id as Id<"inventions">;
   const { isAuthenticated, isLoading } = useConvexAuth();
   const journey = useQuery(getJourneyCenter, isAuthenticated && inventionId ? { inventionId } : "skip");
+  const evidenceRequests = useQuery(listEvidenceRequests, isAuthenticated && inventionId ? { inventionId } : "skip");
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.push("/sign-in");
@@ -77,6 +79,10 @@ export default function JourneyCenterPage() {
   if (!journey) return null;
 
   const completion = Math.round((journey.completedStages / journey.totalStages) * 100);
+  const hasActiveValidationSurvey = evidenceRequests?.some((request) => request.kind === "survey" && request.status === "active" && request.title.startsWith("[Validation follow-up]")) ?? false;
+  const nextAction = journey.currentStage.name === "Validation" && hasActiveValidationSurvey
+    ? "Share your prepared survey with five people who may have this problem, then add their answers as evidence."
+    : journey.nextAction;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -96,7 +102,7 @@ export default function JourneyCenterPage() {
 
           <section className="rounded-2xl border border-primary/20 bg-primary/5 p-6 sm:p-7">
             <p className="text-xs font-semibold uppercase tracking-wider text-primary">What happens next</p>
-            <h2 className="mt-2 text-xl font-semibold">{journey.nextAction}</h2>
+            <h2 className="mt-2 text-xl font-semibold">{nextAction}</h2>
             <p className="mt-2 text-sm text-muted-foreground">Current focus: Stage {journey.currentStage.id} — {journey.currentStage.name}.</p>
           </section>
 

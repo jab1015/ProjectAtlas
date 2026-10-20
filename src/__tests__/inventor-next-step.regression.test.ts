@@ -29,7 +29,7 @@ describe("inventor next steps", () => {
     expect(journey).toContain("Do the next step");
     expect(journey).toContain("tasks done");
     expect(backend).toContain("Open ${firstIncomplete.name} and follow the first step.");
-    expect(backend).toContain('request.title.startsWith("[Validation follow-up]")');
-    expect(backend).toContain("Share your prepared survey with five people who may have this problem");
+    expect(journey).toContain('request.title.startsWith("[Validation follow-up]")');
+    expect(journey).toContain("Share your prepared survey with five people who may have this problem");
   });
 });
