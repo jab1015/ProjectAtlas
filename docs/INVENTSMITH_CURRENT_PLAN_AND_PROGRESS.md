@@ -440,3 +440,10 @@ A fresh authenticated reload after the Convex deployment clarified the post-retr
 - Local verification after the legacy mapping fix: **131 test files / 711 tests passed**, web and Convex TypeScript passed, `npm audit --omit=dev --audit-level=high` reported **0 vulnerabilities**, and direct `npx next build` completed all **36/36** pages. The combined `npm run build` wrapper remains environment-dependent because local Convex codegen requires `CONVEX_DEPLOYMENT`; the direct Next build passed.
 - GitHub Actions **run 39373720916** completed successfully for the branch workflow dispatch. It passed both typechecks, the full regression suite, dependency audit, production build, and isolated Convex deployment. The log confirms target `decideforusapp:projectatlas:dev/inventsmith-test` at `https://quick-fox-785.convex.cloud`. Netlify was not used because the team’s operational credits paused production deploys and Agent Runners; no production service was touched.
 - The updated backend is ready for the next authenticated retry of the legacy technical-feasibility item. Its compatibility mapping routes the old row to the registered Discovery & Feasibility agent and preserves fail-closed behavior for unknown work kinds. Netlify Preview acceptance of this specific fix remains pending until credits resume.
+
+
+### Backend-only retry acceptance — October 20, 2026
+
+- After run **39373720916** deployed the mapping fix to `quick-fox-785`, the signed-in Work Library retry for the legacy `technical_feasibility` item succeeded through the existing Preview UI.
+- The failure card disappeared and a saved **RiseJars — Technical Feasibility and Product Risk Assessment** artifact appeared. It is correctly marked **Professional review required**; no engineering approval or external-use authorization was inferred.
+- Package quality checks improved from **18 to 17 required deliverables missing** and now show no autonomous work failure. The remaining work is still gated by missing upstream deliverables, concept visualization, and required professional/physical evidence.
