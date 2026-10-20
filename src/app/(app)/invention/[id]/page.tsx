@@ -283,6 +283,12 @@ export default function InventionWorkspacePage() {
   const stageId = currentStage.id;
   const fields = STAGE_FIELDS[stageId];
 
+  useEffect(() => {
+    if (inventionState && inventionState.currentStage.id > 4) {
+      router.replace(`/invention/${inventionId}/journey`);
+    }
+  }, [inventionId, inventionState, router]);
+
   // ── Stage 2: Validation Research Status (replaces questionnaire) ─────────────
   if (stageId === 2) {
     const {
@@ -578,12 +584,6 @@ export default function InventionWorkspacePage() {
       </div>
     );
   }
-
-  useEffect(() => {
-    if (inventionState && inventionState.currentStage.id > 4) {
-      router.replace(`/invention/${inventionId}/journey`);
-    }
-  }, [inventionId, inventionState, router]);
 
   // Show congratulations after completing the foundation stages.
   if (showCongrats) {
