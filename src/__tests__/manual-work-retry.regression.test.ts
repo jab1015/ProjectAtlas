@@ -71,6 +71,26 @@ describe("manual failed-work retry", () => {
     expect(state.runAfter).toHaveBeenCalledTimes(1);
   });
 
+  it("routes the legacy technical-feasibility job to the registered feasibility agent", async () => {
+    const state = makeContext(failedItem({
+      title: "Assess technical feasibility and product risks",
+      kind: "technical_feasibility",
+      inputSnapshot: { product: "RiseJars", department: "unknown" },
+    }), { autonomousCostUnits: 0, reservedAutonomousCostUnits: 0 });
+    await expect(retryFailedWorkItemHandler(state.ctx, { inventionId: "inv-1" as any, workItemId: "work-1" as any })).resolves.toEqual({ queued: true, reason: "scheduled" });
+    expect(state.patch).toHaveBeenCalledWith("work-1", expect.objectContaining({
+      status: "queued",
+      inputSnapshot: { product: "RiseJars", department: "canonical" },
+    }));
+    expect(state.insert).toHaveBeenCalledWith("atlasExecutionEvents", expect.objectContaining({
+      metadata: expect.objectContaining({
+        department: "canonical",
+        departmentAgentId: "inventsmith.department.canonical.v1",
+      }),
+    }));
+    expect(state.runAfter).toHaveBeenCalledTimes(1);
+  });
+
   it("requires edit access before any retry side effects", async () => {
     mocks.requireInventionEditAccess.mockRejectedValue(new Error("Invention edit access required"));
     const state = makeContext(failedItem(), { autonomousCostUnits: 0 });
