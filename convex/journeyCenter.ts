@@ -13,13 +13,14 @@ export const getJourneyCenter = query({
     const classification = classifyInvention(invention);
     const journeyStages = journeyStagesForProductType(classification.productType);
 
-    const [workItems, deliverables, reviews, approvals, decisions, evidence] = await Promise.all([
+    const [workItems, deliverables, reviews, approvals, decisions, evidence, evidenceRequests] = await Promise.all([
       ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect(),
       ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect(),
       ctx.db.query("professionalReviews").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect(),
       ctx.db.query("approvalRequests").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect(),
       ctx.db.query("inventionDecisions").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect(),
       ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect(),
+      ctx.db.query("evidenceRequests").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).order("desc").collect(),
     ]);
 
     const deliverableById = new Map(deliverables.map((item) => [String(item._id), item]));
@@ -71,6 +72,7 @@ export const getJourneyCenter = query({
     const blockedWorkCount = workItems.filter((item) => item.status === "blocked" || item.status === "awaiting_approval").length;
     const pendingReviewCount = reviews.filter((item) => item.status !== "accepted" && item.status !== "declined").length;
     const completedStages = stageRows.filter((stage) => stage.status === "complete").length;
+    const hasActiveValidationSurvey = evidenceRequests.some((request) => request.kind === "survey" && request.status === "active" && request.title.startsWith("[Validation follow-up]"));
 
     let nextAction = `Open ${firstIncomplete.name} and follow the first step.`;
     if (pendingApprovalCount > 0) nextAction = `Review an approval so InventSmith can continue (${pendingApprovalCount} waiting).`;
@@ -79,6 +81,7 @@ export const getJourneyCenter = query({
     else if (firstIncomplete.status === "professional_review") nextAction = `${firstIncomplete.name} is ready for a qualified professional to review.`;
     else if (firstIncomplete.status === "needs_refresh") nextAction = `Open ${firstIncomplete.name}; new information means some work needs updating.`;
     else if (firstIncomplete.status === "failed") nextAction = `Open ${firstIncomplete.name} and retry the step that failed.`;
+    else if (firstIncomplete.name === "Validation" && hasActiveValidationSurvey) nextAction = "Share your prepared survey with five people who may have this problem, then add their answers as evidence.";
 
     return {
       invention: {
