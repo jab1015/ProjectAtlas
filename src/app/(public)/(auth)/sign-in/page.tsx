@@ -12,6 +12,8 @@ import { Label } from "@/components/ui/label";
 import { AtlasLogo } from "@/components/atlas/atlas-logo";
 import { trackSignedIn } from "@/lib/analytics";
 
+const SIGN_IN_TIMEOUT_MS = 15_000;
+
 export default function SignInPage() {
   const { signIn } = useAuthActions();
   const { isAuthenticated } = useConvexAuth();
@@ -74,11 +76,31 @@ export default function SignInPage() {
     setError(null);
     setLoading(true);
     const formData = new FormData(e.currentTarget);
+
     try {
-      await signIn("password", formData);
+      await new Promise<void>((resolve, reject) => {
+        const timeoutId = window.setTimeout(
+          () => reject(new Error("AUTH_TIMEOUT")),
+          SIGN_IN_TIMEOUT_MS
+        );
+
+        void signIn("password", formData)
+          .then(() => {
+            window.clearTimeout(timeoutId);
+            resolve();
+          })
+          .catch((signInError) => {
+            window.clearTimeout(timeoutId);
+            reject(signInError);
+          });
+      });
       trackSignedIn("password");
-    } catch {
-      setError("Invalid email or password.");
+    } catch (signInError) {
+      if (signInError instanceof Error && signInError.message === "AUTH_TIMEOUT") {
+        setError("InventSmith could not connect to the sign-in service. Please try again in a moment.");
+      } else {
+        setError("Invalid email or password.");
+      }
     } finally {
       setLoading(false);
     }
