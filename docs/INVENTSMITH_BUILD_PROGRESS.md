@@ -437,3 +437,10 @@ The Convex GitHub device authorization page reported “Device connected,” but
 ### Work Library reconciliation — October 20, 2026
 
 A fresh authenticated reload after the Convex deployment clarified the post-retry state: Work Library shows the saved Idea brief-analysis artifact, **18 of 19 required deliverables missing**, and one separate failed work item, “Assess technical feasibility and product risks,” at three attempts. The package export remains locked (required deliverables and concept visualization are missing, and the failed job requires attention). Therefore, earlier retry notes that described zero remaining failed cards or 19 missing deliverables are superseded by this live Work Library observation. The two specifically retried items remain as recorded: Idea brief analysis completed and saved; Market Research was blocked at a professional patent/FTO review gate. No retry of the remaining technical-feasibility failure was initiated during this verification.
+
+
+### Legacy feasibility retry hardening — October 20, 2026
+
+- A live retry attempt exposed a legacy `technical_feasibility` work item with an unknown department label. The retry correctly failed closed before mutation rather than misrouting it.
+- Added an explicit compatibility mapping to the registered Discovery & Feasibility agent (`inventsmith.department.canonical.v1`) and regression coverage for routing, audit metadata, and queued retry behavior. This preserves department identity for old rows while keeping unknown work kinds fail-closed.
+- Focused retry and department-routing tests pass (**12/12**); web and Convex TypeScript checks and `git diff --check` pass locally. Pushed as branch updates after commit `9d7da44` (remote content commits `2af098a`, `1979c87`, `b773938`). A new Netlify Preview and isolated Convex workflow are required before retrying the live item.
