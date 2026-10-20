@@ -177,3 +177,6 @@ Live department execution is still not established: Journey Center reports 1/15 
 
 The signed-in Preview's prepared survey link is displayed for the inventor to share. This test did not send it to respondents, submit survey answers, start queued department agents, spend provider credits, make purchases, contact vendors, or file legal documents. Growth showed five queued prerequisite-dependent jobs and no completed outputs. Treat department execution, external actions, money, and physical work as unverified or approval-gated until individually tested under an authorized budget and conditions.
 
+## Department test boundary — 2026-10-19
+
+The audit read every department route and checked code-level routing; it did not start a worker, consume model/CAD/rendering capacity, send survey links, contact providers, make purchases, or create legal filings. The personal organization uses shared AI, research, CAD, rendering, and document-generation capacity; the Preview did not expose its remaining balance. Keep live provider-backed acceptance within an explicit usage limit and avoid external/physical/legal/payment actions.

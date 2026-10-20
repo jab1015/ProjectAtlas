@@ -241,3 +241,6 @@ Live department execution is still not established: Journey Center reports 1/15 
 - Local `npm run readiness` and `npm run build` are blocked before build by missing Convex target configuration (`CONVEX_DEPLOYMENT`, `NEXT_PUBLIC_CONVEX_URL`). The successful Netlify deploy is the hosted build check.
 - Preview/production separation remains in force; this retest did not publish production.
 
+## Department Preview acceptance — 2026-10-19
+
+All 15 authenticated stage routes rendered without app-level errors. Validation is complete/current and includes uploaded survey evidence. Market Research has zero saved market deliverables; Patent Readiness is still running with handoff pending; Product Design + CAD has 17 queued items and zero complete; later stages show prerequisite waits. The work-plan/profile routing suite passes. For end-to-end acceptance, satisfy prerequisites in order, run bounded provider-backed work, and verify each saved artifact, evidence references, audit identity, retry behavior, and handoff. The account reports shared organization capacity but not its remaining balance; no live generation was launched in this pass.

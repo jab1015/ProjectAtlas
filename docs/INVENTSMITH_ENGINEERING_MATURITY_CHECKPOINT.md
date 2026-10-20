@@ -67,3 +67,10 @@ Live department execution is still not established: Journey Center reports 1/15 
 - Local build reproducibility: blocked at Convex codegen due missing target env in checkout. Netlify Preview deploy build succeeded.
 - Remaining maturity gap: run safe, cost-bounded end-to-end agent execution tests per department with prerequisites satisfied; verify persisted artifact, evidence references, retry/idempotency and user-visible handoff for each.
 
+## Department execution maturity — 2026-10-19
+
+**Routing maturity:** 21 distinct profiles; all product work-plan assignments resolve to registered agents, and the prompt binds the selected agent mission/guardrails. Regression tests cover both general orchestration and native CAD.
+
+**Hosted route maturity:** all 15 stage routes load successfully. Current RiseJars acceptance state is Idea done, Validation 11/11 current at 45%, Market Research with zero saved market deliverables, Patent Readiness incomplete, Design 0/17, and downstream stage queues waiting on prerequisites.
+
+**Execution maturity:** insufficient for a claim that every department works end to end. No live provider job was run; per-department output persistence, evidence citation, retries, and handoffs still need acceptance under a visible usage cap.

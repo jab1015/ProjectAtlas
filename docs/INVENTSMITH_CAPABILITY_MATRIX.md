@@ -137,3 +137,14 @@ Live department execution is still not established: Journey Center reports 1/15 
 | Automated tests | Passed | 703 tests across 130 files. |
 | Local deployment readiness/build | Blocked | Convex target and public backend URL are not configured in this checkout; hosted Netlify deploy is the build evidence. |
 
+## Department isolation and execution coverage — 2026-10-19
+
+| Area | Verified | Not yet verified |
+|---|---|---|
+| Agent registry | 21 unique stable IDs, names, missions and guardrails; automated tests pass | Live provider execution for each profile |
+| Work routing | All physical/lifecycle and software plan items route to a registered profile; CAD routes through Product Design | Persisted output/audit/evidence linkage for each agent run |
+| Stage UI | All 15 routes render without application errors | Route rendering alone does not prove the work item can complete |
+| RiseJars state | Validation current, 11/11, survey credited, score 45% | Market Research has 0 saved deliverables; Patent Readiness is in progress; Design 0/17; stages 6–15 have no completed deliverables and wait on prerequisites |
+| Runtime acceptance | Automated suite and frontend typecheck run; detailed results recorded in build progress | Per-department generation, saved artifact, citations, retries and handoffs |
+
+No live generation was initiated for this audit. The authenticated Preview's account page indicates shared organization usage but does not show remaining capacity.
