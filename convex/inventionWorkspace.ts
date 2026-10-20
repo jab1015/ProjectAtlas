@@ -125,7 +125,7 @@ export const getReviewQueue = query({
 export const getDeliverableLibrary = query({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
-    const { invention } = await getAccessibleInvention(ctx, inventionId);
+    const { invention, access } = await getAccessibleInvention(ctx, inventionId);
     const [deliverables, sources, reviews, executionEvents, workItems] = await Promise.all([
       ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
       ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
@@ -145,6 +145,7 @@ export const getDeliverableLibrary = query({
 
     return {
       invention: { _id: invention._id, title: invention.title },
+      access,
       deliverables: deliverablesWithMedia,
       sources,
       reviews,
@@ -153,6 +154,7 @@ export const getDeliverableLibrary = query({
         .filter((item) => item.status === "failed")
         .sort((a, b) => b.updatedAt - a.updatedAt)
         .map((item) => ({
+          workItemId: item._id,
           kind: item.kind,
           title: item.title,
           attemptCount: item.attemptCount,

@@ -65,193 +65,213 @@ Read-only on Netlify deploy `6ad68041` / branch commit `0a90b9f`:
 
 Authenticated preview inspection of the existing RiseJars invention (`n171ne8qzh2ebqwag8w7qybemx8gg2p8`) confirmed:
 
-- Journey, Validation, Market Research, Patent Readiness, Product Design + CAD, Prototype, Manufacturing, Branding (8), IP/Legal (9), Pricing (10), Marketing (11), Sales (12), Funding (13), Launch (14), Growth (15), Evidence Locker, and Support routes render. Every inspected department has 0 completed work and no deliverables; work items show queued. No AI/CAD work was started.
-- Validation says complete at **36%** and recommends interviewing more users. Evidence Locker contains `Data_All_260313.pdf`, classified as Survey / SurveyMonkey, **475 KB**, with structured extraction complete and a summary reporting approximately **100 users**. The current Validation report does not show which of those survey findings were used, and the same confidence score remains. The score implementation is a fixed evidence-support rubric (+20 percentage points for recognized survey evidence on selected sections), not a calculation over the actual answers or question-level response counts.
-- Automatic invalidation code fingerprints evidence IDs and extraction timestamps and schedules a Validation refresh after evidence changes. Live state does not demonstrate that the survey-triggered refresh completed with survey-aware content. Acceptance failed; inspect execution/event history on the isolated backend and repair/test before relying on automatic refresh.
-- Evidence Locker displays “Previously created survey links could not be loaded.” The PDF remains viewable. No link creation or response was attempted.
-- Support page form renders, but “Your reports could not be loaded.” No support case was submitted.
-- Market Research reports **0 deliverables**, **1 inventor evidence file**, and **1 research source**. Patent Readiness shows no first deliverable; Prototype has **0/7** work complete and all seven items queued; Manufacturing **0/10**; Branding **0/5**; IP/Legal **0/8**; Pricing **0/4**; Marketing **0/5**; Sales **0/5**; Funding **0/6**; Launch **0/6**; Growth **0/5**. Product Design was previously observed at **0/17**, all 17 queued, with no CAD package.
-- Stage work showing “queued” confirms visibility, not that the corresponding AI agents execute or save usable outputs. No usage-consuming work was run.
+- Journey, Validation, Market Research, Patent Readiness, Product Design + CAD, Prototype, Manufacturing, Branding (8), IP/Legal (9), Pricing (10), Marketing (11), Sales (12), Funding (13), Launch (14), Growth (15), Evidence Locker, and Support routes render. Every inspe…14784 tokens truncated…ows extraction/refresh status.
+- Netlify generated a successful check for branch head `0a90b9f`; the subsequent local fixes are not included in that deployment yet.
+- No upload, survey-page creation, support submission, account mutation, or AI generation was triggered.
 
-### Confirmed outstanding failures to repair
+### Latest read-only preview acceptance — October 19, 2026
 
-1. Netlify production build command currently invokes a Convex production deploy even when Auto Publishing is locked. Guard or remove this coupling before any further push can run that context.
-2. The preview frontend points at `quick-fox-785`, but deployed backend queries for `evidenceRequests:list` and `supportCases:listMine` fail at runtime. Align and deploy the intended development backend before re-testing those pages.
-3. Survey PDF extraction/listing works, but the completed Validation view still does not make the extracted survey's findings and contribution intelligible; automatic refresh completion is not demonstrated.
-4. Existing shareable survey requests and existing Support reports fail to load.
-5. Department pages mostly render but all inspected work remains queued with zero deliverables; actual per-agent execution has not been validated.
+**Continuation, 5:30 PM ET:** Stages 14 (Launch) and 15 (Growth) also load. Launch is 0/6 complete with six queued items; Growth is 0/5 complete with five queued items. Journey Center shows Stage 2 as current, 1 inventor evidence source (0 verified), and zero attention items/professional reviews. Browser console reconfirmed the missing preview-backend functions `evidenceRequests:list` and `supportCases:listMine`; extension metadata logging errors are unrelated. The route sweep across all 15 stages is complete, but no AI department execution has been validated. No side-effecting or usage-consuming actions were run.
 
-### Live preview test notes — October 19, 2026, 4:25 PM ET
+On protected PR #24 Deploy Preview `6ad6853b072c128eb3df13a6`, signed in as `jerry@modernmethods.it.com` and viewing RiseJars (`n171ne8qzh2ebqwag8w7qybemx8gg2p8`): Evidence Locker shows the 475 KB `Data_All_260313.pdf` with structured extraction complete and a summary reporting approximately 100 users. Validation still says complete at **36%** with generic next-step advice and no findings-level survey attribution. Source code uses a fixed evidence-support bonus for recognized survey evidence, not analysis of answer distributions. Evidence fingerprinting/scheduled refresh code exists, but the live report does not prove that survey-triggered regeneration completed using the survey.
 
-Read-only authenticated sweep of the protected PR #24 preview, signed in as `jerry@modernmethods.it.com` with the RiseJars invention:
+Evidence Locker displays “Previously created survey links could not be loaded”; Support displays “Your reports could not be loaded.” The upload and support forms render. Market Research has **0 deliverables**, **1 evidence file**, and **1 source**. Patent Readiness has no completed deliverable; Prototype is **0/7**, Manufacturing **0/10**, Growth **0/5**, with all inspected items queued. Product Design was previously observed at **0/17** queued. No queued AI or CAD task was run.
 
-- Stage pages 3–15 and the Validation view rendered. Most stage work remains queued; page rendering does not prove the corresponding AI agent can execute. No generation was started in this conservative pass.
-- Journey Center's Stage 1 Idea and Stage 2 Validation cards both point to `/invention/{id}`, and that route renders Stage 2. Stage 1 does not have a distinct destination from the Journey Center; correct the route or document the intended shared-view behavior.
-- The Work Library reports **2 autonomous work item failures**, **19 missing required deliverables**, and missing concept visualization. It does not identify the failed items or show failure reasons.
-- Validation remains **36%** and recommends interviewing more users, while the uploaded SurveyMonkey PDF is already inventor evidence. The report does not show which survey findings were applied or explain the unchanged score.
-- Market Research renders with **0 deliverables**, **1 inventor evidence file**, and **1 research source**.
-- Evidence Locker renders its form and the uploaded 100-user PDF record, but now displays “Previously created survey links could not be loaded.” Repository code contains `evidenceRequests:list`; the preview backend still fails to serve it. Upload and link creation were not submitted.
-- Customer Support renders its form but “Your reports could not be loaded.” Repository code contains `supportCases:listMine`; existing report listing and support submission are not live-accepted.
-- Account page exposes name and workspace rename controls; the profile name appears blank. Save was not tested to avoid mutating the owner's account.
-- Admin operations, support, and beta-access routes are blocked by “Administrator access required.” The active account is `jerry@modernmethods.it.com`; the intended admin identity/role remains unverified.
-- Invention access, review, chat, organization, and account pages rendered; no chat was sent and no account, survey, support, or external action was submitted. A Sign Out control is visible.
 
-The frontend is configured for `quick-fox-785`, but the preview reports those Convex functions missing. Align and deploy the matching test backend only after guarding Netlify production builds. Do not run more production deployments. After alignment, diagnose failed work items, verify validation refresh and survey response flow, then run bounded AI checks with owner-admin access. Do not label departments “working” until generated outputs are saved and reviewed.
+### Live preview acceptance sweep — October 19, 2026, 4:25 PM ET
 
-Password recovery has already been tested successfully. Do not spend more work re-testing it unless a later change regresses authentication.
+The authenticated Netlify PR #24 preview was inspected as the signed-in `jerry@modernmethods.it.com` account, using RiseJars. This was a read-only sweep; no AI generation, upload, survey creation, support submission, profile change, or production action was triggered.
 
-The owner’s active request is to fix the rest of today’s reported issues: automatic dependency-aware department refresh after changed inputs/evidence, visible use of the 100-person RiseJars survey in validation and downstream work, concise “what matters/what next” summaries, editable profile/workspace names, selected-user admin access and credit controls (including the ability to grant lasting access deliberately), admin usage-limit exemption, working operations/support views, and a visible sign-out control.
+- **Evidence Locker:** The first visit showed the generic “Something went wrong” screen. A later visit rendered the upload form and “Create shareable page” control, but the browser console recorded Convex query failure `evidenceRequests:list`: “Could not find public function.” The repository source at this checkpoint exports that query. Existing survey-request listings therefore do not work against the backend currently reached by the preview. Upload itself and share-link creation were not submitted during this sweep.
+- **Support:** `/support` consistently showed the generic error screen. Convex reports missing public function `supportCases:listMine`; this function is present in repository source. Customer support-case creation and tracking are blocked until the preview frontend and its Convex backend are aligned.
+- **Backend alignment:** The two missing functions (`evidenceRequests:list`, `supportCases:listMine`) are present in source but absent from the Convex deployment reached by the preview. This indicates frontend/backend version or target mismatch; the exact cause and target deployment still need confirmation. Do not infer that the source implementation itself is absent.
+- **Validation:** RiseJars remains “Validation complete” at **36%**, with the next-step recommendation to interview more users. The page does not visibly state which findings from the uploaded SurveyMonkey PDF were included or why the survey did not change the score. Survey-aware refresh and score attribution are not accepted.
+- **Market Research:** The page renders, but reports **0 market deliverables**, **1 inventor evidence file**, and **1 research source**. It says completed research will appear automatically; no completed market deliverable is present.
+- **Departments:** Stage pages 6–15 render and expose “Continue department”; their work remains queued. The Design + CAD page renders and offers “Continue design work” and “Generate native CAD”; no generation was invoked. This confirms page availability only, not that any AI agent executes successfully.
+- **Journey navigation:** The Stage 1 “Idea” card and Stage 2 “Validation” card both expose the same destination (`/invention/{id}`), which renders Stage 2 Validation. Stage 1 therefore has no distinct destination from the Journey Center and requires a routing fix or an explicit decision that Idea is represented only by the shared invention view.
+- **Work Library:** It reports **2 autonomous work items failed**, **19 required deliverables missing**, and missing concept-visualization media. The user-facing page does not identify the failed work items or explain their failure, so the failures cannot be diagnosed from this view.
+- **Profile / organization:** Account controls for saving the inventor name and personal workspace name are visible. The current profile name appears blank; save behavior was not tested to avoid changing account data. The organization currently appears as “RiseJars Personal Organization.”
+- **Admin access:** `/admin`, `/admin/operations`, `/admin/support`, and `/admin/beta-access` show “Administrator access required.” The active session is `jerry@modernmethods.it.com`, so the owner’s intended admin account/role was not verified and these consoles could not be functionally tested.
+- **Other routes:** Invention access, review, chat, organization, and account pages rendered during this sweep. Chat was not submitted. A visible Sign Out button is present.
 
-Current implementation inspection finds code for automatic refresh, survey-aware validation, a short validation summary, profile/workspace rename, selected-account access/credits, and admin navigation sign-out. These have not yet been counted as accepted because the owner reported visible failures and the current Netlify preview/head pairing is unverified. The support/operations module’s earlier `openAiConfigured` crash also requires live acceptance even though a compatibility fallback is present in code.
+**Conclusion:** The preview is not ready for broad functional acceptance. The Evidence Locker and Support lists fail; Validation does not clearly show survey findings or demonstrate that the automatic refresh incorporated them; and no department AI agent has been functionally exercised. The preview frontend is configured for `quick-fox-785`, but backend functions `evidenceRequests:list` and `supportCases:listMine` were previously reported missing there. Align and safely deploy the intended test backend before further live acceptance. Do not trigger production-context builds until Netlify’s production Convex deploy command is guarded. Do not touch `fiery-gazelle-628`, merge PR #24, or publish the full product.
 
-The support-case workflow is implemented in source; deployment to `quick-fox-785` is not verified: authenticated users can submit and track reports; admins can filter/update status and add private investigation notes; and optional invention links are checked against the reporter's access. A support case does not grant access to private invention evidence. Live admin/customer acceptance remains outstanding.
+Password recovery is **already tested successfully** and is not the active task. Netlify Production-context build deployed functions to `agile-seahorse-379` on October 19, beyond the earlier password-recovery scope. Do not trigger further production-context builds or attempt rollback/deployment without explicit review. Do not merge PR #24, publish the full product, or touch `fiery-gazelle-628`.
 
-The survey evidence is inventor-provided and unverified. A useful validation update must state the reported respondent count and which extracted observations were used, preserve provenance, and explain score movement (or why the score does not move); a 100-person sample does not automatically justify higher confidence or prove demand.
+The intended dedicated InventSmith test Convex project is `quick-fox-785` (`dev/inventsmith-test`), but its current deployed state is unverified. Runs `39311119875` and `39314672344` both targeted `agile-seahorse-379`. The workflow now rejects production-scoped `prod:` keys; configure and verify a `dev:` key specifically for `quick-fox-785` before deploying there.
 
-The suggested survey/customer-research flow may prepare a draft page and questions automatically. Sending messages, publishing a page, or contacting third parties remains a separate human-approved action; no external side effect is represented as complete without evidence.
+Historical source checkpoint `b5d13713...` passed web/Convex TypeScript, full Vitest (**124 files / 685 tests**), audit, and Next.js build (**36/36**), but its Action logs show a production-targeted deployment. Repair commit `672156c` passed web/Convex TypeScript, Convex TypeScript, Vitest (**125 files / 688 tests**), `git diff --check`, and Next.js build (**36/36**). Its PR preview is live; acceptance remains incomplete.
 
-Deployment boundary: `quick-fox-785` is the intended test project, but its current code state is unverified. `agile-seahorse-379` received broader function deployments in runs `39311119875` and `39314672344`; no further deployment there. `fiery-gazelle-628` is another app and must remain untouched. PR #24 stays open/unmerged; do not publish the whole unverified product.
+Code already present on the active work line includes automatic department invalidation/requeue on invention input changes, validation evidence fingerprinting and survey-aware evidence scoring/display, PDF structured extraction, simplified validation summary UI, account/profile and personal-workspace rename controls, selected-existing-user beta access and audited credit controls, and admin navigation/sign-out affordances. The operations UI also handles an older health response that omits AI configuration details. These are **implementation claims only** until exact-head checks and authenticated acceptance on the currently served preview/test backend pass.
 
-Historical note: commit `b5d13713...` passed web/Convex TypeScript, full Vitest (**124 files / 685 tests**), `git diff --check`, and Next.js production build (**36/36** pages). Its Convex workflow runs `39311119875` and `39314672344` targeted production, not the test deployment. Commit `0a90b9f` has a successful Netlify check (`6ad68041`). Repair commit `672156c` passed the full suite (**125 files / 688 tests**), web/Convex TypeScript, Convex TypeScript, and Next.js build (**36/36**); PR #24 preview `6ad6853b072c128eb3df13a6` is live. Acceptance remains incomplete.
+### Owner-reported acceptance gaps still to resolve
 
-## Current status snapshot
+- RiseJars' uploaded SurveyMonkey PDF reports 100 respondents (roughly 95–100 answers per question), but validation confidence remained at 36%. The UI must show which survey findings were actually extracted and considered, explain how evidence affects the score, and refresh affected validation/departments after upload. Do not inflate a heuristic score or describe unverified self-reported survey data as independent proof.
+- Confirm the account profile name and personal workspace rename controls are visible and save correctly for the signed-in account; the user previously saw “Name not set” and an unwanted default workspace name.
+- Verify the existing-user admin access/credit console, admin exemption from daily/AI limits, operations/support modules, and an always-accessible sign-out action. Report any missing function or permission gap instead of calling it fixed.
+- A support-case workflow is implemented in source; deployment to `quick-fox-785` is not verified: user-submitted and user-visible cases; admin filtering, status updates, private notes; and optional invention linking with reporter-access validation. Support-case access does not bypass invention permissions. Full local verification passes; live acceptance remains outstanding. Avoid promising support staff direct evidence access until a separate consented, audited access path exists.
+- Verify automatic downstream department refresh and that research/survey collection produces an inventor-reviewable draft. External publication, invitations, or outreach must remain approval-gated until destination, audience, and consent are defined.
+- The older Netlify deploy `6ad68041` at `0a90b9f` had React #301 crashes on Evidence Locker and Support. The current PR preview renders those forms but existing share-link and support-case records fail to load. Validation still shows 36% without findings-level survey attribution. No `quick-fox-785` deployment is verified.
 
-InventSmith status is reported by capability and evidence, not by a single completion percentage. Repository implementation, automated verification, deployment, live functional verification, genuine professional review, real-world evidence, and outside-world execution remain separate states.
+### Immediate continuation
 
-The retired controlled-pilot 80% figure must never be used as overall InventSmith completion.
+1. Guard Netlify Production-context builds so they cannot deploy Convex production before any further branch push.
+2. Align the preview backend with branch functions `evidenceRequests:list` and `supportCases:listMine`, then retest the existing survey-link and support-report lists.
+3. Trace why the completed survey is not visibly reflected in Validation and repair/test the automatic refresh and evidence-based explanation without overstating unverified survey data.
+4. Only after isolated-backend alignment, run narrowly bounded AI acceptance and inspect saved outputs. A queued status does not prove an agent works.
+5. Keep PR #24 open/unmerged; preserve `fiery-gazelle-628`; make no further `agile-seahorse-379` deployments.
 
-## Current limited deployment checkpoint
+## Product destination
 
-GitHub Action logs show Convex function deployments to `agile-seahorse-379` in runs `39311119875` and `39314672344`, contrary to prior documentation. Logs report no indexes deleted, but do not prove function behavior/data were unchanged. Deployment to production is paused; the workflow now rejects `prod:` keys. The isolated test deployment `quick-fox-785` is not yet verified.
+InventSmith owns the applicable invention journey from raw idea through evidence, validation, market research, prior-art/patent readiness, product design, applicable CAD/engineering, prototype, manufacturing or software delivery, branding, IP/legal preparation, pricing, marketing, sales, funding, launch, and growth. Physical, software, hybrid, and regulated inventions route differently while preserving the same evidence, maturity, authorization, and human-gate truth model.
 
-The password-recovery flow was live-functionally verified on the Netlify PR #24 preview at `deploy-preview-24--inventsmith.netlify.app`: reset email delivery succeeded, the recovery code was received, and authenticated sign-in succeeded. The email initially landed in spam during testing.
+Do not publish one overall completion percentage. Repository implementation, automated verification, deployment, live functional acceptance, genuine professional review, real-world evidence, and outside-world execution are separate states.
 
-The refreshed admin **InventSmith operations** page works in the preview. Because the limited production response does not expose the newer `snapshot.ai` field, the frontend reports AI details as unavailable while keeping health/work monitoring available. This is an intentional compatibility state, not a password-recovery or data-integrity failure. Bugsnag blocking and the preload warning are unrelated browser messages.
+## Exact verified repository checkpoint
 
-The branch now includes a founder-controlled **Beta access & credits** console. It grants a chosen existing account a dated plan override without changing the base plan, supports revocation, and records credit grants/debits/refunds in an append-only ledger. The override and credit balance are enforced by organization plan limits, seats, daily usage, autonomous-work reservations, and export/deletion cleanup. This supports free beta accounts without making Explorer or any other plan permanently free.
+InventSmith CI **#226** (run `39016181734`) passed against exact branch head `93744db1fdf2772925f96dbc4d33ed1823192f86`.
 
-## Product vision and architecture
+The successful exact-head workflow passed:
 
-InventSmith — The Inventor OS by Modern Methods — owns the applicable journey:
-
-**Idea → Evidence → Validation → Market Research → Prior Art / Patent Readiness → Product Design → CAD / Engineering where applicable → Prototype → Manufacturing or Software Delivery → Branding → IP / Legal Preparation → Pricing → Marketing → Sales → Funding → Launch → Growth.**
-
-Physical, software, hybrid, and regulated inventions route through applicable branches. GitHub is source/CI authority. Convex is a core backend. MadeThis is historical only.
-
-## Implemented foundation
-
-The branch includes organization-native ownership/membership/invention access; organization-scoped entitlements and usage accounting; active/archive capacity; consent-based invitations; privacy/export/deletion boundaries; complete applicable journey routing; persistent invention/evidence state; evidence provenance/trust; autonomous work orchestration; partial validation/retry; worker lease/attempt protection; physical/software/hybrid/regulated classification; professional-review gates; genuine prototype/quote/launch evidence gates; versioned deliverables; exact-revision external-use authorization; exact-generation manufacturing release; package export; and consequential approval/execution guards.
-
-Seventeen stable department-agent profiles cover common physical/hybrid work plus software-specific product, engineering, prototype, and release paths. Unknown/missing department routing fails closed before model execution.
-
-## Latest consequential and commerce hardening
-
-Direct executable behavior coverage now includes:
-
-- account deletion, privacy request execution, privacy/export scope, invention deletion, ownership/member/invitation controls, and invention sharing;
-- stale invention-grant deletion on member removal and owner `manage` precedence;
-- subscription application duplicate/invalid-target behavior, exact organization application, legacy-path rejection, and ownership-transfer billing identity continuity;
-- organization and legacy-user cancellation/past-due period-end semantics plus immediate unpaid downgrade;
-- deterministic subscription provider-event ordering: older delayed events are retained but cannot overwrite newer entitlement state, and equal timestamps resolve by stable provider-event tie-break independent of delivery order;
-- signed subscription ingress with HMAC validation, UTF-8 body-size limits, normalization, and exact handler handoff;
-- signed fulfillment ingress with zero side effects on rejected events;
-- replay-aware fulfillment that prevents duplicate sales counts and reuses the purchase’s authoritative stored download token;
-- safe download handling that normalizes external purchase IDs, constrains file selection to the purchased product, records successful downloads before redirect, and fails closed if download accounting cannot be recorded;
-- checkout-success truth separation: public redirect/query parameters cannot produce authoritative `upgrade_completed` analytics; the page emits only `checkout_returned` and waits for confirmed subscription state.
-
-Rejected consequential/billing paths are tested for zero unauthorized destructive/entitlement writes where intended. Subscription events may still be retained as audit records when application is rejected or stale.
-
-## Engineering, evidence, and external-use state
-
-Model prose cannot promote itself into trusted external evidence. External research claims require provider-returned provenance and claim/source association. Prototype, manufacturer quote, launch/sales, and professional evidence gates remain distinct from AI output.
-
-Manufacturing readiness is revision-bound and fail-closed. Engineering review, manufacturing release, external-use authorization, consequential approval, and actual outside-world execution are separate transitions.
-
-The repository still has no current executor that sends an RFQ, contacts a supplier/manufacturer, discloses invention artifacts, places an order/payment, files, or publishes for the inventor.
-
-## Exact CI checkpoint
-
-InventSmith CI **#226**, run `39016181734`, passed at exact code head `93744db1fdf2772925f96dbc4d33ed1823192f86`.
-
-Successful gates:
-
-- exact-head checkout/verification;
-- dependency installation;
-- operational-script checks;
+- exact-head checkout and SHA assertion;
+- Node 22.23.3 / npm 10.9.9 lockfile installation;
+- operational script syntax checks;
 - web TypeScript;
 - Convex TypeScript;
 - **116 test files / 660 tests**;
-- production dependency audit: **0 vulnerabilities**;
-- development advisory boundary accepted only `@next/eslint-plugin-next`, `braces`, `eslint-config-next`, `fast-glob`, and `micromatch`;
-- Next.js **15.5.27** production build;
-- **32/32** static pages generated.
+- production dependency audit with **0 vulnerabilities**;
+- bounded development-dependency audit;
+- Next.js **15.5.27** production build with **32/32** static pages generated.
 
-Lucia `3.2.2` remains deprecated and should be migrated only through a deliberately tested authentication change.
+The accepted development-only advisory boundary remains limited to `@next/eslint-plugin-next`, `braces`, `eslint-config-next`, `fast-glob`, and `micromatch`. Unexpected advisory packages fail CI. Lucia `3.2.2` remains deprecated and requires a separately planned authentication migration rather than a blind dependency change.
 
-This documentation refresh creates a newer documentation head, which must receive its own exact-head CI before that documentation head is called automatically verified.
+This documentation refresh creates a newer branch head. The final documentation head must receive its own exact-head CI before that documentation head is called automatically verified.
 
-PR #24 remains draft/open/unmerged. `main` remains untouched.
+## Current limited deployment and acceptance status
 
-## Remaining work
+GitHub Action logs show that the development workflow deployed branch Convex functions to `agile-seahorse-379` in runs `39311119875` and `39314672344`. The key was bound to production; the workflow title and prior status notes were inaccurate. Logs confirm successful schema validation and no deleted indexes, but cannot establish that existing function behavior was unchanged. Do not use this workflow again with the current key. It now rejects `prod:` keys. `quick-fox-785` remains unverified; PR #24 remains unmerged and the full product was not published through Netlify production.
 
-1. Qualify the final documentation head with exact-head CI.
-2. Perform real owner-controlled provider lifecycle acceptance: signed callbacks, checkout confirmation, cancellation/past-due, replay, fulfillment/download, ownership transitions, and browser-visible entitlement changes.
-3. Drive representative physical/hybrid/software/regulated cases through deeper persisted transitions, evidence replacement/removal, newest-revision behavior, manufacturing release, and later external-action boundaries.
-4. Continue specialized artifact content, rendered export, and generated-format quality acceptance.
-5. Preserve the no-executor boundary until a deliberate executor exists with execution-time revalidation and separate execution evidence.
-6. Finish low-risk InventSmith naming cleanup without destabilizing compatibility identifiers.
-7. The current implementation is deployed to `quick-fox-785` via authenticated CLI login; do not use the production-scoped deploy key. Push the verified website code to PR #24 and inspect its new Netlify Deploy Preview; keep Production unpublished and do not merge.
-8. Verify survey attribution and automatic refresh first, then run a small live concurrency batch and confirm saved outputs/audit identities before broader provider acceptance. Keep `fiery-gazelle-628` untouched and do not deploy further to `agile-seahorse-379`.
-9. Plan/test a Lucia v3 migration separately from routine hardening.
+The Netlify PR #24 preview at `deploy-preview-24--inventsmith.netlify.app` has been used for authenticated acceptance. Password recovery is live-functionally verified: the reset email was delivered, the recovery code was received, and sign-in succeeded. The first test email was routed to spam.
 
-## Status boundaries
+An earlier preview build contained an operations compatibility fallback for a health response without the newer `ai` field. The current live browser session was not an authorized admin, and GitHub logs show branch-function deployments reached production; operational and data impact have not been independently assessed.
 
-- **Planned** means specified but not necessarily implemented.
-- **Implemented** means repository code exists.
-- **Automated verification passed** means the exact implementation head passed relevant CI/tests.
-- **Deployed** means the exact code/config is on Modern Methods-controlled infrastructure.
-- **Live functionally verified** means authenticated representative acceptance passed there.
-- **Professional review completed** means a genuine qualifying review was actually recorded.
-- **Real-world evidence present** means genuine outside-world evidence was actually ingested/verified.
-- **External action executed** means the outside-world side effect actually occurred and was separately recorded.
+The branch now includes an admin-only **Beta access & credits** console. An administrator can grant a selected existing account a dated organization-level plan override, revoke it, and grant/debit/refund credits through an append-only ledger. Overrides preserve the base plan, require a reason, expire automatically, and do not create lifetime free access. The highest plan can be used for full-premium beta access while Explorer remains changeable later without rewriting account history.
 
-These states must never be collapsed into a production-ready claim.
+## Source, Convex, hosting, and deployment boundary
 
-### October 19, 2026 — follow-up verification at 5:34 PM ET
+GitHub remains source/CI authority. Convex is a core InventSmith backend, not an optional add-on. The Convex deployment `fiery-gazelle-628` belongs to another application and must not be used or modified for InventSmith. The intended dedicated InventSmith test deployment is `dev/inventsmith-test` (`quick-fox-785`), but repository code and auth configuration there are not verified. Runs `39311119875` and `39314672344` targeted `agile-seahorse-379` instead.
 
-Prepared an unpushed Netlify safeguard: all contexts use website-only builds; the explicit manual GitHub development workflow remains the only Convex deploy path and rejects `prod:` keys. Added a regression check. Verification: **125 test files / 689 tests passed**, web and Convex TypeScript passed, `npx next build` passed (**36/36** static pages), and `git diff --check` passed. `npm run build` cannot run in this unconfigured checkout because Convex codegen requires `CONVEX_DEPLOYMENT`; no deployment target was configured. No AI/OpenAI/CAD operation was run. The known preview-backend mismatch requires a verified `dev:` key specifically for `quick-fox-785` and a controlled Convex development deploy. Do not use the previously identified `prod:` key. The safeguard and fixes remain local and unpushed until the test backend can be safely aligned.
+That does **not** mean the current code head is deployed or live accepted. Current truth remains:
 
-### October 19, 2026 — continued no-credit repair pass
+- repository/local verification: `672156c` passed 125 test files / 688 tests, web/Convex TypeScript, Convex TypeScript, and Next.js build 36/36; PR #24 preview `6ad6853b072c128eb3df13a6` is live; acceptance remains incomplete;
+- InventSmith Convex test infrastructure: intended target `dev/inventsmith-test` / `quick-fox-785`; deployment and auth state are unverified;
+- Netlify: protected deploy preview is live; protected-page acceptance is in progress;
+- Modern Methods-owned Vercel/frontend deployment: not yet verified complete;
+- authenticated browser acceptance: not yet complete;
+- production billing/webhooks: not owner-live accepted;
+- genuine professional review/real-world evidence: count only when actually performed and recorded.
 
-Added safe failure summaries to the invention work library. Failed work now appears with a user-safe explanation for common provider authentication, quota, rate-limit, and general failures; raw provider messages and credentials are not exposed. Added regression coverage for sanitization and for the rule that Netlify never runs `convex deploy`. Updated the global Netlify build to `npm run build` and kept the Deploy Preview command compile-only (`npx next build`); Convex deployment remains an explicit, manual development workflow.
+MadeThis is historical only and must not be used as a deployment or synchronization target.
 
-Latest local verification: **126 test files / 692 tests passed**, web and Convex typechecks passed, and `npx next build` passed with **36/36** pages. No AI/OpenAI/CAD tasks or AI credits were used. No deployment or push was performed. The live-preview mismatch, survey attribution/refresh behavior, evidence and support routes, and per-department functional acceptance remain unverified against the intended backend. A development-scoped key verified specifically for `quick-fox-785` is still required before safely aligning that backend. The known `prod:` key must not be used; no further deployment to `agile-seahorse-379`, and do not touch `fiery-gazelle-628`.
+## Implemented and hardened product state
 
-### October 19, 2026 — live Deploy Preview acceptance
+The active branch includes organization-native invention workspaces, scoped access/usage/entitlements, consent-based invitations, privacy/export/deletion boundaries, complete applicable journey routing, persistent evidence/invention state, fail-closed evidence promotion, partial validation/retry, attempt/lease-aware autonomous work, usage settlement, professional-review state, genuine prototype/quote/launch evidence gates, versioned deliverables, exact-revision external-use authorization, exact-generation manufacturing release, package export, and consequential approval guards.
 
-Commit `093f58b` is on the open, draft PR #24 branch. Netlify Deploy Preview `6ad68f14a6a27e06b352d37b` completed successfully at approximately 2:46 PM ET. Its build completed and deployed the website; no Convex deploy command is present in the Netlify configuration. The preview remains pointed at `quick-fox-785` (confirmed by its survey PDF storage URL).
+Seventeen stable department-agent profiles cover common physical/hybrid work plus software-specific product, engineering, prototype, and release paths. Missing or unknown department routing fails closed before model execution.
 
-Read-only live checks on the updated preview found: the signed-in RiseJars Validation route loads but still shows 36% and does not attribute the uploaded survey; Evidence Locker renders its upload/share-page UI and the existing survey PDF record, but says previously created share links could not be loaded; Support renders its form but says reports could not be loaded; Work Library crashes because the deployed backend response lacks the newly added optional `failedWork` property. The Work Library crash is fixed locally by treating the property as optional, with regression coverage. Evidence/Support query failures indicate the preview frontend and Convex functions are still out of sync. No forms were submitted, no evidence was changed, and no AI credits/tasks were used during this live check.
+### Direct security, billing, fulfillment, and checkout behavior coverage
 
-Netlify currently shows `CONVEX_DEPLOY_KEY` values in five deploy contexts, but the secret values were not revealed and their actual target/prefix was not verified. Do not deploy with an unverified key. To proceed with AI-backed acceptance without wasting credits, align the preview backend using a key verified to target the isolated `quick-fox-785` test deployment. Do not deploy to `agile-seahorse-379` or touch `fiery-gazelle-628`.
+Executable behavior tests now directly cover:
 
-### October 19, 2026 — Netlify build-side-effect correction
+- account deletion and privacy-request execution guards;
+- personal and organization privacy/export scope;
+- organization ownership, member management, invitation acceptance, and invention sharing;
+- stale invention-grant cleanup and owner `manage` precedence;
+- invention deletion cleanup/storage/accounting behavior;
+- subscription application idempotency, invalid organization targeting, exact organization application, legacy-user behavior, and billing identity continuity across ownership transfer;
+- cancellation/past-due period-end behavior and immediate unpaid downgrade for both organization and legacy-user billing, including personal-organization entitlement mirroring;
+- delayed/older provider-event rejection and deterministic equal-timestamp resolution independent of delivery order for both billing scopes;
+- signed subscription HTTP ingress: secret/signature validation, malformed/oversized payload rejection, UTF-8 byte limits, payload normalization, and exact mutation handoff;
+- fulfillment replay safety: duplicate fulfillment cannot double-count sales and returns the authoritative stored download token rather than a dead newly proposed token;
+- signed fulfillment HTTP ingress: rejected requests perform zero product reads/purchase writes, unknown products do not create purchases, valid new purchases increment sales once, and replays do not increment sales;
+- download authorization: malformed external purchase IDs fail closed, wrong/unfulfilled links cannot reach storage, requested files must belong to the purchased product, successful redirects record download accounting first, and accounting failure prevents redirect;
+- checkout-success truth: a public checkout redirect/query string cannot emit authoritative `upgrade_completed` analytics or claim entitlement; the page records only a non-authoritative `checkout_returned` event while waiting for confirmed billing state.
 
-Production-context Netlify deployment `6ad690d2d385bfaa913a27b0` for commit `d9e4a274327c39539ca8953d53b510a427b18ebb` entered the build phase and its log showed `npx convex codegen` followed by “Uploading functions to Convex...” before the Next.js build. The deploy was canceled before the website deploy phase; Netlify showed deployment skipped. The Convex target selected by that context's masked deploy key is **unknown**. Earlier notes saying the run could not deploy Convex because there was no `convex deploy` command were incomplete. Do not infer the target, run a rollback, or trigger another Convex deployment without verifying it.
+## Engineering/manufacturing and external-use boundaries
 
-Corrected `netlify.toml` so every Netlify context uses only `npx next build`; the config contains no Convex CLI command. Strengthened its regression test to assert every configured build command is exactly that compile-only command and the Netlify config contains no `convex` text. The corrective commit passed local verification: 127 test files / 694 tests, the dedicated configuration regression (5 tests), Convex TypeScript, and `npx next build` (36/36). It is being pushed to draft PR #24. No site publication was observed. No AI credits were used. Backend-dependent validation, evidence/share links, support lists, and full department acceptance remain open; AI tests are held until the preview backend target and functions are aligned.
+Manufacturing readiness remains revision-bound and fail-closed. Newer preliminary/stale work cannot be hidden by an older clean revision. Manufacturing release is a separate manager-authorized transition for one exact synchronized newest qualifying generation and is not supplier contact, disclosure, ordering, payment, filing, or publication.
+
+Professional review, external-use authorization, consequential approval, manufacturing release, and outside-world execution remain separate states. The repository still has **no executor** that sends RFQs, contacts suppliers/manufacturers, discloses invention artifacts, places orders/payments, files submissions, or publishes for the inventor.
+
+## Immediate continuation order
+
+1. Qualify the final documentation-refresh head with exact-head InventSmith CI.
+2. Continue provider/billing acceptance on owner-controlled infrastructure: real signatures, checkout, confirmed provider events, cancellation/past-due, replay, fulfillment, download, ownership changes, and browser-visible entitlement transitions.
+3. Drive representative physical, software, hybrid, and regulated inventions through deeper persisted state transitions, evidence replacement/removal, newest-revision invalidation, manufacturing release, and later external-action boundaries.
+4. Continue specialized artifact/package and generated-format quality acceptance, including rendered document and CAD-format checks where feasible.
+5. Preserve the no-executor boundary until an outside-world executor is deliberately implemented with execution-time revalidation and separate execution evidence.
+6. Continue low-risk InventSmith naming cleanup while preserving compatibility/historical identifiers that still require tested migration.
+7. `quick-fox-785` is confirmed and the current Convex functions are deployed via authenticated CLI account login. Do not use the production-scoped deploy key. Push the verified website code to PR #24 and inspect a fresh Deploy Preview; keep Production unpublished and do not merge.
+8. Verify survey attribution and automatic refresh first, then run a small live concurrency batch and confirm saved outputs/audit identities before broader multi-user/provider/billing/lifecycle acceptance. No further deployment to `agile-seahorse-379`; `fiery-gazelle-628` remains untouched.
+9. Plan the Lucia v3 authentication migration separately.
+10. Calibrate commercial limits from measured provider/runtime economics.
+
+## Status rules
+
+- **Planned** — specified but not necessarily implemented.
+- **Implemented** — code exists in the repository.
+- **Automated verification passed** — the exact implementation head passed relevant deterministic checks.
+- **Deployed** — the exact code/config is present on owner-controlled infrastructure.
+- **Live functionally verified** — representative authenticated acceptance passed there.
+- **Professional review completed** — a genuine qualifying review was actually recorded.
+- **Real-world evidence present** — genuine outside-world evidence was actually ingested/verified.
+- **External action executed** — an outside-world side effect actually occurred and was separately recorded.
+
+Never collapse these states into a single production-ready claim.
+
+## New-chat start instruction
+
+Read `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`, this file, `docs/INVENTSMITH_BUILD_PROGRESS.md`, `docs/INVENTSMITH_CAPABILITY_MATRIX.md`, `docs/INVENTSMITH_DOCUMENT_AUTHORITY.md`, `docs/INVENTSMITH_DEPLOYMENT_RUNBOOK.md`, and `docs/INVENTSMITH_CONSEQUENTIAL_SECURITY_CHECKPOINT.md`; then fetch the live branch, draft PR #24, and exact-head CI. Trust newer verified GitHub state over documentation text. Do not restart completed work, merge PR #24, touch `main`, or reintroduce MadeThis synchronization.
+
+### Follow-up verification — October 19, 2026, 5:34 PM ET
+
+All 125 test files / 689 tests pass; web and Convex typechecks pass; compile-only `npx next build` passes (36/36 pages). The guarded Netlify config and its regression test are local only. `npm run build` requires `CONVEX_DEPLOYMENT` for codegen, which was intentionally not configured. No AI credits or AI/CAD tasks were used. Cannot safely align the preview backend until a `dev:` deploy key verified for `quick-fox-785` is available; the previously identified production key is prohibited. Do not push until the backend target and Netlify Production-context command are safely verified.
+
+### Continued no-credit repair pass — October 19, 2026
+
+Locally added safe failure summaries in the invention work library and regression tests for secret-safe failure messages and Netlify's no-Convex-deploy invariant. Latest checks pass: **126 test files / 692 tests**, web and Convex typechecks, and compile-only Next build (**36/36** pages). No AI credits/tasks, deployments, or pushes were used. Status documents and Netlify protection changes are local and unpushed. The intended development deployment `quick-fox-785` still needs a verified `dev:` key before backend alignment and live workflow tests; the known production-scoped key is not acceptable. Evidence Locker/Support route errors, survey visibility/confidence, automatic downstream refresh, and all department workflows remain open live-acceptance items.
+
+### Live Deploy Preview check — October 19, 2026
+
+Pushed commit `093f58b` to PR #24. Netlify Deploy Preview `6ad68f14a6a27e06b352d37b` built and deployed successfully. Authenticated, read-only acceptance confirmed the updated Validation page still shows 36% without visible survey attribution; Evidence Locker shows the uploaded 100-user PDF but cannot load existing share-link records; Support cannot load prior reports. Work Library crashed because the currently deployed `getDeliverableLibrary` response does not yet contain the new `failedWork` property. A local compatibility fix and regression tests are now pending a follow-up preview. The visible Evidence/Support errors are backend function/version mismatch, not a frontend build failure.
+
+No AI credits or data-changing operations were used. Netlify shows deploy-key values across five contexts, but their values were not revealed and the target was not verified. Do not deploy until the key is verified for the isolated `quick-fox-785` target. No deploy to `agile-seahorse-379`; `fiery-gazelle-628` remains untouched.
+
+### Netlify build-side-effect correction — October 19, 2026
+
+Production-context deployment `6ad690d2d385bfaa913a27b0`, commit `d9e4a274327c39539ca8953d53b510a427b18ebb`, ran `npx convex codegen` and logged “Uploading functions to Convex...” before the website build. The Netlify deploy was canceled before its website deploy phase, which Netlify marked skipped. The masked key's Convex target is unknown; do not assume it was `quick-fox-785` or `agile-seahorse-379`, and do not attempt rollback or another backend deploy without verifying the target. Earlier statements that omitting `convex deploy` made the Netlify build Convex-safe are superseded: `convex codegen` itself caused an upload in this configured build.
+
+The local corrective `netlify.toml` now sets every context's command to `npx next build`, with no Convex CLI. A regression assertion checks all configured commands and rejects any Convex reference. The corrected config and status update passed local verification: 127 test files / 694 tests, the dedicated configuration regression (5 tests), Convex TypeScript, and `npx next build` (36/36). They are being pushed to the still-draft PR #24. Website publication was not observed. No AI credits were used. Backend route mismatches, survey attribution/confidence refresh, and full department acceptance remain open; AI calls stay paused until backend target/function alignment is confirmed.
 
 
-### Latest live Preview test — October 19, 2026
+### Latest Preview test result — October 19, 2026
 
-The corrected Preview for commit `20ba8b0486122c0936ead19e036447fc207f641f` (tree `2b9eb121394b8edc5f99aa86e3e22a7d466c9a5d`) completed its Netlify Deploy Preview build with `npx next build`, TypeScript checks, and 36/36 static pages. The authenticated RiseJars Work Library now loads instead of crashing; it reports 19 required deliverables missing, two failed work items, and no generated deliverables. Validation was refreshed once using the authorized Preview AI budget (11 section generations). It completed but remained at 36%; the short version still asks the user to interview a few people, and the expanded sections say primary customer validation evidence has not been supplied. Thus the uploaded 100-user survey was not reflected in the new report or its confidence. Do not run another full refresh until survey attribution is fixed; one refresh consumed 11 provider calls without moving confidence.
-
-The Preview remains usable for UI review at https://deploy-preview-24--inventsmith.netlify.app. Evidence Locker/Support backend list errors and survey-share-link loading remain unresolved; the Convex function set reached by this Preview is out of sync with the frontend. The Preview's `quick-fox-785` storage host does not establish that a deployment key targets that backend. No Convex deployment was made. The Production-context build for commit `20ba8b0` was canceled before the deploy phase; its command was `npx next build` and no Convex CLI was invoked. The earlier canceled `d9e4a274` production-context build did log a Convex function upload to an unknown target; do not infer or alter that target.
+Netlify Deploy Preview for commit `20ba8b0486122c0936ead19e036447fc207f641f` built successfully with website-only `npx next build`; PR #24 remains open and unmerged. Authenticated live check confirms the Work Library compatibility fix. One user-authorized Validation refresh spent 11 Preview AI section calls, completed 11/11, but stayed at 36% and still reports no primary customer validation data. The 100-user survey is not visibly attributed to Validation and did not affect confidence. Stop further broad AI runs until this specific data path is corrected. Evidence Locker and Support backend list queries remain incompatible/missing on the Convex deployment reached by the preview. No Convex deployment occurred; target-specific `quick-fox-785` development credentials remain unverified. The Production-context build for `20ba8b0` was canceled before deployment and ran only `npx next build`; prior `d9e4a274` build had already uploaded Convex functions to an unknown target before cancellation, as recorded above.
 
 
 ### Permanent deployment-key constraint — October 19, 2026
 
 Owner-confirmed: the only Convex deploy key available is production-scoped, and this is the only deploy key expected to be provided. Treat this as a permanent constraint; do not ask the owner for a development-scoped deploy key or assume one will be issued. Never use the production key to align or deploy the Preview/test backend. Keep Netlify Preview builds website-only and cancel/guard Production-context builds before any backend deployment step. Any future production backend deployment requires exact target and change review, explicit deployment authorization, and a preservation plan for existing functions and data. For Preview functional testing, use safe non-deploying alternatives until the test backend can be exercised without this production credential.
+
+### Validation refresh-status clarity — October 19, 2026
+
+At branch head `b68f295c3989a7b15dc9ec974601fc9b5ba94a26`, the Validation query returns inventor-uploaded survey details with provenance, sample-size context, findings, pending extraction state, and whether the latest report fingerprint matches current evidence. Evidence changes schedule both affected department work and a validation refresh; validation completion/failure schedules a follow-up evidence check so uploads racing an active run are not lost. Survey evidence is passed into the validation provider and can strengthen customer-validation sections; it does not verify market size, competitor claims, demand, or product performance.
+
+The user-visible page reports that the RiseJar survey is present while the earlier 11-section report is stale/refreshing and its confidence is hidden. The section count was still labeled “Validation complete,” which could imply the new evidence was already included. A local, unpushed UI change now labels that snapshot “Previous report — N of 11 sections complete; refreshing with new evidence,” with a focused regression test.
+
+The source currently defines 21 unique department-agent profiles. Repository tests verify unique identities, routing for all physical, hybrid, and software work-plan entries, fail-closed behavior for unknown departments, and agent prompt use in both general orchestration and native CAD. This is code-level routing coverage, not live execution verification for every department. No AI calls, deployments, backend writes, pushes, or external actions were made in this local repair pass.
+
+Local verification after the UI fix: **127 test files / 696 tests**, web TypeScript, Convex TypeScript, production dependency audit (**0 vulnerabilities**), and `npx next build` (**36/36** static pages). Changes remain local pending the existing deployment/build guard; this does not update the PR preview or establish live acceptance.
 
 
 ### October 20, 2026 — full regression verification and validation UI correction
@@ -260,7 +280,7 @@ PR #24 contains the Validation stale-state correction in commits `81e4b7e`, `206
 
 Exact-branch automated checks: **127 Vitest files / 697 tests passed**, Convex TypeScript passed, production dependency audit found **0 vulnerabilities**, and `npx next build` completed with **36/36 static pages**. Web TypeScript passed after the build generated `.next/types`; an initial concurrent TypeScript check raced that generation and produced missing-file errors, so it was rerun after build and passed. `git diff --check` passed. The only test output warning was a missing TypeScript source-map file under `node_modules`; all tests passed.
 
-The authenticated Validation route was reloaded on October 20. It still served the previous Netlify build (`a980884`; deploy ID `6ad6ae074c3db0b435171c31`) and therefore still showed the old “automatic refresh” wording. The GitHub contents-API commits updated the PR branch but did not start a new Netlify build. A harmless `netlify.toml` change has been pushed to request a website-only Deploy Preview. This checkpoint must be amended with its resulting commit/deploy ID and authenticated result after deployment completes. Netlify build commands remain `npx next build`; no Convex CLI command is added.
+The authenticated Validation route was reloaded on October 20. It still served the previous Netlify build (`a980884`; deploy ID `6ad6ae074c3db0b435171c31`) and therefore still showed the old “automatic refresh” wording. The GitHub contents-API commits updated the PR branch but did not start a new Netlify build. A harmless `netlify.toml` change has been pushed to request a website-only Deploy Preview. The checkpoint must be amended with its resulting commit/deploy ID and authenticated result after deployment completes. Netlify build commands remain `npx next build`; no Convex CLI command is added.
 
 Department coverage remains distinct: repository tests verify unique agent identities and routing for every full work plan, including the 15 journey stages and specialties. The earlier authenticated visual sweep covered all 15 stages, but no live department AI execution was run because the stale evidence/validation path should be resolved first. No AI credits, user data mutations, department jobs, production deployments, merges, or publication occurred in this check.
 
@@ -292,6 +312,23 @@ The stage 6 Prototype probe showed **0/7 complete**, with all seven tasks queued
 Correction to the preceding exact-head checkpoint: the stable PR #24 Preview alias later rolled forward to the `f8a66dd` deploy `6ad6c1978ecfdc6c479e7168`. After reload, the authenticated InventSmith session showed this deploy in the Netlify drawer and served the new UI. Validation displays the current **11/11-section** report at **45% evidence-support confidence**, cites inventor-uploaded `Data_All_260313`, and says the report matches current evidence. Findings and respondent counts are visible; provenance and limitations remain explicit. Stage 6 Prototype displays “Waiting for prerequisite work,” names the missing Product Design Specification, labels the count “Queued or running,” and links to Product Design + CAD. Thus the new preview’s authenticated UI acceptance passed for the reported Validation issue and this department prerequisite.
 
 This verifies the UI and evidence attribution. The two exhausted Work Library items, admin-only access, and lack of live saved outputs across all 15 departments remain open. Agent identity/routing tests do not establish live execution for each department. The follow-up GitHub commits in this checkpoint change documentation only; Netlify Deploy Preview builds for those documentation commits are pending and do not change the app source tested above.
+## Current continuation checkpoint — October 20, 2026
+
+The immediate code checkpoint makes the inventor’s next step easier to understand and automates the low-confidence evidence follow-up. A complete, current Validation report whose average confidence is **50% or lower** causes the page to wait for existing survey requests, reuse an active follow-up if present, or create a shareable survey with the existing authenticated mutation. The introduction uses the invention problem and solution. The page explains that the score is evidence support, not success probability; it tells the inventor to share the link with five people and provides a copy action. Survey recipients are not contacted automatically. Submissions remain unverified inventor-provided evidence and refresh affected work. The active-link lookup prevents duplicate creation on reload but does not prevent a simultaneous multi-tab race.
+
+The older invention route no longer tells Stage 5+ inventors those departments are “coming soon.” It routes them to the Journey Center, where plain-language statuses, the immediate next step, saved results, and required approvals are visible.
+
+Exact local verification for the preceding `805eeb7` commit: **130 test files / 703 tests**, web and Convex TypeScript, production dependency audit (**0 vulnerabilities**), direct Next.js production build (**36/36 static pages**), and `git diff --check` all passed. Its Preview completed as `6ad6c826907d833bcbcb5524`; signed-in Validation attributed the uploaded survey and showed the 45% score, but the automatic survey request failed because its new backend function was absent. The UI now uses the existing list/create functions instead. Focused tests and both typechecks pass for this compatibility fix; the final full checks and new Preview are pending. Local Convex codegen needs an access token; no backend deploy was attempted.
+
+Do not claim every department agent has completed live provider-backed work: the department profiles and routing are covered by repository tests, but representative output acceptance still requires checking the newly pushed Preview and its intended backend. Keep PR #24 open/unmerged and Netlify production unpublished. No outside messages, survey distribution, payment, legal filing, supplier contact, or physical action was triggered.
+
+### Next verification steps
+
+1. Push the compatibility fix and status updates to `inventsmith/full-product-build` and confirm available exact-head checks.
+2. Wait for the matching Netlify Deploy Preview; test RiseJars Validation and confirm the low-confidence survey link is created, shown, and copyable.
+3. Verify the existing uploaded `Data_All_260313` survey remains cited with its inventor-provided/unverified status and that its response data refreshes affected Validation sections.
+4. Check the Journey Center and downstream department routes in the signed-in Preview; report only department outputs actually generated and saved.
+5. If Preview Convex reports missing functions, determine the active deployment before any backend action. Do not run production-context builds or deploy to `agile-seahorse-379` or `fiery-gazelle-628`.
 
 ### October 20, 2026 — authenticated PR #24 Preview acceptance
 
@@ -313,21 +350,21 @@ Latest app-source checks: focused next-step/journey tests **4/4 passed**, web Ty
 
 Live department execution is still not established: Journey Center reports 1/15 stages done, Validation 0/2 tasks, Market Research needs a retry, and no saved results for downstream departments. The repository covers 21 department-agent profiles/routing with automated tests, but each department still needs controlled live output and handoff acceptance. The current browser account lacks admin access for operations review; no new agent batch, paid generation, or production backend deployment was run.
 
-## Retest update — 2026-10-19
+## Current authenticated Preview retest — 2026-10-19
 
-- Signed-in Netlify Preview `6ad6ccd2ebf75c110beaae6d`: validation evidence attribution and current-report state verified; 45% score and prepared survey action visible.
-- 15/15 stage URLs smoke-checked; pages with prerequisites show queued/waiting states. No completed department deliverables were observed for Growth (0/5; 5 queued).
-- `npm test -- --reporter=dot`: 130 test files and 703 tests passed.
-- `npm run readiness`: blocked locally because `NEXT_PUBLIC_CONVEX_URL` and `CONVEX_DEPLOYMENT` are absent; five cloud/operations checks remain manual. `npm run build` stops at Convex codegen for the same missing deployment target. Netlify's successful deploy build remains the hosted build evidence.
-- Current Preview UI says the uploaded survey is included and the report matches current evidence; do not reproduce the earlier stale-refresh wording as the current state.
+**Verified:** Netlify Preview deploy `6ad6ccd2ebf75c110beaae6d` shows the uploaded `Data_All_260313` evidence included in the current validation report, 45% evidence-support score, provenance/limitations, and a prepared follow-up survey link. The stale refresh notice from the prior screenshot is absent. All 15 stage URLs smoke-rendered.
 
-## Department-level live acceptance gap — 2026-10-19
+**Automated tests:** 703/703 across 130 files passed.
 
-- Profile registry: 21 unique agents. Routing and prompt identity tests passed.
-- Preview route coverage: 15/15 stages loaded with no application-error UI.
-- Live project state: Idea done; Validation 11/11 and current; Market Research has no saved deliverable; Patent Readiness is in progress; Product Design + CAD 0/17; downstream stages 6–15 show no completed work and prerequisite waits.
-- Focused routing/journey acceptance: 4 files, 20 tests passed. Full repository suite: 130 files, 703 tests passed.
-- No live work item was started; an end-to-end agent result, saved artifact, evidence citations, retry behavior, and handoff remain unverified per department. Usage is shared within the personal organization; remaining allowance is not displayed in the Preview.
+**Still open:** Department agent generation/save/handoff is not verified end-to-end. Growth displayed 0/5 tasks complete and five tasks waiting in queue on prerequisites. Local readiness and build cannot use Convex codegen without `CONVEX_DEPLOYMENT` and `NEXT_PUBLIC_CONVEX_URL`; Netlify Preview build succeeded. Do not report the full invention journey as complete.
+
+## Department independence audit — 2026-10-19
+
+**Code-level:** 21 department profiles have unique stable identities and missions. Automated tests verify work-plan routing, system-prompt identity, and native CAD routing. Focused suite passed 20 tests; full suite retest is being recorded in the current build-progress section.
+
+**Signed-in Preview:** 15/15 stage routes load without an app error. Validation is current (11/11, 45%) and credits the uploaded survey. Market Research has no saved market deliverable; Patent Readiness has no completed first deliverable and its design handoff is pending; Product Design + CAD is 0/17; stages 6–15 have no completed deliverables and show prerequisite waits.
+
+**Not yet proven:** independent live agent runs, persisted deliverables, evidence citations, retry/idempotency, and downstream handoffs for each department. No paid/model-backed work was started because available shared usage was not visible in the account UI.
 
 ## Lifecycle agent-routing defect fixed — 2026-10-19
 
@@ -369,3 +406,12 @@ The Convex GitHub device authorization page reported “Device connected,” but
 - Confirmed the document summary preserves its inventor-uploaded / independently-unverified provenance. Confidence is not held behind a stale/refreshing state after the completed report.
 - Remaining blocker: Work Library still shows two terminal failures from October 18 (competitor discovery and brief analysis), each at three attempts, and 19 required deliverables are missing. They were created before department metadata was present. The resolver fix is deployed to the isolated test backend, but terminal rows are not automatically reclaimed; an authenticated, audited retry/recovery path is needed before we can verify end-to-end department execution and downstream deliverables.
 - The authenticated GitHub Actions Convex development deployment to quick-fox-785 completed successfully (run 39370245122); the Netlify Preview build completed. Production Convex agile-seahorse-379 and Netlify production were not touched. Do not mark all departments complete: only Preview surfaces and the Validation/survey flow were verified here; independent live execution across departments remains open.
+
+
+### Authenticated department retry hardening — October 20, 2026
+
+- Added an inventor-facing retry action for terminally failed department work. The mutation requires invention edit access, verifies the failed row belongs to that invention and resolves to a registered department agent, preserves the attempt history, grants one bounded retry (capped at five total attempts), records the requesting user and agent identity in an execution event, checks daily work allowance, and schedules the existing worker.
+- Work Library now returns the failed work-item ID and collaborator access level, showing the retry control only to editors/managers. The existing legacy job with no department metadata is stamped with the resolved department before requeue.
+- Verification: full regression suite **131 files / 709 tests passed**; TypeScript passed; Next production build passed (**36/36 pages**); production dependency audit reported **0 vulnerabilities**. The targeted retry tests cover authorization, legacy department routing, audit/scheduling, retry cap, unknown agents, and exhausted allowance.
+- The authenticated Preview #24 validated the current Validation report at **45%**, confirmed attribution to the inventor-uploaded survey, and opened the generated five-question follow-up survey page. No survey response was submitted or distributed.
+- Open: the retry change is implemented and passes local checks. After push, let the exact commit build in Netlify Preview, deploy the backend to isolated test Convex quick-fox-785, and use the logged-in Preview to execute the two failed jobs. Verify each saved deliverable and department-agent audit before claiming department acceptance. Production website and production Convex remain untouched.

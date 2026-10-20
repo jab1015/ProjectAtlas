@@ -18,6 +18,7 @@ import { getFailedWorkItems, type FailedWorkSummary } from "@/lib/workFailureVie
 
 interface DeliverableLibrary {
   invention: { _id: Id<"inventions">; title: string };
+  access: "manage" | "edit" | "view" | "review";
   deliverables: Array<Doc<"atlasDeliverables"> & { mediaUrl: string | null }>;
   sources: Doc<"evidenceSources">[];
   reviews: Doc<"professionalReviews">[];
@@ -27,6 +28,7 @@ interface DeliverableLibrary {
 const getDeliverableLibrary = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, DeliverableLibrary>("inventionWorkspace:getDeliverableLibrary");
 interface PilotEvaluation { score: number; passed: boolean; blockers: string[]; metrics: { requiredDeliverables: number; missingDeliverables: number; evidenceCheckedRatio: number }; }
 const getPilotEvaluation = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, PilotEvaluation>("inventionWorkspace:getPilotEvaluation");
+const retryFailedWorkItem = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; workItemId: Id<"atlasWorkItems"> }, { queued: boolean; reason: string }>("workRetryMutation:retryFailedWorkItem");
 const authorizeDeliverableExternalUse = makeFunctionReference<"mutation", { deliverableId: Id<"atlasDeliverables"> }, { success: true; idempotent: boolean; deliverableId: Id<"atlasDeliverables">; version: number }>("externalUseAuthorization:authorizeDeliverableExternalUse");
 
 function WorkSkeleton() { return <div className="mx-auto max-w-4xl animate-pulse space-y-6 px-4 py-12 sm:px-6"><div className="h-5 w-32 rounded bg-muted" /><div className="h-11 w-2/3 rounded bg-muted" /><div className="h-64 rounded-2xl bg-muted" /></div>; }
@@ -39,8 +41,9 @@ function downloadMarkdown(title: string, version: number, content: string) {
 
 export default function InventionWorkPage() {
   const params = useParams(); const router = useRouter(); const inventionId = params.id as Id<"inventions">;
-  const { isAuthenticated, isLoading } = useConvexAuth(); const [exportError, setExportError] = useState<string | null>(null); const [authorizationError, setAuthorizationError] = useState<string | null>(null); const [authorizingId, setAuthorizingId] = useState<Id<"atlasDeliverables"> | null>(null);
+  const { isAuthenticated, isLoading } = useConvexAuth(); const [exportError, setExportError] = useState<string | null>(null); const [authorizationError, setAuthorizationError] = useState<string | null>(null); const [authorizingId, setAuthorizingId] = useState<Id<"atlasDeliverables"> | null>(null); const [retryingId, setRetryingId] = useState<string | null>(null); const [retryError, setRetryError] = useState<string | null>(null);
   const authorizeExternalUse = useMutation(authorizeDeliverableExternalUse);
+  const retryWorkItem = useMutation(retryFailedWorkItem);
   const library = useQuery(getDeliverableLibrary, isAuthenticated && inventionId ? { inventionId } : "skip");
   const evaluation = useQuery(getPilotEvaluation, isAuthenticated && inventionId ? { inventionId } : "skip");
   useEffect(() => { if (!isLoading && !isAuthenticated) router.push("/sign-in"); }, [isAuthenticated, isLoading, router]);
@@ -85,6 +88,15 @@ export default function InventionWorkPage() {
     catch (error) { setAuthorizationError(error instanceof Error ? error.message : "InventSmith could not authorize this artifact for external use."); }
     finally { setAuthorizingId(null); }
   };
+  const retryFailedItem = async (workItemId: string) => {
+    setRetryError(null); setRetryingId(workItemId);
+    try {
+      const result = await retryWorkItem({ inventionId, workItemId: workItemId as Id<"atlasWorkItems"> });
+      if (!result.queued) setRetryError("This project has reached its daily autonomous work limit. The failed step is saved and can be retried when work is available.");
+    } catch (error) {
+      setRetryError(error instanceof Error ? error.message : "InventSmith could not retry this work item.");
+    } finally { setRetryingId(null); }
+  };
 
   return <div className="flex min-h-screen flex-col bg-background"><AppNav /><main className="flex-1"><div className="mx-auto max-w-4xl space-y-8 px-4 py-10 sm:px-6 sm:py-14">
     <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" aria-hidden="true" />Back to briefing</Link>
@@ -93,7 +105,7 @@ export default function InventionWorkPage() {
       {exportError && <p role="alert" className="text-sm text-destructive">{exportError}</p>}
       {authorizationError && <p role="alert" className="text-sm text-destructive">{authorizationError}</p>}
     </header>
-    {failedWork.length > 0 && <section className="rounded-xl border border-destructive/30 bg-destructive/5 p-5" aria-labelledby="failed-work-title"><h2 id="failed-work-title" className="text-lg font-semibold">Work that needs attention</h2><p className="mt-1 text-sm text-muted-foreground">InventSmith hides raw system errors here to protect credentials and technical details.</p><ul className="mt-4 space-y-3">{failedWork.map((item) => <li key={`${item.kind}-${item.updatedAt}`} className="rounded-lg border bg-background p-4"><p className="font-medium">{item.title}</p><p className="mt-1 text-sm text-muted-foreground">{item.summary}</p><p className="mt-2 text-xs text-muted-foreground">{item.attemptCount} attempt{item.attemptCount === 1 ? "" : "s"} · Updated {new Date(item.updatedAt).toLocaleString()}</p></li>)}</ul></section>}
+    {failedWork.length > 0 && <section className="rounded-xl border border-destructive/30 bg-destructive/5 p-5" aria-labelledby="failed-work-title"><h2 id="failed-work-title" className="text-lg font-semibold">Work that needs attention</h2><p className="mt-1 text-sm text-muted-foreground">InventSmith hides raw system errors here to protect credentials and technical details.</p>{retryError && <p role="alert" className="mt-3 text-sm text-destructive">{retryError}</p>}<ul className="mt-4 space-y-3">{failedWork.map((item) => <li key={`${item.kind}-${item.updatedAt}`} className="flex flex-col gap-3 rounded-lg border bg-background p-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-medium">{item.title}</p><p className="mt-1 text-sm text-muted-foreground">{item.summary}</p><p className="mt-2 text-xs text-muted-foreground">{item.attemptCount} attempt{item.attemptCount === 1 ? "" : "s"} · Updated {new Date(item.updatedAt).toLocaleString()}</p></div>{(library.access === "manage" || library.access === "edit") && item.workItemId && <Button type="button" variant="outline" size="sm" disabled={retryingId === item.workItemId} onClick={() => void retryFailedItem(item.workItemId!)}>{retryingId === item.workItemId ? "Queuing retry…" : "Retry this step"}</Button>}</li>)}</ul></section>}
     {library.deliverables.length === 0 ? <section className="rounded-2xl border border-border bg-card p-8 text-center"><BookOpen className="mx-auto h-9 w-9 text-primary" aria-hidden="true" /><h2 className="mt-4 text-xl font-semibold">InventSmith is preparing the first deliverables</h2><p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">Finished work will appear here automatically. InventSmith will show its evidence and limitations rather than asking you to assemble the report.</p><Button asChild variant="outline" className="mt-6"><Link href="/dashboard">Return to briefing</Link></Button></section> : <div className="space-y-5">{library.deliverables.map((deliverable) => {
       const sources = deliverable.sourceIds.flatMap((sourceId) => { const source = sourcesById.get(String(sourceId)); return source ? [source] : []; });
       const reviews = library.reviews.filter((review) => review.deliverableId === deliverable._id); const readyForUse = isDeliverableReadyForExternalUse(deliverable.trustState, deliverable.staleReason); const readableContent = contentToReadableText(deliverable.content); const isLatestRevision = latestDeliverableIds.has(String(deliverable._id)); const canRequestExternalAuthorization = isLatestRevision && !deliverable.staleReason && !readyForUse && deliverable.trustState !== "professional_review_required";

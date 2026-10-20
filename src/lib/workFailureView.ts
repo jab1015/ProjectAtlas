@@ -1,4 +1,5 @@
 export interface FailedWorkSummary {
+  workItemId?: string;
   kind: string;
   title: string;
   attemptCount: number;
