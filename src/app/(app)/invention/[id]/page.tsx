@@ -21,8 +21,8 @@ import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
 import { getSafeValidationFailureMessage, getValidationCompletionLabel, getValidationResearchViewState } from "@/lib/validationResearchView";
 import { makeFunctionReference } from "convex/server";
 
-const ensureValidationSurveyRef = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { created: boolean; requestId?: string; token?: string; reason?: string }>("evidenceRequests:ensureValidationSurvey");
-const listEvidenceRequestsRef = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, Array<{ token: string; kind: "survey" | "interview"; purpose?: string; status: string }>>("evidenceRequests:list");
+const createEvidenceRequestRef = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; kind: "survey" | "interview"; title?: string; introduction?: string }, { requestId: string; token: string }>("evidenceRequests:create");
+const listEvidenceRequestsRef = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, Array<{ token: string; kind: "survey" | "interview"; title: string; purpose?: string; status: string }>>("evidenceRequests:list");
 
 // ── Congratulations screen (Stage 4 completion) ──────────────────────────────
 
@@ -128,7 +128,7 @@ export default function InventionWorkspacePage() {
   const advanceStage = useMutation(api.journeyEngine.advanceStage);
   const forceRegenerateValidation = useMutation(api.validationResearchSessionMutations.forceRegenerateValidation);
   const retryFailedValidation = useMutation(api.validationResearchSessionMutations.retryFailedValidationSections);
-  const ensureValidationSurvey = useMutation(ensureValidationSurveyRef);
+  const createEvidenceRequest = useMutation(createEvidenceRequestRef);
   const evidenceRequests = useQuery(listEvidenceRequestsRef, isAuthenticated && inventionId ? { inventionId } : "skip");
 
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
@@ -136,6 +136,7 @@ export default function InventionWorkspacePage() {
   const [showCongrats, setShowCongrats] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
   const [rebuildError, setRebuildError] = useState<string | null>(null);
+  const [surveyPreparationError, setSurveyPreparationError] = useState<string | null>(null);
   const rebuildTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const initializedRef = useRef(false);
   const autoSurveyAttemptedRef = useRef(false);
@@ -169,13 +170,28 @@ export default function InventionWorkspacePage() {
     && reportSections.every((section) => section.status === "generated");
 
   useEffect(() => {
-    if (autoSurveyAttemptedRef.current || !isAuthenticated || !reportIsCurrentAndComplete || reportConfidenceAverage === null || reportConfidenceAverage > 0.5) return;
+    if (autoSurveyAttemptedRef.current || !isAuthenticated || !reportIsCurrentAndComplete || reportConfidenceAverage === null || reportConfidenceAverage > 0.5 || !inventionState || !Array.isArray(evidenceRequests)) return;
+    const fallbackTitle = `[Validation follow-up] ${inventionState.invention.title}`;
+    const existing = evidenceRequests.find((request) => request.kind === "survey" && request.status === "active" && (request.purpose === "validation_follow_up" || request.title === fallbackTitle));
+    if (existing) {
+      autoSurveyAttemptedRef.current = true;
+      return;
+    }
     autoSurveyAttemptedRef.current = true;
-    void ensureValidationSurvey({ inventionId }).catch((error) => {
+    setSurveyPreparationError(null);
+    const idea = inventionState.invention;
+    const details = [idea.problemStatement?.trim(), idea.solutionDescription?.trim()].filter(Boolean).join(" A possible solution is: ");
+    void createEvidenceRequest({
+      inventionId,
+      kind: "survey",
+      title: fallbackTitle,
+      introduction: `InventSmith prepared this short survey because the current evidence score is ${Math.round(reportConfidenceAverage * 100)}%. Please share it with people who may have this problem${details ? `: ${details.slice(0, 320)}` : ""}. Responses are saved as inventor-provided evidence and are not independently verified.`,
+    }).catch((error) => {
       console.error("Could not prepare the validation follow-up survey:", error);
+      setSurveyPreparationError("InventSmith could not prepare the survey link. Open Evidence Locker to create a survey page.");
       autoSurveyAttemptedRef.current = false;
     });
-  }, [ensureValidationSurvey, inventionId, isAuthenticated, reportConfidenceAverage, reportIsCurrentAndComplete]);
+  }, [createEvidenceRequest, evidenceRequests, inventionId, inventionState, isAuthenticated, reportConfidenceAverage, reportIsCurrentAndComplete]);
 
   // Initialize local field values from server state
   useEffect(() => {
@@ -362,13 +378,13 @@ export default function InventionWorkspacePage() {
                   <p className="font-semibold text-foreground">Your next step</p>
                   <p className="mt-1 text-muted-foreground">Your evidence score is {Math.round(reportConfidenceAverage * 100)}%. InventSmith has prepared a short survey. Share it with five people who might have this problem.</p>
                   {(() => {
-                    const request = evidenceRequests?.find((item) => item.purpose === "validation_follow_up" && item.status === "active");
+                    const request = evidenceRequests?.find((item) => item.kind === "survey" && item.status === "active" && (item.purpose === "validation_follow_up" || item.title === `[Validation follow-up] ${invention.title}`));
                     return request ? (
                       <div className="mt-3 space-y-2">
                         <p className="break-all rounded-md bg-background px-3 py-2 font-mono text-xs">{typeof window !== "undefined" ? `${window.location.origin}/respond/${request.token}` : `/respond/${request.token}`}</p>
                         <Button size="sm" variant="outline" onClick={() => { void navigator.clipboard?.writeText(`${window.location.origin}/respond/${request.token}`); }}>Copy survey link</Button>
                       </div>
-                    ) : <p className="mt-2 text-xs text-muted-foreground">Preparing your survey link…</p>;
+                    ) : surveyPreparationError ? <p role="alert" className="mt-2 text-xs text-destructive">{surveyPreparationError} <Link className="underline" href={`/invention/${inventionId}/evidence`}>Open Evidence Locker</Link></p> : evidenceRequests instanceof Error ? <p role="alert" className="mt-2 text-xs text-destructive">Survey links could not be loaded. <Link className="underline" href={`/invention/${inventionId}/evidence`}>Open Evidence Locker</Link></p> : <p className="mt-2 text-xs text-muted-foreground">Preparing your survey link…</p>;
                   })()}
                   <p className="mt-2 text-xs text-muted-foreground">Responses are saved as inventor-provided evidence and included in the next validation refresh. You decide where to share the link.</p>
                 </div>

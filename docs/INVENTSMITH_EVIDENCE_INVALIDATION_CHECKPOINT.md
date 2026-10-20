@@ -6,11 +6,11 @@
 
 ## Validation follow-up survey — October 20, 2026
 
-When the newest Validation report is complete, its evidence fingerprint matches current evidence, all sections completed, and average confidence is **50% or lower**, InventSmith now prepares one active, tailored survey page for the inventor to share. The backend rechecks report completion, evidence freshness, and the threshold before creating the page. Repeated page loads reuse the existing active follow-up survey instead of creating duplicates.
+When the newest Validation report is complete, its evidence fingerprint matches current evidence, all sections completed, and average confidence is **50% or lower**, the Validation page prepares a survey for the inventor to share. It first waits for the evidence-request list, then checks for an active Validation follow-up before using the existing `evidenceRequests:create` mutation. The page introduction uses the invention problem/solution context. This client-side check avoids duplicate creation on ordinary reloads; simultaneous tabs are not yet protected by server-side idempotency.
 
 Survey responses continue to create inventor-provided, unverified evidence records and enter the existing evidence-impact/Validation refresh path. Creating the page does not send invitations, messages, or posts. The Validation view makes the next step explicit and shows the copyable link. The threshold triggers more evidence collection; it does not inflate confidence or imply success probability.
 
-Repository regression coverage and local checks pass (130 files / 703 tests; both TypeScript checks; production dependency audit 0 vulnerabilities; Next.js build 36/36). Live Preview survey creation, response intake, and refresh acceptance remain pending exact-head deployment.
+Repository regression coverage and local checks pass (130 files / 703 tests; both TypeScript checks; production dependency audit 0 vulnerabilities; Next.js build 36/36). Preview `6ad6c826907d833bcbcb5524` surfaced that `ensureValidationSurvey` was not deployed. The UI now relies on the existing list/create functions instead; verify survey creation, response intake, and refresh in the next Preview.
 
 ## Change
 
