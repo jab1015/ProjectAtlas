@@ -378,3 +378,11 @@ The Convex GitHub device authorization page reported “Device connected,” but
 ### Convex GitHub device retry — October 19, 2026
 
 The Convex GitHub device authorization page reported “Device connected,” but the workspace CLI then failed because its request to `auth.convex.dev` was blocked by the environment network policy. No backend deployment occurred, no department provider work ran, and Production and other Convex deployments were not touched. Full department acceptance remains blocked until the authenticated CLI can reach Convex, deploy the matching PR code to `quick-fox-785`, and re-run each eligible department against its real upstream evidence and gates.
+
+
+### Authenticated Preview and work-recovery checkpoint — October 20, 2026
+
+- Verified the latest authenticated Netlify Preview #24 against the signed-in InventSmith account and the RiseJars invention. The Validation page now says the report matches current evidence, explicitly states the uploaded survey was included, shows a 45% evidence-support score (not a success probability), and offers a shareable follow-up survey because the score is below 50%. The survey link opens a working five-question respondent form; no response was submitted or distributed.
+- Confirmed the document summary preserves its inventor-uploaded / independently-unverified provenance. Confidence is not held behind a stale/refreshing state after the completed report.
+- Remaining blocker: Work Library still shows two terminal failures from October 18 (competitor discovery and brief analysis), each at three attempts, and 19 required deliverables are missing. They were created before department metadata was present. The resolver fix is deployed to the isolated test backend, but terminal rows are not automatically reclaimed; an authenticated, audited retry/recovery path is needed before we can verify end-to-end department execution and downstream deliverables.
+- The authenticated GitHub Actions Convex development deployment to quick-fox-785 completed successfully (run 39370245122); the Netlify Preview build completed. Production Convex agile-seahorse-379 and Netlify production were not touched. Do not mark all departments complete: only Preview surfaces and the Validation/survey flow were verified here; independent live execution across departments remains open.
