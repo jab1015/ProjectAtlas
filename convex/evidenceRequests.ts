@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { requireInventionEditAccess, requireInventionReadAccess } from "./organizations";
 import { applyInventorEvidenceChange } from "./evidenceImpact";
+import { readValidationEvidence } from "./validationEvidence";
 
 const DEFAULT_SURVEY = [
   "How often do you use products like this?",
@@ -45,6 +46,85 @@ export const create = mutation({
     });
     const request = await ctx.db.get(id);
     return { requestId: id, token: request!.token };
+  },
+});
+
+/** Create one inventor-shareable survey when a current validation report is at or below 50%. */
+export const ensureValidationSurvey = mutation({
+  args: { inventionId: v.id("inventions") },
+  handler: async (ctx, { inventionId }) => {
+    const { userId } = await requireInventionEditAccess(ctx, inventionId);
+    const invention = await ctx.db.get(inventionId);
+    if (!invention) throw new ConvexError("Invention not found");
+
+    const report = await ctx.db.query("validationResearch")
+      .withIndex("by_inventionId", q => q.eq("inventionId", inventionId))
+      .order("desc")
+      .first();
+    if (!report || (report.researchStatus !== "completed" && report.status !== "complete")) {
+      return { created: false, reason: "validation_not_complete" as const };
+    }
+    const evidence = await readValidationEvidence(ctx, inventionId);
+    if (!report.evidenceFingerprint || report.evidenceFingerprint !== evidence.fingerprint) {
+      return { created: false, reason: "validation_needs_refresh" as const };
+    }
+
+    let sections: unknown[] = [];
+    if (Array.isArray(report.sections)) sections = report.sections;
+    else if (report.sections && typeof report.sections === "object") sections = Object.values(report.sections as Record<string, unknown>);
+    else if (report.sectionsJson) {
+      try {
+        const parsed: unknown = JSON.parse(report.sectionsJson);
+        sections = Array.isArray(parsed) ? parsed : parsed && typeof parsed === "object" ? Object.values(parsed as Record<string, unknown>) : [];
+      } catch { sections = []; }
+    }
+    const complete = sections.filter((section) => {
+      if (!section || typeof section !== "object") return false;
+      const value = section as Record<string, unknown>;
+      return value.sectionStatus === "COMPLETED" || value.status === "generated" || value.status === "completed";
+    });
+    const scores = complete.map((section) => {
+      const value = section as Record<string, unknown>;
+      const confidence = value.confidence && typeof value.confidence === "object" ? value.confidence as Record<string, unknown> : {};
+      const score = confidence.score;
+      return typeof score === "number" && Number.isFinite(score) ? Math.max(0, Math.min(1, score)) : null;
+    }).filter((score): score is number => score !== null);
+    if (!complete.length || scores.length !== complete.length || scores.reduce((sum, score) => sum + score, 0) / scores.length > 0.5) {
+      return { created: false, reason: "confidence_above_threshold" as const };
+    }
+
+    const requests = await ctx.db.query("evidenceRequests")
+      .withIndex("by_inventionId", q => q.eq("inventionId", inventionId))
+      .collect();
+    const existing = requests.find(request => request.purpose === "validation_follow_up" && request.status === "active");
+    if (existing) return { created: false, requestId: existing._id, token: existing.token };
+
+    const problem = invention.problemStatement?.trim();
+    const solution = invention.solutionDescription?.trim();
+    const questions = [
+      `How often do you experience this problem${problem ? `: ${problem.slice(0, 180)}` : ""}?`,
+      "Tell us about the last time this happened. What did you do?",
+      "What is frustrating or costly about the way you handle it today?",
+      `How useful would a solution like this be${solution ? `: ${solution.slice(0, 180)}` : ""}? What concerns would you have?`,
+      "What would make you try, buy, or recommend a solution?",
+    ];
+    const now = Date.now();
+    const id = await ctx.db.insert("evidenceRequests", {
+      inventionId,
+      createdByUserId: userId,
+      token: token(),
+      kind: "survey",
+      purpose: "validation_follow_up",
+      title: `${invention.title} customer follow-up survey`,
+      introduction: `InventSmith prepared this short survey because the current validation report needs more customer evidence. Please answer from your own experience. Responses become inventor-provided evidence and are not independently verified.`,
+      questions: questions.map((prompt, index) => ({ id: `q${index + 1}`, prompt })),
+      status: "active",
+      responseCount: 0,
+      createdAt: now,
+      updatedAt: now,
+    });
+    const request = await ctx.db.get(id);
+    return { created: true, requestId: id, token: request!.token };
   },
 });
 

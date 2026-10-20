@@ -1,8 +1,14 @@
 # InventSmith Engineering Maturity Checkpoint
 
-**Updated:** October 1, 2026
+**Updated:** October 20, 2026
 **Branch:** `inventsmith/full-product-build`  
 **Status:** engineering-review and deliberate manufacturing-release transitions implemented and behavior-tested; live qualified acceptance remains
+
+## October 20 workflow and inventor-guidance checkpoint
+
+The inventor-facing workflow now routes Stage 5+ users to the full Journey Center instead of the retired “coming soon” page. The Journey Center presents one plain-language next action while preserving the existing approval, expert-review, evidence, and physical-work boundaries. A low-confidence Validation report can prepare a survey page automatically, but distribution remains the inventor’s choice; collected answers remain unverified evidence until appropriately assessed.
+
+Local verification for this checkpoint passed 130 test files / 703 tests, both TypeScript checks, the production dependency audit with 0 vulnerabilities, and the Next.js production build with 36/36 static pages. No live CAD generation, engineering review, physical prototype, manufacturer acceptance, supplier contact, or release action is claimed. The updated code has not yet been verified in the Netlify Preview.
 
 ## Manufacturing-readiness hardening
 

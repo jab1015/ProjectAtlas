@@ -1,6 +1,14 @@
 # INVENTSMITH AUTOMATION IMPLEMENTATION PLAN
 
-> **Current-state notice (August 14, 2026):** This document remains the long-range automation reference, but its July 2026 current-state assessment is historical. Active implementation scope is governed by `ATLAS_PRODUCT_RESET_V1.md`, and verified progress is tracked in `ATLAS_BUILD_PROGRESS.md`.
+> **Current-state notice (October 20, 2026):** This document remains the long-range automation reference. Its July 2026 maturity assessment below is historical and should not be read as the current repository state. Use `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`, `docs/INVENTSMITH_BUILD_PROGRESS.md`, and `docs/INVENTSMITH_CAPABILITY_MATRIX.md` for current status. The repository now contains the full 15-stage department workflow and dedicated agents; authenticated provider-backed acceptance is incomplete. A current, complete Validation score at or below 50% automatically prepares one shareable survey page, and the Journey Center gives the inventor a plain-language next step. External distribution, purchases, filings, professional judgment, and physical tasks remain gated.
+
+## Current automation checkpoint — October 20, 2026
+
+- **Automatic:** identify a current low-confidence Validation report, prepare one tailored survey page, expose its link, accept responses as unverified evidence, and route evidence changes through the existing refresh logic.
+- **Inventor’s next step:** share the survey link with people who might have the problem. InventSmith does not message them or post the survey.
+- **Automated work scope:** department profiles, work plans, routing, prerequisites, and eligible background work are implemented and covered by repository checks. This does not establish that every department agent has successfully generated and saved a live result.
+- **Approval/physical boundary:** payment, legal filing, outside communication/publication, qualified professional review, supplier/prototype work, and other physical execution remain human-gated and separately recorded.
+- **Local verification:** 130 test files / 703 tests; web and Convex TypeScript; production dependency audit 0 vulnerabilities; direct Next.js production build 36/36. Local Convex codegen is blocked without an access token. Netlify Preview acceptance is pending push.
 
 > **Version 1.0 | July 2026**
 > **Classification: Internal Engineering Reference**

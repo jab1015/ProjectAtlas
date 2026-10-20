@@ -1,6 +1,6 @@
 # InventSmith Capability Matrix
 
-**Updated:** October 19, 2026 (America/New_York)
+**Updated:** October 20, 2026 (America/New_York)
 **Branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
 **Latest verified CI checkpoint:** `93744db1fdf2772925f96dbc4d33ed1823192f86` (CI #226). Later operations-console compatibility changes were preview-accepted but await exact-head CI.
@@ -18,9 +18,9 @@
 
 No overall completion percentage is asserted.
 
-### Current preview checkpoint — October 19, 2026
+### Current implementation checkpoint — October 20, 2026
 
-Branch head `6b6becb` has a failed Netlify Deploy Preview. The build log reports invalid UTF-8 in `src/app/(app)/invention/[id]/page.tsx`; the broken source blob is being repaired and a fresh preview remains pending. The existing successful preview is still serving the earlier commit, so the new fixes are not yet available to test. No full-product Convex deployment or provider-backed AI acceptance is claimed.
+Working-tree changes now prepare one invention-tailored survey page automatically when the latest current Validation report averages 50% or less, provide a shareable link in the Validation view, and explain the next inventor action in plain language. The survey is idempotent, stays inventor-provided/unverified, and does not contact anyone or publish externally. The legacy Stage 5+ route now opens the Journey Center instead of showing a “coming soon” lock. Local verification passes **130 test files / 703 tests**, web and Convex TypeScript, production dependency audit (**0 vulnerabilities**), and `npx next build` (**36/36 pages**). The full `npm run build` wrapper is blocked only at local Convex codegen because this environment has no access token; direct Next build passes. Changes are not yet pushed or Preview-verified at this checkpoint.
 
 ## Naming / infrastructure
 
@@ -38,13 +38,15 @@ Convex production `agile-seahorse-379` has a deliberately limited password-recov
 |---|---|---|---|---|
 | Complete applicable journey/navigation | implemented | representative regressions passed; completion semantics locked | newest head not claimed live | deeper persisted lifecycle acceptance |
 | Password recovery | implemented | recovery flow and auth backend checks passed | live-functionally verified on the PR #24 preview against limited Convex production | broader authenticated acceptance and final release decision |
-| Dedicated AI agent per department | implemented: 17 stable profiles | routing/prompt/audit/fail-closed coverage passed | newest head not claimed deployed | provider-backed authenticated executions |
+| Dedicated AI agent per department | implemented: 21 stable profiles | routing/prompt/audit/fail-closed coverage passed | newest head not claimed deployed | provider-backed authenticated executions for every department |
 | Physical/software/hybrid/regulated routing | implemented | representative routing covered | not live-accepted | persisted/live acceptance |
 | Organization-native tenancy/access | implemented | direct authorization, ownership, member, sharing and owner-precedence behavior covered | not live multi-user accepted | deeper live multi-user cases |
 | Selected beta access and credits | implemented | admin-only dated overrides, append-only credit ledger, effective-plan enforcement, reservation settlement, deletion/export coverage | source implementation present; no verified deployment to `quick-fox-785`; live admin workflow not accepted | exercise selected-account grant/revoke and credit adjustment with disposable testers |
 | Secure organization invitations | implemented | exact account/email binding, expiry and current seat-capacity directly tested | not live multi-user accepted | authenticated live acceptance |
 | Invention sharing/grants | implemented | active same-org target requirement, exact insert/update, stale-grant cleanup directly tested | not live multi-user accepted | live grant/revocation acceptance |
 | Evidence provenance/trust | implemented | fail-closed evidence tests established | not live-calibrated | provider-backed calibration |
+| Low-confidence survey follow-up | implemented in this checkpoint | current-report/fingerprint/50% cutoff and duplicate prevention regressions passed | awaiting exact-head Preview test | authenticated survey-link creation and response refresh acceptance |
+| Plain-language next step / later-stage routing | implemented in this checkpoint | route and journey copy regressions passed | awaiting exact-head Preview test | verify each department link and prerequisite experience live |
 | Worker attempt/lease reliability | implemented | deterministic regressions established | not live-soak-tested | concurrency/soak |
 | Usage settlement/accounting | implemented | deterministic paths plus deletion reserved-usage release covered | not production-integrated | provider interruption economics |
 | Professional-review audit state | implemented | direct mutation/replay/invalidation covered | genuine review not generalized | qualified real reviews |

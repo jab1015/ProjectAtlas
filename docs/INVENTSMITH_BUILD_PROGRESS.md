@@ -1,3 +1,11 @@
+## Inventor next-step and low-confidence survey checkpoint — October 20, 2026
+
+- Updated the Validation page so a completed, current evidence-support score at or below 50% automatically creates one active, invention-tailored shareable survey. The inventor sees the score, a plain-language instruction to share it with five people, the link, and a copy action. No one is contacted and nothing is posted externally. Survey responses continue to be stored as unverified inventor-provided evidence and trigger affected-work refresh.
+- The survey mutation checks the latest report status and evidence fingerprint, enforces the 50% cutoff on the server, and reuses an existing active follow-up link to avoid duplicates.
+- Removed the legacy Stage 5+ “coming soon” lock from the old invention route. It now directs inventors to the Journey Center, where the next task and prerequisites are visible. Reworded the Journey Center’s next-action messages and status labels in plain language.
+- Verification: **130 test files / 703 tests passed**; web and Convex TypeScript passed; production dependency audit **0 vulnerabilities**; `npx next build` passed (**36/36** static pages); `git diff --check` passed. `npm run build` could not run its initial Convex codegen because this local environment has no Convex access token; no deploy occurred. Direct Next.js build succeeded using checked-in generated types.
+- Netlify Preview verification is pending this code push. Live department-agent execution and successful survey creation/response on the served backend are not claimed until verified in the authenticated Preview.
+
 ### InventSmith test Convex deployment — October 19, 2026, 6:45 PM ET
 
 The owner authorized Convex deployment as part of this approval and confirmed the target is InventSmith test, `quick-fox-785` (`dev/inventsmith-test`, Convex project `decideforusapp:projectatlas`). Deployed with authenticated Convex CLI using explicit `CONVEX_DEPLOYMENT=dev:quick-fox-785`; no deploy key was used. CLI confirmed the exact target, added the evidence request/response and support-case indexes, and reported **Convex functions ready**. It did not target `agile-seahorse-379` or `fiery-gazelle-628`.
@@ -25,7 +33,7 @@ Live limitation: survey attribution and confidence still need verification after
 - The owner-confirmed only deploy key is production-scoped. Do not use it against `quick-fox-785`, `agile-seahorse-379`, or any other backend. The frontend is verified to build; end-to-end backend and AI-department acceptance is still blocked. Keep `fiery-gazelle-628` untouched and do not merge PR #24 or publish the full product.
 - Next safe work: preserve this verified Preview; improve automated integration coverage using controlled local/test fixtures; investigate whether the isolated Convex backend can be aligned without using the production key. Only after backend parity is proven, run one bounded Validation acceptance and verify survey attribution, refresh, evidence links, Support cases, and department outputs.
 
-**Last updated:** October 19, 2026 (America/New_York)
+**Last updated:** October 20, 2026 (America/New_York)
 **Product destination:** Complete Idea-to-Market Inventor OS  
 **Authoritative product specification:** `docs/INVENTSMITH_MASTER_PRODUCT_SPEC.md`  
 **Current continuation checkpoint:** `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`  

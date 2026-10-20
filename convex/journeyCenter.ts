@@ -72,13 +72,13 @@ export const getJourneyCenter = query({
     const pendingReviewCount = reviews.filter((item) => item.status !== "accepted" && item.status !== "declined").length;
     const completedStages = stageRows.filter((stage) => stage.status === "complete").length;
 
-    let nextAction = `Continue ${firstIncomplete.name}.`;
-    if (pendingApprovalCount > 0) nextAction = `Review ${pendingApprovalCount} pending authorization${pendingApprovalCount === 1 ? "" : "s"}.`;
-    else if (openDecisionCount > 0) nextAction = `Resolve ${openDecisionCount} inventor decision${openDecisionCount === 1 ? "" : "s"}.`;
-    else if (blockedWorkCount > 0) nextAction = `Provide the smallest required input for ${blockedWorkCount} blocked work item${blockedWorkCount === 1 ? "" : "s"}.`;
-    else if (firstIncomplete.status === "professional_review") nextAction = `Professional review is required before required stage work for ${firstIncomplete.name} can be treated as complete.`;
-    else if (firstIncomplete.status === "needs_refresh") nextAction = `Refresh ${firstIncomplete.name} because upstream evidence or invention facts changed.`;
-    else if (firstIncomplete.status === "failed") nextAction = `Retry or resolve failed ${firstIncomplete.name} work.`;
+    let nextAction = `Open ${firstIncomplete.name} and follow the first step.`;
+    if (pendingApprovalCount > 0) nextAction = `Review an approval so InventSmith can continue (${pendingApprovalCount} waiting).`;
+    else if (openDecisionCount > 0) nextAction = `Answer an open question so InventSmith can continue (${openDecisionCount} waiting).`;
+    else if (blockedWorkCount > 0) nextAction = `Open ${firstIncomplete.name} to see what information is missing (${blockedWorkCount} item${blockedWorkCount === 1 ? "" : "s"}).`;
+    else if (firstIncomplete.status === "professional_review") nextAction = `${firstIncomplete.name} is ready for a qualified professional to review.`;
+    else if (firstIncomplete.status === "needs_refresh") nextAction = `Open ${firstIncomplete.name}; new information means some work needs updating.`;
+    else if (firstIncomplete.status === "failed") nextAction = `Open ${firstIncomplete.name} and retry the step that failed.`;
 
     return {
       invention: {

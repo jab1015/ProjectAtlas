@@ -14,15 +14,19 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, ArrowRight, Lock, PartyPopper, RefreshCw } from "lucide-react";
+import { ArrowLeft, ArrowRight, PartyPopper, RefreshCw } from "lucide-react";
 import Link from "next/link";
-import { trackStageCompleted, trackContinueClicked, trackUpgradePromptShown } from "@/lib/analytics";
+import { trackStageCompleted, trackContinueClicked } from "@/lib/analytics";
 import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
 import { getSafeValidationFailureMessage, getValidationCompletionLabel, getValidationResearchViewState } from "@/lib/validationResearchView";
+import { makeFunctionReference } from "convex/server";
+
+const ensureValidationSurveyRef = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { created: boolean; requestId?: string; token?: string; reason?: string }>("evidenceRequests:ensureValidationSurvey");
+const listEvidenceRequestsRef = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, Array<{ token: string; kind: "survey" | "interview"; purpose?: string; status: string }>>("evidenceRequests:list");
 
 // ── Congratulations screen (Stage 4 completion) ──────────────────────────────
 
-function CongratulatoryScreen({ inventionTitle }: { inventionTitle: string }) {
+function CongratulatoryScreen({ inventionTitle, inventionId }: { inventionTitle: string; inventionId: string }) {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <AppNav />
@@ -35,29 +39,24 @@ function CongratulatoryScreen({ inventionTitle }: { inventionTitle: string }) {
           </div>
           <div className="space-y-3">
             <p className="text-xs font-medium uppercase tracking-widest text-primary">
-              Stage 4 Complete
+              Foundation complete
             </p>
             <h1
               className="text-3xl font-bold text-foreground"
               style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
             >
-              {inventionTitle} is patent-ready.
+              {inventionTitle} is ready for the next department.
             </h1>
             <p className="text-muted-foreground leading-relaxed">
-              You&rsquo;ve completed all four foundation stages — idea capture,
-              validation, market research, and patent readiness. This is a real
-              milestone.
+              Your idea and validation work is saved. InventSmith will guide you through the remaining departments and show what each one needs next.
             </p>
           </div>
           <div className="rounded-xl border border-border bg-muted/30 p-5 text-left space-y-2">
-            <p className="text-sm font-medium text-foreground">Coming soon: Pro</p>
-            <p className="text-sm text-muted-foreground">
-              Stages 5–15 — product design, IP protection, manufacturing,
-              funding, and launch — are on the way. Upgrade when ready.
-            </p>
+            <p className="text-sm font-medium text-foreground">What happens next</p>
+            <p className="text-sm text-muted-foreground">Open your journey to see the next department, its work, and any evidence or approval it needs.</p>
           </div>
           <Button asChild size="lg" className="w-full">
-            <Link href="/dashboard">Back to Dashboard</Link>
+            <Link href={`/invention/${inventionId}/journey`}>Continue to my journey</Link>
           </Button>
         </div>
       </main>
@@ -101,52 +100,6 @@ const STAGE_FIELDS: Record<number, FieldDef[]> = {
   ],
 };
 
-// ── Upgrade screen for stages 5+ ────────────────────────────────────────────
-
-function ComingSoonStage({ stageId, stageName }: { stageId: number; stageName: string }) {
-  useEffect(() => {
-    trackUpgradePromptShown(`stage_${stageId}`);
-  }, [stageId]);
-
-  return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <AppNav />
-      <main className="flex-1 flex items-center justify-center px-4">
-        <div className="text-center space-y-6 max-w-sm">
-          <div className="flex justify-center">
-            <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center">
-              <Lock className="h-7 w-7 text-muted-foreground" />
-            </div>
-          </div>
-          <div>
-            <h1
-              className="text-2xl font-bold text-foreground mb-2"
-              style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
-            >
-              Stage {stageId}: {stageName}
-            </h1>
-            <p className="text-muted-foreground">
-              This stage is part of the Pro journey — coming soon.
-              Complete Stages 1–4 to reach patent readiness.
-            </p>
-          </div>
-          <Button asChild variant="outline">
-            <Link href="/dashboard">Back to Dashboard</Link>
-          </Button>
-          <div>
-            <Link href="/pricing" className="text-sm text-primary hover:underline underline-offset-4">
-              Learn about Pro →
-            </Link>
-          </div>
-        </div>
-      </main>
-      <footer className="border-t border-border">
-        <MadeThisBadge />
-      </footer>
-    </div>
-  );
-}
-
 // ── Stage 1 field values come from the invention record itself ───────────────
 // Other stages use stageProgress. This function flattens them for display.
 
@@ -175,6 +128,8 @@ export default function InventionWorkspacePage() {
   const advanceStage = useMutation(api.journeyEngine.advanceStage);
   const forceRegenerateValidation = useMutation(api.validationResearchSessionMutations.forceRegenerateValidation);
   const retryFailedValidation = useMutation(api.validationResearchSessionMutations.retryFailedValidationSections);
+  const ensureValidationSurvey = useMutation(ensureValidationSurveyRef);
+  const evidenceRequests = useQuery(listEvidenceRequestsRef, isAuthenticated && inventionId ? { inventionId } : "skip");
 
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
   const [advancing, setAdvancing] = useState(false);
@@ -183,6 +138,7 @@ export default function InventionWorkspacePage() {
   const [rebuildError, setRebuildError] = useState<string | null>(null);
   const rebuildTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const initializedRef = useRef(false);
+  const autoSurveyAttemptedRef = useRef(false);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -199,6 +155,27 @@ export default function InventionWorkspacePage() {
     api.validationMutations.getValidationResearch,
     isAuthenticated && inventionId ? { inventionId } : "skip"
   );
+
+  const reportSections = validationResearch?.sections ?? [];
+  const reportConfidenceScores = reportSections
+    .filter((section) => section.status !== "pending" && typeof section.confidence?.score === "number")
+    .map((section) => section.confidence.score);
+  const reportConfidenceAverage = reportConfidenceScores.length
+    ? reportConfidenceScores.reduce((sum, score) => sum + score, 0) / reportConfidenceScores.length
+    : null;
+  const reportIsCurrentAndComplete = validationResearch?.status === "complete"
+    && validationResearch.evidenceReview?.currentEvidenceMatchesRun === true
+    && reportSections.length >= 11
+    && reportSections.every((section) => section.status === "generated");
+
+  useEffect(() => {
+    if (autoSurveyAttemptedRef.current || !isAuthenticated || !reportIsCurrentAndComplete || reportConfidenceAverage === null || reportConfidenceAverage > 0.5) return;
+    autoSurveyAttemptedRef.current = true;
+    void ensureValidationSurvey({ inventionId }).catch((error) => {
+      console.error("Could not prepare the validation follow-up survey:", error);
+      autoSurveyAttemptedRef.current = false;
+    });
+  }, [ensureValidationSurvey, inventionId, isAuthenticated, reportConfidenceAverage, reportIsCurrentAndComplete]);
 
   // Initialize local field values from server state
   useEffect(() => {
@@ -380,6 +357,22 @@ export default function InventionWorkspacePage() {
               <p className="text-sm text-foreground">
                 Status: <span className="font-medium">{statusLabel}</span>
               </p>
+              {reportIsCurrentAndComplete && reportConfidenceAverage !== null && reportConfidenceAverage <= 0.5 && (
+                <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm">
+                  <p className="font-semibold text-foreground">Your next step</p>
+                  <p className="mt-1 text-muted-foreground">Your evidence score is {Math.round(reportConfidenceAverage * 100)}%. InventSmith has prepared a short survey. Share it with five people who might have this problem.</p>
+                  {(() => {
+                    const request = evidenceRequests?.find((item) => item.purpose === "validation_follow_up" && item.status === "active");
+                    return request ? (
+                      <div className="mt-3 space-y-2">
+                        <p className="break-all rounded-md bg-background px-3 py-2 font-mono text-xs">{typeof window !== "undefined" ? `${window.location.origin}/respond/${request.token}` : `/respond/${request.token}`}</p>
+                        <Button size="sm" variant="outline" onClick={() => { void navigator.clipboard?.writeText(`${window.location.origin}/respond/${request.token}`); }}>Copy survey link</Button>
+                      </div>
+                    ) : <p className="mt-2 text-xs text-muted-foreground">Preparing your survey link…</p>;
+                  })()}
+                  <p className="mt-2 text-xs text-muted-foreground">Responses are saved as inventor-provided evidence and included in the next validation refresh. You decide where to share the link.</p>
+                </div>
+              )}
               <div className="flex items-center gap-3">
                 <Button
                   variant="outline"
@@ -570,14 +563,20 @@ export default function InventionWorkspacePage() {
     );
   }
 
-  // Show congratulations after completing all enabled stages
+  useEffect(() => {
+    if (inventionState && inventionState.currentStage.id > 4) {
+      router.replace(`/invention/${inventionId}/journey`);
+    }
+  }, [inventionId, inventionState, router]);
+
+  // Show congratulations after completing the foundation stages.
   if (showCongrats) {
-    return <CongratulatoryScreen inventionTitle={invention.title} />;
+    return <CongratulatoryScreen inventionTitle={invention.title} inventionId={String(inventionId)} />;
   }
 
-  // Stages 5+: show coming soon
+  // Later stages use the full journey center and department workspaces.
   if (!currentStage.enabled || stageId > 4) {
-    return <ComingSoonStage stageId={stageId} stageName={currentStage.name} />;
+    return <div className="min-h-screen bg-background"><AppNav /><main className="mx-auto max-w-3xl px-4 py-12 text-sm text-muted-foreground">Opening your next department…</main></div>;
   }
 
   // ── Handlers ───────────────────────────────────────────────────────────────

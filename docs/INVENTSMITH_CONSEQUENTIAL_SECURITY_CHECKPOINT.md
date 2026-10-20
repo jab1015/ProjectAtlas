@@ -1,6 +1,6 @@
 # InventSmith Consequential Security Checkpoint
 
-**Updated:** October 18, 2026 (America/New_York)
+**Updated:** October 20, 2026 (America/New_York)
 **Branch:** `inventsmith/full-product-build`  
 **Pull request:** draft PR #24 — intentionally open and unmerged  
 **Latest verified code head before this documentation refresh:** `93744db1fdf2772925f96dbc4d33ed1823192f86`
@@ -8,6 +8,10 @@
 ## Current security checkpoint
 
 Consequential operations remain fail-closed, server-authorized, revision-bound where artifacts are involved, and explicitly separated from outside-world execution.
+
+### Automatic validation survey boundary — October 20, 2026
+
+For a complete Validation report whose evidence fingerprint is current and whose average section confidence is 50% or lower, a server-checked mutation may create one inventor-shareable survey page. It deduplicates by invention and active purpose. The inventor gets a link and decides whether and where to share it. InventSmith does not send messages, invite recipients, publish posts, spend money, or treat responses as verified facts. Public responses are stored with inventor-provided/unverified provenance and enter the existing evidence-impact refresh path.
 
 InventSmith CI **#226** (`39016181734`) passed against exact code head `93744db1fdf2772925f96dbc4d33ed1823192f86` with web/Convex typechecking, **116 test files / 660 tests**, production dependency audit with **0 vulnerabilities**, bounded development-dependency audit, and Next.js **15.5.27** production build with **32/32** static pages generated.
 

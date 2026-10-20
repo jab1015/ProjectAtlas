@@ -24,7 +24,7 @@ Live authenticated inspection is still failing at the backend boundary: Evidence
 
 The only available Convex deploy key is production-scoped. It must not be used to deploy `quick-fox-785` or to test the Preview. Therefore code/build verification is complete for this head, but live backend and department acceptance is not. Preserve production data and functions; leave `agile-seahorse-379` and `fiery-gazelle-628` untouched. Continue with fixture-backed integration tests and determine a safe, non-production-key path for test-backend parity before any further AI-consuming acceptance.
 
-**Updated:** October 19, 2026 (America/New_York)
+**Updated:** October 20, 2026 (America/New_York)
 **Product:** InventSmith — The Inventor OS  
 **Company:** Modern Methods  
 **Repository:** `jab1015/ProjectAtlas` (historical repository slug)  
@@ -292,3 +292,20 @@ The stage 6 Prototype probe showed **0/7 complete**, with all seven tasks queued
 Correction to the preceding exact-head checkpoint: the stable PR #24 Preview alias later rolled forward to the `f8a66dd` deploy `6ad6c1978ecfdc6c479e7168`. After reload, the authenticated InventSmith session showed this deploy in the Netlify drawer and served the new UI. Validation displays the current **11/11-section** report at **45% evidence-support confidence**, cites inventor-uploaded `Data_All_260313`, and says the report matches current evidence. Findings and respondent counts are visible; provenance and limitations remain explicit. Stage 6 Prototype displays “Waiting for prerequisite work,” names the missing Product Design Specification, labels the count “Queued or running,” and links to Product Design + CAD. Thus the new preview’s authenticated UI acceptance passed for the reported Validation issue and this department prerequisite.
 
 This verifies the UI and evidence attribution. The two exhausted Work Library items, admin-only access, and lack of live saved outputs across all 15 departments remain open. Agent identity/routing tests do not establish live execution for each department. The follow-up GitHub commits in this checkpoint change documentation only; Netlify Deploy Preview builds for those documentation commits are pending and do not change the app source tested above.
+## Current continuation checkpoint — October 20, 2026
+
+The immediate code checkpoint makes the inventor’s next step easier to understand and automates the low-confidence evidence follow-up. A complete, current Validation report whose average confidence is **50% or lower** now causes InventSmith to prepare one tailored survey page and link. The page explains that the score is evidence support, not success probability; it tells the inventor to share the link with five people and provides a copy action. Survey recipients are not contacted automatically. Submissions remain unverified inventor-provided evidence and refresh affected work.
+
+The older invention route no longer tells Stage 5+ inventors those departments are “coming soon.” It routes them to the Journey Center, where plain-language statuses, the immediate next step, saved results, and required approvals are visible.
+
+Exact local verification: **130 test files / 703 tests**, web and Convex TypeScript, production dependency audit (**0 vulnerabilities**), direct Next.js production build (**36/36 static pages**), and `git diff --check` all pass. `npm run build` stops at Convex codegen because this environment has no Convex access token; no backend deploy was attempted. The direct Next.js build passed against the checked-in generated types. Exact-head CI and authenticated Netlify Preview acceptance remain pending the push.
+
+Do not claim every department agent has completed live provider-backed work: the department profiles and routing are covered by repository tests, but representative output acceptance still requires checking the newly pushed Preview and its intended backend. Keep PR #24 open/unmerged and Netlify production unpublished. No outside messages, survey distribution, payment, legal filing, supplier contact, or physical action was triggered.
+
+### Next verification steps
+
+1. Push the tested code and status updates to `inventsmith/full-product-build` and confirm exact-head CI.
+2. Wait for the matching Netlify Deploy Preview; test RiseJars Validation and confirm the low-confidence survey link is created once, shown, and copyable.
+3. Verify the existing uploaded `Data_All_260313` survey remains cited with its inventor-provided/unverified status and that its response data refreshes affected Validation sections.
+4. Check the Journey Center and downstream department routes in the signed-in Preview; report only department outputs actually generated and saved.
+5. If Preview Convex reports missing functions, determine the active deployment before any backend action. Do not run production-context builds or deploy to `agile-seahorse-379` or `fiery-gazelle-628`.

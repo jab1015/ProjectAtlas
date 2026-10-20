@@ -1,6 +1,10 @@
 # InventSmith Product Roadmap
 
-> **Delivery note (August 14, 2026):** This is the complete long-range journey roadmap. The controlled-pilot release is intentionally limited to Idea through Feasibility and IP Readiness as defined in `ATLAS_PRODUCT_RESET_V1.md`. Current build evidence and completion percentage are maintained in `ATLAS_BUILD_PROGRESS.md`.
+> **Delivery note (October 20, 2026):** This is the long-range 15-stage product roadmap. Repository implementation and automated checks cover the department workflows; authenticated provider-backed acceptance is still incomplete. Current verified status lives in `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`, `docs/INVENTSMITH_BUILD_PROGRESS.md`, and `docs/INVENTSMITH_CAPABILITY_MATRIX.md`. Do not use the historic pilot note below to infer that later department work is absent or that all agents are live-verified.
+
+## Current inventor experience checkpoint — October 20, 2026
+
+InventSmith’s Journey Center now leads with one plain-language next step and uses simple task statuses. Stage 5+ inventors arriving from the legacy invention page are sent to the department journey instead of a “coming soon” screen. A current Validation result at or below 50% automatically gets one tailored survey page and shareable link. The inventor decides where to share it; responses are tracked as inventor-provided, unverified evidence. Local verification is 130 test files / 703 tests, web and Convex TypeScript, zero production dependency vulnerabilities, and 36/36 pages in the direct Next.js build. Netlify Preview acceptance for this checkpoint is pending.
 ## From Idea to Market — The Complete Inventor Journey
 
 ---
@@ -15,7 +19,7 @@ InventSmith changes that.
 
 InventSmith provides inventors with a structured, AI-guided journey across 15 stages — from the first spark of an idea to a product growing in the market. Each stage is a defined unit of work with clear inputs, AI-powered guidance, concrete outputs, and a handoff to the next stage. The inventor always knows what to do next. InventSmith always knows where they are.
 
-**The architecture is complete.** All 15 stages are defined in the system. Stages 1–4 are live today. Stages 5–15 are queued and will be enabled one complete stage at a time as the product matures. The journey is always the destination — incremental delivery is a release strategy, not a product compromise.
+**The 15-stage journey is defined.** Repository code includes department workspaces, agent identities, routing, and prerequisite gates across the idea-to-market path. A visible route or queued task confirms availability, not successful live execution. Each department still needs provider-backed acceptance and a saved useful result before its operational readiness is claimed.
 
 **Every stage is independently valuable.** A first-time inventor completing Stage 2 (Validation) leaves with a structured analysis of their market opportunity — regardless of whether Stage 5 (Product Design) exists yet. Each stage delivers something real and usable. Each stage also prepares the inventor for what comes next, so the handoff is seamless when the next stage unlocks.
 

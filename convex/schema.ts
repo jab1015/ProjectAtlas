@@ -325,6 +325,7 @@ export default defineSchema({
     createdByUserId: v.id("users"),
     token: v.string(),
     kind: v.union(v.literal("survey"), v.literal("interview")),
+    purpose: v.optional(v.union(v.literal("validation_follow_up"))),
     title: v.string(),
     introduction: v.string(),
     questions: v.array(v.object({ id: v.string(), prompt: v.string() })),

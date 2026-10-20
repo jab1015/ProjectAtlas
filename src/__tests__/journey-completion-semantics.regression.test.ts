@@ -14,7 +14,7 @@ const journeyCenter = readFileSync(
 
 describe("journey completion semantics", () => {
   it("presents completed stages as completed InventSmith work rather than completed external action", () => {
-    expect(journeyPage).toContain('complete: { label: "Stage work complete"');
+    expect(journeyPage).toContain('complete: { label: "Done"');
     expect(journeyPage).toContain("InventSmith’s required work for that stage is complete");
     expect(journeyPage).toContain("It does not mean InventSmith contacted a supplier or professional");
     expect(journeyPage).toContain("placed an order or payment");
@@ -26,10 +26,7 @@ describe("journey completion semantics", () => {
 
   it("keeps professional-review completion language scoped to required stage work", () => {
     expect(journeyCenter).toContain(
-      "Professional review is required before required stage work for ${firstIncomplete.name} can be treated as complete.",
-    );
-    expect(journeyCenter).not.toContain(
-      "Professional review is required before ${firstIncomplete.name} can be treated as complete.",
+      "${firstIncomplete.name} is ready for a qualified professional to review.",
     );
   });
 });

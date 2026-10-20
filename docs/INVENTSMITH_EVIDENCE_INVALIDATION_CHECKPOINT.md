@@ -1,8 +1,16 @@
 # InventSmith Scoped Evidence Invalidation Checkpoint
 
-**Date:** September 14, 2026  
+**Date:** October 20, 2026
 **Branch:** `inventsmith/full-product-build`  
 **Status:** implemented; exact-head CI required before this checkpoint is called verified
+
+## Validation follow-up survey — October 20, 2026
+
+When the newest Validation report is complete, its evidence fingerprint matches current evidence, all sections completed, and average confidence is **50% or lower**, InventSmith now prepares one active, tailored survey page for the inventor to share. The backend rechecks report completion, evidence freshness, and the threshold before creating the page. Repeated page loads reuse the existing active follow-up survey instead of creating duplicates.
+
+Survey responses continue to create inventor-provided, unverified evidence records and enter the existing evidence-impact/Validation refresh path. Creating the page does not send invitations, messages, or posts. The Validation view makes the next step explicit and shows the copyable link. The threshold triggers more evidence collection; it does not inflate confidence or imply success probability.
+
+Repository regression coverage and local checks pass (130 files / 703 tests; both TypeScript checks; production dependency audit 0 vulnerabilities; Next.js build 36/36). Live Preview survey creation, response intake, and refresh acceptance remain pending exact-head deployment.
 
 ## Change
 
