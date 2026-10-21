@@ -13,9 +13,9 @@ const item = (kind: string, priority = 1) => ({
 });
 
 describe("autonomous work entitlements", () => {
-  it("keeps free work to research preview and reserves design/handoff for Pro", () => {
+  it("keeps autonomous research free and reserves design/handoff for Pro", () => {
     expect(canTierRunWorkKind("free", "preliminary_prior_art")).toBe(true);
-    expect(canTierRunWorkKind("free", "technical_feasibility")).toBe(false);
+    expect(canTierRunWorkKind("free", "technical_feasibility")).toBe(true);
     expect(canTierRunWorkKind("inventor", "feasibility_recommendation")).toBe(true);
     expect(canTierRunWorkKind("inventor", "concept_image_generation")).toBe(false);
     expect(canTierRunWorkKind("pro", "concept_image_generation")).toBe(true);
