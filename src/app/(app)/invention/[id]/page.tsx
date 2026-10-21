@@ -37,10 +37,19 @@ async function copyTextToClipboard(value: string): Promise<boolean> {
   textarea.value = value;
   textarea.setAttribute("readonly", "");
   textarea.style.position = "fixed";
-  textarea.style.opacity = "0";
+  textarea.style.top = "0";
+  textarea.style.left = "-9999px";
+  textarea.style.fontSize = "16px";
   document.body.appendChild(textarea);
+  textarea.focus();
   textarea.select();
-  const copied = document.execCommand("copy");
+  textarea.setSelectionRange(0, value.length);
+  let copied = false;
+  try {
+    copied = document.execCommand("copy");
+  } catch {
+    copied = false;
+  }
   textarea.remove();
   return copied;
 }
