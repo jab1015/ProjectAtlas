@@ -20,6 +20,36 @@ export interface WorkSelectionResult<T> {
 /** Keep provider spend and database contention bounded while allowing independent departments to work together. */
 export const MAX_CONCURRENT_DEPARTMENT_WORK_ITEMS = 3;
 
+// Research and draft-production jobs should not strand an invention after a
+// transient provider, retrieval, or image-generation failure. Recovery is
+// deliberately bounded so a genuinely broken job remains visible instead of
+// consuming credits forever.
+export const MAX_AUTOMATIC_RECOVERY_CYCLES = 2;
+const AUTOMATICALLY_RECOVERABLE_KINDS = new Set([
+  "assumptions_unknowns", "competitor_discovery", "technical_feasibility",
+  "market_feasibility", "preliminary_prior_art", "feature_prior_art_comparison",
+  "distinguishing_features", "ip_readiness", "patent_design_handoff",
+  "materials_manufacturing", "regulatory_screening", "evidence_verification",
+  "preliminary_bom_cost", "concept_image_generation", "product_render_generation",
+]);
+
+export function automaticRecoveryCount(inputSnapshot: Record<string, unknown> | undefined): number {
+  const value = inputSnapshot?.automaticRecoveryCount;
+  return typeof value === "number" && Number.isFinite(value) ? value : 0;
+}
+
+export function shouldAutomaticallyRecoverFailedWork(
+  kind: string | undefined,
+  inputSnapshot: Record<string, unknown> | undefined,
+  attemptCount: number,
+  maxAttempts = 3,
+): boolean {
+  return Boolean(
+    kind && AUTOMATICALLY_RECOVERABLE_KINDS.has(kind) && attemptCount >= maxAttempts &&
+      automaticRecoveryCount(inputSnapshot) < MAX_AUTOMATIC_RECOVERY_CYCLES,
+  );
+}
+
 export function selectNextWorkItem<T extends SchedulableWorkItem>(
   items: T[],
   availableCostUnits: number,
