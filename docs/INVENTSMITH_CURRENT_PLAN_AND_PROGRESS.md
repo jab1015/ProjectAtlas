@@ -32,6 +32,14 @@ Open acceptance items: confirm live per-department outputs and downstream handof
 
 **Updated:** October 21, 2026 (UTC)
 
+## Patent-to-design sequencing update — October 21, 2026
+
+- The automated patent department now researches live/current and inactive references, records the status evidence, compares the proposed features, and sends design-around constraints directly to Product Design.
+- Expired, lapsed, abandoned, withdrawn, discontinued, or otherwise inactive references are retained as prior-art context but are not treated as current enforcement blockers. Active or unclear-status overlap is carried forward as a design constraint and triggers materially different design directions when appropriate.
+- Product Design may begin after the automated patent comparison and differentiation handoff. It does not wait for the separate patent-professional readiness brief or professional review.
+- Patent-professional review remains a later legal gate for patentability, freedom to operate, claims, filing, and final legal strategy. This change authorizes preparatory design work, not legal clearance.
+- Commit: `4b33960 Let automated patent research guide design`. Focused checks: **17 tests passed** and TypeScript passed.
+
 # InventSmith Current Plan and Progress
 
 ## Current acceptance checkpoint — October 19, 2026
