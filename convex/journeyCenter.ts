@@ -3,6 +3,7 @@ import { query } from "./_generated/server";
 import { journeyStagesForProductType, routeForJourneyStage } from "./fullJourneyDefinition";
 import { classifyInvention } from "./inventionClassificationLogic";
 import { requireInventionReadAccess } from "./organizations";
+import { AUTONOMOUS_RESEARCH_KINDS } from "./statusBriefingLogic";
 
 function activityForWork(kind: string, title: string) {
   const activities: Record<string, string> = {
@@ -46,7 +47,9 @@ export const getJourneyCenter = query({
     const stageRows = journeyStages.map((stage) => {
       const relevant = stage.requiredWorkKinds.map((kind) => workItems.find((item) => item.kind === kind)).filter(Boolean);
       const completedCount = relevant.filter((item) => item?.status === "completed").length;
-      const blockedItems = relevant.filter((item) => item?.status === "blocked" || item?.status === "awaiting_approval");
+      const blockedItems = relevant.filter((item) =>
+        (item?.status === "blocked" && !AUTONOMOUS_RESEARCH_KINDS.has(item?.kind ?? "")) || item?.status === "awaiting_approval"
+      );
       const activeItems = relevant.filter((item) => item?.status === "queued" || item?.status === "running");
       const runningItems = relevant.filter((item) => item?.status === "running");
       const queuedItems = relevant.filter((item) => item?.status === "queued");
@@ -100,7 +103,9 @@ export const getJourneyCenter = query({
     const firstIncomplete = stageRows.find((stage) => stage.status !== "complete") ?? stageRows[stageRows.length - 1];
     const pendingApprovalCount = approvals.filter((item) => item.status === "pending").length;
     const openDecisionCount = decisions.filter((item) => item.status === "open").length;
-    const blockedWorkCount = workItems.filter((item) => item.status === "blocked" || item.status === "awaiting_approval").length;
+    const blockedWorkCount = workItems.filter((item) =>
+      (item.status === "blocked" && !AUTONOMOUS_RESEARCH_KINDS.has(item.kind)) || item.status === "awaiting_approval"
+    ).length;
     const pendingReviewCount = reviews.filter((item) => item.status !== "accepted" && item.status !== "declined").length;
     const completedStages = stageRows.filter((stage) => stage.status === "complete").length;
     const hasActiveValidationSurvey = evidenceRequests.some((request) => request.kind === "survey" && request.status === "active" && request.title.startsWith("[Validation follow-up]"));
