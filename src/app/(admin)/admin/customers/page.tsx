@@ -3,10 +3,11 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { Search, Users } from "lucide-react";
+import { ArrowRight, Gift, Search, Users } from "lucide-react";
 import { AdminHeader } from "@/components/admin";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 function formatCurrency(cents: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -94,8 +95,27 @@ export default function CustomersPage() {
     <div className="space-y-6">
       <AdminHeader
         title="Customers"
-        description={`${customers.length} unique customer${customers.length !== 1 ? "s" : ""}`}
+        description={`${customers.length} paying customer${customers.length !== 1 ? "s" : ""}`}
       />
+
+      <section className="flex flex-col gap-4 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3">
+          <Gift className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+          <div>
+            <h2 className="font-semibold">Manage every account</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              This page lists completed purchases only. Use the access console to select any registered user, grant beta or lifetime access, change plans, and adjust credits.
+            </p>
+          </div>
+        </div>
+        <Link
+          href="/admin/beta-access"
+          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+        >
+          Beta access &amp; credits
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      </section>
 
       {/* Search */}
       <div className="relative max-w-md">
