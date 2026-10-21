@@ -5,6 +5,7 @@ import { hasRecoverableAutonomousWork, shouldQueueEvidenceRefresh } from "./auto
 import { MAX_AUTONOMOUS_RUN_BUDGET } from "./usagePolicyLogic";
 import { EVIDENCE_FRESHNESS_STALE_REASON, isSourceEligibleForPromotion } from "./evidenceIntegrityLogic";
 import { departmentAgentAuditMetadata, resolveDepartmentAgent } from "./departmentAgentLogic";
+import { shouldAutomaticallyRecoverFailedWork } from "./workOrchestratorLogic";
 
 const findCandidates = makeFunctionReference<"query", Record<string, never>, Id<"inventions">[]>("autonomyMaintenance:findResumeCandidates");
 const runAvailableWork = makeFunctionReference<"action", { inventionId: Id<"inventions">; costBudgetUnits?: number }, unknown>("atlasWorkOrchestration:runAvailableWork");
@@ -83,13 +84,24 @@ export const recoverFailedWork = internalMutation({
     for (const invention of inventions) {
       const workItems = await ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).collect();
       for (const item of workItems) {
-        if (item.status !== "failed" || item.attemptCount >= (item.maxAttempts ?? 3)) continue;
+        if (item.status !== "failed") continue;
+        const maxAttempts = item.maxAttempts ?? 3;
+        const withinRetryBudget = item.attemptCount < maxAttempts;
+        const boundedAutomaticRecovery = shouldAutomaticallyRecoverFailedWork(item.kind, item.inputSnapshot, item.attemptCount, maxAttempts);
+        if (!withinRetryBudget && !boundedAutomaticRecovery) continue;
         let agent;
         try { agent = resolveDepartmentAgent(item.inputSnapshot, item.kind); } catch { continue; }
         await ctx.db.patch(item._id, {
           status: "queued",
           lastError: undefined,
-          inputSnapshot: { ...(item.inputSnapshot ?? {}), department: agent.department },
+          maxAttempts: boundedAutomaticRecovery ? item.attemptCount + 2 : item.maxAttempts,
+          inputSnapshot: {
+            ...(item.inputSnapshot ?? {}),
+            department: agent.department,
+            ...(boundedAutomaticRecovery
+              ? { automaticRecoveryCount: Number(item.inputSnapshot?.automaticRecoveryCount ?? 0) + 1, lastAutomaticRecoveryAt: now }
+              : {}),
+          },
           updatedAt: now,
         });
         await ctx.db.insert("atlasExecutionEvents", {
