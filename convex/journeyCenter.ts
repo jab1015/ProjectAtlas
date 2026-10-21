@@ -4,6 +4,25 @@ import { journeyStagesForProductType, routeForJourneyStage } from "./fullJourney
 import { classifyInvention } from "./inventionClassificationLogic";
 import { requireInventionReadAccess } from "./organizations";
 
+function activityForWork(kind: string, title: string) {
+  const activities: Record<string, string> = {
+    preliminary_prior_art: "Searching USPTO, Google Patents, and related patent sources",
+    feature_prior_art_comparison: "Comparing proposed features against prior-art references",
+    distinguishing_features: "Developing alternative embodiments and design-around options",
+    patent_design_handoff: "Preparing patent-to-design constraints for Product Design",
+    competitor_discovery: "Researching competing products and alternatives",
+    market_feasibility: "Assessing demand signals, customer pain, and market evidence",
+    assumptions_unknowns: "Building the assumptions and unknowns register",
+    technical_feasibility: "Assessing mechanisms, risks, and prototype questions",
+    design_candidate_generation: "Generating differentiated product design candidates",
+    design_candidate_scoring: "Scoring candidates for differentiation and feasibility",
+    product_design_specification: "Writing the preliminary Product Design Specification",
+    native_cad_generation: "Generating the preliminary parametric CAD model",
+    product_render_generation: "Preparing the product presentation artwork",
+  };
+  return activities[kind] ?? title;
+}
+
 export const getJourneyCenter = query({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, args) => {
@@ -29,6 +48,8 @@ export const getJourneyCenter = query({
       const completedCount = relevant.filter((item) => item?.status === "completed").length;
       const blockedItems = relevant.filter((item) => item?.status === "blocked" || item?.status === "awaiting_approval");
       const activeItems = relevant.filter((item) => item?.status === "queued" || item?.status === "running");
+      const runningItems = relevant.filter((item) => item?.status === "running");
+      const queuedItems = relevant.filter((item) => item?.status === "queued");
       const failedItems = relevant.filter((item) => item?.status === "failed");
       const staleItems = relevant.filter((item) => item?.status === "stale");
       const relevantWorkIds = new Set(relevant.map((item) => item ? String(item._id) : ""));
@@ -41,6 +62,12 @@ export const getJourneyCenter = query({
       const initialized = relevant.length > 0;
       const allWorkComplete = stage.requiredWorkKinds.length > 0 && completedCount === stage.requiredWorkKinds.length;
       const hasStaleDeliverable = stageDeliverables.some((item) => Boolean(item.staleReason));
+      const progressPercent = allWorkComplete
+        ? 100
+        : runningItems.length > 0
+          ? Math.max(1, Math.min(99, Math.round(((completedCount + 0.25) / Math.max(stage.requiredWorkKinds.length, 1)) * 100)))
+          : Math.round((completedCount / Math.max(stage.requiredWorkKinds.length, 1)) * 100);
+      const activeWork = runningItems[0] ?? queuedItems[0];
 
       let status: "complete" | "professional_review" | "blocked" | "working" | "ready_to_start" | "planned" | "needs_refresh" | "failed";
       if (staleItems.length > 0 || hasStaleDeliverable) status = "needs_refresh";
@@ -63,6 +90,10 @@ export const getJourneyCenter = query({
         failedCount: failedItems.length,
         pendingProfessionalReviews: pendingReviews.length,
         deliverableCount: stageDeliverables.length,
+        progressPercent,
+        activeWorkCount: runningItems.length,
+        queuedWorkCount: queuedItems.length,
+        activityLabel: activeWork ? activityForWork(activeWork.kind, activeWork.title) : null,
       };
     });
 
