@@ -36,7 +36,7 @@ export const create = mutation({
       token: token(),
       kind: args.kind,
       title: args.title?.trim() || `${invention.title} ${args.kind}`,
-      introduction: args.introduction?.trim() || `Help improve ${invention.title} by sharing your experience. Responses are used as inventor-provided customer evidence and are not independently verified.`,
+      introduction: args.introduction?.trim() || `Help improve ${invention.title} by sharing your experience. Responses are logged as site-collected customer-validation evidence and will be included in the next validation refresh.`,
       questions: prompts.map((prompt, index) => ({ id: `q${index + 1}`, prompt })),
       status: "active",
       responseCount: 0,
@@ -75,9 +75,10 @@ export const submit = mutation({
     if (!answers.length) throw new ConvexError("Please answer at least one question");
     const now = Date.now();
     const evidenceKind = request.kind === "survey" ? "survey" : "interview";
-    // Keep each anonymous response structured enough for Validation to consume
-    // it immediately. It remains inventor-provided/unverified; this only records
-    // that one respondent completed the public instrument.
+    // Keep each response structured enough for Validation to consume it
+    // immediately. A first-party response is not the same thing as an
+    // independently verified market study, but it is traceable customer-
+    // validation evidence and must not be presented as if it were ignored.
     const extraction = {
       mode: "public_response",
       documentType: request.kind === "survey" ? "public_survey_response" : "public_interview_response",
@@ -85,6 +86,8 @@ export const submit = mutation({
       questions: request.questions,
       answers,
       respondentName: args.respondentName?.trim() || undefined,
+      collectionStatus: "site_collected",
+      validationStatus: "counted_customer_signal",
       ...(request.kind === "survey"
         ? { sampleSize: 1, survey: { rowCount: 1, columnCount: request.questions.length } }
         : {}),
@@ -98,7 +101,19 @@ export const submit = mutation({
       accessedAt: now,
       excerpt: answers.map(answer => answer.answer).join("\n"),
       reliability: "unverified",
-      metadata: { provenance: "inventor_upload", evidenceOrigin: "public_response", evidenceKind, requestId: String(request._id), extractionStatus: "completed", extraction, uploadedAt: now, extractedAt: now },
+      metadata: {
+        provenance: "inventor_upload",
+        evidenceOrigin: "public_response",
+        evidenceKind,
+        requestId: String(request._id),
+        extractionStatus: "completed",
+        collectionStatus: "site_collected",
+        validationStatus: "counted_customer_signal",
+        traceability: "response_logged_with_request_and_timestamp",
+        extraction,
+        uploadedAt: now,
+        extractedAt: now,
+      },
       createdAt: now,
     });
     await ctx.db.patch(request._id, { responseCount: request.responseCount + 1, updatedAt: now });
