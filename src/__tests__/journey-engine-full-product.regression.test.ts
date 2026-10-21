@@ -38,8 +38,8 @@ describe("InventSmith journey engine full-product baseline", () => {
       "preliminary_prior_art",
       "feature_prior_art_comparison",
       "distinguishing_features",
-      "ip_readiness",
     ]));
+    expect(canonicalByKind.get("patent_design_handoff")?.dependsOnKinds).not.toContain("ip_readiness");
     expect(canonicalByKind.get("design_directions")?.dependsOnKinds).toContain("patent_design_handoff");
   });
 });
