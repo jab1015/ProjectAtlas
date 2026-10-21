@@ -46,7 +46,7 @@ Live limitation: survey attribution and confidence still need verification after
 - The handoff explicitly separates current design constraints from historical context: active/pending/in-force or unknown-status references can drive design-around changes; expired, lapsed, abandoned, withdrawn, or discontinued references remain visible as prior art but do not block design generation.
 - Product Design no longer waits for the separate `ip_readiness` counsel package or a professional review before generating differentiated candidates. Professional review remains required before patentability, freedom-to-operate, filing, or other legal conclusions.
 - Patent Readiness wording now tells the inventor what is happening in plain language and makes the “research first, design second, professional review after the package is assembled” sequence explicit.
-- Focused regression verification passed: **2 test files / 17 tests**, TypeScript, and `git diff --check`.
+- Full verification passed: **131 test files / 712 tests**, TypeScript, and `git diff --check`.
 
 # InventSmith Build Progress
 
