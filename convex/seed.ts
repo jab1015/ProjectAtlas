@@ -12,7 +12,6 @@ import { v } from "convex/values";
 
 const ADMIN_EMAILS = [
   "jerry.brown1015@gmail.com",
-  "jerry@modernmethods.it.com",
 ] as const;
 const ADMIN_SUBSCRIPTION_TIER = "enterprise";
 
