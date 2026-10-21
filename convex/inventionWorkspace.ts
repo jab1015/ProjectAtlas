@@ -21,6 +21,7 @@ import {
   resolveApprovalRequestHandler,
 } from "./consequentialApprovalMutation";
 import { departmentAgentAuditMetadata, resolveDepartmentAgent } from "./departmentAgentLogic";
+import { shouldAutomaticallyRecoverFailedWork } from "./workOrchestratorLogic";
 
 const runAvailableWork = makeFunctionReference<
   "action",
@@ -258,7 +259,10 @@ export const kickAutonomousWork = mutation({
     const workItems = await ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
     for (const item of workItems) {
       const recoverableResearchGate = item.status === "blocked" && item.humanGateType === "professional_review" && AUTONOMOUS_RESEARCH_KINDS.has(item.kind);
-      const recoverableFailure = item.status === "failed" && item.attemptCount < (item.maxAttempts ?? 3);
+      const recoverableFailure = item.status === "failed" && (
+        item.attemptCount < (item.maxAttempts ?? 3) ||
+        shouldAutomaticallyRecoverFailedWork(item.kind, item.inputSnapshot, item.attemptCount, item.maxAttempts ?? 3)
+      );
       if (!recoverableResearchGate && !recoverableFailure) continue;
       try {
         const agent = resolveDepartmentAgent(item.inputSnapshot, item.kind);
@@ -267,7 +271,14 @@ export const kickAutonomousWork = mutation({
           lastError: undefined,
           blockedReason: undefined,
           humanGateType: undefined,
-          inputSnapshot: { ...(item.inputSnapshot ?? {}), department: agent.department },
+          maxAttempts: item.attemptCount >= (item.maxAttempts ?? 3) ? item.attemptCount + 2 : item.maxAttempts,
+          inputSnapshot: {
+            ...(item.inputSnapshot ?? {}),
+            department: agent.department,
+            ...(item.attemptCount >= (item.maxAttempts ?? 3)
+              ? { automaticRecoveryCount: Number(item.inputSnapshot?.automaticRecoveryCount ?? 0) + 1, lastAutomaticRecoveryAt: now }
+              : {}),
+          },
           updatedAt: now,
         });
         await ctx.db.insert("atlasExecutionEvents", {
