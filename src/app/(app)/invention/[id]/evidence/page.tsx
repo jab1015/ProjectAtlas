@@ -48,6 +48,36 @@ function formatBytes(value: number | null | undefined) {
   return `${(value / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+async function copyTextToClipboard(value: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+  } catch {
+    // Use the iPhone-compatible selection fallback below.
+  }
+  const textarea = document.createElement("textarea");
+  textarea.value = value;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.top = "0";
+  textarea.style.left = "-9999px";
+  textarea.style.fontSize = "16px";
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  textarea.setSelectionRange(0, value.length);
+  let copied = false;
+  try {
+    copied = document.execCommand("copy");
+  } catch {
+    copied = false;
+  }
+  textarea.remove();
+  return copied;
+}
+
 function extractionStatusLabel(status: string | null | undefined) {
   if (status === "queued") return "Structured extraction queued";
   if (status === "running") return "Structured extraction running";
@@ -307,7 +337,7 @@ export default function InventionEvidencePage() {
         <section className="rounded-xl border border-primary/20 bg-primary/5 p-6 space-y-4">
           <div><p className="text-xs font-medium uppercase tracking-widest text-primary">Need evidence?</p><h2 className="mt-1 text-xl font-semibold">Let InventSmith collect it for you</h2><p className="mt-1 text-sm text-muted-foreground">Create a tailored survey or interview page, share the link, and responses will automatically become inventor-provided evidence and refresh affected departments.</p></div>
           <div className="flex flex-wrap items-center gap-3"><select value={requestKind} onChange={e => setRequestKind(e.target.value as "survey" | "interview")} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="survey">Create survey</option><option value="interview">Create interview page</option></select><Button type="button" variant="outline" disabled={creatingRequest} onClick={async () => { setError(null); setCreatingRequest(true); try { const result = await createRequest({ inventionId, kind: requestKind }); setShareLink(`${window.location.origin}/respond/${result.token}`); } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not create the survey link."); } finally { setCreatingRequest(false); } }}><ExternalLink className="mr-2 h-4 w-4" />{creatingRequest ? "Creating page…" : "Create shareable page"}</Button></div>
-          {shareLink && <div className="rounded-lg border border-border bg-background p-3 text-sm"><p className="font-medium">Share this link</p><p className="mt-1 break-all text-muted-foreground">{shareLink}</p><Button type="button" size="sm" variant="secondary" className="mt-2" onClick={() => void navigator.clipboard?.writeText(shareLink)}>Copy link</Button></div>}
+          {shareLink && <div className="rounded-lg border border-border bg-background p-3 text-sm"><p className="font-medium">Share this link</p><p className="mt-1 break-all text-muted-foreground select-all">{shareLink}</p><Button type="button" size="sm" variant="secondary" className="mt-2" onClick={async () => { const copied = await copyTextToClipboard(shareLink); setError(copied ? "Survey link copied." : "Copy was unavailable. Press and hold the link above to copy it."); }}>Copy link</Button></div>}
           {requests instanceof Error && <p role="alert" className="text-sm text-destructive">Previously created survey links could not be loaded. The evidence upload form remains available.</p>}
           {requests && !(requests instanceof Error) && requests.length > 0 && <div className="space-y-2">{requests.map(request => <p key={request._id} className="text-sm text-muted-foreground">{request.kind === "survey" ? "Survey" : "Interview"}: {request.responseCount} response{request.responseCount === 1 ? "" : "s"} · {request.status}</p>)}</div>}
         </section>
