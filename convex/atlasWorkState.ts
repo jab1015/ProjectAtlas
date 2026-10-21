@@ -200,8 +200,11 @@ export const claimNextWork = internalMutation({
     // bounded until an explicit retry or the normal recovery policy handles it.
     const legacyAgentFailureKinds = new Set([
       "brief_analysis", "assumptions_unknowns", "competitor_discovery", "market_feasibility",
-      "technical_feasibility", "preliminary_prior_art", "feature_prior_art_comparison",
-      "distinguishing_features", "patent_design_handoff", "ip_readiness", "regulatory_screening",
+      "technical_feasibility", "materials_manufacturing", "product_requirements", "design_directions",
+      "preliminary_bom_cost", "concept_image_generation", "engineering_handoff", "development_risks",
+      "evidence_verification", "feasibility_recommendation", "package_assembly", "preliminary_prior_art",
+      "feature_prior_art_comparison", "distinguishing_features", "patent_design_handoff", "ip_readiness",
+      "regulatory_screening",
     ]);
     const legacyAgentFailure = items.find((item) =>
       item.status === "failed" &&

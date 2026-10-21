@@ -70,6 +70,16 @@ const WORK_KIND_DEPARTMENT: Readonly<Record<string, DepartmentAgentKey>> = {
   // The original feasibility work item predates department metadata. Keep it
   // on the dedicated discovery/feasibility agent when a retry reconstructs it.
   technical_feasibility: "canonical",
+  materials_manufacturing: "manufacturing",
+  product_requirements: "product_design",
+  design_directions: "product_design",
+  preliminary_bom_cost: "product_design",
+  concept_image_generation: "product_design",
+  engineering_handoff: "product_design",
+  development_risks: "canonical",
+  evidence_verification: "canonical",
+  feasibility_recommendation: "canonical",
+  package_assembly: "canonical",
   preliminary_prior_art: "patent_readiness",
   feature_prior_art_comparison: "patent_readiness",
   distinguishing_features: "patent_readiness",
