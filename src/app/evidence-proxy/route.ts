@@ -3,6 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 const ALLOWED_CONVEX_HOSTS = new Set(["agile-seahorse-379.convex.cloud", "agile-seahorse-379.convex.site"]);
 
+export async function GET() {
+  return NextResponse.json({ ok: true, route: "evidence-proxy" });
+}
+
 export async function POST(request: NextRequest) {
   const uploadUrl = request.headers.get("x-convex-upload-url");
   if (!uploadUrl) return NextResponse.json({ error: "Missing upload target." }, { status: 400 });
