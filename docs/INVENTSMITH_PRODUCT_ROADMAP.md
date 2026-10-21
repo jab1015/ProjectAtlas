@@ -1,10 +1,18 @@
 # InventSmith Product Roadmap
 
-> **Delivery note (October 20, 2026):** This is the long-range 15-stage product roadmap. Repository implementation and automated checks cover the department workflows; authenticated provider-backed acceptance is still incomplete. Current verified status lives in `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`, `docs/INVENTSMITH_BUILD_PROGRESS.md`, and `docs/INVENTSMITH_CAPABILITY_MATRIX.md`. Do not use the historic pilot note below to infer that later department work is absent or that all agents are live-verified.
+## Cross-stage infrastructure workstream — secure storage for CAD and 3-D artifacts
 
-## Current inventor experience checkpoint — October 20, 2026
+This is an open platform task that must be completed before Product Design, Prototype, Manufacturing, or the export/package workflow can claim production-ready native CAD. Store large binary artifacts privately; keep metadata, permissions, versions, processing status, checksums, and audit history in the InventSmith data layer.
 
-InventSmith’s Journey Center now leads with one plain-language next step and uses simple task statuses. Stage 5+ inventors arriving from the legacy invention page are sent to the department journey instead of a “coming soon” screen. A current Validation result at or below 50% automatically gets one tailored survey page and shareable link. The inventor decides where to share it; responses are tracked as inventor-provided, unverified evidence. Local verification is 130 test files / 703 tests, web and Convex TypeScript, zero production dependency vulnerabilities, and 36/36 pages in the direct Next.js build. Netlify Preview acceptance for this checkpoint is pending.
+The planned design is provider-neutral: begin with private Vercel Blob for the Vercel deployment, using client/multipart uploads for large files, while preserving an adapter path to Cloudflare R2 or Amazon S3. Use encryption in transit and at rest, short-lived scoped URLs, strict organization/invention authorization, versioning, retention/lifecycle rules, backup/restore, revocation, and audit logs. Never expose public object URLs or provider credentials.
+
+**Reminder / task:** complete the storage decision, threat model, cost and retention plan, implementation, and large-file security tests soon. The task is complete only when a large CAD package can upload, resume, process, download, version, and be revoked safely.
+
+> **Delivery note (October 21, 2026):** This is the long-range 15-stage product roadmap. InventSmith now has a working Product Design surface and a verified Vercel Preview for the autonomous design-candidate workflow. Authenticated provider-backed execution across every department is still being accepted incrementally. Current verified status lives in `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`, `docs/INVENTSMITH_BUILD_PROGRESS.md`, and `docs/INVENTSMITH_CAPABILITY_MATRIX.md`. Do not treat a visible queue as proof of a saved AI result.
+
+## Current inventor experience checkpoint — October 21, 2026
+
+InventSmith’s Journey Center and Product Design surface now lead with plain-language status and a clear division of responsibility. Stage 5+ inventors arriving from the legacy invention page are sent to the department journey instead of a “coming soon” screen. Patent Readiness hands constraints to Product Design, and Product Design is instructed to generate at least three materially different candidates automatically before asking the inventor to choose. The verified Preview is `inventsmith-badyyve5a-inventors-os.vercel.app`; production promotion is waiting for Vercel’s Hobby deployment quota to reset. Local verification is 131 test files / 712 tests plus TypeScript and diff checks. Live execution of every downstream department still requires saved-output acceptance.
 ## From Idea to Market — The Complete Inventor Journey
 
 ---
