@@ -158,13 +158,20 @@ export default function InventionEvidencePage() {
     try {
       const currentExtraction = extraction ?? await extractEvidenceFromFile(file, evidenceKind);
       const uploadUrl = await generateUploadUrl({ inventionId });
-      const response = await fetch("/evidence-proxy", {
-        method: "POST",
-        headers: {
-          "Content-Type": file.type || "application/octet-stream",
-          "x-convex-upload-url": uploadUrl,
-        },
-        body: file,
+      const response = await new Promise<Response>((resolve, reject) => {
+        const request = new XMLHttpRequest();
+        request.open("POST", "/evidence-proxy");
+        request.responseType = "text";
+        request.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+        request.setRequestHeader("x-convex-upload-url", uploadUrl);
+        request.onload = () => {
+          const contentType = request.getResponseHeader("Content-Type") ?? "application/json";
+          resolve(new Response(request.responseText, { status: request.status, headers: { "Content-Type": contentType } }));
+        };
+        request.onerror = () => reject(new TypeError("Evidence upload transport failed."));
+        request.ontimeout = () => reject(new TypeError("Evidence upload timed out."));
+        request.timeout = 120000;
+        request.send(file);
       });
       if (!response.ok) {
         const detail = (await response.text()).trim();
