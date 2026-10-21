@@ -107,6 +107,7 @@ export const getJourneyCenter = query({
         total: evidence.length,
         inventorProvided: evidence.filter((item) => item.metadata?.provenance === "inventor_upload").length,
         verified: evidence.filter((item) => item.reliability !== "unverified").length,
+        customerValidationResponses: evidence.filter((item) => item.metadata?.evidenceOrigin === "public_response" && item.metadata?.validationStatus === "counted_customer_signal").length,
       },
     };
   },
