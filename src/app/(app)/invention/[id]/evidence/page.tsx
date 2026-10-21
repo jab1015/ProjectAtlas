@@ -112,6 +112,8 @@ export default function InventionEvidencePage() {
     fileName: string;
     fileSize: number | null;
     evidenceKind: string;
+    evidenceOrigin?: string | null;
+    validationStatus?: string | null;
     extractionStatus?: string | null;
     extractionSummary?: string | null;
     extractionError?: string | null;
@@ -139,6 +141,7 @@ export default function InventionEvidencePage() {
   const [requestKind, setRequestKind] = useState<"survey" | "interview">("survey");
   const [shareLink, setShareLink] = useState<string | null>(null);
   const [creatingRequest, setCreatingRequest] = useState(false);
+  const [copiedRequestId, setCopiedRequestId] = useState<string | null>(null);
 
   const kindLabels = useMemo(
     () => Object.fromEntries(EVIDENCE_KINDS.map(([value, label]) => [value, label])),
@@ -339,13 +342,13 @@ export default function InventionEvidencePage() {
           <div className="flex flex-wrap items-center gap-3"><select value={requestKind} onChange={e => setRequestKind(e.target.value as "survey" | "interview")} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="survey">Create survey</option><option value="interview">Create interview page</option></select><Button type="button" variant="outline" disabled={creatingRequest} onClick={async () => { setError(null); setCreatingRequest(true); try { const result = await createRequest({ inventionId, kind: requestKind }); setShareLink(`${window.location.origin}/respond/${result.token}`); } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not create the survey link."); } finally { setCreatingRequest(false); } }}><ExternalLink className="mr-2 h-4 w-4" />{creatingRequest ? "Creating page…" : "Create shareable page"}</Button></div>
           {shareLink && <div className="rounded-lg border border-border bg-background p-3 text-sm"><p className="font-medium">Share this link</p><p className="mt-1 break-all text-muted-foreground select-all">{shareLink}</p><Button type="button" size="sm" variant="secondary" className="mt-2" onClick={async () => { const copied = await copyTextToClipboard(shareLink); setError(copied ? "Survey link copied." : "Copy was unavailable. Press and hold the link above to copy it."); }}>Copy link</Button></div>}
           {requests instanceof Error && <p role="alert" className="text-sm text-destructive">Previously created survey links could not be loaded. The evidence upload form remains available.</p>}
-          {requests && !(requests instanceof Error) && requests.length > 0 && <div className="space-y-2">{requests.map(request => <p key={request._id} className="text-sm text-muted-foreground">{request.kind === "survey" ? "Survey" : "Interview"}: {request.responseCount} response{request.responseCount === 1 ? "" : "s"} · {request.status}</p>)}</div>}
+          {requests && !(requests instanceof Error) && requests.length > 0 && <div className="space-y-3">{requests.map(request => { const link = `${window.location.origin}/respond/${request.token}`; return <div key={request._id} className="rounded-lg border border-border bg-background p-3"><p className="text-sm font-medium">{request.kind === "survey" ? "Survey" : "Interview"}: {request.responseCount} response{request.responseCount === 1 ? "" : "s"} · {request.status}</p><p className="mt-1 break-all text-xs text-muted-foreground select-all">{link}</p>{request.status === "active" && <Button type="button" size="sm" variant="secondary" className="mt-2" onClick={async () => { const copied = await copyTextToClipboard(link); setCopiedRequestId(copied ? request._id : null); setError(copied ? "Survey link copied." : "Copy was unavailable. Press and hold the link above to copy it."); }}>{copiedRequestId === request._id ? "Copied" : "Copy link"}</Button>}</div>; })}</div>}
         </section>
 
         <section className="space-y-4">
           <div>
             <h2 className="text-xl font-semibold text-foreground">Inventor-provided evidence</h2>
-            <p className="text-sm text-muted-foreground">Uploaded evidence can refresh affected research and design work, but remains inventor-provided and unverified until InventSmith or a qualified reviewer evaluates its provenance and relevance.</p>
+            <p className="text-sm text-muted-foreground">Uploaded files remain inventor-provided and unverified until their provenance and relevance are reviewed. Responses collected through an InventSmith survey link are counted as customer-validation signals, but are not presented as independently verified market research.</p>
           </div>
 
           {evidence instanceof Error ? <p role="alert" className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">Evidence files could not be loaded. You can still use the upload form above; if this continues, copy the browser console error so we can identify the backend failure.</p> : evidence === undefined ? <p className="text-sm text-muted-foreground">Loading evidence…</p> : evidence.length === 0 ? (
@@ -366,7 +369,7 @@ export default function InventionEvidencePage() {
                         {item.extractionSummary && <p className="text-xs text-primary">Structured intake: {item.extractionSummary}</p>}
                         {statusLabel && <p className={`inline-flex items-center gap-1.5 text-xs ${item.extractionStatus === "failed" ? "text-destructive" : item.extractionStatus === "completed" ? "text-success" : "text-primary"}`}>{item.extractionStatus === "failed" ? <AlertTriangle className="h-3.5 w-3.5" /> : item.extractionStatus === "queued" || item.extractionStatus === "running" ? <DatabaseZap className="h-3.5 w-3.5" /> : null}{statusLabel}</p>}
                         {item.extractionError && <p className="max-w-2xl text-xs text-destructive">{item.extractionError}</p>}
-                        <p className="text-xs text-amber-700 dark:text-amber-400">Evidence state: unverified inventor upload</p>
+                        <p className={`text-xs ${item.evidenceOrigin === "public_response" || item.validationStatus === "counted_customer_signal" ? "text-success" : "text-amber-700 dark:text-amber-400"}`}>{item.evidenceOrigin === "public_response" || item.validationStatus === "counted_customer_signal" ? "Evidence state: counted customer-validation signal · collected on this site" : "Evidence state: unverified inventor upload"}</p>
                       </div>
                     </div>
                     <div className="flex gap-2 shrink-0 self-start">
