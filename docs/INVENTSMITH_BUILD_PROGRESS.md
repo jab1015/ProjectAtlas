@@ -30,6 +30,16 @@ Verification: **127 Vitest files / 695 tests passed**, `npx tsc --noEmit` passed
 
 Live limitation: survey attribution and confidence still need verification after the new Preview is built. Three-worker execution is verified by deterministic tests, not yet by a live AI run. Patent work remains dependency-gated; no legal opinion, filing, physical test, supplier contact, payment, or release is implied.
 
+## Current verified checkpoint — October 21, 2026
+
+- Journey Center status handling was hardened so completed stages are shown as complete, stale deliverables do not incorrectly reopen them, and autonomous research items are eligible for recovery even when an older gate classification is present.
+- Autonomous coverage now includes assumptions/unknowns, competitor discovery, technical feasibility, materials/manufacturing, evidence verification, preliminary BOM/cost, prior-art, market-feasibility, and regulatory research work. This allows eligible research to resume instead of remaining indefinitely queued.
+- Plain-language stage explanations were added to the Journey Center so the inventor can see what a stage is doing or why it is waiting.
+- Local verification passed: **131 test files / 712 tests**, `npx tsc --noEmit`, and `git diff --check`.
+- The guarded GitHub Actions workflow completed successfully for commit `8ada262fe7986c95b3c33fc11f1fdd074ddbc137`: typecheck, regression tests, and **Deploy Convex production backend** all succeeded. This verifies the Convex backend deployment only.
+- The branch contains the frontend changes, but the Vercel deployment currently visible is still serving an older frontend commit. The Journey Center UI changes are therefore **not yet live in the user-facing deployment** and require a fresh Vercel deployment/alias update.
+- No patentability, freedom-to-operate, prototype, professional-review, supplier, filing, payment, or other external-world conclusion is implied by this checkpoint. Prior-art research can produce design guidance; it cannot replace qualified legal review.
+
 # InventSmith Build Progress
 
 ## Latest controlled verification — October 19, 2026
