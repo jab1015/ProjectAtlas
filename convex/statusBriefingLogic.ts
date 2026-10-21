@@ -68,6 +68,18 @@ export const AUTONOMOUS_RESEARCH_KINDS = new Set([
   "design_candidate_generation",
 ]);
 
+// Older records may contain an open decision created before design-candidate
+// generation became an autonomous InventSmith work item. Treat it as stale
+// system state instead of asking the inventor to choose before candidates are
+// generated and scored.
+export function isAutonomousDecision(decision: { title?: string; question?: string }) {
+  const title = decision.title?.trim().toLowerCase() ?? "";
+  const question = decision.question?.trim().toLowerCase() ?? "";
+  return title === "generate evidence-backed product design candidates"
+    || title.includes("evidence-backed product design candidates")
+    || question.includes("generate evidence-backed product design candidates");
+}
+
 const newestFirst = <T extends { updatedAt: number }>(items: T[]) =>
   [...items].sort((a, b) => b.updatedAt - a.updatedAt);
 
@@ -99,7 +111,7 @@ export function buildStatusBriefing(input: StatusBriefingInput): StatusBriefing 
     }));
 
   const pendingDecisions = input.decisions
-    .filter((decision) => decision.status === "open")
+    .filter((decision) => decision.status === "open" && !isAutonomousDecision(decision))
     .map((decision) => ({
       type: "decision" as const,
       title: decision.title,

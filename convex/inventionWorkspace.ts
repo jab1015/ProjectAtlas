@@ -2,7 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { internalMutation, mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { makeFunctionReference } from "convex/server";
-import { AUTONOMOUS_RESEARCH_KINDS, buildStatusBriefing } from "./statusBriefingLogic";
+import { AUTONOMOUS_RESEARCH_KINDS, buildStatusBriefing, isAutonomousDecision } from "./statusBriefingLogic";
 import { canResolveDecision } from "./reviewLogic";
 import { MAX_AUTONOMOUS_RUN_BUDGET, remainingAutonomousCostUnitsAfterReservations, utcDateKey } from "./usagePolicyLogic";
 import { evaluatePilotPackage } from "./pilotEvaluationLogic";
@@ -63,7 +63,7 @@ export const getWorkspaceState = query({
       record,
       assumptions,
       findings,
-      decisions,
+      decisions: decisions.filter((decision) => !isAutonomousDecision(decision)),
       approvals,
       workItems,
       deliverables,
@@ -117,7 +117,7 @@ export const getReviewQueue = query({
 
     return {
       invention: { _id: invention._id, title: invention.title },
-      decisions: decisions.sort((a, b) => a.createdAt - b.createdAt),
+      decisions: decisions.filter((decision) => !isAutonomousDecision(decision)).sort((a, b) => a.createdAt - b.createdAt),
       approvals: approvals.sort((a, b) => a.requestedAt - b.requestedAt),
       blockedWork: blockedWork
         .filter((item) => !AUTONOMOUS_RESEARCH_KINDS.has(item.kind))
