@@ -36,10 +36,20 @@ interface JourneyCenterState {
   evidence: { total: number; inventorProvided: number; verified: number; customerValidationResponses: number };
 }
 
+interface StatusBriefing {
+  needsInventor: Array<{
+    type: "decision" | "approval" | "blocked_work";
+    title: string;
+    detail: string;
+    requestedAt: number;
+  }>;
+}
+
 const getJourneyCenter = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, JourneyCenterState>("journeyCenter:getJourneyCenter");
 const backfillWorkspace = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { addedWorkCount: number }>("inventionMigrations:backfillWorkspace");
 const kickAutonomousWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { scheduled: boolean; reason: string }>("inventionWorkspace:kickAutonomousWork");
 const listEvidenceRequests = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, Array<{ kind: "survey" | "interview"; title: string; status: "active" | "closed" }>>("evidenceRequests:list");
+const getStatusBriefing = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, StatusBriefing>("inventionWorkspace:getStatusBriefing");
 
 const STATUS: Record<JourneyStageRow["status"], { label: string; className: string }> = {
   complete: { label: "Done", className: "bg-success/10 text-success" },
@@ -70,6 +80,7 @@ export default function JourneyCenterPage() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const journey = useQuery(getJourneyCenter, isAuthenticated && inventionId ? { inventionId } : "skip");
   const evidenceRequests = useQuery(listEvidenceRequests, isAuthenticated && inventionId ? { inventionId } : "skip");
+  const briefing = useQuery(getStatusBriefing, isAuthenticated && inventionId ? { inventionId } : "skip");
   const migrateWorkspace = useMutation(backfillWorkspace);
   const kickWork = useMutation(kickAutonomousWork);
 
@@ -100,6 +111,9 @@ export default function JourneyCenterPage() {
   const nextAction = journey.currentStage.name === "Validation" && hasActiveValidationSurvey
     ? "Share your prepared survey with five people who may have this problem, then add their answers as evidence."
     : journey.nextAction;
+  const attentionItems = briefing?.needsInventor ?? [];
+  const attentionCount = journey.attention.pendingApprovals + journey.attention.openDecisions + journey.attention.blockedWork;
+  const reviewHref = `/invention/${inventionId}/review`;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -126,8 +140,8 @@ export default function JourneyCenterPage() {
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Stages done</p><p className="mt-2 text-2xl font-semibold">{journey.completedStages}/{journey.totalStages}</p><div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary" style={{ width: `${completion}%` }} /></div></div>
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Customer validation</p><p className="mt-2 text-2xl font-semibold">{journey.evidence.customerValidationResponses}</p><p className="mt-1 text-xs text-muted-foreground">site responses counted · {journey.evidence.verified} independently verified sources</p></div>
-            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Needs your attention</p><p className="mt-2 text-2xl font-semibold">{journey.attention.pendingApprovals + journey.attention.openDecisions + journey.attention.blockedWork}</p><p className="mt-1 text-xs text-muted-foreground">approvals, decisions, blocked work</p></div>
-            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Professional review</p><p className="mt-2 text-2xl font-semibold">{journey.attention.pendingProfessionalReviews}</p><p className="mt-1 text-xs text-muted-foreground">open review requirements</p></div>
+            <details className="group rounded-2xl border border-warning/40 bg-warning/5 p-5 [&_summary::-webkit-details-marker]:hidden"><summary className="cursor-pointer list-none"><div className="flex items-start justify-between gap-3"><div><p className="text-xs uppercase tracking-wider text-warning">Needs your attention</p><p className="mt-2 text-2xl font-semibold">{attentionCount}</p><p className="mt-1 text-xs text-muted-foreground">Tap to see exactly what to do</p></div><span className="mt-1 text-xl text-warning transition-transform group-open:rotate-180">⌄</span></div></summary><div className="mt-5 border-t border-warning/20 pt-4"><p className="text-sm font-medium">InventSmith is waiting for these specific actions:</p>{attentionItems.length > 0 ? <div className="mt-3 space-y-3">{attentionItems.map((item) => <div key={`${item.type}-${item.title}-${item.requestedAt}`} className="rounded-xl border border-border bg-card p-4"><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{item.type === "decision" ? "Your decision" : item.type === "approval" ? "Your authorization" : "Information needed"}</p><p className="mt-1 font-medium">{item.title}</p><p className="mt-1 text-sm text-muted-foreground">{item.detail}</p><Link href={reviewHref} className="mt-3 inline-flex text-sm font-medium text-primary underline underline-offset-4">Open and respond</Link></div>)}</div> : <p className="mt-3 text-sm text-muted-foreground">The attention details are still loading. Open the review queue to see the current items.</p>}<Link href={reviewHref} className="mt-4 inline-flex text-sm font-semibold text-primary">Open full review queue →</Link></div></details>
+            <Link href={`/invention/${inventionId}/review`} className="rounded-2xl border border-border bg-card p-5 no-underline transition-colors hover:border-primary/30 hover:bg-muted/20"><p className="text-xs uppercase tracking-wider text-muted-foreground">Professional review</p><p className="mt-2 text-2xl font-semibold">{journey.attention.pendingProfessionalReviews}</p><p className="mt-1 text-xs text-muted-foreground">Tap to see what the reviewer must check</p></Link>
           </section>
 
           <section className="rounded-2xl border border-border bg-card p-6 sm:p-7">
@@ -141,7 +155,7 @@ export default function JourneyCenterPage() {
                 const Icon = stageIcon(stage.status);
                 const status = STATUS[stage.status];
                 return (
-                  <Link key={stage.id} href={stage.href} className="block rounded-2xl border border-border bg-card p-5 no-underline transition-colors hover:border-primary/30 hover:bg-muted/20">
+                  <Link key={stage.id} href={stage.status === "blocked" || stage.status === "professional_review" ? reviewHref : stage.href} className="block rounded-2xl border border-border bg-card p-5 no-underline transition-colors hover:border-primary/30 hover:bg-muted/20">
                     <div className="flex items-start gap-4">
                       <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${stage.status === "complete" ? "bg-success/10 text-success" : stage.id === journey.currentStage.id ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}><Icon className="h-5 w-5" /></div>
                       <div className="min-w-0 flex-1"><div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Stage {stage.id}</p><h3 className="mt-1 font-semibold text-foreground">{stage.name}</h3></div><span className={`w-fit rounded-full px-3 py-1 text-xs font-medium ${status.className}`}>{status.label}</span></div><div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted-foreground"><span>{stage.completedWorkCount}/{stage.requiredWorkCount} tasks done</span><span>{stage.deliverableCount} saved results</span>{stage.blockedCount > 0 && <span>{stage.blockedCount} waiting for you</span>}{stage.pendingProfessionalReviews > 0 && <span>{stage.pendingProfessionalReviews} expert reviews</span>}</div></div>
