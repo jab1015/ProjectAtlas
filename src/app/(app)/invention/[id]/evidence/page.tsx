@@ -166,7 +166,10 @@ export default function InventionEvidencePage() {
         },
         body: file,
       });
-      if (!response.ok) {\n        const detail = (await response.text()).trim();\n        throw new Error(detail ? `Evidence upload failed (${response.status}): ${detail.slice(0, 240)}` : `Evidence upload failed (${response.status}).`);\n      }
+      if (!response.ok) {
+        const detail = (await response.text()).trim();
+        throw new Error(detail ? `Evidence upload failed (${response.status}): ${detail.slice(0, 240)}` : `Evidence upload failed (${response.status}).`);
+      }
       const { storageId } = (await response.json()) as { storageId: Id<"_storage"> };
 
       await registerEvidence({
