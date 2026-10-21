@@ -21,7 +21,7 @@ import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
 import { getSafeValidationFailureMessage, getValidationCompletionLabel, getValidationResearchViewState } from "@/lib/validationResearchView";
 import { makeFunctionReference } from "convex/server";
 
-const PUBLIC_SURVEY_APP_URL = "https://inventsmith-fey5av9bc-inventors-os.vercel.app";
+const PUBLIC_SURVEY_APP_URL = "https://inventsmith.vercel.app";
 
 function getPublicSurveyUrl(token: string): string {
   return `${PUBLIC_SURVEY_APP_URL}/respond/${token}`;
