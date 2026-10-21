@@ -89,14 +89,31 @@ export default function BetaAccessPage() {
         {accounts === undefined ? <p className="mt-5 text-sm text-muted-foreground">Loading accounts…</p> : accounts.length === 0 ? <p className="mt-5 text-sm text-muted-foreground">No accounts found.</p> : (
           <div className="mt-5 overflow-x-auto rounded-md border">
             <table className="w-full text-sm">
-              <thead><tr className="border-b bg-muted/50"><th className="px-3 py-2 text-left">Account</th><th className="px-3 py-2 text-left">Access</th><th className="px-3 py-2 text-right">Credits</th><th className="px-3 py-2 text-right">Actions</th></tr></thead>
+              <thead><tr className="border-b bg-muted/50"><th className="px-3 py-2 text-left">Account</th><th className="px-3 py-2 text-left">Access</th><th className="hidden px-3 py-2 text-right md:table-cell">Credits</th><th className="hidden px-3 py-2 text-right md:table-cell">Actions</th></tr></thead>
               <tbody>{accounts.map((account) => (
                 <Fragment key={String(account.userId)}>
                 <tr className="border-b last:border-0">
                   <td className="px-3 py-3"><div className="font-medium">{account.name || account.email}</div><div className="text-muted-foreground">{account.email}</div></td>
-                  <td className="px-3 py-3"><div>{account.planKey}</div>{account.override && <div className="text-xs text-muted-foreground">{account.override.expiresAt ? `until ${formatDate(account.override.expiresAt)}` : "Lifetime access · no expiration"} · {account.override.reason}</div>}</td>
-                  <td className="px-3 py-3 text-right font-medium">{account.creditBalance}</td>
-                  <td className="space-x-2 whitespace-nowrap px-3 py-3 text-right">
+                  <td className="px-3 py-3"><div>{account.planKey}</div>{account.override && <div className="text-xs text-muted-foreground">{account.override.expiresAt ? `until ${formatDate(account.override.expiresAt)}` : "Lifetime access · no expiration"} · {account.override.reason}</div>}
+                    <div className="mt-3 flex flex-wrap gap-2 md:hidden">
+                      <Button size="sm" variant="outline" onClick={() => {
+                        const userId = String(account.userId);
+                        if (editingUserId === userId) {
+                          setEditingUserId("");
+                        } else {
+                          setEditingUserId(userId);
+                          setPlanKey(PLANS.includes(account.planKey as (typeof PLANS)[number]) ? account.planKey as (typeof PLANS)[number] : "enterprise");
+                          setLifetime(false);
+                          setConfirmLifetime(false);
+                          setDurationDays("30");
+                        }
+                      }}>{editingUserId === String(account.userId) ? "Close" : "Manage access"}</Button>
+                      {account.organizationId && <><Button size="sm" variant="outline" onClick={() => void changeCredits(String(account.organizationId), 100)}>+100 credits</Button><Button size="sm" variant="outline" onClick={() => void changeCredits(String(account.organizationId), -100)} disabled={account.creditBalance < 100}>-100 credits</Button></>}
+                      {account.override && <Button size="sm" variant="destructive" onClick={async () => { const why = window.prompt("Reason for revocation:", "Beta period ended"); if (why?.trim()) await revokeAccess({ overrideId: account.override!._id, reason: why }); }}>Revoke</Button>}
+                    </div>
+                  </td>
+                  <td className="hidden px-3 py-3 text-right font-medium md:table-cell">{account.creditBalance}</td>
+                  <td className="hidden space-x-2 whitespace-nowrap px-3 py-3 text-right md:table-cell">
                     <Button size="sm" variant="outline" onClick={() => {
                       const userId = String(account.userId);
                       if (editingUserId === userId) {
