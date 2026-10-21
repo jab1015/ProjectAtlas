@@ -20,6 +20,7 @@ import {
   requestApprovalHandler,
   resolveApprovalRequestHandler,
 } from "./consequentialApprovalMutation";
+import { departmentAgentAuditMetadata, resolveDepartmentAgent } from "./departmentAgentLogic";
 
 const runAvailableWork = makeFunctionReference<
   "action",
@@ -248,6 +249,32 @@ export const kickAutonomousWork = mutation({
           usage?.reservedAutonomousCostUnits ?? 0
         );
     if (remaining === 0) return { scheduled: false, reason: "daily_usage_limit" as const };
+    const now = Date.now();
+    const workItems = await ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+    for (const item of workItems) {
+      if (item.status !== "failed" || item.attemptCount >= (item.maxAttempts ?? 3)) continue;
+      try {
+        const agent = resolveDepartmentAgent(item.inputSnapshot, item.kind);
+        await ctx.db.patch(item._id, {
+          status: "queued",
+          lastError: undefined,
+          inputSnapshot: { ...(item.inputSnapshot ?? {}), department: agent.department },
+          updatedAt: now,
+        });
+        await ctx.db.insert("atlasExecutionEvents", {
+          inventionId,
+          workItemId: item._id,
+          eventType: "work_queued",
+          actorType: "system",
+          summary: `InventSmith automatically recovered ${item.title} and returned it to the worker queue.`,
+          attemptNumber: item.attemptCount,
+          metadata: { changeType: "automatic_failure_recovery", ...departmentAgentAuditMetadata({ ...(item.inputSnapshot ?? {}), department: agent.department }, item.kind) },
+          createdAt: now,
+        });
+      } catch {
+        // Leave genuinely unmapped or exhausted failures visible for repair.
+      }
+    }
     await ctx.scheduler.runAfter(0, runAvailableWork, {
       inventionId,
       costBudgetUnits: Math.min(MAX_AUTONOMOUS_RUN_BUDGET, remaining),
