@@ -171,7 +171,7 @@ export default function InventionEvidencePage() {
         request.onerror = () => reject(new TypeError("Evidence upload transport failed."));
         request.ontimeout = () => reject(new TypeError("Evidence upload timed out."));
         request.timeout = 120000;
-        request.send(file);
+        void file.arrayBuffer().then((buffer) => request.send(buffer)).catch(reject);
       });
       if (!response.ok) {
         const detail = (await response.text()).trim();
