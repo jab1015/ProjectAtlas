@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useConvexAuth } from "convex/react";
@@ -24,6 +24,8 @@ const getActiveAccessibleInvention = makeFunctionReference<"query", Record<strin
 const getStatusBriefing = makeFunctionReference<"query", { inventionId: string }, StatusBriefingData>("inventionWorkspace:getStatusBriefing");
 const backfillWorkspace = makeFunctionReference<"mutation", { inventionId: string }, { recordCreated: boolean; addedWorkCount: number; alreadyCurrent: boolean }>("inventionMigrations:backfillWorkspace");
 const kickAutonomousWork = makeFunctionReference<"mutation", { inventionId: string }, { scheduled: boolean }>("inventionWorkspace:kickAutonomousWork");
+const getWorkspaceState = makeFunctionReference<"query", { inventionId: string }, { workItems: Array<{ _id: string; status: string }> }>("inventionWorkspace:getWorkspaceState");
+const retryFailedWorkItem = makeFunctionReference<"mutation", { inventionId: string; workItemId: string }, { queued: boolean; reason: string }>("workRetryMutation:retryFailedWorkItem");
 
 interface JourneyCenterState {
   invention: { _id: Id<"inventions">; title: string; updatedAt: number };
@@ -50,7 +52,10 @@ export default function DashboardPage() {
 
   const migrateWorkspace = useMutation(backfillWorkspace);
   const kickWork = useMutation(kickAutonomousWork);
+  const retryWorkItem = useMutation(retryFailedWorkItem);
   const canEdit = activeInvention?.access === "manage" || activeInvention?.access === "edit";
+  const workspace = useQuery(getWorkspaceState, activeInvention ? { inventionId: activeInvention._id } : "skip");
+  const retryAttemptedRef = useRef(false);
   const canManage = activeInvention?.access === "manage";
 
   useEffect(() => {
@@ -58,12 +63,17 @@ export default function DashboardPage() {
     void (async () => {
       try {
         await migrateWorkspace({ inventionId: activeInvention._id });
+        if (!retryAttemptedRef.current && workspace?.workItems) {
+          retryAttemptedRef.current = true;
+          const failed = workspace.workItems.filter((item) => item.status === "failed").slice(0, 3);
+          await Promise.all(failed.map((item) => retryWorkItem({ inventionId: activeInvention._id, workItemId: item._id })));
+        }
         await kickWork({ inventionId: activeInvention._id });
       } catch {
         // Dashboard remains available when background execution is temporarily unavailable.
       }
     })();
-  }, [activeInvention, canEdit, migrateWorkspace, kickWork]);
+  }, [activeInvention, canEdit, kickWork, migrateWorkspace, retryWorkItem, workspace]);
 
   const briefing = useQuery(getStatusBriefing, activeInvention ? { inventionId: activeInvention._id } : "skip");
   const journey = useQuery(getJourneyCenter, activeInvention ? { inventionId: activeInvention._id } : "skip");
