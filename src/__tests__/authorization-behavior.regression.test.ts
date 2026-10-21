@@ -164,8 +164,8 @@ describe("invention authorization behavior", () => {
 });
 
 describe("backend entitlement behavior", () => {
-  it("does not grant paid lifecycle work to the Explorer tier", () => {
-    expect(canTierRunWorkKind("explorer", "product_requirements")).toBe(false);
+  it("allows autonomous research preparation for the Explorer tier", () => {
+    expect(canTierRunWorkKind("explorer", "product_requirements")).toBe(true);
   });
 
   it("allows an entitled tier to execute applicable lifecycle work", () => {
