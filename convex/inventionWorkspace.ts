@@ -150,6 +150,18 @@ export const getDeliverableLibrary = query({
       sources,
       reviews,
       executionEvents: executionEvents.sort((a, b) => b.createdAt - a.createdAt).slice(0, 50),
+      workItems: workItems
+        .sort((a, b) => a.priority - b.priority || a.createdAt - b.createdAt)
+        .map((item) => ({
+          workItemId: item._id,
+          kind: item.kind,
+          title: item.title,
+          status: item.status,
+          attemptCount: item.attemptCount,
+          updatedAt: item.updatedAt,
+          blockedReason: item.blockedReason,
+          outputSummary: item.outputSummary,
+        })),
       failedWork: workItems
         .filter((item) => item.status === "failed")
         .sort((a, b) => b.updatedAt - a.updatedAt)
