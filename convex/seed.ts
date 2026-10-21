@@ -1,5 +1,5 @@
 /**
- * InventSmith seed: ensures jerry.brown1015@gmail.com has admin + enterprise tier.
+ * InventSmith seed: ensures designated owner/admin accounts have admin + enterprise tier.
  * Runs idempotently — safe to call multiple times.
  *
  * This is an internalMutation so it can only be triggered from trusted contexts
@@ -10,42 +10,46 @@
 import { internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 
-const ADMIN_EMAIL = "jerry.brown1015@gmail.com";
+const ADMIN_EMAILS = [
+  "jerry.brown1015@gmail.com",
+  "jerry@modernmethods.it.com",
+] as const;
 const ADMIN_SUBSCRIPTION_TIER = "enterprise";
 
 export const ensureAdminUser = internalMutation({
   args: {},
   handler: async (ctx) => {
-    // Look up user by email
-    const existing = await ctx.db
-      .query("users")
-      .withIndex("email", (q) => q.eq("email", ADMIN_EMAIL))
-      .first();
+    let updated = false;
+    const userIds: string[] = [];
+    for (const email of ADMIN_EMAILS) {
+      const existing = await ctx.db
+        .query("users")
+        .withIndex("email", (q) => q.eq("email", email))
+        .first();
 
-    if (existing) {
-      // Update role and tier if not already set correctly
-      if (existing.role !== "admin" || existing.subscriptionTier !== ADMIN_SUBSCRIPTION_TIER) {
-        await ctx.db.patch(existing._id, {
-          role: "admin",
-          subscriptionTier: ADMIN_SUBSCRIPTION_TIER,
-        });
+      if (existing) {
+        userIds.push(String(existing._id));
+        if (existing.role !== "admin" || existing.subscriptionTier !== ADMIN_SUBSCRIPTION_TIER) {
+          await ctx.db.patch(existing._id, {
+            role: "admin",
+            subscriptionTier: ADMIN_SUBSCRIPTION_TIER,
+          });
+          updated = true;
+        }
+        continue;
       }
-      return { updated: true, userId: existing._id };
+
+      const userId = await ctx.db.insert("users", {
+        email,
+        role: "admin",
+        subscriptionTier: ADMIN_SUBSCRIPTION_TIER,
+        createdAt: Date.now(),
+      });
+      userIds.push(String(userId));
+      updated = true;
     }
 
-    // User hasn't signed up yet — create a placeholder record.
-    // When they sign in via @convex-dev/auth, the auth system will find
-    // their email and merge, or we match post-login.
-    // NOTE: The actual merge happens in users.ts store callback —
-    // so we just pre-create the user row here.
-    const userId = await ctx.db.insert("users", {
-      email: ADMIN_EMAIL,
-      role: "admin",
-      subscriptionTier: ADMIN_SUBSCRIPTION_TIER,
-      createdAt: Date.now(),
-    });
-
-    return { created: true, userId };
+    return { updated, userIds };
   },
 });
 
@@ -56,7 +60,7 @@ export const ensureAdminUser = internalMutation({
 export const ensureAdminAuthAccount = internalMutation({
   args: { secretHash: v.string() },
   handler: async (ctx, args) => {
-    const email = ADMIN_EMAIL;
+    const email = ADMIN_EMAILS[0];
     const existingUsers = await ctx.db.query("users").withIndex("email", (q) => q.eq("email", email)).collect();
     const user = existingUsers.find((candidate) => candidate.role === "admin") ?? existingUsers[0];
     const userId = user?._id ?? await ctx.db.insert("users", {
