@@ -24,6 +24,8 @@ export const CANONICAL_WORK_PLAN: readonly CanonicalWorkPlanItem[] = [
   {
     kind: "patent_design_handoff",
     title: "Hand patent constraints and differentiation targets to Product Design",
+    // This handoff is intentionally driven by automated prior-art analysis;
+    // the separate professional package must not block preliminary design work.
     priority: 55,
     estimatedCostUnits: 10,
     deliverableKind: "patent_design_handoff",
