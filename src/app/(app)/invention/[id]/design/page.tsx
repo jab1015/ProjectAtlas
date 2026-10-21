@@ -55,6 +55,24 @@ const STATUS_LABELS: Record<string, string> = {
   stale: "Refresh needed",
 };
 
+const AUTONOMOUS_DESIGN_KINDS = new Set([
+  "design_candidate_generation",
+  "design_candidate_scoring",
+  "product_design_specification",
+  "cad_model_specification",
+  "exploded_view_specification",
+  "manufacturing_drawing_specification",
+  "native_cad_generation",
+  "product_render_generation",
+]);
+
+function displayStatus(item: Doc<"atlasWorkItems">) {
+  if (AUTONOMOUS_DESIGN_KINDS.has(item.kind) && (item.status === "blocked" || item.status === "awaiting_approval")) {
+    return item.status === "awaiting_approval" ? "Queued for review" : "InventSmith working";
+  }
+  return STATUS_LABELS[item.status] ?? item.status;
+}
+
 function statusClass(status: string) {
   if (status === "completed") return "bg-success/10 text-success";
   if (status === "running") return "bg-primary/10 text-primary";
@@ -135,7 +153,7 @@ export default function ProductDesignStudioPage() {
   if (!workspace) return null;
 
   const completed = workspace.workItems.filter((item) => item.status === "completed").length;
-  const active = workspace.workItems.filter((item) => item.status === "running" || item.status === "queued").length;
+  const active = workspace.workItems.filter((item) => item.status === "running" || item.status === "queued" || (AUTONOMOUS_DESIGN_KINDS.has(item.kind) && item.status === "blocked")).length;
   const latestDeliverables = [...workspace.deliverables].sort((a, b) => b.updatedAt - a.updatedAt);
   const latestCadGeneration = selectCurrentSynchronizedCadGeneration(cadArtifacts) ?? [];
   const latestCadNeedsRefresh = latestCadGeneration.some((artifact) => Boolean(artifact.staleReason));
@@ -184,7 +202,8 @@ export default function ProductDesignStudioPage() {
             <div className="grid gap-3">
               {workspace.workItems.length === 0 ? <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Start Product Design to create the design queue.</div> : workspace.workItems.map((item) => {
                 const guidance = workItemGuidance(item);
-                return <article key={item._id} className="rounded-xl border border-border bg-card p-5"><div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div className="min-w-0"><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{item.kind.replaceAll("_", " ")}</p><h3 className="mt-1 font-semibold">{item.title}</h3>{item.outputSummary && <p className="mt-2 text-sm text-muted-foreground">{item.outputSummary}</p>}{guidance && <p className="mt-2 text-sm text-muted-foreground">{guidance}</p>}{item.blockedReason && <p className="mt-2 flex items-start gap-2 text-sm text-warning"><ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />{item.blockedReason}</p>}{item.kind === "design_candidate_generation" && item.status === "completed" && <Button asChild variant="outline" size="sm" className="mt-3"><Link href={`/invention/${inventionId}/work`}>Review design candidates</Link></Button>}</div><span className={`w-fit shrink-0 rounded-full px-3 py-1 text-xs font-medium ${statusClass(item.status)}`}>{STATUS_LABELS[item.status] ?? item.status}</span></div></article>;
+                const autonomous = AUTONOMOUS_DESIGN_KINDS.has(item.kind);
+                return <article key={item._id} className="rounded-xl border border-border bg-card p-5"><div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div className="min-w-0"><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{item.kind.replaceAll("_", " ")}</p><h3 className="mt-1 font-semibold">{item.title}</h3>{item.outputSummary && <p className="mt-2 text-sm text-muted-foreground">{item.outputSummary}</p>}{guidance && <p className="mt-2 text-sm text-muted-foreground">{guidance}</p>}{item.blockedReason && !autonomous && <p className="mt-2 flex items-start gap-2 text-sm text-warning"><ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />{item.blockedReason}</p>}{item.kind === "design_candidate_generation" && item.status === "completed" && <Button asChild variant="outline" size="sm" className="mt-3"><Link href={`/invention/${inventionId}/work`}>Review design candidates</Link></Button>}</div><span className={`w-fit shrink-0 rounded-full px-3 py-1 text-xs font-medium ${statusClass(item.status)}`}>{displayStatus(item)}</span></div></article>;
               })}
             </div>
           </section>
