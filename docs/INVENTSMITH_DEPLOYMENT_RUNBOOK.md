@@ -1,5 +1,14 @@
 # InventSmith Owner-Controlled Deployment and Acceptance Runbook
 
+### Current deployment checkpoint — October 21, 2026
+
+- GitHub branch `inventsmith/full-product-build` contains the Journey Center/autonomous-work fixes through commit `8ada262fe7986c95b3c33fc11f1fdd074ddbc137`.
+- Verification is green: **131 test files / 712 tests**, TypeScript, and diff checks.
+- The guarded GitHub Actions production Convex workflow completed successfully, including typecheck, regression tests, and the Convex production deploy step.
+- The frontend remains a separate deployment concern. The currently visible Vercel deployment is behind the branch head and does not yet prove the new Journey Center UI is live. Create and verify a fresh Vercel deployment before reporting the frontend changes as deployed.
+- Acceptance sequence after the frontend deployment: sign in, open Journey Center, confirm plain-language status explanations, confirm completed stages remain complete, confirm eligible autonomous work is not permanently queued, and inspect Validation/Market Research evidence refresh behavior.
+- Do not treat a successful Convex deploy as patent clearance, prototype completion, professional approval, or production acceptance. Keep `fiery-gazelle-628` untouched and do not use Netlify for this work.
+
 ### Latest checkpoint — October 19, 2026
 
 The repository now sets Netlify contexts to a website-only `npx next build`; the historical Convex-upload incident below remains part of the audit record but this current config contains no Convex CLI command. Auto Publishing remains locked; do not publish a production deploy. PR #24 remains open/draft/unmerged.
