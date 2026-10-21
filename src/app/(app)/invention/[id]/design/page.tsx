@@ -78,6 +78,13 @@ function maturityLabel(maturity?: NativeCadArtifact["artifactMaturity"]) {
   return "Preliminary CAD";
 }
 
+function workItemGuidance(item: Doc<"atlasWorkItems">) {
+  if (item.kind === "design_candidate_generation") {
+    return "InventSmith should create at least three materially different design concepts automatically. You do not need to choose, draw, or upload anything yet. When the concepts are ready, review them and choose which direction should move toward a prototype.";
+  }
+  return null;
+}
+
 export default function ProductDesignStudioPage() {
   const params = useParams();
   const router = useRouter();
@@ -221,9 +228,10 @@ export default function ProductDesignStudioPage() {
             <summary className="cursor-pointer list-none text-xl font-semibold marker:hidden">Detailed design pipeline <span className="ml-2 text-sm font-normal text-muted-foreground group-open:hidden">(tap to expand)</span><span className="ml-2 text-sm font-normal text-muted-foreground hidden group-open:inline">(tap to collapse)</span></summary>
             <p className="mt-2 text-sm text-muted-foreground">Dependencies are enforced automatically. InventSmith advances each task when its prerequisites are ready.</p>
             <div className="mt-4 grid gap-3">
-              {workspace.workItems.length === 0 ? <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Start Product Design to create the design queue.</div> : workspace.workItems.map((item) => (
-                <article key={item._id} className="rounded-xl border border-border bg-card p-5"><div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div className="min-w-0"><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{item.kind.replaceAll("_", " ")}</p><h3 className="mt-1 font-semibold">{item.title}</h3>{item.outputSummary && <p className="mt-2 text-sm text-muted-foreground">{item.outputSummary}</p>}{item.blockedReason && <p className="mt-2 flex items-start gap-2 text-sm text-warning"><ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />{item.blockedReason}</p>}</div><span className={`w-fit shrink-0 rounded-full px-3 py-1 text-xs font-medium ${statusClass(item.status)}`}>{STATUS_LABELS[item.status] ?? item.status}</span></div></article>
-              ))}
+              {workspace.workItems.length === 0 ? <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Start Product Design to create the design queue.</div> : workspace.workItems.map((item) => {
+                const guidance = workItemGuidance(item);
+                return <article key={item._id} className="rounded-xl border border-border bg-card p-5"><div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div className="min-w-0"><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{item.kind.replaceAll("_", " ")}</p><h3 className="mt-1 font-semibold">{item.title}</h3>{item.outputSummary && <p className="mt-2 text-sm text-muted-foreground">{item.outputSummary}</p>}{guidance && <p className="mt-2 text-sm text-muted-foreground">{guidance}</p>}{item.blockedReason && <p className="mt-2 flex items-start gap-2 text-sm text-warning"><ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />{item.blockedReason}</p>}{item.kind === "design_candidate_generation" && item.status === "completed" && <Button asChild variant="outline" size="sm" className="mt-3"><Link href={`/invention/${inventionId}/work`}>Review design candidates</Link></Button>}</div><span className={`w-fit shrink-0 rounded-full px-3 py-1 text-xs font-medium ${statusClass(item.status)}`}>{STATUS_LABELS[item.status] ?? item.status}</span></div></article>;
+              })}
             </div>
           </details>
 
