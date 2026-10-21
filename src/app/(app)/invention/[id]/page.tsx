@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, ArrowRight, PartyPopper, RefreshCw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Mail, MessageSquare, PartyPopper, RefreshCw, Share2 } from "lucide-react";
 import Link from "next/link";
 import { trackStageCompleted, trackContinueClicked } from "@/lib/analytics";
 import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
@@ -23,6 +23,27 @@ import { makeFunctionReference } from "convex/server";
 
 const createEvidenceRequestRef = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; kind: "survey" | "interview"; title?: string; introduction?: string }, { requestId: string; token: string }>("evidenceRequests:create");
 const listEvidenceRequestsRef = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, Array<{ token: string; kind: "survey" | "interview"; title: string; purpose?: string; status: string }>>("evidenceRequests:list");
+
+async function copyTextToClipboard(value: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+  } catch {
+    // Fall through to the compatibility path below.
+  }
+  const textarea = document.createElement("textarea");
+  textarea.value = value;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  const copied = document.execCommand("copy");
+  textarea.remove();
+  return copied;
+}
 
 // ── Congratulations screen (Stage 4 completion) ──────────────────────────────
 
@@ -137,6 +158,7 @@ export default function InventionWorkspacePage() {
   const [rebuilding, setRebuilding] = useState(false);
   const [rebuildError, setRebuildError] = useState<string | null>(null);
   const [surveyPreparationError, setSurveyPreparationError] = useState<string | null>(null);
+  const [surveyShareMessage, setSurveyShareMessage] = useState<string | null>(null);
   const rebuildTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const initializedRef = useRef(false);
   const autoSurveyAttemptedRef = useRef(false);
@@ -231,6 +253,27 @@ export default function InventionWorkspacePage() {
       if (rebuildTimeoutRef.current) clearTimeout(rebuildTimeoutRef.current);
     }
   }, [forceRegenerateValidation, inventionId, retryFailedValidation]);
+
+  const shareSurvey = useCallback(async (token: string) => {
+    const url = `${window.location.origin}/respond/${token}`;
+    setSurveyShareMessage(null);
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: `Rise Jar validation survey`,
+          text: `Please take this short survey to help validate the invention:`,
+          url,
+        });
+        setSurveyShareMessage("Share sheet opened.");
+        return;
+      }
+      const copied = await copyTextToClipboard(url);
+      setSurveyShareMessage(copied ? "Survey link copied." : "Copy was unavailable. Use the email or text option below.");
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      setSurveyShareMessage("Share was unavailable. Use the email or text option below.");
+    }
+  }, []);
 
   const TOTAL_SECTIONS = 11;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -388,7 +431,14 @@ export default function InventionWorkspacePage() {
                     return request ? (
                       <div className="mt-3 space-y-2">
                         <p className="break-all rounded-md bg-background px-3 py-2 font-mono text-xs">{typeof window !== "undefined" ? `${window.location.origin}/respond/${request.token}` : `/respond/${request.token}`}</p>
-                        <Button size="sm" variant="outline" onClick={() => { void navigator.clipboard?.writeText(`${window.location.origin}/respond/${request.token}`); }}>Copy survey link</Button>
+                        <div className="flex flex-wrap gap-2">
+                          <Button size="sm" variant="outline" onClick={() => { void copyTextToClipboard(`${window.location.origin}/respond/${request.token}`).then((copied) => setSurveyShareMessage(copied ? "Survey link copied." : "Copy was unavailable. Use the share options below.")); }}>Copy survey link</Button>
+                          <Button size="sm" variant="outline" onClick={() => void shareSurvey(request.token)}><Share2 className="mr-1.5 h-3.5 w-3.5" />Share survey</Button>
+                          <Button asChild size="sm" variant="outline"><a href={`sms:?body=${encodeURIComponent(`Please take this short Rise Jar validation survey: ${window.location.origin}/respond/${request.token}`)}`}><MessageSquare className="mr-1.5 h-3.5 w-3.5" />Text</a></Button>
+                          <Button asChild size="sm" variant="outline"><a href={`mailto:?subject=${encodeURIComponent("Rise Jar validation survey")}&body=${encodeURIComponent(`Please take this short survey to help validate Rise Jar:\n\n${window.location.origin}/respond/${request.token}`)}`}><Mail className="mr-1.5 h-3.5 w-3.5" />Email</a></Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground">Use Share survey to open your phone’s contacts/share sheet, or send it by text or email. For community outreach, post the same link in groups where you already participate; InventSmith does not post or message people without an explicit connected-channel authorization.</p>
+                        {surveyShareMessage && <p role="status" className="text-xs text-primary">{surveyShareMessage}</p>}
                       </div>
                     ) : surveyPreparationError ? <p role="alert" className="mt-2 text-xs text-destructive">{surveyPreparationError} <Link className="underline" href={`/invention/${inventionId}/evidence`}>Open Evidence Locker</Link></p> : evidenceRequests instanceof Error ? <p role="alert" className="mt-2 text-xs text-destructive">Survey links could not be loaded. <Link className="underline" href={`/invention/${inventionId}/evidence`}>Open Evidence Locker</Link></p> : <p className="mt-2 text-xs text-muted-foreground">Preparing your survey link…</p>;
                   })()}
