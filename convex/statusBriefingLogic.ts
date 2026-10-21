@@ -146,3 +146,5 @@ export function buildStatusBriefing(input: StatusBriefingInput): StatusBriefing 
 
   return { completed, discoveries, needsInventor, next };
 }
+
+// Deployment marker: keep branch deployment synchronized with the autonomous journey fixes.
