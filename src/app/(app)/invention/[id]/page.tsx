@@ -21,9 +21,10 @@ import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
 import { getSafeValidationFailureMessage, getValidationCompletionLabel, getValidationResearchViewState } from "@/lib/validationResearchView";
 import { makeFunctionReference } from "convex/server";
 
+const PUBLIC_SURVEY_APP_URL = "https://inventsmith-fey5av9bc-inventors-os.vercel.app";
+
 function getPublicSurveyUrl(token: string): string {
-  if (typeof window !== "undefined") return `${window.location.origin}/respond/${token}`;
-  return `/respond/${token}`;
+  return `${PUBLIC_SURVEY_APP_URL}/respond/${token}`;
 }
 
 const createEvidenceRequestRef = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; kind: "survey" | "interview"; title?: string; introduction?: string }, { requestId: string; token: string }>("evidenceRequests:create");
