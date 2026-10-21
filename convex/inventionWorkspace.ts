@@ -30,6 +30,8 @@ const runAvailableWork = makeFunctionReference<
 >("atlasWorkOrchestration:runAvailableWork");
 
 const AUTONOMOUS_RESEARCH_KINDS = new Set([
+  "assumptions_unknowns", "competitor_discovery", "technical_feasibility",
+  "materials_manufacturing", "evidence_verification", "preliminary_bom_cost",
   "preliminary_prior_art", "feature_prior_art_comparison", "distinguishing_features",
   "ip_readiness", "market_feasibility", "regulatory_screening",
 ]);
@@ -258,7 +260,10 @@ export const kickAutonomousWork = mutation({
     const now = Date.now();
     const workItems = await ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
     for (const item of workItems) {
-      const recoverableResearchGate = item.status === "blocked" && item.humanGateType === "professional_review" && AUTONOMOUS_RESEARCH_KINDS.has(item.kind);
+      // These assignments are InventSmith's preparation work. Recover stale
+      // records regardless of the old gate type so a prior prototype or
+      // professional-review response cannot strand autonomous work.
+      const recoverableResearchGate = item.status === "blocked" && AUTONOMOUS_RESEARCH_KINDS.has(item.kind);
       const recoverableFailure = item.status === "failed" && (
         item.attemptCount < (item.maxAttempts ?? 3) ||
         shouldAutomaticallyRecoverFailedWork(item.kind, item.inputSnapshot, item.attemptCount, item.maxAttempts ?? 3)
