@@ -21,12 +21,6 @@ import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
 import { getSafeValidationFailureMessage, getValidationCompletionLabel, getValidationResearchViewState } from "@/lib/validationResearchView";
 import { makeFunctionReference } from "convex/server";
 
-const PUBLIC_SURVEY_APP_URL = "https://inventsmith.vercel.app";
-
-function getPublicSurveyUrl(token: string): string {
-  return `${PUBLIC_SURVEY_APP_URL}/respond/${token}`;
-}
-
 const createEvidenceRequestRef = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; kind: "survey" | "interview"; title?: string; introduction?: string }, { requestId: string; token: string }>("evidenceRequests:create");
 const listEvidenceRequestsRef = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, Array<{ token: string; kind: "survey" | "interview"; title: string; purpose?: string; status: string }>>("evidenceRequests:list");
 
@@ -164,6 +158,7 @@ export default function InventionWorkspacePage() {
   const advanceStage = useMutation(api.journeyEngine.advanceStage);
   const forceRegenerateValidation = useMutation(api.validationResearchSessionMutations.forceRegenerateValidation);
   const retryFailedValidation = useMutation(api.validationResearchSessionMutations.retryFailedValidationSections);
+  const ensureValidationCurrent = useMutation(api.validationResearchSessionMutations.ensureValidationCurrent);
   const createEvidenceRequest = useMutation(createEvidenceRequestRef);
   const evidenceRequests = useQuery(listEvidenceRequestsRef, isAuthenticated && inventionId ? { inventionId } : "skip");
 
@@ -205,6 +200,15 @@ export default function InventionWorkspacePage() {
     && validationResearch.evidenceReview?.currentEvidenceMatchesRun === true
     && reportSections.length >= 11
     && reportSections.every((section) => section.status === "generated");
+
+  // Repair reports created before the current evidence/quality rules so public
+  // survey responses count without requiring the inventor to press Refresh.
+  useEffect(() => {
+    if (!isAuthenticated || !inventionId || inventionState?.currentStage.id !== 2) return;
+    void ensureValidationCurrent({ inventionId }).catch((error) => {
+      console.error("Could not ensure current validation:", error);
+    });
+  }, [ensureValidationCurrent, inventionId, inventionState, isAuthenticated]);
 
   useEffect(() => {
     if (autoSurveyAttemptedRef.current || !isAuthenticated || !reportIsCurrentAndComplete || reportConfidenceAverage === null || reportConfidenceAverage > 0.5 || !inventionState || !Array.isArray(evidenceRequests)) return;
@@ -270,7 +274,7 @@ export default function InventionWorkspacePage() {
   }, [forceRegenerateValidation, inventionId, retryFailedValidation]);
 
   const shareSurvey = useCallback(async (token: string) => {
-    const url = getPublicSurveyUrl(token);
+    const url = `${window.location.origin}/respond/${token}`;
     setSurveyShareMessage(null);
     try {
       if (navigator.share) {
@@ -366,7 +370,7 @@ export default function InventionWorkspacePage() {
     const surveyEvidenceIncluded = completedSections.some((section) =>
       /survey evidence|survey observations strengthen/i.test(section.confidence?.evidenceSummary ?? "")
     );
-    const evidenceReview = (validationResearch as { evidenceReview?: { currentEvidenceMatchesRun: boolean; surveys: Array<{ title: string; sampleSize?: string; summary: string; findings: string[]; provenance: string }>; pendingSurveys?: Array<{ title: string; status: "processing" | "failed" }> } } | null)?.evidenceReview;
+    const evidenceReview = (validationResearch as { evidenceReview?: { currentEvidenceMatchesRun: boolean; surveys: Array<{ title: string; sampleSize?: string; summary: string; findings: string[]; provenance: string }>; pendingSurveys?: Array<{ title: string; status: "processing" | "failed" }>; surveyResponseCount?: number } } | null)?.evidenceReview;
     const uploadedSurveys = evidenceReview?.surveys ?? [];
     const avgConfidence =
       sectionsWithConf.length > 0
@@ -445,15 +449,15 @@ export default function InventionWorkspacePage() {
                     const request = evidenceRequests?.find((item) => item.kind === "survey" && item.status === "active" && (item.purpose === "validation_follow_up" || item.title === `[Validation follow-up] ${invention.title}`));
                     return request ? (
                       <div className="mt-3 space-y-2">
-                        <p className="break-all rounded-md bg-background px-3 py-2 font-mono text-xs">{typeof window !== "undefined" ? getPublicSurveyUrl(request.token) : getPublicSurveyUrl(request.token)}</p>
+                        <p className="break-all rounded-md bg-background px-3 py-2 font-mono text-xs">{typeof window !== "undefined" ? `${window.location.origin}/respond/${request.token}` : `/respond/${request.token}`}</p>
                         <div className="flex flex-wrap gap-2">
-                          <Button size="sm" variant="outline" onClick={() => { void copyTextToClipboard(getPublicSurveyUrl(request.token)).then((copied) => setSurveyShareMessage(copied ? "Copied! The survey link is ready to paste." : "Copy was unavailable. Use the share options below.")); }} className={surveyShareMessage?.startsWith("Copied!") ? "border-primary bg-primary/10 text-primary" : ""}>{surveyShareMessage?.startsWith("Copied!") ? "Copied!" : "Copy survey link"}</Button>
+                          <Button size="sm" variant="outline" onClick={() => { void copyTextToClipboard(`${window.location.origin}/respond/${request.token}`).then((copied) => setSurveyShareMessage(copied ? "Survey link copied." : "Copy was unavailable. Use the share options below.")); }}>Copy survey link</Button>
                           <Button size="sm" variant="outline" onClick={() => void shareSurvey(request.token)}><Share2 className="mr-1.5 h-3.5 w-3.5" />Share survey</Button>
-                          <Button asChild size="sm" variant="outline"><a href={`sms:?body=${encodeURIComponent(`Please take this short Rise Jar validation survey: ${getPublicSurveyUrl(request.token)}`)}`}><MessageSquare className="mr-1.5 h-3.5 w-3.5" />Text</a></Button>
-                          <Button asChild size="sm" variant="outline"><a href={`mailto:?subject=${encodeURIComponent("Rise Jar validation survey")}&body=${encodeURIComponent(`Please take this short survey to help validate Rise Jar:\n\n${getPublicSurveyUrl(request.token)}`)}`}><Mail className="mr-1.5 h-3.5 w-3.5" />Email</a></Button>
+                          <Button asChild size="sm" variant="outline"><a href={`sms:?body=${encodeURIComponent(`Please take this short Rise Jar validation survey: ${window.location.origin}/respond/${request.token}`)}`}><MessageSquare className="mr-1.5 h-3.5 w-3.5" />Text</a></Button>
+                          <Button asChild size="sm" variant="outline"><a href={`mailto:?subject=${encodeURIComponent("Rise Jar validation survey")}&body=${encodeURIComponent(`Please take this short survey to help validate Rise Jar:\n\n${window.location.origin}/respond/${request.token}`)}`}><Mail className="mr-1.5 h-3.5 w-3.5" />Email</a></Button>
                         </div>
                         <p className="text-xs text-muted-foreground">Use Share survey to open your phone’s contacts/share sheet, or send it by text or email. For community outreach, post the same link in groups where you already participate; InventSmith does not post or message people without an explicit connected-channel authorization.</p>
-                        {surveyShareMessage && <p role="status" aria-live="polite" className="rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-sm font-semibold text-primary">{surveyShareMessage}</p>}
+                        {surveyShareMessage && <p role="status" className="text-xs text-primary">{surveyShareMessage}</p>}
                       </div>
                     ) : surveyPreparationError ? <p role="alert" className="mt-2 text-xs text-destructive">{surveyPreparationError} <Link className="underline" href={`/invention/${inventionId}/evidence`}>Open Evidence Locker</Link></p> : evidenceRequests instanceof Error ? <p role="alert" className="mt-2 text-xs text-destructive">Survey links could not be loaded. <Link className="underline" href={`/invention/${inventionId}/evidence`}>Open Evidence Locker</Link></p> : <p className="mt-2 text-xs text-muted-foreground">Preparing your survey link…</p>;
                   })()}
@@ -520,6 +524,7 @@ export default function InventionWorkspacePage() {
                         {survey.title}: {survey.status === "failed" ? "extraction needs retry" : "extraction is still processing; its results are not included yet"}.
                       </p>
                     ))}
+                    {(evidenceReview?.surveyResponseCount ?? 0) > 0 && <p className="font-medium text-primary">{evidenceReview?.surveyResponseCount} public survey response{evidenceReview?.surveyResponseCount === 1 ? "" : "s"} received and attached to the invention evidence.</p>}
                     <p className="text-xs text-muted-foreground">Survey results support customer-validation sections. They do not independently verify market size or prove demand. {evidenceReview?.currentEvidenceMatchesRun ? "This report matches the current evidence." : isGenerating ? "This report does not match current evidence; a refresh is currently running." : "This report does not match current evidence, and no refresh is running. Select Refresh validation to update it."}</p>
                     <p className="text-xs text-muted-foreground">The overall confidence is an evidence-support score, not the chance of success. A survey can strengthen relevant customer sections, but does not by itself verify demand, market size, or the product’s performance.</p>
                   </div>
