@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useConvexAuth, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import type { Doc, Id } from "@convex/_generated/dataModel";
 import { ArrowLeft, ExternalLink, FileSearch, Gavel, ShieldCheck, Sparkles, Wrench } from "lucide-react";
@@ -21,6 +21,8 @@ interface DeliverableLibrary {
 }
 
 const getDeliverableLibrary = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, DeliverableLibrary>("inventionWorkspace:getDeliverableLibrary");
+const backfillWorkspace = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { addedWorkCount: number }>("inventionMigrations:backfillWorkspace");
+const kickAutonomousWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; departmentStageId?: number }, { scheduled: boolean; reason: string }>("inventionWorkspace:kickAutonomousWork");
 
 const PATENT_KINDS = new Set([
   "preliminary_prior_art",
@@ -40,10 +42,24 @@ export default function PatentReadinessPage() {
   const inventionId = params.id as Id<"inventions">;
   const { isAuthenticated, isLoading } = useConvexAuth();
   const library = useQuery(getDeliverableLibrary, isAuthenticated && inventionId ? { inventionId } : "skip");
+  const migrateWorkspace = useMutation(backfillWorkspace);
+  const kickWork = useMutation(kickAutonomousWork);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.push("/sign-in");
   }, [isAuthenticated, isLoading, router]);
+
+  useEffect(() => {
+    if (isLoading || !isAuthenticated || !inventionId) return;
+    void (async () => {
+      try {
+        await migrateWorkspace({ inventionId });
+        await kickWork({ inventionId, departmentStageId: 4 });
+      } catch (error) {
+        console.error("Could not wake Patent Readiness work:", error);
+      }
+    })();
+  }, [inventionId, isAuthenticated, isLoading, migrateWorkspace, kickWork]);
 
   if (isLoading || !isAuthenticated || library === undefined) {
     return <div className="min-h-screen bg-background"><AppNav /><main className="mx-auto max-w-5xl px-4 py-12 text-sm text-muted-foreground sm:px-6">Loading patent readiness workspace…</main></div>;
@@ -87,7 +103,7 @@ export default function PatentReadinessPage() {
           )}
 
           <section className="space-y-4">
-            <div><h2 className="text-xl font-semibold">Patent-readiness work</h2><p className="mt-1 text-sm text-muted-foreground">Every item preserves source coverage, uncertainty and professional-review limits. Expired, abandoned or otherwise inactive references can still remain relevant prior art and therefore remain in the design comparison.</p></div>
+            <div><h2 className="text-xl font-semibold">Patent-readiness work</h2><p className="mt-1 text-sm text-muted-foreground">InventSmith automatically searches relevant patent and non-patent sources, compares the proposed features, and converts possible conflicts into design-around constraints. Every item preserves source coverage, uncertainty and professional-review limits. Expired, abandoned or otherwise inactive references can still remain relevant prior art and therefore remain in the design comparison.</p></div>
             {deliverables.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border p-8 text-center text-muted-foreground">InventSmith has not completed the first Patent Readiness deliverable yet. The department remains visible while research runs.</div>
             ) : (
