@@ -48,7 +48,7 @@ export const getJourneyCenter = query({
       const relevant = stage.requiredWorkKinds.map((kind) => workItems.find((item) => item.kind === kind)).filter(Boolean);
       const completedCount = relevant.filter((item) => item?.status === "completed").length;
       const blockedItems = relevant.filter((item) =>
-        (item?.status === "blocked" && !AUTONOMOUS_RESEARCH_KINDS.has(item?.kind ?? "")) || item?.status === "awaiting_approval"
+        (item && (item.status === "blocked" || item.status === "awaiting_approval") && !AUTONOMOUS_RESEARCH_KINDS.has(item.kind))
       );
       const activeItems = relevant.filter((item) => item?.status === "queued" || item?.status === "running");
       const runningItems = relevant.filter((item) => item?.status === "running");
@@ -73,11 +73,14 @@ export const getJourneyCenter = query({
       const activeWork = runningItems[0] ?? queuedItems[0];
 
       let status: "complete" | "professional_review" | "blocked" | "working" | "ready_to_start" | "planned" | "needs_refresh" | "failed";
-      if (staleItems.length > 0 || hasStaleDeliverable) status = "needs_refresh";
+      // Completion is the primary state. A stale result means InventSmith
+      // should refresh it, not that a finished stage became the inventor's
+      // responsibility again.
+      if (allWorkComplete && pendingReviews.length > 0) status = "professional_review";
+      else if (allWorkComplete) status = "complete";
+      else if (staleItems.length > 0 || hasStaleDeliverable) status = "needs_refresh";
       else if (failedItems.length > 0) status = "failed";
       else if (blockedItems.length > 0) status = "blocked";
-      else if (allWorkComplete && pendingReviews.length > 0) status = "professional_review";
-      else if (allWorkComplete) status = "complete";
       else if (activeItems.length > 0 || initialized) status = "working";
       else status = stage.id <= 5 ? "ready_to_start" : "planned";
 
@@ -97,6 +100,19 @@ export const getJourneyCenter = query({
         activeWorkCount: runningItems.length,
         queuedWorkCount: queuedItems.length,
         activityLabel: activeWork ? activityForWork(activeWork.kind, activeWork.title) : null,
+        statusExplanation: status === "complete"
+          ? "InventSmith finished the required work for this stage."
+          : status === "professional_review"
+            ? "InventSmith prepared the work; a qualified professional must review it."
+            : status === "blocked"
+              ? "InventSmith is waiting for the specific information or authorization shown above."
+              : status === "needs_refresh"
+                ? "New evidence changed this stage. InventSmith is refreshing it automatically."
+                : status === "failed"
+                  ? "InventSmith is retrying this failed step automatically."
+                  : activeWork
+                    ? (runningItems.length > 0 ? "InventSmith is working on this now." : "InventSmith has queued this next.")
+                    : "This stage will begin when its prerequisites are ready.",
       };
     });
 
@@ -104,7 +120,7 @@ export const getJourneyCenter = query({
     const pendingApprovalCount = approvals.filter((item) => item.status === "pending").length;
     const openDecisionCount = decisions.filter((item) => item.status === "open").length;
     const blockedWorkCount = workItems.filter((item) =>
-      (item.status === "blocked" && !AUTONOMOUS_RESEARCH_KINDS.has(item.kind)) || item.status === "awaiting_approval"
+      (item.status === "blocked" || item.status === "awaiting_approval") && !AUTONOMOUS_RESEARCH_KINDS.has(item.kind)
     ).length;
     const pendingReviewCount = reviews.filter((item) => item.status !== "accepted" && item.status !== "declined").length;
     const completedStages = stageRows.filter((stage) => stage.status === "complete").length;
