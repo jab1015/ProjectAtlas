@@ -135,7 +135,18 @@ export default function InventionEvidencePage() {
 
     setExtracting(true);
     try {
-      const bytes = await selected.arrayBuffer();
+      const bytes = await new Promise<ArrayBuffer>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(reader.error ?? new Error("Could not read the selected evidence file."));
+        reader.onload = () => {
+          if (!(reader.result instanceof ArrayBuffer)) {
+            reject(new Error("Could not read the selected evidence file."));
+            return;
+          }
+          resolve(reader.result);
+        };
+        reader.readAsArrayBuffer(selected);
+      });
       setUploadBytes(bytes);
       setExtraction(await extractEvidenceFromFile(selected, evidenceKind));
     } catch {
