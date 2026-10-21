@@ -105,6 +105,11 @@ export default function InventSmithChatPage() {
               <Bot className="mx-auto h-8 w-8 text-primary" />
               <h2 className="mt-3 font-semibold">What would you like to know?</h2>
               <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">Ask what InventSmith has completed, what each department is doing, what evidence supports a conclusion, what is blocked, or what happens next. If you supply material project facts, URLs, test results, quotes, survey/interview findings, or patent-status observations, InventSmith records them as inventor-provided evidence for the project to evaluate.</p>
+              <div className="mx-auto mt-5 flex max-w-xl flex-wrap justify-center gap-2">
+                {["How is my validation going?", "What is InventSmith working on now?", "What do I need to do today?", "What is waiting on evidence?"].map((prompt) => (
+                  <Button key={prompt} type="button" variant="outline" size="sm" onClick={() => setMessage(prompt)}>{prompt}</Button>
+                ))}
+              </div>
             </div>
           )}
           {conversation.messages.map((item) => (
