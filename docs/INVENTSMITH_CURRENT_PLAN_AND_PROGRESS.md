@@ -38,7 +38,7 @@ Open acceptance items: confirm live per-department outputs and downstream handof
 - Expired, lapsed, abandoned, withdrawn, discontinued, or otherwise inactive references are retained as prior-art context but are not treated as current enforcement blockers. Active or unclear-status overlap is carried forward as a design constraint and triggers materially different design directions when appropriate.
 - Product Design may begin after the automated patent comparison and differentiation handoff. It does not wait for the separate patent-professional readiness brief or professional review.
 - Patent-professional review remains a later legal gate for patentability, freedom to operate, claims, filing, and final legal strategy. This change authorizes preparatory design work, not legal clearance.
-- Commit: `4b33960 Let automated patent research guide design`. Focused checks: **17 tests passed** and TypeScript passed.
+- Commits: `4b33960 Let automated patent research guide design` and `307ffcd Update patent handoff regression coverage`. Full checks: **131 test files / 712 tests passed**, TypeScript passed, and `git diff --check` passed.
 
 # InventSmith Current Plan and Progress
 
