@@ -8,6 +8,20 @@ const FREE_WORK = new Set([
   "assumptions_unknowns",
   "market_feasibility",
   "preliminary_prior_art",
+  // Autonomous research and preparation remain available while InventSmith
+  // preserves separate gates for spending, legal filing, professional sign-off,
+  // private information, and physical-world work.
+  "technical_feasibility",
+  "materials_manufacturing",
+  "regulatory_screening",
+  "ip_readiness",
+  "feature_prior_art_comparison",
+  "distinguishing_features",
+  "product_requirements",
+  "preliminary_bom_cost",
+  "development_risks",
+  "evidence_verification",
+  "feasibility_recommendation",
 ]);
 
 const INVENTOR_WORK = new Set([
