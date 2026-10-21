@@ -33,7 +33,7 @@ interface JourneyCenterState {
   totalStages: number;
   nextAction: string;
   attention: { pendingApprovals: number; openDecisions: number; blockedWork: number; pendingProfessionalReviews: number };
-  evidence: { total: number; inventorProvided: number; verified: number };
+  evidence: { total: number; inventorProvided: number; verified: number; customerValidationResponses: number };
 }
 
 const getJourneyCenter = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, JourneyCenterState>("journeyCenter:getJourneyCenter");
@@ -125,7 +125,7 @@ export default function JourneyCenterPage() {
 
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Stages done</p><p className="mt-2 text-2xl font-semibold">{journey.completedStages}/{journey.totalStages}</p><div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary" style={{ width: `${completion}%` }} /></div></div>
-            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Inventor evidence</p><p className="mt-2 text-2xl font-semibold">{journey.evidence.inventorProvided}</p><p className="mt-1 text-xs text-muted-foreground">{journey.evidence.verified} verified / {journey.evidence.total} total</p></div>
+            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Customer validation</p><p className="mt-2 text-2xl font-semibold">{journey.evidence.customerValidationResponses}</p><p className="mt-1 text-xs text-muted-foreground">site responses counted · {journey.evidence.verified} independently verified sources</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Needs your attention</p><p className="mt-2 text-2xl font-semibold">{journey.attention.pendingApprovals + journey.attention.openDecisions + journey.attention.blockedWork}</p><p className="mt-1 text-xs text-muted-foreground">approvals, decisions, blocked work</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Professional review</p><p className="mt-2 text-2xl font-semibold">{journey.attention.pendingProfessionalReviews}</p><p className="mt-1 text-xs text-muted-foreground">open review requirements</p></div>
           </section>
