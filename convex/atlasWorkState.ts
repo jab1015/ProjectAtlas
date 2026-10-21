@@ -194,6 +194,49 @@ export const claimNextWork = internalMutation({
       }
     }
 
+    // Older canonical records could fail before the work-kind router knew how
+    // to select their registered department agent. Requeue only that specific,
+    // recoverable failure class; ordinary failed work must remain visible and
+    // bounded until an explicit retry or the normal recovery policy handles it.
+    const legacyAgentFailureKinds = new Set([
+      "brief_analysis", "assumptions_unknowns", "competitor_discovery", "market_feasibility",
+      "technical_feasibility", "preliminary_prior_art", "feature_prior_art_comparison",
+      "distinguishing_features", "patent_design_handoff", "ip_readiness", "regulatory_screening",
+    ]);
+    const legacyAgentFailure = items.find((item) =>
+      item.status === "failed" &&
+      legacyAgentFailureKinds.has(item.kind) &&
+      /missing (a )?registered department agent|no registered agent/i.test(item.lastError ?? "")
+    );
+    if (legacyAgentFailure) {
+      await ctx.db.patch(legacyAgentFailure._id, {
+        status: "queued",
+        attemptCount: 0,
+        startedAt: undefined,
+        claimedAt: undefined,
+        leaseExpiresAt: undefined,
+        reservedCostUnits: undefined,
+        reservationDateKey: undefined,
+        actualCostUnits: undefined,
+        outputSummary: undefined,
+        blockedReason: undefined,
+        humanGateType: undefined,
+        lastError: "Released from a legacy missing-agent failure; InventSmith repaired the department routing and requeued this work.",
+        updatedAt: args.now,
+      });
+      const index = items.findIndex((item) => item._id === legacyAgentFailure._id);
+      if (index >= 0) items[index] = { ...items[index], status: "queued", attemptCount: 0, lastError: undefined };
+      await ctx.db.insert("atlasExecutionEvents", {
+        inventionId: args.inventionId,
+        workItemId: legacyAgentFailure._id,
+        eventType: "work_queued",
+        actorType: "system",
+        summary: `InventSmith repaired legacy department routing for ${legacyAgentFailure.kind} and requeued it.`,
+        metadata: { repairedLegacyMissingAgent: true, kind: legacyAgentFailure.kind },
+        createdAt: args.now,
+      });
+    }
+
     const organizationUsage = usageScope.scope === "organization" && !usageScope.isAdmin
       ? await ensureOrganizationDailyUsage(ctx, usageScope.organizationId, dateKey, args.now)
       : null;
