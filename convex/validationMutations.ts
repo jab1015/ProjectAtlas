@@ -399,7 +399,12 @@ export const getValidationResearch = query({
             const extraction = source.extraction && typeof source.extraction === "object"
               ? source.extraction as Record<string, unknown>
               : {};
-            const sampleSize = typeof extraction.sampleSize === "string" ? extraction.sampleSize : undefined;
+            const numericSampleSize = typeof extraction.sampleSize === "number" ? extraction.sampleSize : undefined;
+            const sampleSize = typeof extraction.sampleSize === "string"
+              ? extraction.sampleSize
+              : numericSampleSize !== undefined
+              ? `${numericSampleSize} respondent${numericSampleSize === 1 ? "" : "s"}`
+              : undefined;
             const findings = Array.isArray(extraction.keyFindings)
               ? extraction.keyFindings
                   .filter((finding): finding is Record<string, unknown> => Boolean(finding) && typeof finding === "object")
@@ -416,6 +421,7 @@ export const getValidationResearch = query({
             };
           }),
         pendingSurveys: evidenceSnapshot.pendingSurveys,
+        surveyResponseCount: evidenceSnapshot.evidence.filter((source) => source.evidenceKind === "survey" && source.extraction && typeof source.extraction === "object" && (source.extraction as Record<string, unknown>).mode === "public_response").length,
       },
     };
   },
