@@ -55,8 +55,8 @@ describe("InventSmith representative idea-to-market wiring", () => {
       "preliminary_prior_art",
       "feature_prior_art_comparison",
       "distinguishing_features",
-      "ip_readiness",
     ]);
+    expect(byKind.get("patent_design_handoff")?.dependsOnKinds).not.toContain("ip_readiness");
     expectDepends("design_candidate_generation", ["patent_design_handoff", "design_directions", "product_requirements"]);
     expect(reaches("design_candidate_generation", "preliminary_prior_art")).toBe(true);
   });
