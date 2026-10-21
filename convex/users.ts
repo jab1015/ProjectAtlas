@@ -3,7 +3,10 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { effectiveTierForSubscription } from "./subscriptionPolicyLogic";
 
-const ADMIN_EMAIL = "jerry.brown1015@gmail.com";
+const ADMIN_EMAILS = new Set([
+  "jerry.brown1015@gmail.com",
+  "jerry@modernmethods.it.com",
+]);
 const ADMIN_SUBSCRIPTION_TIER = "enterprise";
 
 function normalizeSubscriptionTier(tier: unknown): "free" | "inventor" | "pro" | "enterprise" {
@@ -48,7 +51,7 @@ export const updateMyProfileName = mutation({
 /**
  * Called client-side after every sign-in to ensure user has role and tier set.
  * Idempotent — safe to call multiple times.
- * Also grants admin to the designated email.
+ * Also grants admin to the designated owner/admin emails.
  */
 export const ensureUserProfile = mutation({
   args: {},
@@ -59,7 +62,7 @@ export const ensureUserProfile = mutation({
     const user = await ctx.db.get(userId);
     if (!user) return null;
 
-    const isAdminEmail = user.email === ADMIN_EMAIL;
+    const isAdminEmail = Boolean(user.email && ADMIN_EMAILS.has(user.email.trim().toLowerCase()));
 
     const updates: Record<string, unknown> = {};
 
