@@ -107,7 +107,9 @@ export const getJourneyCenter = query({
         total: evidence.length,
         inventorProvided: evidence.filter((item) => item.metadata?.provenance === "inventor_upload").length,
         verified: evidence.filter((item) => item.reliability !== "unverified").length,
-        customerValidationResponses: evidence.filter((item) => item.metadata?.evidenceOrigin === "public_response" && item.metadata?.validationStatus === "counted_customer_signal").length,
+        // Public responses created before validation metadata was added are still
+        // traceable customer-validation evidence and must remain visible here.
+        customerValidationResponses: evidence.filter((item) => item.metadata?.evidenceOrigin === "public_response" || item.metadata?.validationStatus === "counted_customer_signal").length,
       },
     };
   },
