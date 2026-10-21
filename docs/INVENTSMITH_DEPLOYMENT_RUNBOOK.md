@@ -4,7 +4,7 @@
 - The handoff must label each reference as current/unclear or inactive. Only current/unclear references become active design-around constraints; inactive references remain historical prior-art context.
 - Product Design can consume the handoff and generate preliminary candidates, artwork, specifications, and CAD preparation. These outputs remain draft/preliminary until the required engineering and patent-professional reviews are accepted.
 - Do not report this workflow as patent clearance or freedom-to-operate approval. The professional gate remains before legal conclusions, claims, filing, or external reliance.
-- Implementation commit: `4b33960`. Focused regression checks and TypeScript passed.
+- Implementation commits: `4b33960` and `307ffcd`. Full verification passed: **131 test files / 712 tests**, TypeScript, and `git diff --check`.
 
 # InventSmith Owner-Controlled Deployment and Acceptance Runbook
 
