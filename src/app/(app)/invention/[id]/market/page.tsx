@@ -18,7 +18,7 @@ interface DeliverableLibrary {
   sources: Doc<"evidenceSources">[];
   reviews: Doc<"professionalReviews">[];
   executionEvents: Doc<"atlasExecutionEvents">[];
-  workItems: Array<{
+  workItems?: Array<{
     workItemId: Id<"atlasWorkItems">;
     kind: string;
     title: string;
@@ -28,7 +28,7 @@ interface DeliverableLibrary {
     blockedReason?: string;
     outputSummary?: string;
   }>;
-  failedWork: Array<{
+  failedWork?: Array<{
     workItemId: Id<"atlasWorkItems">;
     kind: string;
     title: string;
@@ -76,7 +76,7 @@ export default function MarketResearchPage() {
   const deliverables = library.deliverables.filter((item) => MARKET_KINDS.has(item.kind));
   const sourcesById = new Map(library.sources.map((source) => [String(source._id), source]));
   const inventorEvidence = library.sources.filter((source) => source.metadata?.provenance === "inventor_upload");
-  const marketWork = library.workItems.filter((item) => MARKET_WORK_KINDS.has(item.kind));
+  const marketWork = (library.workItems ?? []).filter((item) => MARKET_WORK_KINDS.has(item.kind));
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
