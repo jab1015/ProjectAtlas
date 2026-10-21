@@ -23,6 +23,7 @@ describe("Ask InventSmith operational project summary", () => {
     expect(summary.patentPrerequisitesMissing).toEqual([
       "feature_prior_art_comparison",
       "distinguishing_features",
+      "ip_readiness",
     ]);
     expect(summary.explanation).toMatch(/cannot complete yet/i);
   });

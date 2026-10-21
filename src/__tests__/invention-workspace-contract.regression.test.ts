@@ -63,4 +63,10 @@ describe("invention workspace operation contract", () => {
     expect(exportedFunctionBlock("resolveApprovalRequest")).toContain("handler: resolveApprovalRequestHandler");
     expect(source).toContain('from "./consequentialApprovalMutation"');
   });
+
+  it("does not expose autonomous research work as an inventor review gate", () => {
+    const reviewQueue = exportedFunctionBlock("getReviewQueue");
+    expect(reviewQueue).toContain("AUTONOMOUS_RESEARCH_KINDS.has(item.kind)");
+    expect(reviewQueue).toContain("!AUTONOMOUS_RESEARCH_KINDS.has(item.kind)");
+  });
 });

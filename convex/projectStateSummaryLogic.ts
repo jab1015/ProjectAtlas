@@ -22,6 +22,7 @@ const PATENT_HANDOFF_PREREQUISITES = [
   "preliminary_prior_art",
   "feature_prior_art_comparison",
   "distinguishing_features",
+  "ip_readiness",
 ] as const;
 
 const DESIGN_PIPELINE = [
@@ -34,6 +35,23 @@ const DESIGN_PIPELINE = [
   "native_cad_generation",
   "product_render_generation",
 ] as const;
+
+// These jobs are InventSmith's own preparation work. A stale blocked record
+// must never be reported as a request for inventor action or as a design gate.
+const AUTONOMOUS_WORK_KINDS = new Set([
+  "assumptions_unknowns",
+  "competitor_discovery",
+  "technical_feasibility",
+  "materials_manufacturing",
+  "preliminary_bom_cost",
+  "preliminary_prior_art",
+  "feature_prior_art_comparison",
+  "distinguishing_features",
+  "ip_readiness",
+  "market_feasibility",
+  "regulatory_screening",
+  "design_candidate_generation",
+]);
 
 function workMap(workItems: OperationalWorkItem[]) {
   return new Map(workItems.map((item) => [item.kind, item]));
@@ -54,7 +72,9 @@ export function summarizePatentDesignHandoff(workItems: OperationalWorkItem[]) {
   const designItems = DESIGN_PIPELINE.map((kind) => map.get(kind)).filter(Boolean) as OperationalWorkItem[];
   const designRunning = designItems.filter((item) => item.status === "running").map((item) => item.kind);
   const designQueued = designItems.filter((item) => item.status === "queued").map((item) => item.kind);
-  const designBlocked = designItems.filter((item) => item.status === "blocked" || item.status === "awaiting_approval").map((item) => item.kind);
+  const designBlocked = designItems
+    .filter((item) => (item.status === "blocked" || item.status === "awaiting_approval") && !AUTONOMOUS_WORK_KINDS.has(item.kind))
+    .map((item) => item.kind);
   const designCompleted = designItems.filter((item) => item.status === "completed").map((item) => item.kind);
 
   let state: PatentDesignHandoffState;
@@ -131,7 +151,7 @@ export function summarizeKeyProjectOperations(workItems: OperationalWorkItem[]) 
     keyWorkStatuses: Object.fromEntries(selectedKinds.map((kind) => [kind, statusFor(map, kind)])),
     activeWork: workItems.filter((item) => item.status === "running").map((item) => item.kind),
     blockedWork: workItems
-      .filter((item) => item.status === "blocked" || item.status === "awaiting_approval")
+      .filter((item) => (item.status === "blocked" || item.status === "awaiting_approval") && !AUTONOMOUS_WORK_KINDS.has(item.kind))
       .map((item) => ({ kind: item.kind, reason: item.blockedReason ?? null })),
     failedWork: workItems.filter((item) => item.status === "failed").map((item) => ({ kind: item.kind, error: item.lastError ?? null })),
   };

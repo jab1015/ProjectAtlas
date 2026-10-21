@@ -5,6 +5,7 @@ import { effectiveTierForSubscription } from "./subscriptionPolicyLogic";
 
 const ADMIN_EMAILS = new Set([
   "jerry.brown1015@gmail.com",
+  "jerry@modernmethods.it.com",
 ]);
 const ADMIN_SUBSCRIPTION_TIER = "enterprise";
 
@@ -50,8 +51,7 @@ export const updateMyProfileName = mutation({
 /**
  * Called client-side after every sign-in to ensure user has role and tier set.
  * Idempotent — safe to call multiple times.
- * Also grants admin only to the designated owner/admin email and repairs
- * stale global-admin flags left on accounts that are no longer designated.
+ * Also grants admin to the designated owner/admin emails.
  */
 export const ensureUserProfile = mutation({
   args: {},
@@ -72,10 +72,7 @@ export const ensureUserProfile = mutation({
         updates.subscriptionTier = ADMIN_SUBSCRIPTION_TIER;
       }
     } else {
-      // A paid plan or organization-admin membership must never become a
-      // global application administrator. Repair the previous secondary
-      // account allowlist if it still has the old global role.
-      if (!user.role || user.role === "admin") updates.role = "user";
+      if (!user.role) updates.role = "user";
       const pendingEvents = user.email
         ? await ctx.db.query("subscriptionEvents").withIndex("by_customerEmail", (q) => q.eq("customerEmail", user.email!)).collect()
         : [];

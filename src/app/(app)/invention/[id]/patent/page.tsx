@@ -103,7 +103,7 @@ export default function PatentReadinessPage() {
           )}
 
           <section className="space-y-4">
-            <div><h2 className="text-xl font-semibold">Patent-readiness work</h2><p className="mt-1 text-sm text-muted-foreground">InventSmith automatically searches relevant patent and non-patent sources, compares the proposed features, and sends design-around guidance to Product Design as soon as the automated comparison is ready. Active or unclear-status references become current design constraints. Expired, abandoned or otherwise inactive references remain visible as historical prior art, but do not block the design workflow. A qualified patent professional still reviews the completed package before any patentability, freedom-to-operate, or filing decision.</p></div>
+            <div><h2 className="text-xl font-semibold">Patent-readiness work</h2><p className="mt-1 text-sm text-muted-foreground">InventSmith automatically searches relevant patent and non-patent sources, compares the proposed features, and converts possible conflicts into design-around constraints. Every item preserves source coverage, uncertainty and professional-review limits. Expired, abandoned or otherwise inactive references can still remain relevant prior art and therefore remain in the design comparison.</p></div>
             {deliverables.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border p-8 text-center text-muted-foreground">InventSmith has not completed the first Patent Readiness deliverable yet. The department remains visible while research runs.</div>
             ) : (
@@ -128,4 +128,3 @@ export default function PatentReadinessPage() {
     </div>
   );
 }
-

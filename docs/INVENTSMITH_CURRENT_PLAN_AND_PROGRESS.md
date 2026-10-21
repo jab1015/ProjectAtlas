@@ -14,33 +14,61 @@ Automated verification is green: **127 test files / 695 tests**, TypeScript, and
 
 Open acceptance items: confirm live per-department outputs and downstream handoffs on `quick-fox-785`; confirm Validation cites the uploaded 100-user survey and relevant section confidence reflects it; verify automatic evidence refresh and affected-department requeue; verify potential prior-art conflicts are carried into new design candidates. No professional clearance, patentability conclusion, external contact, prototype completion, or release action has been made.
 
-## Current continuation checkpoint — October 21, 2026
-
-### Verified now
-
-- Code changes are committed on `inventsmith/full-product-build` through `8ada262fe7986c95b3c33fc11f1fdd074ddbc137`.
-- The automated suite is green at **131 test files / 712 tests**; TypeScript and diff checks also pass.
-- Convex production deployment completed successfully through the guarded manual GitHub workflow. The successful backend deployment does not mean the frontend is deployed.
-- Journey Center logic now prioritizes completed stages, explains waiting states in plain language, and can recover eligible autonomous research work that had been left queued or blocked by stale classification.
-
-### Still open
-
-- Vercel is still serving an older frontend deployment, so the new Journey Center explanations and autonomous-work UI behavior have not been visually confirmed on the live deployment.
-- A fresh Vercel deployment for the exact branch head must be created and then checked in an authenticated inventor session.
-- After that deployment, verify that eligible work transitions from queued to running/completed, that failures expose a recoverable action, and that evidence-triggered refreshes are reflected in Validation and Market Research.
-- Keep professional, legal, physical-prototype, payment, supplier, filing, and publication gates explicit. AI research may prepare findings and design alternatives, but it must not silently clear those gates.
-
-**Updated:** October 21, 2026 (UTC)
-
-## Patent-to-design sequencing update — October 21, 2026
-
-- The automated patent department now researches live/current and inactive references, records the status evidence, compares the proposed features, and sends design-around constraints directly to Product Design.
-- Expired, lapsed, abandoned, withdrawn, discontinued, or otherwise inactive references are retained as prior-art context but are not treated as current enforcement blockers. Active or unclear-status overlap is carried forward as a design constraint and triggers materially different design directions when appropriate.
-- Product Design may begin after the automated patent comparison and differentiation handoff. It does not wait for the separate patent-professional readiness brief or professional review.
-- Patent-professional review remains a later legal gate for patentability, freedom to operate, claims, filing, and final legal strategy. This change authorizes preparatory design work, not legal clearance.
-- Commits: `4b33960 Let automated patent research guide design` and `307ffcd Update patent handoff regression coverage`. Full checks: **131 test files / 712 tests passed**, TypeScript passed, and `git diff --check` passed.
-
 # InventSmith Current Plan and Progress
+
+## New infrastructure workstream — secure storage for large CAD and 3-D files
+
+**Status: Planned and open — complete this soon, before native CAD is treated as production-ready.**
+
+STEP, STL, DXF, editable CAD source, renders, exploded views, and prototype media can be much larger than ordinary evidence files. InventSmith needs a secure large-file design instead of routing these files through normal request bodies or public links.
+
+### Required plan
+
+- Keep file metadata, ownership, invention/organization relationships, processing state, checksums, versions, and audit events in Convex.
+- Store binary artifacts in a private object-storage layer. Vercel Blob private storage is the simplest first candidate for the Vercel deployment; its documented limit is up to 5 TB per file. Files above 4.5 MB need client uploads, and files above 100 MB should use multipart upload.
+- Keep the storage adapter replaceable so Cloudflare R2 or Amazon S3 can be selected if cost, egress, retention, replication, or scale makes them preferable.
+- Issue only short-lived, object-scoped upload/download URLs after checking the signed-in user’s organization and invention permissions. No public bucket, long-lived credential, or browser-exposed provider secret.
+- Add resumable/multipart upload, MIME and size validation, checksums, safe processing/scanning, versioning, lifecycle cleanup, backup/restore, access revocation, and audit logging.
+
+### Near-term completion task
+
+Write the storage decision, threat model, cost/retention estimate, and implementation plan, then add automated authorization and large-file upload/download tests. Acceptance means a large CAD package can upload, resume, process, download, version, and be revoked without a Vercel request-size failure or unauthorized access.
+
+## Current working-product checkpoint — October 21, 2026
+
+InventSmith has reached a working, visibly usable product milestone. The design-candidate workflow is now represented in the application as autonomous work: after Patent Readiness hands off its constraints, InventSmith is expected to generate at least three materially different design directions automatically. The Product Design page now explains that the inventor does not need to choose, draw, or upload anything before those candidates exist; the inventor reviews candidates only after generation completes.
+
+### Verified in this checkpoint
+
+- The tested change is committed as `f33376e` (`Clarify autonomous design candidate workflow`).
+- A clean Vercel Preview deployment is ready from `inventsmith/finish-design`: [inventsmith-badyyve5a-inventors-os.vercel.app](https://inventsmith-badyyve5a-inventors-os.vercel.app).
+- The preview landing page loads successfully.
+- Automated verification is green: **131 test files / 712 tests**, `npx tsc --noEmit`, and `git diff --check`.
+- The remote branch contains the autonomous design-candidate classification and the plain-language Product Design guidance.
+
+### Current product position
+
+1. Idea, Validation, and Market Research are represented in the journey and feed downstream work.
+2. Patent Readiness has produced the preliminary prior-art comparison, differentiation hypotheses, and Product Design handoff. These remain research and design guidance, not legal clearance.
+3. Product Design is the active next execution area. Its first meaningful output is a set of materially different candidates, followed by scoring, a selected design specification, CAD specifications, drawings, renders, and native CAD generation.
+4. The inventor should only be asked to choose a candidate after InventSmith has generated and displayed the candidates. A physical prototype, professional review, payment, or outside-world action remains a later, explicit gate.
+
+### Deployment status and blocker
+
+The verified preview is ready, but promotion to `inventsmith.vercel.app` was refused by Vercel’s Hobby quota: **more than 100 deployments in 24 hours**. No unverified deployment was promoted. Production promotion can be retried after the quota resets. The preview is the current working verification surface until then.
+
+### Next execution order
+
+1. Promote the verified `f33376e` build after Vercel permits deployment.
+2. Sign in on the preview/production surface and confirm the Product Design queue starts or resumes automatically.
+3. Confirm at least three candidate concepts are saved, visible, and traceable to the Patent Readiness handoff.
+4. Confirm candidate scoring and the Product Design Specification proceed without asking the inventor to perform work InventSmith can do.
+5. Generate the native CAD package only after the selected design specification is current; keep CAD marked Preliminary until engineering, tolerance, manufacturability, and prototype checks are complete.
+6. Continue the same acceptance pattern through Market Research, Patent Readiness, Prototype, Manufacturing, Branding, IP/Legal, Pricing, Marketing, Sales, Funding, Launch, and Growth: a visible status, a useful saved output, a plain-language next step, and an explicit gate only when human judgment or the physical world is genuinely required.
+
+### Important boundary
+
+This checkpoint confirms a working product surface and tested code path. It does not claim patentability, freedom to operate, engineering approval, regulatory clearance, manufacturing release, customer demand, or completed outside-world execution. Those remain separate states in the system.
 
 ## Current acceptance checkpoint — October 19, 2026
 

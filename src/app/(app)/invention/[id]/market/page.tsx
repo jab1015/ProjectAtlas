@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import type { Doc, Id } from "@convex/_generated/dataModel";
-import { ArrowLeft, ExternalLink, FileUp, LineChart, MessageCircle, Search, Users, ShieldAlert } from "lucide-react";
+import { ArrowLeft, ExternalLink, FileUp, LineChart, MessageCircle, Search, Users } from "lucide-react";
 import { AppNav } from "@/components/atlas/app-nav";
 import { MarkdownContent } from "@/components/markdown-content";
 import { Button } from "@/components/ui/button";
@@ -96,8 +96,6 @@ export default function MarketResearchPage() {
   const sourcesById = new Map(library.sources.map((source) => [String(source._id), source]));
   const inventorEvidence = library.sources.filter((source) => source.metadata?.provenance === "inventor_upload");
   const marketWork = (library.workItems ?? []).filter((item) => MARKET_WORK_KINDS.has(item.kind));
-  const competitorWork = marketWork.find((item) => item.kind === "competitor_discovery");
-  const competitorDeliverable = deliverables.find((item) => item.kind === "competitor_landscape");
   const completedMarketWork = marketWork.filter((item) => item.status === "completed").length;
   const marketProgress = marketWork.length > 0 ? Math.round((completedMarketWork / marketWork.length) * 100) : 0;
 
@@ -146,28 +144,12 @@ export default function MarketResearchPage() {
             {marketWork.length === 0 ? <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 text-sm"><p className="font-semibold">InventSmith is preparing Market Research automatically.</p><p className="mt-2 text-muted-foreground">{queueError ? `The queue reported: ${queueError}` : "The queue is being initialized or repaired in the background. You do not need to return to the Journey Center or press a hidden start button. This page will show queued, running, completed, or blocked work as soon as the worker reports it."}</p><Link href={`/invention/${inventionId}/chat`} className="mt-3 inline-flex text-primary underline underline-offset-4">Ask InventSmith for a plain-language status update</Link></div> : <div className="grid gap-3 md:grid-cols-2">{marketWork.map((item) => <article key={item.workItemId} className="rounded-2xl border border-border bg-card p-5"><div className="flex items-start justify-between gap-3"><h3 className="font-semibold">{item.title}</h3><span className={`rounded-full px-3 py-1 text-xs font-medium ${item.status === "failed" ? "bg-red-100 text-red-900" : item.status === "completed" ? "bg-emerald-100 text-emerald-900" : "bg-muted text-foreground"}`}>{statusLabel(item.status)}</span></div>{item.status === "failed" && <p className="mt-3 text-sm text-destructive">This work item needs recovery before a market finding can be shown.</p>}{item.status === "blocked" && item.blockedReason && <p className="mt-3 text-sm text-muted-foreground">Blocked: {item.blockedReason}</p>}{item.outputSummary && <p className="mt-3 text-sm text-muted-foreground">{item.outputSummary}</p>}</article>)}</div>}
           </section>
 
-          <section id="competitor-research" className="rounded-2xl border border-primary/25 bg-primary/5 p-6 sm:p-7">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Automated market work</p>
-                <h2 className="mt-2 text-xl font-semibold">Competitor research</h2>
-                <p className="mt-2 max-w-3xl text-sm text-muted-foreground">InventSmith researches direct competitors, substitutes, pricing signals, and open market space. The result feeds Validation, Patent Readiness, Product Design, Pricing, Marketing, and the pitch deck.</p>
-              </div>
-              <span className={`w-fit shrink-0 rounded-full px-3 py-1 text-xs font-medium ${competitorWork ? competitorWork.status === "completed" ? "bg-emerald-100 text-emerald-900" : competitorWork.status === "failed" ? "bg-red-100 text-red-900" : competitorWork.status === "running" ? "bg-primary/10 text-primary" : "bg-muted text-foreground" : "bg-muted text-muted-foreground"}`}>
-                {competitorWork ? statusLabel(competitorWork.status) : "Not initialized"}
-              </span>
-            </div>
-            {competitorWork?.outputSummary && <p className="mt-4 text-sm text-muted-foreground">{competitorWork.outputSummary}</p>}
-            {competitorWork?.status === "failed" && <p className="mt-4 flex items-start gap-2 text-sm text-destructive"><ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />Competitor research needs recovery before InventSmith can show a finished landscape. Open the Full work library for the retry and operations details.</p>}
-            {competitorDeliverable && <p className="mt-4 text-sm font-medium text-success">Completed competitor findings are included below.</p>}
-            {!competitorWork && <p className="mt-4 text-sm text-muted-foreground">This page initializes the competitor-research job automatically. Refresh after the queue reports its first status.</p>}
-            <Link href={`/invention/${inventionId}/work`} className="mt-4 inline-flex text-sm text-primary underline underline-offset-4">Open competitor research in the Full work library</Link>
-          </section>
-
           <section className="space-y-4">
             <div><h2 className="text-xl font-semibold">Market and competitor work</h2><p className="mt-1 text-sm text-muted-foreground">These findings feed Validation, Patent Readiness, Product Design, Pricing, Marketing and Funding. New survey/interview evidence can make downstream conclusions stale and trigger refresh.</p></div>
-            {deliverables.length === 0 ? (
+            {deliverables.length === 0 && completedMarketWork === 0 ? (
               <div className="rounded-2xl border border-dashed border-border p-8 text-center text-muted-foreground">No completed market findings are available yet. The work-status section above shows what InventSmith is doing next; findings will appear here when the corresponding work completes.</div>
+            ) : deliverables.length === 0 ? (
+              <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 text-sm"><p className="font-semibold">Market research work is complete, but its findings are still being synchronized.</p><p className="mt-2 text-muted-foreground">InventSmith has completed the market work ledger. The findings will appear here as soon as the current deliverable sync finishes.</p></div>
             ) : (
               <div className="space-y-4">
                 {deliverables.map((deliverable) => {

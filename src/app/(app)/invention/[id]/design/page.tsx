@@ -104,27 +104,11 @@ export default function ProductDesignStudioPage() {
     if (!isLoading && !isAuthenticated) router.push("/sign-in");
   }, [isAuthenticated, isLoading, router]);
 
-  useEffect(() => {
-    if (isLoading || !isAuthenticated || !inventionId) return;
-    void (async () => {
-      try {
-        // Product Design depends on canonical prerequisite work such as
-        // product_requirements and materials_manufacturing. Do not restrict
-        // the wake-up to stage 5, or those cross-stage prerequisites can never
-        // be claimed by the worker.
-        await ensureWorkspace({ inventionId });
-        await kickWork({ inventionId });
-      } catch {
-        // The Continue control remains available as a visible recovery path.
-      }
-    })();
-  }, [ensureWorkspace, inventionId, isAuthenticated, isLoading, kickWork]);
-
   const startDesign = async () => {
     setStarting(true); setMessage(null); setError(null);
     try {
       const ensured = await ensureWorkspace({ inventionId });
-      const scheduled = await kickWork({ inventionId });
+      const scheduled = await kickWork({ inventionId, departmentStageId: 5 });
       setMessage(getDepartmentStartMessage("Product Design", ensured.created, scheduled.scheduled));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "InventSmith could not start Product Design.");
@@ -157,20 +141,7 @@ export default function ProductDesignStudioPage() {
   const latestCadNeedsRefresh = latestCadGeneration.some((artifact) => Boolean(artifact.staleReason));
   const cadRunning = workspace.workItems.some((item) => item.kind === "native_cad_generation" && item.status === "running");
   const completeCadPackage = latestCadGeneration.length === 6;
-  const runningItems = workspace.workItems.filter((item) => item.status === "running");
-  const queuedItems = workspace.workItems.filter((item) => item.status === "queued");
-  const blockedItems = workspace.workItems.filter((item) => item.status === "blocked" || item.status === "awaiting_approval");
-  const failedItems = workspace.workItems.filter((item) => item.status === "failed");
-  const nextItem = runningItems[0] ?? queuedItems[0];
-  const plainLanguageStatus = blockedItems.length > 0
-    ? `InventSmith needs your attention on ${blockedItems[0].title}.`
-    : failedItems.length > 0
-      ? `InventSmith is recovering ${failedItems[0].title}. No action is needed unless the page asks for a decision.`
-      : runningItems.length > 0
-        ? `InventSmith is working on ${runningItems[0].title}.`
-        : queuedItems.length > 0
-          ? `The design queue is ready. InventSmith will start ${nextItem?.title ?? "the next design task"} automatically.`
-          : "Product Design work is complete or waiting for a new design decision.";
+  const specificationReady = workspace.cadStatus.specificationReady;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -194,22 +165,6 @@ export default function ProductDesignStudioPage() {
           {message && <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">{message}</div>}
           {error && <div role="alert" className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{error}</div>}
 
-          <section role="status" className="rounded-2xl border border-primary/25 bg-primary/5 p-6 sm:p-7">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Plain-language update</p>
-            <h2 className="mt-2 text-xl font-semibold">What is happening now?</h2>
-            <p className="mt-2 text-base">{plainLanguageStatus}</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {blockedItems.length > 0
-                ? "Open the item below to see the smallest action required."
-                : "You do not need to create CAD, research patents, or organize the design steps yourself. InventSmith handles the queue and will ask only when a real decision, professional review, payment, or physical test is required."}
-            </p>
-            <div className="mt-4 flex flex-wrap gap-3 text-sm">
-              <span className="rounded-full bg-card px-3 py-1">{runningItems.length} working</span>
-              <span className="rounded-full bg-card px-3 py-1">{queuedItems.length} queued</span>
-              <span className="rounded-full bg-card px-3 py-1">{blockedItems.length} needs you</span>
-            </div>
-          </section>
-
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Design work</p><p className="mt-2 text-2xl font-semibold">{completed}/{workspace.workItems.length}</p><p className="mt-1 text-xs text-muted-foreground">completed</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Active queue</p><p className="mt-2 text-2xl font-semibold">{active}</p><p className="mt-1 text-xs text-muted-foreground">queued or running</p></div>
@@ -224,22 +179,22 @@ export default function ProductDesignStudioPage() {
             </div>
           </section>
 
-          <details className="group rounded-2xl border border-border bg-card p-6 sm:p-7" open>
-            <summary className="cursor-pointer list-none text-xl font-semibold marker:hidden">Detailed design pipeline <span className="ml-2 text-sm font-normal text-muted-foreground group-open:hidden">(tap to expand)</span><span className="ml-2 text-sm font-normal text-muted-foreground hidden group-open:inline">(tap to collapse)</span></summary>
-            <p className="mt-2 text-sm text-muted-foreground">Dependencies are enforced automatically. InventSmith advances each task when its prerequisites are ready.</p>
-            <div className="mt-4 grid gap-3">
+          <section className="space-y-4">
+            <div><h2 className="text-xl font-semibold">Design pipeline</h2><p className="mt-1 text-sm text-muted-foreground">Dependencies are enforced by the backend. InventSmith advances the design when required upstream work is trustworthy enough to proceed.</p></div>
+            <div className="grid gap-3">
               {workspace.workItems.length === 0 ? <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Start Product Design to create the design queue.</div> : workspace.workItems.map((item) => {
                 const guidance = workItemGuidance(item);
                 return <article key={item._id} className="rounded-xl border border-border bg-card p-5"><div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div className="min-w-0"><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{item.kind.replaceAll("_", " ")}</p><h3 className="mt-1 font-semibold">{item.title}</h3>{item.outputSummary && <p className="mt-2 text-sm text-muted-foreground">{item.outputSummary}</p>}{guidance && <p className="mt-2 text-sm text-muted-foreground">{guidance}</p>}{item.blockedReason && <p className="mt-2 flex items-start gap-2 text-sm text-warning"><ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />{item.blockedReason}</p>}{item.kind === "design_candidate_generation" && item.status === "completed" && <Button asChild variant="outline" size="sm" className="mt-3"><Link href={`/invention/${inventionId}/work`}>Review design candidates</Link></Button>}</div><span className={`w-fit shrink-0 rounded-full px-3 py-1 text-xs font-medium ${statusClass(item.status)}`}>{STATUS_LABELS[item.status] ?? item.status}</span></div></article>;
               })}
             </div>
-          </details>
+          </section>
 
           <section className="rounded-2xl border border-primary/25 bg-primary/5 p-6 sm:p-7">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <div><h2 className="flex items-center gap-2 text-xl font-semibold"><Wrench className="h-5 w-5 text-primary" />Native CAD package</h2><p className="mt-1 max-w-2xl text-sm text-muted-foreground">After the Product Design Specification is current, InventSmith converts the selected design into a constrained parametric assembly and deterministically exports STEP, STL and DXF files, editable InventSmith geometry source, orthographic engineering views, and an exploded assembly view.</p></div>
-              <Button onClick={() => void generateCad()} disabled={generatingCad || cadRunning} className="gap-2"><Box className="h-4 w-4" />{generatingCad || cadRunning ? "Generating CAD…" : latestCadGeneration.length ? "Regenerate CAD" : "Generate native CAD"}</Button>
+              <Button onClick={() => void generateCad()} disabled={generatingCad || cadRunning || !specificationReady} className="gap-2"><Box className="h-4 w-4" />{generatingCad || cadRunning ? "Generating CAD…" : latestCadGeneration.length ? "Regenerate CAD" : specificationReady ? "Generate native CAD" : "CAD waits for design spec"}</Button>
             </div>
+            {!specificationReady && <p className="mt-4 rounded-lg border border-warning/30 bg-warning/5 p-3 text-sm text-muted-foreground">CAD generation becomes available automatically after InventSmith completes the Product Design Specification. You do not need to upload CAD or start a prototype yet.</p>}
             {latestCadGeneration.length > 0 && <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{latestCadGeneration.map((artifact) => (
               <div key={artifact._id} className="rounded-xl border border-border bg-background p-4"><p className="text-xs font-semibold uppercase tracking-wider text-primary">{artifactLabel(artifact.kind)}</p><p className="mt-1 text-sm font-medium">v{artifact.version} · {artifact.staleReason ? "Refresh needed" : maturityLabel(artifact.artifactMaturity)}</p>{artifact.staleReason && <p className="mt-1 text-xs text-warning">{artifact.staleReason}</p>}{artifact.downloadUrl && <Button asChild variant="outline" size="sm" className="mt-3 w-full gap-2"><a href={artifact.downloadUrl} download target="_blank" rel="noreferrer"><Download className="h-4 w-4" />Download</a></Button>}</div>
             ))}</div>}
