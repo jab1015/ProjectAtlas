@@ -53,6 +53,7 @@ function surveyEvidenceDetails(context: InventionContext) {
     // are one completed respondent each, so count them without overstating the
     // size of a separate uploaded survey.
     sampleSize: Math.max(publicResponseCount, sampleSizes.length > 0 ? Math.max(...sampleSizes) : 0) || undefined,
+    siteCollectedResponses: publicResponseCount,
   };
 }
 
@@ -90,12 +91,18 @@ export function assessContextOnlyValidationConfidence(
   // or respondent, so duplicates and inflated sample counts cannot inflate it.
   const survey = surveyEvidenceDetails(context);
   const surveySupported = survey.present && SURVEY_SUPPORTED_SECTIONS.has(sectionKey);
-  if (surveySupported) score = Math.min(0.5, score + 0.2);
+  if (surveySupported) {
+    // Site responses are real, traceable customer signals. They strengthen
+    // customer-validation sections without being promoted to independent
+    // market verification merely because they came through our form.
+    const traceabilityBonus = survey.siteCollectedResponses > 0 ? 0.05 : 0;
+    score = Math.min(0.55, score + 0.2 + traceabilityBonus);
+  }
 
   const missingInformation = [
     "Independent retrieval/source records have not been collected by this provider.",
     context.inventorEvidence?.length
-      ? "Uploaded evidence has been included but its methodology and representativeness have not been independently verified."
+      ? "Evidence has been included. Site-collected responses are counted as traceable customer-validation signals; uploaded studies still require methodology review before they can support independent market claims. These records have not been independently verified as representative market evidence."
       : "Primary customer validation data has not been supplied as verified evidence.",
   ];
 
@@ -110,7 +117,7 @@ export function assessContextOnlyValidationConfidence(
     level: score >= 0.5 ? "moderate" : score >= 0.35 ? "low" : "very_low",
     evidenceSummary:
       context.inventorEvidence?.length
-      ? `Grounded in invention context and extracted inventor-uploaded evidence. ${surveySupported ? `Survey observations strengthen customer-validation evidence support${survey.sampleSize ? ` (${survey.sampleSize} reported respondents)` : ""}. ` : ""}The score is a heuristic evidence-support rating, not a statistical confidence level or probability of commercial success. Document observations and AI inferences are not independent verification.`
+      ? `Grounded in invention context and extracted inventor-uploaded evidence. ${surveySupported ? `Survey observations strengthen customer-validation evidence support${survey.sampleSize ? ` (${survey.sampleSize} reported respondents)` : ""}${survey.siteCollectedResponses ? `, including ${survey.siteCollectedResponses} site-collected response${survey.siteCollectedResponses === 1 ? "" : "s"}` : ""}. ` : ""}The score is a heuristic evidence-support rating, not a statistical confidence level or probability of commercial success. Site-collected responses count toward customer validation, but do not independently verify market size or guarantee demand.`
         : "Grounded only in inventor-provided invention context. Generated conclusions are AI inferences/hypotheses, not independently sourced facts.",
     assumptions: [
       "Inventor-provided problem and invention descriptions are accurate statements of the intended concept.",
