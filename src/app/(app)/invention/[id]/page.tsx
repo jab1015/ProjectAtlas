@@ -252,6 +252,12 @@ export default function InventionWorkspacePage() {
     };
   }, []);
 
+  useEffect(() => {
+    if (inventionState && inventionState.currentStage.id > 4) {
+      router.replace(`/invention/${inventionId}/journey`);
+    }
+  }, [inventionId, inventionState, router]);
+
   if (isLoading || !isAuthenticated || inventionState === undefined) {
     return (
       <div className="min-h-screen min-w-0 flex flex-col bg-background">
@@ -282,12 +288,6 @@ export default function InventionWorkspacePage() {
   const { invention, currentStage, readinessState, nextAction, completedFields } = inventionState;
   const stageId = currentStage.id;
   const fields = STAGE_FIELDS[stageId];
-
-  useEffect(() => {
-    if (inventionState && inventionState.currentStage.id > 4) {
-      router.replace(`/invention/${inventionId}/journey`);
-    }
-  }, [inventionId, inventionState, router]);
 
   // ── Stage 2: Validation Research Status (replaces questionnaire) ─────────────
   if (stageId === 2) {
