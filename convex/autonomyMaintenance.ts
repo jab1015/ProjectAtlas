@@ -4,6 +4,7 @@ import type { Id } from "./_generated/dataModel";
 import { hasRecoverableAutonomousWork, shouldQueueEvidenceRefresh } from "./autonomyMaintenanceLogic";
 import { MAX_AUTONOMOUS_RUN_BUDGET } from "./usagePolicyLogic";
 import { EVIDENCE_FRESHNESS_STALE_REASON, isSourceEligibleForPromotion } from "./evidenceIntegrityLogic";
+import { departmentAgentAuditMetadata, resolveDepartmentAgent } from "./departmentAgentLogic";
 
 const findCandidates = makeFunctionReference<"query", Record<string, never>, Id<"inventions">[]>("autonomyMaintenance:findResumeCandidates");
 const runAvailableWork = makeFunctionReference<"action", { inventionId: Id<"inventions">; costBudgetUnits?: number }, unknown>("atlasWorkOrchestration:runAvailableWork");
@@ -72,11 +73,48 @@ export const findResumeCandidates = internalQuery({
   },
 });
 
+/** Requeue failed work whose department assignment is now resolvable. */
+export const recoverFailedWork = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+    const inventions = await ctx.db.query("inventions").withIndex("by_status", (q) => q.eq("status", "active")).take(100);
+    let requeued = 0;
+    for (const invention of inventions) {
+      const workItems = await ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", invention._id)).collect();
+      for (const item of workItems) {
+        if (item.status !== "failed" || item.attemptCount >= (item.maxAttempts ?? 3)) continue;
+        let agent;
+        try { agent = resolveDepartmentAgent(item.inputSnapshot, item.kind); } catch { continue; }
+        await ctx.db.patch(item._id, {
+          status: "queued",
+          lastError: undefined,
+          inputSnapshot: { ...(item.inputSnapshot ?? {}), department: agent.department },
+          updatedAt: now,
+        });
+        await ctx.db.insert("atlasExecutionEvents", {
+          inventionId: invention._id,
+          workItemId: item._id,
+          eventType: "work_queued",
+          actorType: "system",
+          summary: `InventSmith automatically recovered ${item.title} and returned it to the worker queue.`,
+          attemptNumber: item.attemptCount,
+          metadata: { changeType: "automatic_failure_recovery", ...departmentAgentAuditMetadata({ ...(item.inputSnapshot ?? {}), department: agent.department }, item.kind) },
+          createdAt: now,
+        });
+        requeued += 1;
+      }
+    }
+    return { requeued };
+  },
+});
+
 export const resumeEligibleInventions = internalAction({
   args: {},
   handler: async (ctx) => {
     await ctx.runMutation(refreshExpiredEvidenceRef, {});
-    if (!process.env.OPENAI_API_KEY) return { scheduled: 0, reason: "openai_not_configured" };
+    const recovery = await ctx.runMutation(makeFunctionReference<"mutation", Record<string, never>, { requeued: number }>("autonomyMaintenance:recoverFailedWork"), {});
+    if (!process.env.OPENAI_API_KEY) return { scheduled: 0, requeued: recovery.requeued, reason: "openai_not_configured" };
     const inventionIds = await ctx.runQuery(findCandidates, {});
     for (let index = 0; index < inventionIds.length; index += 1) {
       await ctx.scheduler.runAfter(index * 250, runAvailableWork, {
@@ -84,6 +122,6 @@ export const resumeEligibleInventions = internalAction({
         costBudgetUnits: MAX_AUTONOMOUS_RUN_BUDGET,
       });
     }
-    return { scheduled: inventionIds.length, reason: "scheduled" };
+    return { scheduled: inventionIds.length, requeued: recovery.requeued, reason: "scheduled" };
   },
 });
