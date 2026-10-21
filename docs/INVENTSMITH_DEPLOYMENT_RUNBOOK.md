@@ -1,3 +1,11 @@
+### Patent-to-design sequencing — October 21, 2026
+
+- Automated Patent Readiness work is allowed to complete the preliminary landscape, feature comparison, and distinguishing-feature handoff without waiting for the separate professional-review package.
+- The handoff must label each reference as current/unclear or inactive. Only current/unclear references become active design-around constraints; inactive references remain historical prior-art context.
+- Product Design can consume the handoff and generate preliminary candidates, artwork, specifications, and CAD preparation. These outputs remain draft/preliminary until the required engineering and patent-professional reviews are accepted.
+- Do not report this workflow as patent clearance or freedom-to-operate approval. The professional gate remains before legal conclusions, claims, filing, or external reliance.
+- Implementation commit: `4b33960`. Focused regression checks and TypeScript passed.
+
 # InventSmith Owner-Controlled Deployment and Acceptance Runbook
 
 ### Current deployment checkpoint — October 21, 2026
