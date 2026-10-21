@@ -33,19 +33,27 @@ function surveyEvidenceDetails(context: InventionContext) {
       (finding: any) => finding?.basis === "document_observation" && typeof finding.statement === "string" && finding.statement.trim()
     );
     const hasStructuredRows = extraction.mode === "csv_survey" && Number(extraction.survey?.rowCount) > 0;
+    const hasPublicSurveyResponse = extraction.mode === "public_response" && extraction.documentType === "public_survey_response";
     const documentLooksLikeSurvey = /survey|survey monkey|surveymonkey|respondent|response|user/i.test(
       `${extraction.documentType ?? ""} ${extraction.sampleSize ?? ""} ${extraction.summary ?? ""}`
     );
-    return hasFindings || hasStructuredRows || documentLooksLikeSurvey;
+    return hasFindings || hasStructuredRows || hasPublicSurveyResponse || documentLooksLikeSurvey;
   });
 
+  const publicResponseCount = surveys.filter((source) => (source.extraction as Record<string, any>).mode === "public_response").length;
   const sampleSizes = surveys.flatMap((source) => {
     const extraction = source.extraction as Record<string, any>;
     const raw = `${extraction.sampleSize ?? ""} ${extraction.survey?.rowCount ?? ""}`;
     return [...raw.matchAll(/\b(\d{1,6})\b/g)].map((match) => Number(match[1])).filter((value) => value > 0);
   });
 
-  return { present: surveys.length > 0, sampleSize: sampleSizes.length > 0 ? Math.max(...sampleSizes) : undefined };
+  return {
+    present: surveys.length > 0,
+    // Imported survey files may report their own sample size. Public responses
+    // are one completed respondent each, so count them without overstating the
+    // size of a separate uploaded survey.
+    sampleSize: Math.max(publicResponseCount, sampleSizes.length > 0 ? Math.max(...sampleSizes) : 0) || undefined,
+  };
 }
 
 /**

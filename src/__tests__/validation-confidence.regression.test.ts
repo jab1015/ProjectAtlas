@@ -81,6 +81,28 @@ describe("context-only validation confidence", () => {
     expect(assessment.evidenceSummary).toContain("100 reported respondents");
   });
 
+  it("counts anonymous public survey responses as validation evidence", () => {
+    const withResponses: InventionContext = {
+      ...context,
+      inventorEvidence: [1, 2].map((index) => ({
+        sourceId: `public-response-${index}`,
+        title: "Rise Jar survey response",
+        evidenceKind: "survey",
+        provenance: "inventor_upload",
+        extraction: {
+          mode: "public_response",
+          documentType: "public_survey_response",
+          sampleSize: 1,
+          survey: { rowCount: 1 },
+        },
+      })),
+    };
+    const assessment = assessContextOnlyValidationConfidence(withResponses, "validationPlan");
+    expect(assessment.score).toBeGreaterThan(assessContextOnlyValidationConfidence(context, "validationPlan").score);
+    expect(assessment.evidenceSummary).toContain("2 reported respondents");
+    expect(assessment.missingInformation.join(" ")).toContain("not been independently verified");
+  });
+
   it("moves the overall 11-section evidence-support score when a survey is included", () => {
     const sections = [
       "validationPlan", "customerSegments", "competitorAnalysis", "marketSizing",

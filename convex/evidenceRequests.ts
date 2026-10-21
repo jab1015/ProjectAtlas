@@ -74,6 +74,21 @@ export const submit = mutation({
     const answers = args.answers.map(answer => ({ questionId: answer.questionId, answer: answer.answer.trim().slice(0, 4000) })).filter(answer => answer.answer);
     if (!answers.length) throw new ConvexError("Please answer at least one question");
     const now = Date.now();
+    const evidenceKind = request.kind === "survey" ? "survey" : "interview";
+    // Keep each anonymous response structured enough for Validation to consume
+    // it immediately. It remains inventor-provided/unverified; this only records
+    // that one respondent completed the public instrument.
+    const extraction = {
+      mode: "public_response",
+      documentType: request.kind === "survey" ? "public_survey_response" : "public_interview_response",
+      requestId: String(request._id),
+      questions: request.questions,
+      answers,
+      respondentName: args.respondentName?.trim() || undefined,
+      ...(request.kind === "survey"
+        ? { sampleSize: 1, survey: { rowCount: 1, columnCount: request.questions.length } }
+        : {}),
+    };
     await ctx.db.insert("evidenceResponses", { requestId: request._id, inventionId: request.inventionId, answers, respondentName: args.respondentName?.trim().slice(0, 120) || undefined, submittedAt: now });
     const sourceId = await ctx.db.insert("evidenceSources", {
       inventionId: request.inventionId,
@@ -83,13 +98,13 @@ export const submit = mutation({
       accessedAt: now,
       excerpt: answers.map(answer => answer.answer).join("\n"),
       reliability: "unverified",
-      metadata: { provenance: "inventor_upload", evidenceOrigin: "public_response", evidenceKind: request.kind === "survey" ? "survey" : "interview", requestId: String(request._id), extractionStatus: "completed", extraction: { mode: "public_response", requestId: String(request._id), questions: request.questions, answers, respondentName: args.respondentName?.trim() || undefined }, uploadedAt: now, extractedAt: now },
+      metadata: { provenance: "inventor_upload", evidenceOrigin: "public_response", evidenceKind, requestId: String(request._id), extractionStatus: "completed", extraction, uploadedAt: now, extractedAt: now },
       createdAt: now,
     });
     await ctx.db.patch(request._id, { responseCount: request.responseCount + 1, updatedAt: now });
     await applyInventorEvidenceChange(ctx, request.inventionId, {
-      action: "uploaded", sourceId, label: `${request.title} response`, evidenceKind: request.kind === "survey" ? "survey" : "interview",
-      extraction: { mode: "public_response", requestId: String(request._id), answers, respondentName: args.respondentName?.trim() || undefined }, now,
+      action: "uploaded", sourceId, label: `${request.title} response`, evidenceKind,
+      extraction, now,
     });
     return { submitted: true };
   },
