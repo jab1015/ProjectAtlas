@@ -8,12 +8,15 @@ import { api } from "@convex/_generated/api";
 import { BarChart3, Building2, Download, LifeBuoy, LogOut, Map, ScrollText, UserRound, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AtlasLogo } from "@/components/atlas/atlas-logo";
+import { InventorActivityStrip } from "@/components/atlas/inventor-activity-strip";
+import type { StatusBriefing } from "@convex/statusBriefingLogic";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface AppNavProps { className?: string; }
 interface AccessibleInvention { _id: string; title: string; access: "manage" | "edit" | "view" | "review"; }
 const getActiveAccessibleInvention = makeFunctionReference<"query", Record<string, never>, AccessibleInvention | null>("organizationNavigation:getActiveAccessibleInvention");
+const getStatusBriefing = makeFunctionReference<"query", { inventionId: string }, StatusBriefing>("inventionWorkspace:getStatusBriefing");
 
 export function AppNav({ className }: AppNavProps) {
   const { signOut } = useAuthActions();
@@ -21,6 +24,7 @@ export function AppNav({ className }: AppNavProps) {
   const { isAuthenticated } = useConvexAuth();
   const user = useQuery(api.authHelpers.getCurrentUser);
   const activeInvention = useQuery(getActiveAccessibleInvention, isAuthenticated ? {} : "skip");
+  const briefing = useQuery(getStatusBriefing, activeInvention ? { inventionId: activeInvention._id } : "skip");
   const ensureProfile = useMutation(api.users.ensureUserProfile);
 
   const handleSignOut = async () => {
@@ -40,7 +44,8 @@ export function AppNav({ className }: AppNavProps) {
   }, [isAuthenticated, ensureProfile]);
 
   return (
-    <header className={`sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 ${className ?? ""}`}>
+    <>
+      <header className={`sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 ${className ?? ""}`}>
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
         <Link href="/dashboard" className="no-underline transition-opacity hover:opacity-80"><AtlasLogo size="sm" className="text-primary" /></Link>
         <div className="flex items-center gap-1 sm:gap-2">
@@ -57,6 +62,8 @@ export function AppNav({ className }: AppNavProps) {
           <Button variant="ghost" size="sm" onClick={() => void handleSignOut()} className="gap-1.5 text-muted-foreground hover:text-foreground" title="Sign out"><LogOut className="h-4 w-4" /><span className="hidden sm:inline">Sign Out</span></Button>
         </div>
       </div>
-    </header>
+      </header>
+      {activeInvention && <InventorActivityStrip inventionId={activeInvention._id} inventionTitle={activeInvention.title} inventorName={user?.name ?? user?.email} briefing={briefing} />}
+    </>
   );
 }
