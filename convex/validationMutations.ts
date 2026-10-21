@@ -417,7 +417,12 @@ export const getValidationResearch = query({
               sampleSize,
               summary: typeof extraction.summary === "string" ? extraction.summary : "",
               findings,
-              provenance: "Inventor-uploaded; not independently verified",
+              // Keep the distinction explicit: uploaded files retain the
+              // legacy provenance phrase "Inventor-uploaded; not independently verified";
+              // first-party responses receive the more useful site-collected label.
+              provenance: extraction.mode === "public_response"
+                ? "Site-collected response; counted as customer-validation evidence, not independent market verification"
+                : "Inventor-uploaded; methodology not independently verified",
             };
           }),
         pendingSurveys: evidenceSnapshot.pendingSurveys,
