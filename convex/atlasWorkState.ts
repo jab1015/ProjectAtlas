@@ -1,7 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { internalMutation, internalQuery, type MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
-import { selectNextWorkItem, shouldRetryWork } from "./workOrchestratorLogic";
+import { automaticRecoveryCount, selectNextWorkItem, shouldAutomaticallyRecoverFailedWork, shouldRetryWork } from "./workOrchestratorLogic";
 import { canPromoteDeliverable, EVIDENCE_FRESHNESS_STALE_REASON, isSourceEligibleForPromotion, normalizeFinding, reliabilityFromVerificationStatus, sanitizeSourceUrls } from "./evidenceIntegrityLogic";
 import { remainingAutonomousCostUnitsAfterReservations, utcDateKey } from "./usagePolicyLogic";
 import { buildDeliverablePersistencePlan } from "./deliverablePersistenceLogic";
@@ -586,7 +586,22 @@ export const failWork = internalMutation({
       return { willRetry: false, staleAttempt: true };
     }
 
-    const willRetry = shouldRetryWork(item.attemptCount, item.maxAttempts ?? 3);
+    const currentMaxAttempts = item.maxAttempts ?? 3;
+    const ordinaryRetry = shouldRetryWork(item.attemptCount, currentMaxAttempts);
+    const automaticRecovery = !ordinaryRetry && shouldAutomaticallyRecoverFailedWork(
+      item.kind,
+      item.inputSnapshot,
+      item.attemptCount,
+      currentMaxAttempts,
+    );
+    const willRetry = ordinaryRetry || automaticRecovery;
+    const nextInputSnapshot = automaticRecovery
+      ? {
+          ...(item.inputSnapshot ?? {}),
+          automaticRecoveryCount: automaticRecoveryCount(item.inputSnapshot) + 1,
+          lastAutomaticRecoveryAt: args.failedAt,
+        }
+      : item.inputSnapshot;
     const settledCostUnits = conservativeAttemptSettlementCost({
       usageKnown: args.usageKnown,
       actualCostUnits: args.actualCostUnits,
@@ -595,7 +610,9 @@ export const failWork = internalMutation({
     await settleUsageReservation(ctx, item, item.inventionId, settledCostUnits, 0, args.failedAt);
     await ctx.db.patch(item._id, {
       status: willRetry ? "queued" : "failed",
-      lastError: args.error.slice(0, 1000),
+      maxAttempts: automaticRecovery ? item.attemptCount + 2 : item.maxAttempts,
+      lastError: willRetry ? undefined : args.error.slice(0, 1000),
+      inputSnapshot: nextInputSnapshot,
       leaseExpiresAt: undefined,
       reservedCostUnits: undefined,
       reservedDailyCostUnits: undefined,
@@ -608,10 +625,12 @@ export const failWork = internalMutation({
       workItemId: item._id,
       eventType: "work_failed",
       actorType: "atlas",
-      summary: "Autonomous work attempt failed.",
+      summary: automaticRecovery
+        ? "Autonomous work failed at its retry limit and was automatically requeued for recovery."
+        : "Autonomous work attempt failed.",
       attemptNumber: args.attemptNumber,
       costUnits: args.usageKnown ? args.actualCostUnits : undefined,
-      metadata: { ...departmentAgentAuditMetadata(item.inputSnapshot, item.kind), retryScheduled: willRetry, usageKnown: args.usageKnown, budgetDebitUnits: settledCostUnits },
+      metadata: { ...departmentAgentAuditMetadata(nextInputSnapshot, item.kind), retryScheduled: willRetry, automaticRecovery, usageKnown: args.usageKnown, budgetDebitUnits: settledCostUnits },
       createdAt: args.failedAt,
     });
     return { willRetry, staleAttempt: false };
