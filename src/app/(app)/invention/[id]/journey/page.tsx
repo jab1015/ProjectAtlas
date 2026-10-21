@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useConvexAuth, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import type { Id } from "@convex/_generated/dataModel";
 import { AlertTriangle, ArrowLeft, CheckCircle2, CircleDashed, FileUp, Gavel, LockKeyhole, RefreshCw, Sparkles, Wrench } from "lucide-react";
@@ -37,6 +37,8 @@ interface JourneyCenterState {
 }
 
 const getJourneyCenter = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, JourneyCenterState>("journeyCenter:getJourneyCenter");
+const backfillWorkspace = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { addedWorkCount: number }>("inventionMigrations:backfillWorkspace");
+const kickAutonomousWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { scheduled: boolean; reason: string }>("inventionWorkspace:kickAutonomousWork");
 const listEvidenceRequests = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, Array<{ kind: "survey" | "interview"; title: string; status: "active" | "closed" }>>("evidenceRequests:list");
 
 const STATUS: Record<JourneyStageRow["status"], { label: string; className: string }> = {
@@ -68,10 +70,25 @@ export default function JourneyCenterPage() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const journey = useQuery(getJourneyCenter, isAuthenticated && inventionId ? { inventionId } : "skip");
   const evidenceRequests = useQuery(listEvidenceRequests, isAuthenticated && inventionId ? { inventionId } : "skip");
+  const migrateWorkspace = useMutation(backfillWorkspace);
+  const kickWork = useMutation(kickAutonomousWork);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.push("/sign-in");
   }, [isAuthenticated, isLoading, router]);
+
+  useEffect(() => {
+    if (isLoading || !isAuthenticated || !inventionId) return;
+    void (async () => {
+      try {
+        await migrateWorkspace({ inventionId });
+        await kickWork({ inventionId });
+      } catch {
+        // Journey rendering is independent of the scheduler; a later visit
+        // retries the idempotent wake-up.
+      }
+    })();
+  }, [inventionId, isAuthenticated, isLoading, migrateWorkspace, kickWork]);
 
   if (isLoading || !isAuthenticated || journey === undefined) {
     return <div className="min-h-screen bg-background"><AppNav /><main className="mx-auto max-w-5xl px-4 py-12 text-sm text-muted-foreground sm:px-6">Loading InventSmith journey…</main></div>;

@@ -105,6 +105,21 @@ export default function LifecycleDepartmentPage() {
     if (!validStage) router.replace(`/invention/${inventionId}`);
   }, [isAuthenticated, isLoading, router, validStage, inventionId]);
 
+  useEffect(() => {
+    if (isLoading || !isAuthenticated || !validStage || !inventionId) return;
+    void (async () => {
+      try {
+        // Opening a department safely initializes its ledger and wakes
+        // eligible work. Human, payment, legal, and physical-world gates
+        // remain enforced by the worker.
+        await ensureDepartment({ inventionId, stageId });
+        await kickWork({ inventionId, departmentStageId: stageId });
+      } catch {
+        // The explicit Start/Continue control remains available for recovery.
+      }
+    })();
+  }, [ensureDepartment, inventionId, isAuthenticated, isLoading, kickWork, stageId, validStage]);
+
   const departmentWork = useMemo(() => {
     if (!department) return [];
     return mergeById(department.workItems, extensions?.workItems ?? [])

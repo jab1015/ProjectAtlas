@@ -1,17 +1,15 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { missingCanonicalWorkKinds } from "./canonicalWorkPlan";
 import { POST_CANONICAL_WORK_PLAN } from "./fullProductWorkPlan";
+import { requireInventionEditAccess } from "./organizations";
 
 export const backfillWorkspace = mutation({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new ConvexError("Not authenticated");
-
+    const { userId } = await requireInventionEditAccess(ctx, inventionId);
     const invention = await ctx.db.get(inventionId);
-    if (!invention || invention.userId !== userId) throw new ConvexError("Invention not found");
+    if (!invention) throw new ConvexError("Invention not found");
 
     const now = Date.now();
     let recordCreated = false;
