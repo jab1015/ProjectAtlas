@@ -127,6 +127,8 @@ export const listInventionEvidence = query({
             fileSize: typeof source.metadata?.fileSize === "number" ? source.metadata.fileSize : null,
             mimeType: typeof source.metadata?.mimeType === "string" ? source.metadata.mimeType : null,
             evidenceKind: typeof source.metadata?.evidenceKind === "string" ? source.metadata.evidenceKind : "other",
+            evidenceOrigin: typeof source.metadata?.evidenceOrigin === "string" ? source.metadata.evidenceOrigin : null,
+            validationStatus: typeof source.metadata?.validationStatus === "string" ? source.metadata.validationStatus : null,
             extractionMode: extraction?.mode ?? null,
             extractionSummary: extraction?.summary ?? null,
             extractionStatus: typeof source.metadata?.extractionStatus === "string" ? source.metadata.extractionStatus : null,
