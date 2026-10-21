@@ -18,13 +18,43 @@ interface DeliverableLibrary {
   sources: Doc<"evidenceSources">[];
   reviews: Doc<"professionalReviews">[];
   executionEvents: Doc<"atlasExecutionEvents">[];
+  workItems: Array<{
+    workItemId: Id<"atlasWorkItems">;
+    kind: string;
+    title: string;
+    status: string;
+    attemptCount: number;
+    updatedAt: number;
+    blockedReason?: string;
+    outputSummary?: string;
+  }>;
+  failedWork: Array<{
+    workItemId: Id<"atlasWorkItems">;
+    kind: string;
+    title: string;
+    attemptCount: number;
+    updatedAt: number;
+    summary: string;
+  }>;
 }
 
 const getDeliverableLibrary = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, DeliverableLibrary>("inventionWorkspace:getDeliverableLibrary");
 const MARKET_KINDS = new Set(["competitor_discovery", "market_feasibility"]);
+const MARKET_WORK_KINDS = new Set(["competitor_discovery", "market_feasibility"]);
 
 function isWebLocator(locator?: string): locator is string {
   return Boolean(locator && /^https?:\/\//i.test(locator));
+}
+
+function sourceEvidenceLabel(source: Doc<"evidenceSources">) {
+  const metadata = source.metadata as { evidenceKind?: string; fileName?: string; evidenceOrigin?: string } | undefined;
+  if (metadata?.fileName) return metadata.fileName;
+  if (metadata?.evidenceOrigin === "public_response") return "Survey/interview response";
+  return metadata?.evidenceKind?.replaceAll("_", " ") ?? "Inventor evidence";
+}
+
+function statusLabel(status: string) {
+  return status.replaceAll("_", " ");
 }
 
 export default function MarketResearchPage() {
@@ -46,6 +76,7 @@ export default function MarketResearchPage() {
   const deliverables = library.deliverables.filter((item) => MARKET_KINDS.has(item.kind));
   const sourcesById = new Map(library.sources.map((source) => [String(source._id), source]));
   const inventorEvidence = library.sources.filter((source) => source.metadata?.provenance === "inventor_upload");
+  const marketWork = library.workItems.filter((item) => MARKET_WORK_KINDS.has(item.kind));
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -67,9 +98,28 @@ export default function MarketResearchPage() {
           </section>
 
           <section className="space-y-4">
+            <div><h2 className="text-xl font-semibold">Inventor evidence connected to market research</h2><p className="mt-1 text-sm text-muted-foreground">Uploads and survey responses are preserved as unverified inventor-provided evidence. They are available to market, validation, design, pricing and funding work without being presented as independently verified demand.</p></div>
+            {inventorEvidence.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">No inventor evidence is connected yet. Upload a SurveyMonkey export, interview notes, or create a shareable survey page above.</div>
+            ) : (
+              <div className="space-y-3">
+                {inventorEvidence.map((source) => {
+                  const metadata = source.metadata as { extractionStatus?: string; fileSize?: number; uploadedAt?: number } | undefined;
+                  return <article key={source._id} className="rounded-2xl border border-border bg-card p-5"><div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"><div><h3 className="font-semibold">{source.title}</h3><p className="mt-1 text-xs capitalize text-muted-foreground">{sourceEvidenceLabel(source)} · {source.reliability.replaceAll("_", " ")}</p></div><span className="w-fit rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">Unverified inventor evidence</span></div>{source.excerpt && <p className="mt-3 whitespace-pre-wrap text-sm text-muted-foreground">{source.excerpt.slice(0, 700)}{source.excerpt.length > 700 ? "…" : ""}</p>}<p className="mt-3 text-xs text-muted-foreground">{metadata?.extractionStatus === "completed" ? "Structured and available to downstream work" : metadata?.extractionStatus === "running" ? "Being structured for downstream work" : "Queued for structured extraction"}{metadata?.uploadedAt ? ` · Added ${new Date(metadata.uploadedAt).toLocaleDateString()}` : ""}</p></article>;
+                })}
+              </div>
+            )}
+          </section>
+
+          <section className="space-y-4">
+            <div><h2 className="text-xl font-semibold">Market research work status</h2><p className="mt-1 text-sm text-muted-foreground">This is where InventSmith shows whether customer, competitor and demand research is queued, running, completed or needs recovery.</p></div>
+            {marketWork.length === 0 ? <div className="rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">No market-research work has been created yet. Return to the Journey Center to start the autonomous work sequence.</div> : <div className="grid gap-3 md:grid-cols-2">{marketWork.map((item) => <article key={item.workItemId} className="rounded-2xl border border-border bg-card p-5"><div className="flex items-start justify-between gap-3"><h3 className="font-semibold">{item.title}</h3><span className={`rounded-full px-3 py-1 text-xs font-medium ${item.status === "failed" ? "bg-red-100 text-red-900" : item.status === "completed" ? "bg-emerald-100 text-emerald-900" : "bg-muted text-foreground"}`}>{statusLabel(item.status)}</span></div>{item.status === "failed" && <p className="mt-3 text-sm text-destructive">This work item needs recovery before a market finding can be shown.</p>}{item.status === "blocked" && item.blockedReason && <p className="mt-3 text-sm text-muted-foreground">Blocked: {item.blockedReason}</p>}{item.outputSummary && <p className="mt-3 text-sm text-muted-foreground">{item.outputSummary}</p>}</article>)}</div>}
+          </section>
+
+          <section className="space-y-4">
             <div><h2 className="text-xl font-semibold">Market and competitor work</h2><p className="mt-1 text-sm text-muted-foreground">These findings feed Validation, Patent Readiness, Product Design, Pricing, Marketing and Funding. New survey/interview evidence can make downstream conclusions stale and trigger refresh.</p></div>
             {deliverables.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-border p-8 text-center text-muted-foreground">Market Research is visible while InventSmith works. Completed research will appear here automatically.</div>
+              <div className="rounded-2xl border border-dashed border-border p-8 text-center text-muted-foreground">No completed market findings are available yet. The work-status section above shows what InventSmith is doing next; findings will appear here when the corresponding work completes.</div>
             ) : (
               <div className="space-y-4">
                 {deliverables.map((deliverable) => {
