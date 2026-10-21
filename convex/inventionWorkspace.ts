@@ -28,6 +28,11 @@ const runAvailableWork = makeFunctionReference<
   unknown
 >("atlasWorkOrchestration:runAvailableWork");
 
+const AUTONOMOUS_RESEARCH_KINDS = new Set([
+  "preliminary_prior_art", "feature_prior_art_comparison", "distinguishing_features",
+  "ip_readiness", "market_feasibility", "regulatory_screening",
+]);
+
 async function getAccessibleInvention(
   ctx: Parameters<typeof requireInventionReadAccess>[0],
   inventionId: Id<"inventions">
@@ -252,12 +257,16 @@ export const kickAutonomousWork = mutation({
     const now = Date.now();
     const workItems = await ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
     for (const item of workItems) {
-      if (item.status !== "failed" || item.attemptCount >= (item.maxAttempts ?? 3)) continue;
+      const recoverableResearchGate = item.status === "blocked" && item.humanGateType === "professional_review" && AUTONOMOUS_RESEARCH_KINDS.has(item.kind);
+      const recoverableFailure = item.status === "failed" && item.attemptCount < (item.maxAttempts ?? 3);
+      if (!recoverableResearchGate && !recoverableFailure) continue;
       try {
         const agent = resolveDepartmentAgent(item.inputSnapshot, item.kind);
         await ctx.db.patch(item._id, {
           status: "queued",
           lastError: undefined,
+          blockedReason: undefined,
+          humanGateType: undefined,
           inputSnapshot: { ...(item.inputSnapshot ?? {}), department: agent.department },
           updatedAt: now,
         });
@@ -266,9 +275,11 @@ export const kickAutonomousWork = mutation({
           workItemId: item._id,
           eventType: "work_queued",
           actorType: "system",
-          summary: `InventSmith automatically recovered ${item.title} and returned it to the worker queue.`,
+          summary: recoverableResearchGate
+            ? `InventSmith resumed ${item.title}; preliminary research can run autonomously before professional review.`
+            : `InventSmith automatically recovered ${item.title} and returned it to the worker queue.`,
           attemptNumber: item.attemptCount,
-          metadata: { changeType: "automatic_failure_recovery", ...departmentAgentAuditMetadata({ ...(item.inputSnapshot ?? {}), department: agent.department }, item.kind) },
+          metadata: { changeType: recoverableResearchGate ? "autonomous_research_gate_recovery" : "automatic_failure_recovery", ...departmentAgentAuditMetadata({ ...(item.inputSnapshot ?? {}), department: agent.department }, item.kind) },
           createdAt: now,
         });
       } catch {
