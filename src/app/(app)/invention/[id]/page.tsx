@@ -21,6 +21,12 @@ import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
 import { getSafeValidationFailureMessage, getValidationCompletionLabel, getValidationResearchViewState } from "@/lib/validationResearchView";
 import { makeFunctionReference } from "convex/server";
 
+const PUBLIC_SURVEY_APP_URL = (process.env.NEXT_PUBLIC_PUBLIC_APP_URL ?? "https://inventsmith.vercel.app").replace(/\/+$/, "");
+
+function getPublicSurveyUrl(token: string): string {
+  return `${PUBLIC_SURVEY_APP_URL}/respond/${token}`;
+}
+
 const createEvidenceRequestRef = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; kind: "survey" | "interview"; title?: string; introduction?: string }, { requestId: string; token: string }>("evidenceRequests:create");
 const listEvidenceRequestsRef = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, Array<{ token: string; kind: "survey" | "interview"; title: string; purpose?: string; status: string }>>("evidenceRequests:list");
 
@@ -264,7 +270,7 @@ export default function InventionWorkspacePage() {
   }, [forceRegenerateValidation, inventionId, retryFailedValidation]);
 
   const shareSurvey = useCallback(async (token: string) => {
-    const url = `${window.location.origin}/respond/${token}`;
+    const url = getPublicSurveyUrl(token);
     setSurveyShareMessage(null);
     try {
       if (navigator.share) {
@@ -439,15 +445,15 @@ export default function InventionWorkspacePage() {
                     const request = evidenceRequests?.find((item) => item.kind === "survey" && item.status === "active" && (item.purpose === "validation_follow_up" || item.title === `[Validation follow-up] ${invention.title}`));
                     return request ? (
                       <div className="mt-3 space-y-2">
-                        <p className="break-all rounded-md bg-background px-3 py-2 font-mono text-xs">{typeof window !== "undefined" ? `${window.location.origin}/respond/${request.token}` : `/respond/${request.token}`}</p>
+                        <p className="break-all rounded-md bg-background px-3 py-2 font-mono text-xs">{typeof window !== "undefined" ? getPublicSurveyUrl(request.token) : getPublicSurveyUrl(request.token)}</p>
                         <div className="flex flex-wrap gap-2">
-                          <Button size="sm" variant="outline" onClick={() => { void copyTextToClipboard(`${window.location.origin}/respond/${request.token}`).then((copied) => setSurveyShareMessage(copied ? "Survey link copied." : "Copy was unavailable. Use the share options below.")); }}>Copy survey link</Button>
+                          <Button size="sm" variant="outline" onClick={() => { void copyTextToClipboard(getPublicSurveyUrl(request.token)).then((copied) => setSurveyShareMessage(copied ? "Copied! The survey link is ready to paste." : "Copy was unavailable. Use the share options below.")); }}>Copy survey link</Button>
                           <Button size="sm" variant="outline" onClick={() => void shareSurvey(request.token)}><Share2 className="mr-1.5 h-3.5 w-3.5" />Share survey</Button>
                           <Button asChild size="sm" variant="outline"><a href={`sms:?body=${encodeURIComponent(`Please take this short Rise Jar validation survey: ${window.location.origin}/respond/${request.token}`)}`}><MessageSquare className="mr-1.5 h-3.5 w-3.5" />Text</a></Button>
                           <Button asChild size="sm" variant="outline"><a href={`mailto:?subject=${encodeURIComponent("Rise Jar validation survey")}&body=${encodeURIComponent(`Please take this short survey to help validate Rise Jar:\n\n${window.location.origin}/respond/${request.token}`)}`}><Mail className="mr-1.5 h-3.5 w-3.5" />Email</a></Button>
                         </div>
                         <p className="text-xs text-muted-foreground">Use Share survey to open your phone’s contacts/share sheet, or send it by text or email. For community outreach, post the same link in groups where you already participate; InventSmith does not post or message people without an explicit connected-channel authorization.</p>
-                        {surveyShareMessage && <p role="status" className="text-xs text-primary">{surveyShareMessage}</p>}
+                        {surveyShareMessage && <p role="status" aria-live="polite" className="rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-sm font-semibold text-primary">{surveyShareMessage}</p>}
                       </div>
                     ) : surveyPreparationError ? <p role="alert" className="mt-2 text-xs text-destructive">{surveyPreparationError} <Link className="underline" href={`/invention/${inventionId}/evidence`}>Open Evidence Locker</Link></p> : evidenceRequests instanceof Error ? <p role="alert" className="mt-2 text-xs text-destructive">Survey links could not be loaded. <Link className="underline" href={`/invention/${inventionId}/evidence`}>Open Evidence Locker</Link></p> : <p className="mt-2 text-xs text-muted-foreground">Preparing your survey link…</p>;
                   })()}
