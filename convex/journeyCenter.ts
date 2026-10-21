@@ -3,7 +3,7 @@ import { query } from "./_generated/server";
 import { journeyStagesForProductType, routeForJourneyStage } from "./fullJourneyDefinition";
 import { classifyInvention } from "./inventionClassificationLogic";
 import { requireInventionReadAccess } from "./organizations";
-import { AUTONOMOUS_RESEARCH_KINDS } from "./statusBriefingLogic";
+import { AUTONOMOUS_RESEARCH_KINDS, isAutonomousDecision } from "./statusBriefingLogic";
 
 function activityForWork(kind: string, title: string) {
   const activities: Record<string, string> = {
@@ -118,7 +118,7 @@ export const getJourneyCenter = query({
 
     const firstIncomplete = stageRows.find((stage) => stage.status !== "complete") ?? stageRows[stageRows.length - 1];
     const pendingApprovalCount = approvals.filter((item) => item.status === "pending").length;
-    const openDecisionCount = decisions.filter((item) => item.status === "open").length;
+    const openDecisionCount = decisions.filter((item) => item.status === "open" && !isAutonomousDecision(item)).length;
     const blockedWorkCount = workItems.filter((item) =>
       (item.status === "blocked" || item.status === "awaiting_approval") && !AUTONOMOUS_RESEARCH_KINDS.has(item.kind)
     ).length;
