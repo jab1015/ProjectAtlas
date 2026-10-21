@@ -226,7 +226,7 @@ export default function InventionWorkspacePage() {
       inventionId,
       kind: "survey",
       title: fallbackTitle,
-      introduction: `InventSmith prepared this short survey because the current evidence score is ${Math.round(reportConfidenceAverage * 100)}%. Please share it with people who may have this problem${details ? `: ${details.slice(0, 320)}` : ""}. Responses are saved as inventor-provided evidence and are not independently verified.`,
+              introduction: `InventSmith prepared this short survey because the current evidence score is ${Math.round(reportConfidenceAverage * 100)}%. Please share it with people who may have this problem${details ? `: ${details.slice(0, 320)}` : ""}. Responses are logged on this site and counted as customer-validation signals in the next refresh.`,
     }).catch((error) => {
       console.error("Could not prepare the validation follow-up survey:", error);
       setSurveyPreparationError("InventSmith could not prepare the survey link. Open Evidence Locker to create a survey page.");
@@ -461,7 +461,7 @@ export default function InventionWorkspacePage() {
                       </div>
                     ) : surveyPreparationError ? <p role="alert" className="mt-2 text-xs text-destructive">{surveyPreparationError} <Link className="underline" href={`/invention/${inventionId}/evidence`}>Open Evidence Locker</Link></p> : evidenceRequests instanceof Error ? <p role="alert" className="mt-2 text-xs text-destructive">Survey links could not be loaded. <Link className="underline" href={`/invention/${inventionId}/evidence`}>Open Evidence Locker</Link></p> : <p className="mt-2 text-xs text-muted-foreground">Preparing your survey link…</p>;
                   })()}
-                  <p className="mt-2 text-xs text-muted-foreground">Responses are saved as inventor-provided evidence and included in the next validation refresh. You decide where to share the link.</p>
+                  <p className="mt-2 text-xs text-muted-foreground">Every completed response is logged, counted as customer-validation evidence, and included in the next validation refresh. It does not by itself prove market size or demand.</p>
                 </div>
               )}
               <div className="flex items-center gap-3">
@@ -525,7 +525,7 @@ export default function InventionWorkspacePage() {
                       </p>
                     ))}
                     {(evidenceReview?.surveyResponseCount ?? 0) > 0 && <p className="font-medium text-primary">{evidenceReview?.surveyResponseCount} public survey response{evidenceReview?.surveyResponseCount === 1 ? "" : "s"} received and attached to the invention evidence.</p>}
-                    <p className="text-xs text-muted-foreground">Survey results support customer-validation sections. They do not independently verify market size or prove demand. {evidenceReview?.currentEvidenceMatchesRun ? "This report matches the current evidence." : isGenerating ? "This report does not match current evidence; a refresh is currently running." : "This report does not match current evidence, and no refresh is running. Select Refresh validation to update it."}</p>
+                    <p className="text-xs text-muted-foreground">Survey results support customer-validation sections. Site responses count toward customer validation, but do not independently verify market size or prove demand. {evidenceReview?.currentEvidenceMatchesRun ? "This report matches the current evidence." : isGenerating ? "This report does not match current evidence; a refresh is currently running." : "This report does not match current evidence, and no refresh is running. Select Refresh validation to update it."}</p>
                     <p className="text-xs text-muted-foreground">The overall confidence is an evidence-support score, not the chance of success. A survey can strengthen relevant customer sections, but does not by itself verify demand, market size, or the product’s performance.</p>
                   </div>
                 )}
