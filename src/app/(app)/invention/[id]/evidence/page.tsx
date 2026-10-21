@@ -97,6 +97,7 @@ export default function InventionEvidencePage() {
   }> | undefined | Error;
 
   const [file, setFile] = useState<File | null>(null);
+  const [uploadBytes, setUploadBytes] = useState<ArrayBuffer | null>(null);
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
   const [evidenceKind, setEvidenceKind] = useState("survey");
@@ -128,11 +129,14 @@ export default function InventionEvidencePage() {
       return;
     }
     setFile(selected);
+    setUploadBytes(null);
     if (selected && !title) setTitle(selected.name.replace(/\.[^.]+$/, ""));
     if (!selected) return;
 
     setExtracting(true);
     try {
+      const bytes = await selected.arrayBuffer();
+      setUploadBytes(bytes);
       setExtraction(await extractEvidenceFromFile(selected, evidenceKind));
     } catch {
       setExtraction({
@@ -171,7 +175,7 @@ export default function InventionEvidencePage() {
         request.onerror = () => reject(new TypeError("Evidence upload transport failed."));
         request.ontimeout = () => reject(new TypeError("Evidence upload timed out."));
         request.timeout = 120000;
-        void file.arrayBuffer().then((buffer) => request.send(buffer)).catch(reject);
+        void (uploadBytes ?? file.arrayBuffer()).then((buffer) => request.send(buffer)).catch(reject);
       });
       if (!response.ok) {
         const detail = (await response.text()).trim();
@@ -192,6 +196,7 @@ export default function InventionEvidencePage() {
       });
 
       setFile(null);
+      setUploadBytes(null);
       setTitle("");
       setNotes("");
       setEvidenceKind("survey");
