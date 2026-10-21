@@ -15,7 +15,13 @@ function buildState() {
     evidenceFindings: [],
     atlasExecutionEvents: [],
   };
+  const scheduled: Array<{ delay: number; args: unknown }> = [];
   const ctx = {
+    scheduler: {
+      runAfter: async (delay: number, _functionRef: unknown, args: unknown) => {
+        scheduled.push({ delay, args });
+      },
+    },
     db: {
       get: async (id: string) => Object.values(tables).flat().find((row) => row._id === String(id)) ?? null,
       patch: async (id: string, patch: Record<string, unknown>) => Object.assign(Object.values(tables).flat().find((row) => row._id === String(id)), patch),
@@ -32,7 +38,7 @@ function buildState() {
       }),
     },
   } as any;
-  return { ctx, tables };
+  return { ctx, tables, scheduled };
 }
 
 describe("automatic department refresh", () => {
@@ -59,5 +65,10 @@ describe("automatic department refresh", () => {
     expect(state.tables.atlasExecutionEvents).toEqual(expect.arrayContaining([
       expect.objectContaining({ metadata: expect.objectContaining({ changeType: "inventor_evidence" }) }),
     ]));
+    expect(state.scheduled).toHaveLength(2);
+    expect(state.scheduled).toEqual([
+      expect.objectContaining({ delay: 2000, args: { inventionId: "inv-1" } }),
+      expect.objectContaining({ delay: 2000, args: { inventionId: "inv-1" } }),
+    ]);
   });
 });
