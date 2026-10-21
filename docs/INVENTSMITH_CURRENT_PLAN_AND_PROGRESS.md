@@ -14,6 +14,24 @@ Automated verification is green: **127 test files / 695 tests**, TypeScript, and
 
 Open acceptance items: confirm live per-department outputs and downstream handoffs on `quick-fox-785`; confirm Validation cites the uploaded 100-user survey and relevant section confidence reflects it; verify automatic evidence refresh and affected-department requeue; verify potential prior-art conflicts are carried into new design candidates. No professional clearance, patentability conclusion, external contact, prototype completion, or release action has been made.
 
+## Current continuation checkpoint — October 21, 2026
+
+### Verified now
+
+- Code changes are committed on `inventsmith/full-product-build` through `8ada262fe7986c95b3c33fc11f1fdd074ddbc137`.
+- The automated suite is green at **131 test files / 712 tests**; TypeScript and diff checks also pass.
+- Convex production deployment completed successfully through the guarded manual GitHub workflow. The successful backend deployment does not mean the frontend is deployed.
+- Journey Center logic now prioritizes completed stages, explains waiting states in plain language, and can recover eligible autonomous research work that had been left queued or blocked by stale classification.
+
+### Still open
+
+- Vercel is still serving an older frontend deployment, so the new Journey Center explanations and autonomous-work UI behavior have not been visually confirmed on the live deployment.
+- A fresh Vercel deployment for the exact branch head must be created and then checked in an authenticated inventor session.
+- After that deployment, verify that eligible work transitions from queued to running/completed, that failures expose a recoverable action, and that evidence-triggered refreshes are reflected in Validation and Market Research.
+- Keep professional, legal, physical-prototype, payment, supplier, filing, and publication gates explicit. AI research may prepare findings and design alternatives, but it must not silently clear those gates.
+
+**Updated:** October 21, 2026 (UTC)
+
 # InventSmith Current Plan and Progress
 
 ## Current acceptance checkpoint — October 19, 2026
