@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import type { Doc, Id } from "@convex/_generated/dataModel";
-import { ArrowLeft, ExternalLink, FileUp, LineChart, Search, Users } from "lucide-react";
+import { ArrowLeft, ExternalLink, FileUp, LineChart, MessageCircle, Search, Users } from "lucide-react";
 import { AppNav } from "@/components/atlas/app-nav";
 import { MarkdownContent } from "@/components/markdown-content";
 import { Button } from "@/components/ui/button";
@@ -67,6 +67,7 @@ export default function MarketResearchPage() {
   const library = useQuery(getDeliverableLibrary, isAuthenticated && inventionId ? { inventionId } : "skip");
   const migrateWorkspace = useMutation(backfillWorkspace);
   const kickWork = useMutation(kickAutonomousWork);
+  const [queueError, setQueueError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.push("/sign-in");
@@ -74,13 +75,14 @@ export default function MarketResearchPage() {
 
   useEffect(() => {
     if (isLoading || !isAuthenticated || !inventionId) return;
+    setQueueError(null);
     void (async () => {
       try {
         await migrateWorkspace({ inventionId });
         await kickWork({ inventionId });
-      } catch {
-        // Keep the read-only page usable; the next authenticated surface
-        // retries this idempotent backfill and scheduler wake-up.
+      } catch (error) {
+        console.error("Could not initialize market research work:", error);
+        setQueueError(error instanceof Error ? error.message : "The autonomous work queue could not be initialized yet.");
       }
     })();
   }, [inventionId, isAuthenticated, isLoading, migrateWorkspace, kickWork]);
@@ -94,6 +96,8 @@ export default function MarketResearchPage() {
   const sourcesById = new Map(library.sources.map((source) => [String(source._id), source]));
   const inventorEvidence = library.sources.filter((source) => source.metadata?.provenance === "inventor_upload");
   const marketWork = (library.workItems ?? []).filter((item) => MARKET_WORK_KINDS.has(item.kind));
+  const completedMarketWork = marketWork.filter((item) => item.status === "completed").length;
+  const marketProgress = marketWork.length > 0 ? Math.round((completedMarketWork / marketWork.length) * 100) : 0;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -105,13 +109,17 @@ export default function MarketResearchPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Stage 3 — Market Research</p>
             <h1 className="text-3xl font-bold sm:text-4xl">{library.invention.title}: customers, competitors and demand evidence</h1>
             <p className="max-w-3xl text-muted-foreground">InventSmith researches the market and combines that research with inventor-provided surveys, interviews and customer evidence. Observed evidence, estimates and AI inference remain separate so Validation, Product Design, Pricing and Funding can use the record without overstating demand.</p>
-            <Button asChild variant="outline"><Link href={`/invention/${inventionId}/evidence`}><FileUp className="mr-2 h-4 w-4" />Upload surveys, interviews or market evidence</Link></Button>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild variant="outline"><Link href={`/invention/${inventionId}/evidence`}><FileUp className="mr-2 h-4 w-4" />Upload surveys, interviews or market evidence</Link></Button>
+              <Button asChild variant="outline"><Link href={`/invention/${inventionId}/chat`}><MessageCircle className="mr-2 h-4 w-4" />Ask InventSmith what is happening</Link></Button>
+            </div>
           </header>
 
-          <section className="grid gap-4 md:grid-cols-3">
+          <section className="grid gap-4 md:grid-cols-4">
             <div className="rounded-2xl border border-border bg-card p-5"><Search className="h-5 w-5 text-primary" /><p className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">Market deliverables</p><p className="mt-1 text-2xl font-semibold">{deliverables.length}</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><Users className="h-5 w-5 text-primary" /><p className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">Inventor evidence files</p><p className="mt-1 text-2xl font-semibold">{inventorEvidence.length}</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><LineChart className="h-5 w-5 text-primary" /><p className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">Research sources</p><p className="mt-1 text-2xl font-semibold">{library.sources.length}</p></div>
+            <div className="rounded-2xl border border-border bg-card p-5"><LineChart className="h-5 w-5 text-primary" /><p className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">Autonomous progress</p><p className="mt-1 text-2xl font-semibold">{marketWork.length > 0 ? `${marketProgress}%` : "Starting"}</p><p className="mt-1 text-xs text-muted-foreground">{marketWork.length > 0 ? `${completedMarketWork} of ${marketWork.length} work items complete` : "Queue initialization in progress"}</p></div>
           </section>
 
           <section className="space-y-4">
@@ -130,7 +138,7 @@ export default function MarketResearchPage() {
 
           <section className="space-y-4">
             <div><h2 className="text-xl font-semibold">Market research work status</h2><p className="mt-1 text-sm text-muted-foreground">This is where InventSmith shows whether customer, competitor and demand research is queued, running, completed or needs recovery.</p></div>
-            {marketWork.length === 0 ? <div className="rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">No market-research work has been created yet. Return to the Journey Center to start the autonomous work sequence.</div> : <div className="grid gap-3 md:grid-cols-2">{marketWork.map((item) => <article key={item.workItemId} className="rounded-2xl border border-border bg-card p-5"><div className="flex items-start justify-between gap-3"><h3 className="font-semibold">{item.title}</h3><span className={`rounded-full px-3 py-1 text-xs font-medium ${item.status === "failed" ? "bg-red-100 text-red-900" : item.status === "completed" ? "bg-emerald-100 text-emerald-900" : "bg-muted text-foreground"}`}>{statusLabel(item.status)}</span></div>{item.status === "failed" && <p className="mt-3 text-sm text-destructive">This work item needs recovery before a market finding can be shown.</p>}{item.status === "blocked" && item.blockedReason && <p className="mt-3 text-sm text-muted-foreground">Blocked: {item.blockedReason}</p>}{item.outputSummary && <p className="mt-3 text-sm text-muted-foreground">{item.outputSummary}</p>}</article>)}</div>}
+            {marketWork.length === 0 ? <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 text-sm"><p className="font-semibold">InventSmith is preparing Market Research automatically.</p><p className="mt-2 text-muted-foreground">{queueError ? `The queue reported: ${queueError}` : "The queue is being initialized or repaired in the background. You do not need to return to the Journey Center or press a hidden start button. This page will show queued, running, completed, or blocked work as soon as the worker reports it."}</p><Link href={`/invention/${inventionId}/chat`} className="mt-3 inline-flex text-primary underline underline-offset-4">Ask InventSmith for a plain-language status update</Link></div> : <div className="grid gap-3 md:grid-cols-2">{marketWork.map((item) => <article key={item.workItemId} className="rounded-2xl border border-border bg-card p-5"><div className="flex items-start justify-between gap-3"><h3 className="font-semibold">{item.title}</h3><span className={`rounded-full px-3 py-1 text-xs font-medium ${item.status === "failed" ? "bg-red-100 text-red-900" : item.status === "completed" ? "bg-emerald-100 text-emerald-900" : "bg-muted text-foreground"}`}>{statusLabel(item.status)}</span></div>{item.status === "failed" && <p className="mt-3 text-sm text-destructive">This work item needs recovery before a market finding can be shown.</p>}{item.status === "blocked" && item.blockedReason && <p className="mt-3 text-sm text-muted-foreground">Blocked: {item.blockedReason}</p>}{item.outputSummary && <p className="mt-3 text-sm text-muted-foreground">{item.outputSummary}</p>}</article>)}</div>}
           </section>
 
           <section className="space-y-4">
