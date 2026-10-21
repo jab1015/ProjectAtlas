@@ -49,6 +49,18 @@ export interface StatusBriefing {
   next: Array<{ title: string; status: "running" | "queued" | "locked"; requiredTier?: string }>;
 }
 
+// These are research assignments InventSmith is expected to perform before
+// requesting professional review or physical evidence. A stale blocked record
+// must not be shown to the inventor as an action they need to complete.
+export const AUTONOMOUS_RESEARCH_KINDS = new Set([
+  "preliminary_prior_art",
+  "feature_prior_art_comparison",
+  "distinguishing_features",
+  "ip_readiness",
+  "market_feasibility",
+  "regulatory_screening",
+]);
+
 const newestFirst = <T extends { updatedAt: number }>(items: T[]) =>
   [...items].sort((a, b) => b.updatedAt - a.updatedAt);
 
@@ -98,7 +110,7 @@ export function buildStatusBriefing(input: StatusBriefingInput): StatusBriefing 
     }));
 
   const blockedWork = input.workItems
-    .filter((item) => item.status === "blocked" && item.blockedReason)
+    .filter((item) => item.status === "blocked" && item.blockedReason && !AUTONOMOUS_RESEARCH_KINDS.has(item.kind ?? ""))
     .map((item) => ({
       type: "blocked_work" as const,
       title: item.title,
