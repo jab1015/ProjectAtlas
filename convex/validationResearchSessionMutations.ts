@@ -13,7 +13,7 @@ import { readValidationEvidence, scheduleValidationEvidenceRefresh } from "./val
 
 // Must match OpenAIValidationResearchProvider.VERSION. A version change prevents
 // older confidence/research semantics from being silently reused by the 24h cache.
-const PROVIDER_VERSION = "2.1.0";
+const PROVIDER_VERSION = "2.2.0";
 
 const VALIDATION_SECTION_KEYS = new Set([
   "validationPlan",
@@ -60,6 +60,38 @@ export const forceRegenerateValidation = mutation({
     );
 
     return { queued: true };
+  },
+});
+
+/** Repair an old or stale snapshot automatically when Stage 2 is opened. */
+export const ensureValidationCurrent = mutation({
+  args: { inventionId: v.id("inventions") },
+  handler: async (ctx, { inventionId }) => {
+    await requireInventionEditAccess(ctx, inventionId);
+    const latest = await ctx.db
+      .query("validationResearch")
+      .withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId))
+      .order("desc")
+      .first();
+
+    if (!latest) {
+      await ctx.scheduler.runAfter(0, internal.validationResearchOrchestration.runValidationResearchOrchestration, { inventionId });
+      return { queued: true, reason: "validation_not_started" as const };
+    }
+    if (["pending", "running"].includes(latest.researchStatus ?? "")) {
+      return { queued: false, reason: "already_running" as const };
+    }
+
+    const snapshot = await readValidationEvidence(ctx, inventionId);
+    const needsRefresh =
+      latest.evidenceFingerprint !== snapshot.fingerprint ||
+      latest.providerVersion !== PROVIDER_VERSION ||
+      latest.researchStatus === "stale";
+    if (!needsRefresh) return { queued: false, reason: "current" as const };
+
+    await ctx.db.patch(latest._id, { researchStatus: "stale", overallStatus: "STALE", updatedAt: Date.now() });
+    await ctx.scheduler.runAfter(0, internal.validationResearchOrchestration.runValidationResearchOrchestration, { inventionId });
+    return { queued: true, reason: "refresh_required" as const };
   },
 });
 
