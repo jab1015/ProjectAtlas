@@ -49,16 +49,21 @@ const RESEARCH_WORK = new Set([
   "regulatory_screening", "evidence_verification", "preliminary_bom_cost",
 ]);
 
+const AUTONOMOUS_RESEARCH_KINDS = new Set([
+  "preliminary_prior_art", "feature_prior_art_comparison", "distinguishing_features",
+  "ip_readiness", "market_feasibility", "regulatory_screening",
+]);
+
 function assignmentInstructions(kind: string): string {
   const instructions: Record<string, string> = {
     brief_analysis: "Clarify the mechanism, intended users, constraints, unknowns, and contradictions. Do not ask questions InventSmith can answer from the supplied record.",
     assumptions_unknowns: "Create a prioritized register of assumptions and unknowns. For each item state category, impact, current support, how InventSmith can test it, and the smallest human or physical input only if needed.",
     competitor_discovery: "Find direct products, indirect alternatives, substitutes, pricing signals, and likely whitespace. Include URLs for every sourced factual claim.",
-    market_feasibility: "Assess customer pain, demand signals, reachable segments, pricing evidence, market risks, and evidence still needed. Do not invent TAM figures.",
-    preliminary_prior_art: "Perform a preliminary patent and non-patent landscape search. Identify potentially relevant documents and distinguishing feature hypotheses. This is not a patentability or freedom-to-operate opinion.",
+    market_feasibility: "Assess customer pain, demand signals, reachable segments, pricing evidence, market risks, and evidence still needed from the existing invention record, site-collected survey responses, uploaded evidence, and available research. Do not stop to ask the inventor to collect more evidence before producing the preliminary assessment. Mark prototype tests and stronger sampling as follow-up evidence, not as a reason to refuse the current assessment. Do not invent TAM figures.",
+    preliminary_prior_art: "Perform a preliminary patent and non-patent landscape search using the invention record, supplied evidence, drawings/specifications, USPTO and other relevant sources. Do not ask the inventor for a finalized claim set or CAD package before doing this work. Identify potentially relevant documents, crowded features, possible conflicts, and distinguishing feature hypotheses. State what remains uncertain and what a patent professional should later review. This is not a patentability or freedom-to-operate opinion.",
     technical_feasibility: "Assess mechanisms, constraints, failure modes, prototype questions, and engineering risks without representing the concept as engineering approved.",
     materials_manufacturing: "Compare candidate materials and manufacturing processes, including cost drivers, tolerances, tooling, assembly, sustainability, and unresolved engineering checks.",
-    regulatory_screening: "Identify potentially applicable US federal, state, local, industry, testing, labeling, and certification categories. Present a screening checklist, not a compliance conclusion.",
+    regulatory_screening: "Identify potentially applicable US federal, state, local, industry, testing, labeling, and certification categories from the current invention, intended use, materials known so far, and sales configuration assumptions. Produce a preliminary screening checklist now; do not stop to require a regulatory specialist or final material list. Clearly mark specialist review of the final configuration as a later gate, not an inventor task. Present a screening checklist, not a compliance conclusion.",
     evidence_verification: "Independently inspect every supplied source locator supporting a material claim. Confirm that it resolves to relevant content, classify evidence quality, flag conflicts, and leave uncertainty unverified. Return one verifiedSources entry per inspected locator. A model classification alone does not promote stored evidence; trusted promotion requires a separate traceable retrieval and claim-support record.",
     ip_readiness: "Prepare an organized invention disclosure and patent-professional handoff brief using existing work. Clearly separate inventor contribution, prior-art observations, and legal questions.",
     feature_prior_art_comparison: "Build a feature-by-feature comparison between the proposed invention and the most relevant preliminary prior art. Cite source locators, distinguish absence of evidence from evidence of difference, and do not offer a patentability or design-around opinion.",
@@ -179,7 +184,7 @@ export const runAvailableWork = internalAction({
         const retrievalEvidence = needsWebResearch(workItem)
           ? buildTraceableRetrievalRecords(response.output, result.findings, Date.now())
           : [];
-        if (result.needsHuman) {
+        if (result.needsHuman && !AUTONOMOUS_RESEARCH_KINDS.has(workItem.kind)) {
           await ctx.runMutation(blockWorkForHuman, {
             workItemId: claim.workItemId,
             attemptNumber,
