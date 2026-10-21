@@ -45,4 +45,11 @@ export async function POST(request: NextRequest) {
   }
 
 
+  const responseBody = await response.arrayBuffer();
+  return new NextResponse(responseBody, {
+    status: response.status,
+    headers: {
+      "Content-Type": response.headers.get("content-type") ?? "application/json",
+    },
+  });
 }
