@@ -68,6 +68,7 @@ export const AUTONOMOUS_RESEARCH_KINDS = new Set([
   "patent_design_handoff",
   "market_feasibility",
   "regulatory_screening",
+  "design_candidate_generation",
 ]);
 
 const newestFirst = <T extends { updatedAt: number }>(items: T[]) =>
