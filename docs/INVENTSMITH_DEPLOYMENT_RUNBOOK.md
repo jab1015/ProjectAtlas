@@ -1,21 +1,4 @@
-### Patent-to-design sequencing — October 21, 2026
-
-- Automated Patent Readiness work is allowed to complete the preliminary landscape, feature comparison, and distinguishing-feature handoff without waiting for the separate professional-review package.
-- The handoff must label each reference as current/unclear or inactive. Only current/unclear references become active design-around constraints; inactive references remain historical prior-art context.
-- Product Design can consume the handoff and generate preliminary candidates, artwork, specifications, and CAD preparation. These outputs remain draft/preliminary until the required engineering and patent-professional reviews are accepted.
-- Do not report this workflow as patent clearance or freedom-to-operate approval. The professional gate remains before legal conclusions, claims, filing, or external reliance.
-- Implementation commits: `4b33960` and `307ffcd`. Full verification passed: **131 test files / 712 tests**, TypeScript, and `git diff --check`.
-
 # InventSmith Owner-Controlled Deployment and Acceptance Runbook
-
-### Current deployment checkpoint — October 21, 2026
-
-- GitHub branch `inventsmith/full-product-build` contains the Journey Center/autonomous-work fixes through commit `8ada262fe7986c95b3c33fc11f1fdd074ddbc137`.
-- Verification is green: **131 test files / 712 tests**, TypeScript, and diff checks.
-- The guarded GitHub Actions production Convex workflow completed successfully, including typecheck, regression tests, and the Convex production deploy step.
-- The frontend remains a separate deployment concern. The currently visible Vercel deployment is behind the branch head and does not yet prove the new Journey Center UI is live. Create and verify a fresh Vercel deployment before reporting the frontend changes as deployed.
-- Acceptance sequence after the frontend deployment: sign in, open Journey Center, confirm plain-language status explanations, confirm completed stages remain complete, confirm eligible autonomous work is not permanently queued, and inspect Validation/Market Research evidence refresh behavior.
-- Do not treat a successful Convex deploy as patent clearance, prototype completion, professional approval, or production acceptance. Keep `fiery-gazelle-628` untouched and do not use Netlify for this work.
 
 ### Latest checkpoint — October 19, 2026
 

@@ -147,10 +147,6 @@ export default function LifecycleDepartmentPage() {
     return new Map((artifactDownloads ?? []).map((artifact) => [String(artifact.deliverableId), artifact]));
   }, [artifactDownloads]);
 
-  const pitchDeckWork = stageId === 13 ? departmentWork.find((item) => item.kind === "pitch_deck_content") : undefined;
-  const pitchDeckDeliverable = stageId === 13 ? departmentDeliverables.find((item) => item.kind === "pitch_deck") : undefined;
-  const pitchDeckArtifact = pitchDeckDeliverable ? downloadsByDeliverable.get(String(pitchDeckDeliverable._id)) : undefined;
-
   const startDepartment = async () => {
     setStarting(true); setMessage(null); setError(null);
     try {
@@ -203,23 +199,6 @@ export default function LifecycleDepartmentPage() {
             <h2 className="font-semibold">Waiting for prerequisite work</h2>
             <p className="mt-2 text-sm text-muted-foreground">The next queued task needs {nextWorkDependencies.map((kind) => kind.replaceAll("_", " ")).join(", ")} to be completed first. InventSmith will check the queue again after its prerequisites are complete.</p>
             {stageId === 6 && nextWorkDependencies.includes("product_design_specification") && <Button asChild variant="outline" size="sm" className="mt-4"><Link href={`/invention/${inventionId}/design`}>Open Product Design + CAD</Link></Button>}
-          </section>}
-
-          {stageId === 13 && <section id="pitch-deck" className="rounded-2xl border border-primary/25 bg-primary/5 p-6 sm:p-7">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Funding deliverable</p>
-                <h2 className="mt-2 text-xl font-semibold">Pitch deck creation</h2>
-                <p className="mt-2 max-w-3xl text-sm text-muted-foreground">InventSmith creates the investor pitch deck automatically after the funding strategy, financial model, and product design inputs are ready. The finished PowerPoint appears in Department deliverables below and in the Full work library.</p>
-              </div>
-              <span className={`w-fit shrink-0 rounded-full px-3 py-1 text-xs font-medium ${pitchDeckWork ? statusClass(pitchDeckWork.status) : "bg-muted text-muted-foreground"}`}>
-                {pitchDeckWork ? STATUS_LABELS[pitchDeckWork.status] ?? pitchDeckWork.status : "Not initialized"}
-              </span>
-            </div>
-            {pitchDeckWork?.outputSummary && <p className="mt-4 text-sm text-muted-foreground">{pitchDeckWork.outputSummary}</p>}
-            {pitchDeckWork?.blockedReason && <p className="mt-4 flex items-start gap-2 text-sm text-warning"><ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />{pitchDeckWork.blockedReason}</p>}
-            {pitchDeckDeliverable && <div className="mt-4 flex flex-wrap items-center gap-3"><span className="text-sm font-medium">PowerPoint ready below.</span>{pitchDeckArtifact?.downloadUrl && <Button asChild size="sm"><a href={pitchDeckArtifact.downloadUrl} target="_blank" rel="noreferrer" className="gap-2"><Download className="h-4 w-4" />Download PowerPoint</a></Button>}</div>}
-            {!pitchDeckWork && <p className="mt-4 text-sm text-muted-foreground">Open or start this Funding department to initialize the deck work item.</p>}
           </section>}
 
           <section className="rounded-2xl border border-border bg-card p-6 sm:p-7">

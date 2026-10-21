@@ -30,25 +30,39 @@ Verification: **127 Vitest files / 695 tests passed**, `npx tsc --noEmit` passed
 
 Live limitation: survey attribution and confidence still need verification after the new Preview is built. Three-worker execution is verified by deterministic tests, not yet by a live AI run. Patent work remains dependency-gated; no legal opinion, filing, physical test, supplier contact, payment, or release is implied.
 
-## Current verified checkpoint — October 21, 2026
-
-- Journey Center status handling was hardened so completed stages are shown as complete, stale deliverables do not incorrectly reopen them, and autonomous research items are eligible for recovery even when an older gate classification is present.
-- Autonomous coverage now includes assumptions/unknowns, competitor discovery, technical feasibility, materials/manufacturing, evidence verification, preliminary BOM/cost, prior-art, market-feasibility, and regulatory research work. This allows eligible research to resume instead of remaining indefinitely queued.
-- Plain-language stage explanations were added to the Journey Center so the inventor can see what a stage is doing or why it is waiting.
-- Local verification passed: **131 test files / 712 tests**, `npx tsc --noEmit`, and `git diff --check`.
-- The guarded GitHub Actions workflow completed successfully for commit `8ada262fe7986c95b3c33fc11f1fdd074ddbc137`: typecheck, regression tests, and **Deploy Convex production backend** all succeeded. This verifies the Convex backend deployment only.
-- The branch contains the frontend changes, but the Vercel deployment currently visible is still serving an older frontend commit. The Journey Center UI changes are therefore **not yet live in the user-facing deployment** and require a fresh Vercel deployment/alias update.
-- No patentability, freedom-to-operate, prototype, professional-review, supplier, filing, payment, or other external-world conclusion is implied by this checkpoint. Prior-art research can produce design guidance; it cannot replace qualified legal review.
-
-## Patent-to-design workflow update — October 21, 2026
-
-- Patent Readiness now hands automated prior-art findings to Product Design immediately after the preliminary landscape, feature comparison, and distinguishing-feature work completes.
-- The handoff explicitly separates current design constraints from historical context: active/pending/in-force or unknown-status references can drive design-around changes; expired, lapsed, abandoned, withdrawn, or discontinued references remain visible as prior art but do not block design generation.
-- Product Design no longer waits for the separate `ip_readiness` counsel package or a professional review before generating differentiated candidates. Professional review remains required before patentability, freedom-to-operate, filing, or other legal conclusions.
-- Patent Readiness wording now tells the inventor what is happening in plain language and makes the “research first, design second, professional review after the package is assembled” sequence explicit.
-- Full verification passed: **131 test files / 712 tests**, TypeScript, and `git diff --check`.
-
 # InventSmith Build Progress
+
+## Open hardening task — secure CAD/3-D artifact storage
+
+**Status: Not implemented yet; reminder added October 21, 2026. Target: next infrastructure hardening milestone, before native CAD generation is accepted as production-ready.**
+
+CAD packages, STEP/STL/DXF exports, editable source, renders, and exploded views may exceed ordinary upload limits. The build must use private object storage with Convex-owned metadata and authorization. The first candidate is private Vercel Blob with client-side uploads for files over 4.5 MB and multipart uploads above 100 MB; the adapter should remain compatible with R2/S3 if scale or cost requires it.
+
+Completion checklist: signed short-lived URLs; organization/invention authorization; no public bucket or provider secret in the browser; resumable/multipart uploads; MIME/size/checksum validation; safe processing; versioning and lifecycle rules; backup/restore; audit events; revoke/delete tests; and an end-to-end test using a large representative CAD package.
+
+## Latest working-product checkpoint — October 21, 2026
+
+- Commit `f33376e` adds the autonomous design-candidate workflow and plain-language guidance on the Product Design + CAD page.
+- Vercel Preview `inventsmith-badyyve5a-inventors-os.vercel.app` is **Ready** and loads the InventSmith landing page.
+- Verification passed: **131 test files / 712 tests**, `npx tsc --noEmit`, and `git diff --check`.
+- The verified preview was intentionally not promoted to production because Vercel returned the Hobby deployment quota error: `api-deployments-free-per-day` / more than 100 deployments in 24 hours.
+- The current branch/deployment handoff is `inventsmith/finish-design` → `f33376e`. Production remains on its prior deployment until the quota resets.
+
+### What is working now
+
+The application can present the inventor with a clear Product Design status and tell them that InventSmith is responsible for generating at least three materially different candidates. The inventor is not incorrectly asked to provide CAD or select a design before the autonomous design work has produced candidates.
+
+### What is next to verify
+
+1. Promote the verified build when Vercel allows it.
+2. Confirm authenticated Product Design execution creates and persists candidate deliverables.
+3. Confirm scoring, specification, CAD specification, render, and native-CAD tasks advance in dependency order.
+4. Confirm the Journey Center, work library, evidence refresh, survey response attribution, and all department pages show the same truthful status.
+5. Keep professional review, payment, physical testing, manufacturing release, supplier contact, filing, and publication as explicit gates.
+
+### Do not infer
+
+The ready preview proves build and page availability, not that every department has completed live AI execution. A queued or visible work item is not a saved deliverable. A preliminary patent analysis is not legal clearance, and preliminary CAD is not manufacturing release.
 
 ## Latest controlled verification — October 19, 2026
 

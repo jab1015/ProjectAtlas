@@ -72,9 +72,8 @@ export const ensureUserProfile = mutation({
         updates.subscriptionTier = ADMIN_SUBSCRIPTION_TIER;
       }
     } else {
-      // A paid plan or organization-admin membership must never become a
-      // global application administrator. Repair the previous secondary
-      // account allowlist if it still has the old global role.
+      // Enterprise access and organization ownership must never become global
+      // application administrator access. Repair stale flags on old sessions.
       if (!user.role || user.role === "admin") updates.role = "user";
       const pendingEvents = user.email
         ? await ctx.db.query("subscriptionEvents").withIndex("by_customerEmail", (q) => q.eq("customerEmail", user.email!)).collect()

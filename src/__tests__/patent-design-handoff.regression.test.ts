@@ -6,7 +6,7 @@ const workByKind = new Map(CANONICAL_WORK_PLAN.map((item) => [item.kind, item]))
 const stageById = new Map(FULL_JOURNEY_STAGES.map((stage) => [stage.id, stage]));
 
 describe("InventSmith patent-to-design handoff", () => {
-  it("creates an explicit handoff after automated prior-art comparison and differentiation", () => {
+  it("creates an explicit handoff after prior-art comparison, differentiators, and IP readiness", () => {
     const handoff = workByKind.get("patent_design_handoff");
     expect(handoff).toBeDefined();
     expect(handoff?.deliverableKind).toBe("patent_design_handoff");
@@ -14,8 +14,8 @@ describe("InventSmith patent-to-design handoff", () => {
       "preliminary_prior_art",
       "feature_prior_art_comparison",
       "distinguishing_features",
+      "ip_readiness",
     ]));
-    expect(handoff?.dependsOnKinds).not.toContain("ip_readiness");
   });
 
   it("does not let preliminary design directions bypass the patent handoff", () => {
