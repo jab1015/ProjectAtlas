@@ -16,6 +16,10 @@ function isEvidenceRequest(title: string, detail: string) {
   return /survey|surveymonkey|interview|transcript|evidence|prototype\s*(test|result)|test\s*result|factory\s*quote|manufacturer\s*quote|rfq|document|report|upload/i.test(`${title} ${detail}`);
 }
 
+function isAutonomousResearchItem(title: string) {
+  return /assumptions|unknowns|market feasibility|demand signals|prior-art|competing products|alternatives|technical feasibility|feature|materials|manufacturing approaches|regulatory|evidence verification|bom|development risks|feasibility recommendation/i.test(title);
+}
+
 export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
   const primaryNeed = briefing.needsInventor[0];
   const evidenceNeeded = primaryNeed ? isEvidenceRequest(primaryNeed.title, primaryNeed.detail) : false;
@@ -79,10 +83,10 @@ export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
             <ul className="space-y-3">
               {briefing.next.map((item) => (
                 <li key={`${item.status}-${item.title}`} className="flex items-start gap-3 text-sm">
-                  <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${item.status === "running" ? "bg-primary" : item.status === "locked" ? "bg-warning" : "bg-muted-foreground/45"}`} aria-hidden="true" />
+                  <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${item.status === "running" ? "bg-primary" : item.status === "locked" && !isAutonomousResearchItem(item.title) ? "bg-warning" : "bg-muted-foreground/45"}`} aria-hidden="true" />
                   <div>
                     <p className="font-medium text-foreground">{item.title}</p>
-                    <p className="text-xs capitalize text-muted-foreground">{item.status === "locked" ? `${item.requiredTier ?? "Paid"} plan required` : item.status}</p>
+                    <p className="text-xs capitalize text-muted-foreground">{item.status === "locked" && isAutonomousResearchItem(item.title) ? "queued for autonomous execution" : item.status === "locked" ? `${item.requiredTier ?? "Paid"} plan required` : item.status}</p>
                   </div>
                 </li>
               ))}
@@ -90,7 +94,7 @@ export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
           ) : (
             <EmptyLine>No autonomous work is queued yet.</EmptyLine>
           )}
-          {briefing.next.some((item) => item.status === "locked") && (
+          {briefing.next.some((item) => item.status === "locked" && !isAutonomousResearchItem(item.title)) && (
             <Link href="/pricing" className="mt-4 inline-flex text-sm font-medium">Compare plans</Link>
           )}
         </article>
