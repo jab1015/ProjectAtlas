@@ -53,7 +53,7 @@ const AUTONOMOUS_RESEARCH_KINDS = new Set([
   "assumptions_unknowns", "competitor_discovery", "technical_feasibility",
   "materials_manufacturing", "evidence_verification", "preliminary_bom_cost",
   "preliminary_prior_art", "feature_prior_art_comparison", "distinguishing_features",
-  "ip_readiness", "patent_design_handoff", "market_feasibility", "regulatory_screening",
+  "ip_readiness", "patent_design_handoff", "market_feasibility", "regulatory_screening", "design_candidate_generation",
 ]);
 
 function assignmentInstructions(kind: string): string {
