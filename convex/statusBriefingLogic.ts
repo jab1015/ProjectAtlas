@@ -63,6 +63,9 @@ export const AUTONOMOUS_RESEARCH_KINDS = new Set([
   "feature_prior_art_comparison",
   "distinguishing_features",
   "ip_readiness",
+  // The preliminary patent-to-design handoff is autonomous research. The
+  // professional review belongs to the later counsel/clearance package.
+  "patent_design_handoff",
   "market_feasibility",
   "regulatory_screening",
 ]);
@@ -146,5 +149,3 @@ export function buildStatusBriefing(input: StatusBriefingInput): StatusBriefing 
 
   return { completed, discoveries, needsInventor, next };
 }
-
-// Deployment marker: keep branch deployment synchronized with the autonomous journey fixes.

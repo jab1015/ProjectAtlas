@@ -22,7 +22,6 @@ const PATENT_HANDOFF_PREREQUISITES = [
   "preliminary_prior_art",
   "feature_prior_art_comparison",
   "distinguishing_features",
-  "ip_readiness",
 ] as const;
 
 const DESIGN_PIPELINE = [

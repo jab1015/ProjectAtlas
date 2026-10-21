@@ -158,6 +158,42 @@ export const claimNextWork = internalMutation({
     if (!usageScope) throw new ConvexError("Invention not found");
     const dateKey = utcDateKey(args.now);
 
+    // Repair handoff records created under the older policy. The preliminary
+    // patent-to-design handoff is autonomous; professional review is reserved
+    // for the later patent-professional/counsel package. Without this repair,
+    // an already-blocked legacy record would remain invisible to the scheduler
+    // even after the canonical plan changed.
+    const obsoletePatentHandoff = items.find((item) =>
+      item.kind === "patent_design_handoff" &&
+      item.status === "blocked" &&
+      (item.humanGateType === "professional_review" || /qualified patent professional|professional review/i.test(item.blockedReason ?? ""))
+    );
+    if (obsoletePatentHandoff) {
+      const completedKinds = new Set(items.filter((item) => item.status === "completed").map((item) => item.kind));
+      const handoffReady = (obsoletePatentHandoff.dependsOnKinds ?? ["preliminary_prior_art", "feature_prior_art_comparison", "distinguishing_features"])
+        .every((kind) => completedKinds.has(kind));
+      if (handoffReady) {
+        await ctx.db.patch(obsoletePatentHandoff._id, {
+          status: "queued",
+          attemptCount: 0,
+          completedAt: undefined,
+          startedAt: undefined,
+          claimedAt: undefined,
+          leaseExpiresAt: undefined,
+          reservedCostUnits: undefined,
+          reservationDateKey: undefined,
+          actualCostUnits: undefined,
+          outputSummary: undefined,
+          blockedReason: undefined,
+          humanGateType: undefined,
+          lastError: "Released from an obsolete professional-review gate; preliminary patent analysis can continue autonomously.",
+          updatedAt: args.now,
+        });
+        const index = items.findIndex((item) => item._id === obsoletePatentHandoff._id);
+        if (index >= 0) items[index] = { ...items[index], status: "queued", blockedReason: undefined, humanGateType: undefined, attemptCount: 0 };
+      }
+    }
+
     const organizationUsage = usageScope.scope === "organization" && !usageScope.isAdmin
       ? await ensureOrganizationDailyUsage(ctx, usageScope.organizationId, dateKey, args.now)
       : null;
