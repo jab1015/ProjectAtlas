@@ -2,7 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { internalMutation, mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { makeFunctionReference } from "convex/server";
-import { buildStatusBriefing } from "./statusBriefingLogic";
+import { AUTONOMOUS_RESEARCH_KINDS, buildStatusBriefing } from "./statusBriefingLogic";
 import { canResolveDecision } from "./reviewLogic";
 import { MAX_AUTONOMOUS_RUN_BUDGET, remainingAutonomousCostUnitsAfterReservations, utcDateKey } from "./usagePolicyLogic";
 import { evaluatePilotPackage } from "./pilotEvaluationLogic";
@@ -28,13 +28,6 @@ const runAvailableWork = makeFunctionReference<
   { inventionId: Id<"inventions">; costBudgetUnits?: number; departmentStageId?: number },
   unknown
 >("atlasWorkOrchestration:runAvailableWork");
-
-const AUTONOMOUS_RESEARCH_KINDS = new Set([
-  "assumptions_unknowns", "competitor_discovery", "technical_feasibility",
-  "materials_manufacturing", "evidence_verification", "preliminary_bom_cost",
-  "preliminary_prior_art", "feature_prior_art_comparison", "distinguishing_features",
-  "ip_readiness", "market_feasibility", "regulatory_screening", "design_candidate_generation",
-]);
 
 async function getAccessibleInvention(
   ctx: Parameters<typeof requireInventionReadAccess>[0],
@@ -126,7 +119,9 @@ export const getReviewQueue = query({
       invention: { _id: invention._id, title: invention.title },
       decisions: decisions.sort((a, b) => a.createdAt - b.createdAt),
       approvals: approvals.sort((a, b) => a.requestedAt - b.requestedAt),
-      blockedWork: blockedWork.sort((a, b) => a.updatedAt - b.updatedAt),
+      blockedWork: blockedWork
+        .filter((item) => !AUTONOMOUS_RESEARCH_KINDS.has(item.kind))
+        .sort((a, b) => a.updatedAt - b.updatedAt),
     };
   },
 });
