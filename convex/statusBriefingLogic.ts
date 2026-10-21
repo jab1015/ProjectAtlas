@@ -53,6 +53,12 @@ export interface StatusBriefing {
 // requesting professional review or physical evidence. A stale blocked record
 // must not be shown to the inventor as an action they need to complete.
 export const AUTONOMOUS_RESEARCH_KINDS = new Set([
+  "assumptions_unknowns",
+  "competitor_discovery",
+  "technical_feasibility",
+  "materials_manufacturing",
+  "evidence_verification",
+  "preliminary_bom_cost",
   "preliminary_prior_art",
   "feature_prior_art_comparison",
   "distinguishing_features",
