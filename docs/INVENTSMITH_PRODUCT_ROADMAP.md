@@ -1,3 +1,5 @@
+> **Current checkpoint — October 21, 2026:** InventSmith now has a working Product Design surface and a verified Vercel Preview for autonomous design-candidate generation. Product Design is instructed to create at least three materially different candidates before asking the inventor to choose. Authenticated provider-backed execution across every department is still being accepted incrementally. Treat visible queues as availability, not proof of saved AI results.
+
 # InventSmith Product Roadmap
 
 > **Delivery note (October 20, 2026):** This is the long-range 15-stage product roadmap. Repository implementation and automated checks cover the department workflows; authenticated provider-backed acceptance is still incomplete. Current verified status lives in `docs/INVENTSMITH_CURRENT_PLAN_AND_PROGRESS.md`, `docs/INVENTSMITH_BUILD_PROGRESS.md`, and `docs/INVENTSMITH_CAPABILITY_MATRIX.md`. Do not use the historic pilot note below to infer that later department work is absent or that all agents are live-verified.
