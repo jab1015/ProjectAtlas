@@ -160,3 +160,50 @@ export function financialModelMarkdownToSpreadsheetXml(markdown: string, inventi
 export function spreadsheetXmlDataUrl(xml: string) {
   return `data:application/vnd.ms-excel;charset=utf-8,${encodeURIComponent(`\uFEFF${xml}`)}`;
 }
+
+const COMPETITOR_HEADERS = ["Company", "Product", "Category", "Physical store / retailer", "Online location / marketplace", "Price", "Currency", "Price basis", "Product URL", "Source URL", "Research date", "Notes"];
+
+function canonicalCompetitorHeader(value: string) {
+  const normalized = value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  if (normalized.includes("company") || normalized.includes("competitor")) return "Company";
+  if (normalized.includes("product") || normalized.includes("offering")) return "Product";
+  if (normalized.includes("category") || normalized.includes("type")) return "Category";
+  if (normalized.includes("physical") || normalized.includes("retailer") || normalized.includes("store")) return "Physical store / retailer";
+  if (normalized.includes("online") || normalized.includes("marketplace") || normalized.includes("seller") || normalized.includes("sold from")) return "Online location / marketplace";
+  if (normalized.includes("price") || normalized.includes("cost")) return "Price";
+  if (normalized.includes("currency")) return "Currency";
+  if (normalized.includes("basis") || normalized.includes("unit") || normalized.includes("pack")) return "Price basis";
+  if (normalized.includes("product url") || normalized.includes("product link")) return "Product URL";
+  if (normalized.includes("source") || normalized.includes("url") || normalized.includes("link")) return "Source URL";
+  if (normalized.includes("date") || normalized.includes("checked") || normalized.includes("researched")) return "Research date";
+  if (normalized.includes("note") || normalized.includes("observation")) return "Notes";
+  return null;
+}
+
+export function competitorResearchMarkdownToSpreadsheetXml(markdown: string, inventionTitle: string) {
+  const tables = extractMarkdownTables(markdown);
+  const table = tables.find((candidate) => candidate.rows[0]?.some((header) => canonicalCompetitorHeader(header) === "Company"));
+  const today = new Date().toISOString().slice(0, 10);
+  const rows = table ? table.rows.slice(1).map((row) => {
+    const mappings = table.rows[0].map(canonicalCompetitorHeader);
+    return COMPETITOR_HEADERS.map((header) => {
+      const index = mappings.findIndex((mapped) => mapped === header);
+      return index >= 0 ? row[index] ?? "" : header === "Research date" ? today : "";
+    });
+  }) : [["", "", "", "", "", "", "", "", "", "", today, "No structured competitor table was present. Review the report sheet and refresh research."]];
+  const sources = [...new Set([...markdown.matchAll(/https?:\/\/[^\s)\]>]+/gi)].map((match) => match[0].replace(/[.,;]+$/, "")))];
+  const reportRows = markdown.split(/\r?\n/).map(cleanCell).filter(Boolean).map((line) => [line]);
+  const usedNames = new Set<string>();
+  const competitorName = worksheetName("Competitors", usedNames);
+  const sourceName = worksheetName("Sources", usedNames);
+  const reportName = worksheetName("Research report", usedNames);
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>', '<?mso-application progid="Excel.Sheet"?>',
+    '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">',
+    '<Styles><Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Vertical="Bottom"/><Font/><Interior/><NumberFormat/><Protection/></Style><Style ss:ID="Header"><Font ss:Bold="1"/><Interior ss:Color="#E8F2EA" ss:Pattern="Solid"/></Style></Styles>',
+    `<Worksheet ss:Name="${xmlEscape(competitorName)}"><Table>${spreadsheetRow([`InventSmith Competitive Research — ${inventionTitle}`])}${spreadsheetRow(COMPETITOR_HEADERS, true)}${rows.map((row) => spreadsheetRow(row)).join("")}</Table></Worksheet>`,
+    `<Worksheet ss:Name="${xmlEscape(sourceName)}"><Table>${spreadsheetRow(["Source URL"], true)}${(sources.length ? sources : ["No source URLs were captured in the report."]).map((source) => spreadsheetRow([source])).join("")}</Table></Worksheet>`,
+    `<Worksheet ss:Name="${xmlEscape(reportName)}"><Table>${spreadsheetRow(["Research report"], true)}${reportRows.map((row) => spreadsheetRow(row)).join("")}</Table></Worksheet>`,
+    "</Workbook>",
+  ].join("");
+}
