@@ -39,6 +39,7 @@ const DESIGN_PIPELINE = [
 // These jobs are InventSmith's own preparation work. A stale blocked record
 // must never be reported as a request for inventor action or as a design gate.
 const AUTONOMOUS_WORK_KINDS = new Set([
+  "brief_analysis",
   "assumptions_unknowns",
   "competitor_discovery",
   "technical_feasibility",
