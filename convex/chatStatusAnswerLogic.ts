@@ -9,6 +9,7 @@ interface StatusWorkItem {
 interface StatusStage {
   id: number;
   name: string;
+  complete?: boolean;
 }
 
 export function isLiveStatusQuestion(question: string) {
@@ -23,7 +24,11 @@ export function buildLiveStatusAnswer(
   workItems: StatusWorkItem[],
 ) {
   if (!isLiveStatusQuestion(question)) return null;
-  const stage = stages.find((item) => item.id === currentStageId);
+  // The legacy invention field can lag behind Journey Center after a refresh.
+  // Use the same first-incomplete-stage rule as the Journey Center whenever
+  // the live stage snapshot is available.
+  const stage = stages.find((item) => item.complete === false) ?? stages.find((item) => item.id === currentStageId);
+  const resolvedStageId = stage?.id ?? currentStageId;
   const running = workItems.filter((item) => item.status === "running");
   const queued = workItems.filter((item) => item.status === "queued");
   const failed = workItems.filter((item) => item.status === "failed");
@@ -33,7 +38,7 @@ export function buildLiveStatusAnswer(
 
   return [
     `Here is the live status for ${inventionTitle}.`,
-    `Current stage: Stage ${currentStageId} — ${stage?.name ?? "Invention work"}.`,
+    `Current stage: Stage ${resolvedStageId} — ${stage?.name ?? "Invention work"}.`,
     `Work ledger: ${running.length} running, ${queued.length} queued, ${blocked.length} waiting for a decision or review, ${failed.length} failed, and ${completed.length} completed.`,
     running.length ? `InventSmith is working on: ${format(running)}.` : "InventSmith is not actively running a work item at this moment.",
     queued.length ? `Next queued work: ${format(queued)}${queued.length > 5 ? `, plus ${queued.length - 5} more.` : "."}` : "There is no queued work.",

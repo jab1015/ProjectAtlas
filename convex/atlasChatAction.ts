@@ -55,7 +55,7 @@ export const answerQuestion = internalAction({
         question,
         data.invention.title,
         data.invention.currentStageId,
-        data.journey.map((stage: any) => ({ id: stage.id, name: stage.name })),
+        data.journey.map((stage: any) => ({ id: stage.id, name: stage.name, complete: stage.complete })),
         data.workItems.map((item: any) => ({ kind: item.kind, title: item.title, status: item.status, blockedReason: item.blockedReason, lastError: item.lastError })),
       );
       if (liveStatusAnswer) {

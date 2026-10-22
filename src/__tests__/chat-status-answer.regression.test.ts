@@ -24,4 +24,19 @@ describe("live Ask InventSmith status answers", () => {
     expect(answer).toContain("Research materials");
     expect(answer).not.toContain("ip_readiness");
   });
+
+  it("uses the first incomplete Journey stage when the legacy stage field is stale", () => {
+    const answer = buildLiveStatusAnswer(
+      "What is the current status of my invention?",
+      "Rise Jar",
+      2,
+      [
+        { id: 1, name: "Idea", complete: false },
+        { id: 2, name: "Validation", complete: true },
+      ],
+      [{ kind: "brief_analysis", title: "Analyze the invention brief", status: "queued" }],
+    );
+
+    expect(answer).toContain("Current stage: Stage 1 — Idea.");
+  });
 });
