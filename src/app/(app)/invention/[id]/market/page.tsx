@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import type { Doc, Id } from "@convex/_generated/dataModel";
-import { ArrowLeft, ExternalLink, FileUp, LineChart, MessageCircle, Search, Users } from "lucide-react";
+import { ArrowLeft, Download, ExternalLink, FileUp, LineChart, MessageCircle, Search, Users } from "lucide-react";
 import { AppNav } from "@/components/atlas/app-nav";
 import { userFacingError } from "@/lib/userFacingError";
 import { MarkdownContent } from "@/components/markdown-content";
@@ -42,6 +42,7 @@ interface DeliverableLibrary {
 }
 
 const getDeliverableLibrary = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, DeliverableLibrary>("inventionWorkspace:getDeliverableLibrary");
+const getCompetitiveResearchExport = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, { title: string; version: number; staleReason: string | null; downloadUrl: string } | null>("deliverableDownloads:getCompetitiveResearchExport");
 const backfillWorkspace = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { addedWorkCount: number }>("inventionMigrations:backfillWorkspace");
 const kickAutonomousWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { scheduled: boolean; reason: string }>("inventionWorkspace:kickAutonomousWork");
 const MARKET_KINDS = new Set(["competitor_discovery", "market_feasibility"]);
@@ -69,6 +70,7 @@ export default function MarketResearchPage() {
   const inventionId = params.id as Id<"inventions">;
   const { isAuthenticated, isLoading } = useConvexAuth();
   const library = useQuery(getDeliverableLibrary, isAuthenticated && inventionId ? { inventionId } : "skip");
+  const competitiveExport = useQuery(getCompetitiveResearchExport, isAuthenticated && inventionId ? { inventionId } : "skip");
   const migrateWorkspace = useMutation(backfillWorkspace);
   const kickWork = useMutation(kickAutonomousWork);
   const [queueError, setQueueError] = useState<string | null>(null);
@@ -128,6 +130,7 @@ export default function MarketResearchPage() {
             <div className="flex flex-wrap gap-2">
               <Button asChild variant="outline"><Link href={`/invention/${inventionId}/evidence`}><FileUp className="mr-2 h-4 w-4" />Upload surveys, interviews or market evidence</Link></Button>
               <Button asChild variant="outline"><Link href={`/invention/${inventionId}/chat`}><MessageCircle className="mr-2 h-4 w-4" />Ask InventSmith what is happening</Link></Button>
+              {competitiveExport?.downloadUrl && <Button asChild variant="outline"><a href={competitiveExport.downloadUrl} download={competitiveExport.title}><Download className="mr-2 h-4 w-4" />Save competitor research to Excel</a></Button>}
             </div>
           </header>
 
