@@ -4,6 +4,7 @@ import { requireInventionEditAccess, requireInventionReadAccess } from "./organi
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { getOrganizationPlanPolicy } from "./organizationPolicyLogic";
 import { departmentAgentKeyFromDisplayName } from "./departmentAgentLogic";
+import { isInventorEvidenceSource } from "./chatEvidenceLogic";
 
 interface LifecycleWorkDefinition {
   kind: string;
@@ -239,7 +240,7 @@ export const getLifecycleDepartment = query({
       completedWorkKinds: workItems.filter((item: any) => item.status === "completed").map((item: any) => item.kind),
       deliverables: deliverables.filter((item: any) => deliverableKinds.has(item.kind)).sort((a: any, b: any) => b.updatedAt - a.updatedAt),
       evidenceCount: evidence.length,
-      inventorEvidenceCount: evidence.filter((item: any) => item.metadata?.provenance === "inventor_upload").length,
+      inventorEvidenceCount: evidence.filter((item: any) => isInventorEvidenceSource(item.metadata, item.excerpt)).length,
     };
   },
 });

@@ -28,6 +28,13 @@ describe("Ask InventSmith material-input capture", () => {
     expect(shouldCaptureChatAsInventorEvidence("What is the design team doing now?")).toBe(false);
   });
 
+  it("does not turn patent research questions or follow-up chat into evidence", () => {
+    expect(shouldCaptureChatAsInventorEvidence("Are any of the patterns listed in the patent research expired or out of date? Or are they all still live and active?")).toBe(false);
+    expect(shouldCaptureChatAsInventorEvidence("Correct, but you told me that most of them were either expired or abandoned, right? If they are expired abandoned, then they should not be a blocker")).toBe(false);
+    expect(shouldCaptureChatAsInventorEvidence("Are US1234567A1 and US7654321B2 expired?")).toBe(false);
+    expect(shouldCaptureChatAsInventorEvidence("I found US1234567A1 marked abandoned. Does that affect the analysis?")).toBe(true);
+  });
+
   it("stores captured chat material in the canonical inventor-provided channel while preserving its chat origin", () => {
     const capture = readFileSync(join(process.cwd(), "convex/chatEvidenceCapture.ts"), "utf8");
     const chatPage = readFileSync(join(process.cwd(), "src/app/(app)/invention/[id]/chat/page.tsx"), "utf8");

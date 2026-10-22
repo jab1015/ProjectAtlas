@@ -12,6 +12,7 @@ import { userFacingError } from "@/lib/userFacingError";
 import { MarkdownContent } from "@/components/markdown-content";
 import { Button } from "@/components/ui/button";
 import { contentToReadableText, getDeliverableTrustLabel } from "@convex/deliverableLogic";
+import { isInventorEvidenceSource } from "@convex/chatEvidenceLogic";
 import { getMarketResearchNoDeliverableMessage } from "@/lib/marketResearchStatus";
 
 interface DeliverableLibrary {
@@ -51,7 +52,8 @@ function isWebLocator(locator?: string): locator is string {
 }
 
 function sourceEvidenceLabel(source: Doc<"evidenceSources">) {
-  const metadata = source.metadata as { evidenceKind?: string; fileName?: string; evidenceOrigin?: string } | undefined;
+  const metadata = source.metadata as { evidenceKind?: string; fileName?: string; evidenceOrigin?: string; capturedFrom?: string } | undefined;
+  if (metadata?.capturedFrom === "ask_inventsmith") return "Inventor statement";
   if (metadata?.fileName) return metadata.fileName;
   if (metadata?.evidenceOrigin === "public_response") return "Survey/interview response";
   return metadata?.evidenceKind?.replaceAll("_", " ") ?? "Inventor evidence";
@@ -96,7 +98,10 @@ export default function MarketResearchPage() {
 
   const deliverables = library.deliverables.filter((item) => MARKET_KINDS.has(item.kind));
   const sourcesById = new Map(library.sources.map((source) => [String(source._id), source]));
-  const inventorEvidence = library.sources.filter((source) => source.metadata?.provenance === "inventor_upload");
+  // Older Ask InventSmith questions were incorrectly saved as evidence.
+  // Keep genuine factual statements, but remove conversational turns from
+  // this evidence-only view without deleting the underlying chat history.
+  const inventorEvidence = library.sources.filter((source) => isInventorEvidenceSource(source.metadata, source.excerpt));
   const marketWork = (library.workItems ?? []).filter((item) => MARKET_WORK_KINDS.has(item.kind));
   const completedMarketWork = marketWork.filter((item) => item.status === "completed").length;
   const marketProgress = marketWork.length > 0 ? Math.round((completedMarketWork / marketWork.length) * 100) : 0;
@@ -128,23 +133,38 @@ export default function MarketResearchPage() {
 
           <section className="grid gap-4 md:grid-cols-4">
             <div className="rounded-2xl border border-border bg-card p-5"><Search className="h-5 w-5 text-primary" /><p className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">Market deliverables</p><p className="mt-1 text-2xl font-semibold">{deliverables.length}</p></div>
-            <div className="rounded-2xl border border-border bg-card p-5"><Users className="h-5 w-5 text-primary" /><p className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">Inventor evidence files</p><p className="mt-1 text-2xl font-semibold">{inventorEvidence.length}</p></div>
+            <div className="rounded-2xl border border-border bg-card p-5"><Users className="h-5 w-5 text-primary" /><p className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">Inventor evidence items</p><p className="mt-1 text-2xl font-semibold">{inventorEvidence.length}</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><LineChart className="h-5 w-5 text-primary" /><p className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">Research sources</p><p className="mt-1 text-2xl font-semibold">{library.sources.length}</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><LineChart className="h-5 w-5 text-primary" /><p className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">Autonomous progress</p><p className="mt-1 text-2xl font-semibold">{marketWork.length > 0 ? `${marketProgress}%` : "Starting"}</p><p className="mt-1 text-xs text-muted-foreground">{marketWork.length > 0 ? `${completedMarketWork} of ${marketWork.length} work items complete` : "Queue initialization in progress"}</p></div>
           </section>
 
           <section className="space-y-4">
-            <div><h2 className="text-xl font-semibold">Evidence connected to market research</h2><p className="mt-1 text-sm text-muted-foreground">Site-collected survey and interview responses count as customer-validation signals immediately. Uploaded studies remain available to downstream work while methodology and independent market claims stay clearly separated.</p></div>
+            <div><h2 className="text-xl font-semibold">Evidence connected to market research</h2><p className="mt-1 text-sm text-muted-foreground">Site-collected survey and interview responses count as customer-validation signals immediately. Inventor-provided files and factual statements remain marked unverified until their sources and methods are assessed; ordinary Ask InventSmith questions stay in chat history.</p></div>
             {inventorEvidence.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">No inventor evidence is connected yet. Upload a SurveyMonkey export, interview notes, or create a shareable survey page above.</div>
             ) : (
               <div className="space-y-3">
                 {inventorEvidence.map((source) => {
-                  const metadata = source.metadata as { extractionStatus?: string; fileSize?: number; uploadedAt?: number; evidenceOrigin?: string; validationStatus?: string; collectionStatus?: string } | undefined;
+                  const metadata = source.metadata as { extractionStatus?: string; fileSize?: number; uploadedAt?: number; evidenceOrigin?: string; validationStatus?: string; collectionStatus?: string; capturedFrom?: string } | undefined;
                   // Keep legacy public responses visible as site-collected even if
                   // they predate the validation metadata fields.
                   const siteCollected = metadata?.evidenceOrigin === "public_response" || metadata?.validationStatus === "counted_customer_signal";
-                  return <article key={source._id} className="rounded-2xl border border-border bg-card p-5"><div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"><div><h3 className="font-semibold">{source.title}</h3><p className="mt-1 text-xs capitalize text-muted-foreground">{sourceEvidenceLabel(source)} · {siteCollected ? "site-collected" : source.reliability.replaceAll("_", " ")}</p></div><span className={`w-fit rounded-full px-3 py-1 text-xs font-medium ${siteCollected ? "bg-emerald-100 text-emerald-900" : "bg-amber-100 text-amber-900"}`}>{siteCollected ? "Counted customer-validation signal" : "Uploaded evidence — methodology review pending"}</span></div>{source.excerpt && <p className="mt-3 whitespace-pre-wrap text-sm text-muted-foreground">{source.excerpt.slice(0, 700)}{source.excerpt.length > 700 ? "…" : ""}</p>}<p className="mt-3 text-xs text-muted-foreground">{siteCollected ? "Response logged from the InventSmith survey page and included in Validation refreshes." : metadata?.extractionStatus === "completed" ? "Structured and available to downstream work" : metadata?.extractionStatus === "running" ? "Being structured for downstream work" : "Queued for structured extraction"}{metadata?.uploadedAt ? ` · Added ${new Date(metadata.uploadedAt).toLocaleDateString()}` : ""}</p></article>;
+                  const chatStatement = metadata?.capturedFrom === "ask_inventsmith";
+                  const statusText = siteCollected
+                    ? "Response logged from the InventSmith survey page and included in Validation refreshes."
+                    : chatStatement
+                      ? "Shared in Ask InventSmith and saved as an unverified factual statement; it has not been independently checked."
+                      : metadata?.extractionStatus === "completed"
+                        ? "Structured and available to downstream work"
+                        : metadata?.extractionStatus === "running"
+                          ? "Being structured for downstream work"
+                          : metadata?.extractionStatus === "failed"
+                            ? "Could not be structured. Open the Evidence Locker to review or retry extraction."
+                            : metadata?.extractionStatus === "queued"
+                              ? "Queued for structured extraction"
+                              : "Inventor-provided material; source and methodology have not been independently reviewed.";
+                  const evidenceBadge = siteCollected ? "Counted customer-validation signal" : chatStatement ? "Unverified inventor statement" : "Unverified inventor upload";
+                  return <article key={source._id} className="rounded-2xl border border-border bg-card p-5"><div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"><div><h3 className="font-semibold">{source.title}</h3><p className="mt-1 text-xs capitalize text-muted-foreground">{sourceEvidenceLabel(source)} · {siteCollected ? "site-collected" : source.reliability.replaceAll("_", " ")}</p></div><span className={`w-fit rounded-full px-3 py-1 text-xs font-medium ${siteCollected ? "bg-emerald-100 text-emerald-900" : "bg-amber-100 text-amber-900"}`}>{evidenceBadge}</span></div>{source.excerpt && <p className="mt-3 whitespace-pre-wrap text-sm text-muted-foreground">{source.excerpt.slice(0, 700)}{source.excerpt.length > 700 ? "…" : ""}</p>}<p className="mt-3 text-xs text-muted-foreground">{statusText}{metadata?.uploadedAt ? ` · Added ${new Date(metadata.uploadedAt).toLocaleDateString()}` : ""}</p></article>;
                 })}
               </div>
             )}

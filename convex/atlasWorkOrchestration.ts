@@ -12,6 +12,7 @@ import { restrictedPilotReason, triageInventionRisk } from "./riskTriageLogic";
 import { buildPitchDeckArtifact } from "./pitchDeckArtifact";
 import { buildTraceableRetrievalRecords } from "./webRetrievalEvidenceLogic";
 import { departmentAgentSystemPrompt, resolveDepartmentAgent } from "./departmentAgentLogic";
+import { isInventorEvidenceSource } from "./chatEvidenceLogic";
 
 const claimNextWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; availableCostUnits: number; now: number; departmentStageId?: number }, { workItemId: Id<"atlasWorkItems"> | null; attemptNumber: number | null; reason: string }>("atlasWorkState:claimNextWork");
 const getWorkContext = makeFunctionReference<"query", { workItemId: Id<"atlasWorkItems">; attemptNumber: number; now: number }, any>("atlasWorkState:getWorkContext");
@@ -169,7 +170,7 @@ export const runAvailableWork = internalAction({
                 deliverables: deliverables.sort((a: any, b: any) => b.updatedAt - a.updatedAt).slice(0, contextDeliverableLimit(workItem.kind)).map((deliverable: any) => ({ title: deliverable.title, kind: deliverable.kind, version: deliverable.version, trustState: deliverable.trustState, content: deliverable.content, sourceCoverage: deliverable.sourceCoverage, confidence: deliverable.confidence, assumptions: deliverable.assumptions, limitations: deliverable.limitations, staleReason: deliverable.staleReason })),
                 findings: findings.sort((a: any, b: any) => b.updatedAt - a.updatedAt).slice(0, 60).map((finding: any) => ({ statement: finding.statement, kind: finding.kind, confidence: finding.confidence, status: finding.status, sourceIds: finding.sourceIds.map(String), limitations: finding.limitations })),
               },
-              inventorEvidence: sources.filter((source: any) => source.metadata?.provenance === "inventor_upload").slice(0, 40).map((source: any) => ({ title: source.title, evidenceKind: source.metadata?.evidenceKind, reliability: source.reliability, extraction: source.metadata?.extraction ?? null, excerpt: source.excerpt ?? null })),
+              inventorEvidence: sources.filter((source: any) => isInventorEvidenceSource(source.metadata, source.excerpt)).slice(0, 40).map((source: any) => ({ title: source.title, evidenceKind: source.metadata?.evidenceKind, reliability: source.reliability, extraction: source.metadata?.extraction ?? null, excerpt: source.excerpt ?? null })),
               evidenceToVerify: workItem.kind === "evidence_verification" ? {
                 sources: sources.slice(0, 60).map((source: any) => ({ id: String(source._id), title: source.title, locator: source.locator, sourceType: source.sourceType, reliability: source.reliability })),
                 findings: findings.slice(0, 60).map((finding: any) => ({ statement: finding.statement, kind: finding.kind, confidence: finding.confidence, sourceIds: finding.sourceIds.map(String), status: finding.status })),

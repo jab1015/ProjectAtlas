@@ -6,6 +6,7 @@ import { requireInventionReadAccess } from "./organizations";
 import { AUTONOMOUS_RESEARCH_KINDS, isAutonomousDecision } from "./statusBriefingLogic";
 import { getValidationFollowUpAction } from "./journeyNextActionLogic";
 import { getJourneyStageStatus, getJourneyStageStatusExplanation } from "./journeyStageStatusLogic";
+import { isInventorEvidenceSource } from "./chatEvidenceLogic";
 
 function activityForWork(kind: string, title: string) {
   const activities: Record<string, string> = {
@@ -156,7 +157,7 @@ export const getJourneyCenter = query({
       },
       evidence: {
         total: evidence.length,
-        inventorProvided: evidence.filter((item) => item.metadata?.provenance === "inventor_upload").length,
+        inventorProvided: evidence.filter((item) => isInventorEvidenceSource(item.metadata, item.excerpt)).length,
         verified: evidence.filter((item) => item.reliability !== "unverified").length,
         // Public responses created before validation metadata was added are still
         // traceable customer-validation evidence and must remain visible here.

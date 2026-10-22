@@ -3,6 +3,7 @@ import { v, ConvexError } from "convex/values";
 import { canTierRunWorkKind } from "./entitlementPolicyLogic";
 import { requireInventionEditAccess, requireInventionReadAccess } from "./organizations";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
+import { isInventorEvidenceSource } from "./chatEvidenceLogic";
 
 export const DESIGN_WORK = [
   {
@@ -178,7 +179,7 @@ export const getProductDesignWorkspace = query({
         mediaUrl: deliverable.storageId && deliverable.mediaType?.startsWith("image/") ? await ctx.storage.getUrl(deliverable.storageId) : null,
       }))),
       evidenceCount: evidence.length,
-      inventorEvidenceCount: evidence.filter((item: any) => item.metadata?.provenance === "inventor_upload").length,
+      inventorEvidenceCount: evidence.filter((item: any) => isInventorEvidenceSource(item.metadata, item.excerpt)).length,
       cadStatus: {
         // The CAD request mutation requires the current Product Design
         // Specification. A CAD-model specification alone must not enable the

@@ -3,6 +3,7 @@ import type { MutationCtx, QueryCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { makeFunctionReference } from "convex/server";
 import { v } from "convex/values";
+import { isInventorEvidenceSource } from "./chatEvidenceLogic";
 
 const refresh = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }>("validationEvidence:refreshAfterEvidence");
 const run = makeFunctionReference<"action", { inventionId: Id<"inventions"> }>("validationResearchOrchestration:runValidationResearchOrchestration");
@@ -21,7 +22,7 @@ export async function readValidationEvidence(ctx: QueryCtx | MutationCtx, invent
     ctx.db.query("evidenceSources").withIndex("by_inventionId", q => q.eq("inventionId", inventionId)).collect(),
     ctx.db.query("stageProgress").withIndex("by_inventionId", q => q.eq("inventionId", inventionId)).collect(),
   ]);
-  const ready = sources.filter(s => s.metadata?.provenance === "inventor_upload" && (s.metadata?.extractionStatus === "completed" || s.metadata?.evidenceOrigin === "chat"));
+  const ready = sources.filter(s => isInventorEvidenceSource(s.metadata, s.excerpt) && (s.metadata?.extractionStatus === "completed" || (s.metadata?.evidenceOrigin === "chat" && isInventorEvidenceSource(s.metadata, s.excerpt))));
   const invention = await ctx.db.get(inventionId);
   ready.sort((a, b) => String(a._id).localeCompare(String(b._id)));
   return {
@@ -32,7 +33,7 @@ export async function readValidationEvidence(ctx: QueryCtx | MutationCtx, invent
     }),
     evidence: ready.map(s => ({ sourceId: String(s._id), title: s.title, evidenceKind: s.metadata?.evidenceKind ?? "other", provenance: "inventor_upload", extraction: s.metadata?.extraction ?? { text: s.excerpt } })),
     pendingSurveys: sources
-      .filter(s => s.metadata?.provenance === "inventor_upload" && s.metadata?.evidenceKind === "survey" && s.metadata?.extractionStatus !== "completed")
+      .filter(s => isInventorEvidenceSource(s.metadata, s.excerpt) && s.metadata?.evidenceKind === "survey" && s.metadata?.extractionStatus !== "completed")
       .map(s => ({
         title: s.title,
         status: s.metadata?.extractionStatus === "failed" ? "failed" as const : "processing" as const,

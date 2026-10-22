@@ -4,6 +4,7 @@ import { makeFunctionReference } from "convex/server";
 import type { Id } from "./_generated/dataModel";
 import { requireAdmin } from "./authHelpers";
 import { applyInventorEvidenceChange } from "./evidenceImpact";
+import { isInventorEvidenceSource } from "./chatEvidenceLogic";
 import {
   requireInventionEditAccess,
   requireInventionManageAccess,
@@ -108,7 +109,7 @@ export const listInventionEvidence = query({
   handler: async (ctx, args) => {
     await requireInventionReadAccess(ctx, args.inventionId);
     const sources = await ctx.db.query("evidenceSources").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect();
-    const inventorUploads = sources.filter((source) => source.metadata?.provenance === "inventor_upload");
+    const inventorUploads = sources.filter((source) => isInventorEvidenceSource(source.metadata, source.excerpt));
 
     return await Promise.all(
       inventorUploads
