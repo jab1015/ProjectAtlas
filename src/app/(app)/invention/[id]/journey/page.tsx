@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
@@ -96,6 +96,7 @@ export default function JourneyCenterPage() {
   const briefing = useQuery(getStatusBriefing, isAuthenticated && inventionId ? { inventionId } : "skip");
   const migrateWorkspace = useMutation(backfillWorkspace);
   const kickWork = useMutation(kickAutonomousWork);
+  const [workerNotice, setWorkerNotice] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.push("/sign-in");
@@ -106,13 +107,30 @@ export default function JourneyCenterPage() {
     void (async () => {
       try {
         await migrateWorkspace({ inventionId });
-        await kickWork({ inventionId });
+        const result = await kickWork({ inventionId });
+        setWorkerNotice(result.scheduled
+          ? "InventSmith sent a worker wake-up. Queued work will appear as In progress when the first task is claimed."
+          : result.reason === "daily_usage_limit"
+            ? "The daily autonomous work allowance is currently used up. No action is needed from you; InventSmith will resume after the allowance resets."
+            : `InventSmith could not start the queue yet (${result.reason.replaceAll("_", " ")}). The queue remains safe and will be checked again automatically.`);
       } catch {
-        // Journey rendering is independent of the scheduler; a later visit
-        // retries the idempotent wake-up.
+        setWorkerNotice("InventSmith could not contact the work scheduler. The queue is preserved and will be retried automatically.");
       }
     })();
   }, [inventionId, isAuthenticated, isLoading, migrateWorkspace, kickWork]);
+
+  useEffect(() => {
+    if (isLoading || !isAuthenticated || !inventionId) return;
+    const timer = window.setInterval(() => {
+      void kickWork({ inventionId }).then((result) => {
+        if (result.scheduled) setWorkerNotice("InventSmith is checking the queued work now.");
+        else if (result.reason === "daily_usage_limit") setWorkerNotice("The daily autonomous work allowance is currently used up. InventSmith will resume after the allowance resets.");
+      }).catch(() => {
+        // The next interval retries; the queue remains durable.
+      });
+    }, 15000);
+    return () => window.clearInterval(timer);
+  }, [inventionId, isAuthenticated, isLoading, kickWork]);
 
   if (isLoading || !isAuthenticated || journey === undefined) {
     return <div className="min-h-screen bg-background"><AppNav /><main className="mx-auto max-w-5xl px-4 py-12 text-sm text-muted-foreground sm:px-6">Loading InventSmith journey…</main></div>;
@@ -145,6 +163,7 @@ export default function JourneyCenterPage() {
             <p className="text-xs font-semibold uppercase tracking-wider text-primary">What happens next</p>
             <h2 className="mt-2 text-xl font-semibold">{nextAction}</h2>
             <p className="mt-2 text-sm text-muted-foreground">Current focus: Stage {journey.currentStage.id} — {journey.currentStage.name}.</p>
+            {workerNotice && <p role="status" className="mt-4 rounded-xl border border-primary/20 bg-background/70 px-4 py-3 text-sm text-foreground">{workerNotice}</p>}
           </section>
 
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
