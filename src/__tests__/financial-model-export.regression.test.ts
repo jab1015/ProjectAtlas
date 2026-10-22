@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   csvDataUrl,
+  competitorResearchMarkdownToSpreadsheetXml,
   extractMarkdownTables,
   financialModelMarkdownToCsv,
   financialModelMarkdownToSpreadsheetXml,
@@ -70,6 +71,23 @@ describe("InventSmith financial model structured export", () => {
     expect(workbook).toContain('ss:Name="Sales Channel Plan"');
     expect(workbook).toContain('ss:Name="Sales Channel Plan 2"');
     expect(workbook).not.toContain('ss:Name="Sales/Channel: Plan?"');
+  });
+
+  it("exports competitor locations and prices into a structured workbook", () => {
+    const competitorMarkdown = [
+      "## Competitor inventory",
+      "| Company | Product | Category | Physical store / retailer | Online location / marketplace | Price | Currency | Price basis | Product URL | Source URL | Research date | Notes |",
+      "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+      "| Acme | Rise Cup | Jar | Target | Acme.com; Amazon | 12.99 | USD | each | https://acme.example/product | https://acme.example | 2026-10-22 | Observed listing |",
+    ].join("\n");
+    const workbook = competitorResearchMarkdownToSpreadsheetXml(competitorMarkdown, "RiseJar");
+    expect(workbook).toContain('ss:Name="Competitors"');
+    expect(workbook).toContain("Physical store / retailer");
+    expect(workbook).toContain("Online location / marketplace");
+    expect(workbook).toContain("12.99");
+    expect(workbook).toContain("https://acme.example/product");
+    expect(workbook).toContain('ss:Name="Sources"');
+    expect(workbook).toContain('ss:Name="Research report"');
   });
 
   it("exposes both CSV and Excel-readable financial_model downloads through the normal artifact service", () => {
