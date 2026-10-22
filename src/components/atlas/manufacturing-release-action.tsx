@@ -6,6 +6,7 @@ import { makeFunctionReference } from "convex/server";
 import type { Id } from "@convex/_generated/dataModel";
 import { CheckCircle2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { userFacingError } from "@/lib/userFacingError";
 import { selectCurrentSynchronizedCadGeneration, type ManufacturingReleaseCadArtifact } from "@/lib/manufacturing-release-ui-logic";
 
 type InventionAccess = "manage" | "edit" | "view" | "review" | null;
@@ -98,7 +99,7 @@ export function ManufacturingReleaseAction({
           : `Native CAD generation v${result.version} is now manufacturing released for planning. No external action was performed.`
       );
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "InventSmith could not release this CAD generation.");
+      setError(userFacingError(cause, "InventSmith could not release this CAD generation."));
     } finally {
       setReleasing(false);
     }

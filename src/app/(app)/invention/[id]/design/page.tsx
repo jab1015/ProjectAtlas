@@ -8,6 +8,7 @@ import { makeFunctionReference } from "convex/server";
 import type { Doc, Id } from "@convex/_generated/dataModel";
 import { ArrowLeft, Box, CheckCircle2, Download, FileUp, Play, RefreshCw, ShieldAlert, Sparkles, Wrench } from "lucide-react";
 import { AppNav } from "@/components/atlas/app-nav";
+import { userFacingError } from "@/lib/userFacingError";
 import { MadeThisBadge } from "@/components/atlas/made-this-badge";
 import { ManufacturingReleaseAction } from "@/components/atlas/manufacturing-release-action";
 import { MarkdownContent } from "@/components/markdown-content";
@@ -129,7 +130,7 @@ export default function ProductDesignStudioPage() {
       const scheduled = await kickWork({ inventionId, departmentStageId: 5 });
       setMessage(getDepartmentStartMessage("Product Design", ensured.created, scheduled.scheduled));
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "InventSmith could not start Product Design.");
+      setError(userFacingError(cause, "InventSmith could not start Product Design."));
     } finally { setStarting(false); }
   };
 
@@ -143,7 +144,7 @@ export default function ProductDesignStudioPage() {
         ? "Native CAD generation is already running."
         : "Native CAD generation is queued.");
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "InventSmith could not start native CAD generation.");
+      setError(userFacingError(cause, "InventSmith could not start native CAD generation."));
     } finally { setGeneratingCad(false); }
   };
 

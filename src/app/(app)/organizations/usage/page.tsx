@@ -54,6 +54,13 @@ interface UsageOverview {
     byOperationClass: Record<CostClass, ClassUsage>;
     byWorkKind: Array<{ kind: string; costUnits: number; completions: number }>;
   };
+  measuredCostUsage: {
+    totalCostUnits: number;
+    autonomousCostUnits: number;
+    askInventSmithCostUnits: number;
+    completedWorkEvents: number;
+    byOperationClass: Record<CostClass, ClassUsage>;
+  };
   economics: {
     estimatedVariableCostUsd: number | null;
     grossMarginEstimate: number | null;
@@ -124,7 +131,7 @@ export default function OrganizationUsagePage() {
           <>
             <div className="mt-8 grid gap-4 md:grid-cols-3">
               <Card><CardHeader><div className="flex items-center gap-2 text-muted-foreground"><WalletCards className="h-4 w-4" /><span className="text-xs font-medium uppercase tracking-widest">Plan</span></div><CardTitle>{formatPrice(usage.organization.monthlyPriceUsd)}</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">{usage.organization.name} · <span className="capitalize">{usage.organization.planKey.replaceAll("_", " ")}</span></p></CardContent></Card>
-              <Card><CardHeader><div className="flex items-center gap-2 text-muted-foreground"><Gauge className="h-4 w-4" /><span className="text-xs font-medium uppercase tracking-widest">Measured usage</span></div><CardTitle>{usage.autonomousUsage.totalCostUnits} units</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">{usage.autonomousUsage.completedWorkEvents} completed autonomous work events in the last {usage.period.days} days.</p></CardContent></Card>
+              <Card><CardHeader><div className="flex items-center gap-2 text-muted-foreground"><Gauge className="h-4 w-4" /><span className="text-xs font-medium uppercase tracking-widest">Measured usage</span></div><CardTitle>{usage.measuredCostUsage.totalCostUnits} units</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">{usage.measuredCostUsage.autonomousCostUnits} autonomous · {usage.measuredCostUsage.askInventSmithCostUnits} Ask InventSmith units in the last {usage.period.days} days.</p></CardContent></Card>
               <Card><CardHeader><div className="flex items-center gap-2 text-muted-foreground"><Layers3 className="h-4 w-4" /><span className="text-xs font-medium uppercase tracking-widest">Projects</span></div><CardTitle>{usage.inventions.active} active</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">{usage.inventions.archived} archived · {usage.organization.activeInventionLimit === null ? "contracted" : usage.organization.activeInventionLimit} active-slot limit.</p></CardContent></Card>
             </div>
 
@@ -132,7 +139,7 @@ export default function OrganizationUsagePage() {
               <div className="mb-4 flex items-center gap-2"><BarChart3 className="h-4 w-4 text-muted-foreground" /><h2 id="cost-classes-title" className="text-lg font-semibold">Where capacity is going</h2></div>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {(Object.keys(CLASS_LABELS) as CostClass[]).map((key) => {
-                  const item = usage.autonomousUsage.byOperationClass[key];
+                  const item = usage.measuredCostUsage.byOperationClass[key];
                   return <Card key={key}><CardHeader><div className="flex items-center justify-between gap-2"><CardTitle className="text-base">{CLASS_LABELS[key].label}</CardTitle><Badge variant="outline">{item.costUnits} units</Badge></div></CardHeader><CardContent><p className="text-sm text-muted-foreground">{CLASS_LABELS[key].detail}</p><p className="mt-2 text-xs text-muted-foreground">{item.completions} completed operations</p></CardContent></Card>;
                 })}
               </div>

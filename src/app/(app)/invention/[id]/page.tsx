@@ -17,6 +17,8 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, ArrowRight, Mail, MessageSquare, PartyPopper, RefreshCw, Share2 } from "lucide-react";
 import Link from "next/link";
 import { trackStageCompleted, trackContinueClicked } from "@/lib/analytics";
+import { userFacingError } from "@/lib/userFacingError";
+import { truncateAtWordBoundary } from "@/lib/truncateAtWordBoundary";
 import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
 import { getSafeValidationFailureMessage, getValidationCompletionLabel, getValidationResearchViewState } from "@/lib/validationResearchView";
 import { makeFunctionReference } from "convex/server";
@@ -222,11 +224,12 @@ export default function InventionWorkspacePage() {
     setSurveyPreparationError(null);
     const idea = inventionState.invention;
     const details = [idea.problemStatement?.trim(), idea.solutionDescription?.trim()].filter(Boolean).join(" A possible solution is: ");
+    const surveyDetails = truncateAtWordBoundary(details, 320);
     void createEvidenceRequest({
       inventionId,
       kind: "survey",
       title: fallbackTitle,
-              introduction: `InventSmith prepared this short survey because the current evidence score is ${Math.round(reportConfidenceAverage * 100)}%. Please share it with people who may have this problem${details ? `: ${details.slice(0, 320)}` : ""}. Responses are logged on this site and counted as customer-validation signals in the next refresh.`,
+      introduction: `InventSmith prepared this short survey because the current evidence score is ${Math.round(reportConfidenceAverage * 100)}%. Please share it with people who may have this problem${surveyDetails ? `: ${surveyDetails}` : ""}. Responses are logged on this site and counted as customer-validation signals in the next refresh.`,
     }).catch((error) => {
       console.error("Could not prepare the validation follow-up survey:", error);
       setSurveyPreparationError("InventSmith could not prepare the survey link. Open Evidence Locker to create a survey page.");
@@ -266,7 +269,7 @@ export default function InventionWorkspacePage() {
       // Keep rebuilding=true — the reactive query will update as sections come in
     } catch (err) {
       console.error("Rebuild failed:", err);
-      const msg = err instanceof Error ? err.message : "Rebuild failed. Please try again.";
+      const msg = userFacingError(err, "Rebuild failed. Please try again.");
       setRebuildError(msg);
       setRebuilding(false);
       if (rebuildTimeoutRef.current) clearTimeout(rebuildTimeoutRef.current);

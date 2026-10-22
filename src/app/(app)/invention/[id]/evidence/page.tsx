@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertTriangle, ArrowLeft, DatabaseZap, ExternalLink, FileText, RefreshCw, Trash2, Upload } from "lucide-react";
 import { extractEvidenceFromFile, type EvidenceExtraction } from "@/lib/evidenceIngestion";
+import { userFacingError } from "@/lib/userFacingError";
 
 const retryEvidenceExtraction = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; evidenceSourceId: Id<"evidenceSources"> }, { scheduled: boolean; reason: "queued" | "already_queued" }>("evidenceExtractionControl:retryEvidenceExtraction");
 const createEvidenceRequest = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; kind: "survey" | "interview" }, { requestId: string; token: string }>("evidenceRequests:create");
@@ -248,7 +249,7 @@ export default function InventionEvidencePage() {
       const input = document.getElementById("evidence-file") as HTMLInputElement | null;
       if (input) input.value = "";
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed. Please try again.");
+      setError(userFacingError(err, "Upload failed. Please try again."));
     } finally {
       setUploading(false);
     }
@@ -260,7 +261,7 @@ export default function InventionEvidencePage() {
     try {
       await retryExtraction({ inventionId, evidenceSourceId });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "InventSmith could not retry evidence extraction.");
+      setError(userFacingError(err, "InventSmith could not retry evidence extraction."));
     } finally {
       setRetryingId(null);
     }
@@ -339,7 +340,7 @@ export default function InventionEvidencePage() {
 
         <section className="rounded-xl border border-primary/20 bg-primary/5 p-6 space-y-4">
           <div><p className="text-xs font-medium uppercase tracking-widest text-primary">Need evidence?</p><h2 className="mt-1 text-xl font-semibold">Let InventSmith collect it for you</h2><p className="mt-1 text-sm text-muted-foreground">Create a tailored survey or interview page, share the link, and responses will automatically become inventor-provided evidence and refresh affected departments.</p></div>
-          <div className="flex flex-wrap items-center gap-3"><select value={requestKind} onChange={e => setRequestKind(e.target.value as "survey" | "interview")} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="survey">Create survey</option><option value="interview">Create interview page</option></select><Button type="button" variant="outline" disabled={creatingRequest} onClick={async () => { setError(null); setCreatingRequest(true); try { const result = await createRequest({ inventionId, kind: requestKind }); setShareLink(`${window.location.origin}/respond/${result.token}`); } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not create the survey link."); } finally { setCreatingRequest(false); } }}><ExternalLink className="mr-2 h-4 w-4" />{creatingRequest ? "Creating page…" : "Create shareable page"}</Button></div>
+          <div className="flex flex-wrap items-center gap-3"><select value={requestKind} onChange={e => setRequestKind(e.target.value as "survey" | "interview")} className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="survey">Create survey</option><option value="interview">Create interview page</option></select><Button type="button" variant="outline" disabled={creatingRequest} onClick={async () => { setError(null); setCreatingRequest(true); try { const result = await createRequest({ inventionId, kind: requestKind }); setShareLink(`${window.location.origin}/respond/${result.token}`); } catch (cause) { setError(userFacingError(cause, "Could not create the survey link.")); } finally { setCreatingRequest(false); } }}><ExternalLink className="mr-2 h-4 w-4" />{creatingRequest ? "Creating page…" : "Create shareable page"}</Button></div>
           {shareLink && <div className="rounded-lg border border-border bg-background p-3 text-sm"><p className="font-medium">Share this link</p><p className="mt-1 break-all text-muted-foreground select-all">{shareLink}</p><Button type="button" size="sm" variant="secondary" className="mt-2" onClick={async () => { const copied = await copyTextToClipboard(shareLink); setError(copied ? "Survey link copied." : "Copy was unavailable. Press and hold the link above to copy it."); }}>Copy link</Button></div>}
           {requests instanceof Error && <p role="alert" className="text-sm text-destructive">Previously created survey links could not be loaded. The evidence upload form remains available.</p>}
           {requests && !(requests instanceof Error) && requests.length > 0 && <div className="space-y-3">{requests.map(request => { const link = `${window.location.origin}/respond/${request.token}`; return <div key={request._id} className="rounded-lg border border-border bg-background p-3"><p className="text-sm font-medium">{request.kind === "survey" ? "Survey" : "Interview"}: {request.responseCount} response{request.responseCount === 1 ? "" : "s"} · {request.status}</p><p className="mt-1 break-all text-xs text-muted-foreground select-all">{link}</p>{request.status === "active" && <Button type="button" size="sm" variant="secondary" className="mt-2" onClick={async () => { const copied = await copyTextToClipboard(link); setCopiedRequestId(copied ? request._id : null); setError(copied ? "Survey link copied." : "Copy was unavailable. Press and hold the link above to copy it."); }}>{copiedRequestId === request._id ? "Copied" : "Copy link"}</Button>}</div>; })}</div>}
@@ -351,7 +352,7 @@ export default function InventionEvidencePage() {
             <p className="text-sm text-muted-foreground">Uploaded files remain inventor-provided and unverified until their provenance and relevance are reviewed. Responses collected through an InventSmith survey link are counted as customer-validation signals, but are not presented as independently verified market research.</p>
           </div>
 
-          {evidence instanceof Error ? <p role="alert" className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">Evidence files could not be loaded. You can still use the upload form above; if this continues, copy the browser console error so we can identify the backend failure.</p> : evidence === undefined ? <p className="text-sm text-muted-foreground">Loading evidence…</p> : evidence.length === 0 ? (
+          {evidence instanceof Error ? <p role="alert" className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">Evidence files could not be loaded. You can still use the upload form above. Retry this page; if the list still fails, <Link className="underline" href={`/support?inventionId=${inventionId}`}>contact support</Link> and mention that your evidence list did not load.</p> : evidence === undefined ? <p className="text-sm text-muted-foreground">Loading evidence…</p> : evidence.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border p-8 text-center text-muted-foreground">No evidence uploaded yet.</div>
           ) : (
             <div className="space-y-3">

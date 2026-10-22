@@ -7,6 +7,7 @@ import { makeFunctionReference } from "convex/server";
 import { ArrowRightLeft, Building2, Plus, Shield, Trash2, UserPlus, UsersRound } from "lucide-react";
 
 import { AppNav } from "@/components/atlas/app-nav";
+import { userFacingError } from "@/lib/userFacingError";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -133,7 +134,7 @@ export default function OrganizationsPage() {
       setSelectedId(result.organizationId);
       setMessage(`${newOrgKind === "studio" ? "Studio" : "Company"} created on Explorer. Billing must explicitly activate a paid organization plan.`);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "InventSmith could not create the organization.");
+      setMessage(userFacingError(error, "InventSmith could not create the organization."));
     }
   };
 
@@ -144,7 +145,7 @@ export default function OrganizationsPage() {
       setMemberEmail("");
       setMessage(result.created ? "Invitation created. The seat is reserved until the invitation expires or is revoked." : "The existing invitation was refreshed and its role updated.");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "InventSmith could not create that invitation.");
+      setMessage(userFacingError(error, "InventSmith could not create that invitation."));
     }
   };
 
@@ -154,7 +155,7 @@ export default function OrganizationsPage() {
       setSelectedId(result.organizationId);
       setMessage(`You joined ${invitation.organizationName} as ${result.role}.`);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "InventSmith could not accept that invitation.");
+      setMessage(userFacingError(error, "InventSmith could not accept that invitation."));
     }
   };
 
@@ -166,7 +167,7 @@ export default function OrganizationsPage() {
       await transferOwnershipAction({ organizationId: selected.organizationId, newOwnerUserId: member.userId });
       setMessage(`Ownership transferred to ${label}. Your role is now Administrator.`);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "InventSmith could not transfer ownership.");
+      setMessage(userFacingError(error, "InventSmith could not transfer ownership."));
     }
   };
 
@@ -239,14 +240,14 @@ export default function OrganizationsPage() {
                         <div className="min-w-0"><p className="truncate font-medium">{member.name ?? member.email ?? "InventSmith user"}</p><p className="truncate text-xs text-muted-foreground">{member.email ?? "No email available"} · <span className="capitalize">{member.status}</span></p></div>
                         <div className="flex flex-wrap items-center gap-2">
                           {member.role === "owner" ? <Badge><Shield className="mr-1 h-3 w-3" />Owner</Badge> : canManageMembers ? (
-                            <select value={member.role} onChange={(event) => void updateRoleAction({ organizationId: selected.organizationId, userId: member.userId, role: event.target.value as AssignableRole }).catch((error) => setMessage(error instanceof Error ? error.message : "Role update failed."))} className="h-9 rounded-md border border-input bg-background px-3 text-sm">
+                            <select value={member.role} onChange={(event) => void updateRoleAction({ organizationId: selected.organizationId, userId: member.userId, role: event.target.value as AssignableRole }).catch((error) => setMessage(userFacingError(error, "Role update failed.")))} className="h-9 rounded-md border border-input bg-background px-3 text-sm">
                               {ASSIGNABLE_ROLES.map((role) => <option key={role.value} value={role.value}>{role.label}</option>)}
                             </select>
                           ) : <Badge variant="outline" className="capitalize">{member.role}</Badge>}
                           {selected.role === "owner" && selected.kind !== "personal" && member.role !== "owner" && member.status === "active" && (
                             <Button type="button" size="sm" variant="outline" onClick={() => void handleTransferOwnership(member)}><ArrowRightLeft className="mr-1 h-4 w-4" />Transfer ownership</Button>
                           )}
-                          {canManageMembers && member.role !== "owner" && <Button type="button" size="sm" variant="ghost" className="text-destructive" onClick={() => void removeMemberAction({ organizationId: selected.organizationId, userId: member.userId }).then(() => setMessage("Team member removed. Any old invention grant no longer provides access.")).catch((error) => setMessage(error instanceof Error ? error.message : "Member removal failed."))}><Trash2 className="h-4 w-4" /><span className="sr-only">Remove member</span></Button>}
+                          {canManageMembers && member.role !== "owner" && <Button type="button" size="sm" variant="ghost" className="text-destructive" onClick={() => void removeMemberAction({ organizationId: selected.organizationId, userId: member.userId }).then(() => setMessage("Team member removed. Any old invention grant no longer provides access.")).catch((error) => setMessage(userFacingError(error, "Member removal failed.")))}><Trash2 className="h-4 w-4" /><span className="sr-only">Remove member</span></Button>}
                         </div>
                       </div>
                     ))}
@@ -260,7 +261,7 @@ export default function OrganizationsPage() {
                       {pendingInvitations.map((invitation) => (
                         <div key={invitation.invitationId} className="flex flex-col gap-3 rounded-lg border border-border p-4 sm:flex-row sm:items-center sm:justify-between">
                           <div><p className="font-medium">{invitation.email}</p><p className="mt-1 text-xs text-muted-foreground">Invited as <span className="capitalize">{invitation.role}</span> · seat reserved until {invitationExpiry(invitation.expiresAt)}</p></div>
-                          <Button type="button" size="sm" variant="ghost" className="text-destructive" onClick={() => void revokeInvitationAction({ organizationId: selected.organizationId, invitationId: invitation.invitationId }).then(() => setMessage("Invitation revoked; the reserved seat is available again.")).catch((error) => setMessage(error instanceof Error ? error.message : "Invitation revocation failed."))}>Revoke</Button>
+                          <Button type="button" size="sm" variant="ghost" className="text-destructive" onClick={() => void revokeInvitationAction({ organizationId: selected.organizationId, invitationId: invitation.invitationId }).then(() => setMessage("Invitation revoked; the reserved seat is available again.")).catch((error) => setMessage(userFacingError(error, "Invitation revocation failed.")))}>Revoke</Button>
                         </div>
                       ))}
                     </CardContent>

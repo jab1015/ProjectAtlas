@@ -5,6 +5,7 @@ import { classifyInvention } from "./inventionClassificationLogic";
 import { requireInventionReadAccess } from "./organizations";
 import { AUTONOMOUS_RESEARCH_KINDS, isAutonomousDecision } from "./statusBriefingLogic";
 import { getValidationFollowUpAction } from "./journeyNextActionLogic";
+import { getJourneyStageStatus } from "./journeyStageStatusLogic";
 
 function activityForWork(kind: string, title: string) {
   const activities: Record<string, string> = {
@@ -51,7 +52,6 @@ export const getJourneyCenter = query({
       const blockedItems = relevant.filter((item) =>
         (item && (item.status === "blocked" || item.status === "awaiting_approval") && !AUTONOMOUS_RESEARCH_KINDS.has(item.kind))
       );
-      const activeItems = relevant.filter((item) => item?.status === "queued" || item?.status === "running");
       const runningItems = relevant.filter((item) => item?.status === "running");
       const queuedItems = relevant.filter((item) => item?.status === "queued");
       const failedItems = relevant.filter((item) => item?.status === "failed");
@@ -73,17 +73,20 @@ export const getJourneyCenter = query({
           : Math.round((completedCount / Math.max(stage.requiredWorkKinds.length, 1)) * 100);
       const activeWork = runningItems[0] ?? queuedItems[0];
 
-      let status: "complete" | "professional_review" | "blocked" | "working" | "ready_to_start" | "planned" | "needs_refresh" | "failed";
-      // Completion is the primary state. A stale result means InventSmith
-      // should refresh it, not that a finished stage became the inventor's
-      // responsibility again.
-      if (allWorkComplete && pendingReviews.length > 0) status = "professional_review";
-      else if (allWorkComplete) status = "complete";
-      else if (staleItems.length > 0 || hasStaleDeliverable) status = "needs_refresh";
-      else if (failedItems.length > 0) status = "failed";
-      else if (blockedItems.length > 0) status = "blocked";
-      else if (activeItems.length > 0 || initialized) status = "working";
-      else status = stage.id <= 5 ? "ready_to_start" : "planned";
+      // Keep queued work distinct from work that is actively running.
+      const status = getJourneyStageStatus({
+        requiredWorkCount: stage.requiredWorkKinds.length,
+        completedWorkCount: completedCount,
+        pendingProfessionalReviews: pendingReviews.length,
+        staleWorkCount: staleItems.length,
+        hasStaleDeliverable,
+        failedWorkCount: failedItems.length,
+        blockedWorkCount: blockedItems.length,
+        runningWorkCount: runningItems.length,
+        queuedWorkCount: queuedItems.length,
+        initialized,
+        stageId: stage.id,
+      });
 
       return {
         id: stage.id,
@@ -109,10 +112,12 @@ export const getJourneyCenter = query({
               ? "InventSmith is waiting for the specific information or authorization shown above."
               : status === "needs_refresh"
                 ? "New evidence changed this stage. InventSmith is refreshing it automatically."
-                : status === "failed"
+          : status === "failed"
                   ? "InventSmith is retrying this failed step automatically."
+                  : status === "queued"
+                    ? "InventSmith has queued this stage’s work. It will start when its prerequisites and worker capacity are ready."
                   : activeWork
-                    ? (runningItems.length > 0 ? "InventSmith is working on this now." : "InventSmith has queued this next.")
+                    ? "InventSmith is working on this now."
                     : "This stage will begin when its prerequisites are ready.",
       };
     });

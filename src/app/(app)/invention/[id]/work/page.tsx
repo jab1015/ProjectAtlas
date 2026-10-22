@@ -8,6 +8,7 @@ import { makeFunctionReference } from "convex/server";
 import type { Doc, Id } from "@convex/_generated/dataModel";
 import { AlertTriangle, ArrowLeft, BookOpen, CheckCircle2, Download, ExternalLink, FileCheck2, ShieldAlert, ShieldCheck } from "lucide-react";
 import { AppNav } from "@/components/atlas/app-nav";
+import { userFacingError } from "@/lib/userFacingError";
 import { MadeThisBadge } from "@/components/atlas/made-this-badge";
 import { MarkdownContent } from "@/components/markdown-content";
 import { Button } from "@/components/ui/button";
@@ -42,7 +43,7 @@ function simpleBlocker(blocker: string): string {
   return blocker;
 }
 function simpleRetryMessage(error: unknown): string {
-  const message = error instanceof Error ? error.message : "";
+  const message = userFacingError(error, "");
   if (/daily autonomous work limit|quota|rate.?limit/i.test(message)) return "InventSmith is waiting for more work capacity. The saved step can run when capacity is available.";
   return "InventSmith could not restart this step just now. The work is saved, and the background worker will try it automatically.";
 }
@@ -91,14 +92,14 @@ export default function InventionWorkPage() {
   const runExport = async (format: "docx" | "pdf") => {
     setExportError(null);
     try { const exporters = await import("@/lib/packageExport"); if (format === "docx") await exporters.exportAtlasPackageDocx(packageExport); else await exporters.exportAtlasPackagePdf(packageExport); }
-    catch (error) { setExportError(error instanceof Error ? error.message : "InventSmith could not export this package."); }
+    catch (error) { setExportError(userFacingError(error, "InventSmith could not export this package.")); }
   };
   const authorizeArtifact = async (deliverable: Doc<"atlasDeliverables">) => {
     const confirmed = window.confirm(`Authorize ${deliverable.title} version ${deliverable.version} for external use? This records your permission for this exact current revision. It does not replace professional review, authorize spending, contact a third party, place a manufacturing order, file a legal submission, or publish anything automatically.`);
     if (!confirmed) return;
     setAuthorizationError(null); setAuthorizingId(deliverable._id);
     try { await authorizeExternalUse({ deliverableId: deliverable._id }); }
-    catch (error) { setAuthorizationError(error instanceof Error ? error.message : "InventSmith could not authorize this artifact for external use."); }
+    catch (error) { setAuthorizationError(userFacingError(error, "InventSmith could not authorize this artifact for external use.")); }
     finally { setAuthorizingId(null); }
   };
   const retryFailedItem = async (workItemId: string) => {

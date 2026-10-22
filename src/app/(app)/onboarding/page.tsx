@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { ArrowRight, ArrowLeft, Building2 } from "lucide-react";
 import { MadeThisBadge } from "@/components/atlas/made-this-badge";
 import { AtlasLogo } from "@/components/atlas/atlas-logo";
+import { userFacingError } from "@/lib/userFacingError";
 import {
   trackOnboardingStarted,
   trackOnboardingCompleted,
@@ -124,7 +125,7 @@ function OnboardingContent() {
       trackInventionCreated(result.inventionId);
       router.push(`/invention/${result.inventionId}/journey`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "InventSmith could not create the invention. Please try again.");
+      setError(userFacingError(err, "InventSmith could not create the invention. Please try again."));
       setSubmitting(false);
     }
   };

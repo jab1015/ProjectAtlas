@@ -8,6 +8,7 @@ import { useMutation, useQueries } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import type { Id } from "@convex/_generated/dataModel";
 import { AppNav } from "@/components/atlas/app-nav";
+import { userFacingError } from "@/lib/userFacingError";
 import { Button } from "@/components/ui/button";
 
 const STATUS_LABELS = { open: "Open", investigating: "Being investigated", waiting_on_user: "Waiting on you", resolved: "Resolved" } as const;
@@ -35,7 +36,7 @@ function SupportForm() {
     try {
       await createCase({ category, subject, description, ...(inventionId.trim() ? { inventionId: inventionId.trim() as never } : {}) });
       setSubject(""); setDescription(""); setMessage("Support case submitted. You can track its status below.");
-    } catch (error) { setMessage(error instanceof Error ? error.message : "Could not submit your support case."); }
+    } catch (error) { setMessage(userFacingError(error, "Could not submit your support case.")); }
     finally { setSaving(false); }
   }
 
@@ -49,7 +50,7 @@ function SupportForm() {
       {message && <p role="status" className="text-sm text-muted-foreground">{message}</p>}
       <Button type="submit" disabled={saving}>{saving ? "Submitting…" : "Submit support case"}</Button>
     </form>
-    <section className="space-y-3"><h2 className="text-xl font-semibold">Your reports</h2>{cases === undefined ? <p className="text-sm text-muted-foreground">Loading…</p> : cases instanceof Error ? <p role="alert" className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">Your reports could not be loaded. You can still submit a support case; if this continues, share the error with InventSmith support.</p> : cases.length === 0 ? <p className="text-sm text-muted-foreground">You have not submitted a support case yet.</p> : cases.map(item => <article key={String(item._id)} className="rounded-lg border p-4"><div className="flex flex-wrap justify-between gap-2"><h3 className="font-medium">{item.subject}</h3><span className="text-sm text-muted-foreground">{STATUS_LABELS[item.status]}</span></div><p className="mt-1 text-xs text-muted-foreground">{item.category} · {new Date(item.createdAt).toLocaleString()}</p><p className="mt-3 whitespace-pre-wrap text-sm">{item.description}</p>{item.inventionId && <Link className="mt-2 inline-block text-sm text-primary underline" href={`/invention/${item.inventionId}/evidence`}>Open related invention workspace</Link>}</article>)}</section>
+    <section className="space-y-3"><h2 className="text-xl font-semibold">Your reports</h2>{cases === undefined ? <p className="text-sm text-muted-foreground">Loading…</p> : cases instanceof Error ? <div role="alert" className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950"><p>Your reports could not be loaded. You can still submit a support case.</p><Link href="/support" className="mt-2 inline-block font-medium underline">Open the support form</Link></div> : cases.length === 0 ? <p className="text-sm text-muted-foreground">You have not submitted a support case yet.</p> : cases.map(item => <article key={String(item._id)} className="rounded-lg border p-4"><div className="flex flex-wrap justify-between gap-2"><h3 className="font-medium">{item.subject}</h3><span className="text-sm text-muted-foreground">{STATUS_LABELS[item.status]}</span></div><p className="mt-1 text-xs text-muted-foreground">{item.category} · {new Date(item.createdAt).toLocaleString()}</p><p className="mt-3 whitespace-pre-wrap text-sm">{item.description}</p>{item.inventionId && <Link className="mt-2 inline-block text-sm text-primary underline" href={`/invention/${item.inventionId}/evidence`}>Open related invention workspace</Link>}</article>)}</section>
     <Link href="/dashboard" className="text-sm text-primary underline">Back to dashboard</Link>
   </main></>;
 }

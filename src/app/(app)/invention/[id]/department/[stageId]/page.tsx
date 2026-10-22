@@ -8,6 +8,7 @@ import { makeFunctionReference } from "convex/server";
 import type { Doc, Id } from "@convex/_generated/dataModel";
 import { ArrowLeft, CheckCircle2, Download, FileUp, Play, RefreshCw, ShieldAlert, Sparkles } from "lucide-react";
 import { AppNav } from "@/components/atlas/app-nav";
+import { userFacingError } from "@/lib/userFacingError";
 import { getDepartmentStartMessage } from "@/lib/departmentStartMessage";
 import { getNextUnmetWorkDependencies } from "@/lib/departmentWorkStatus";
 import { MadeThisBadge } from "@/components/atlas/made-this-badge";
@@ -154,7 +155,7 @@ export default function LifecycleDepartmentPage() {
       const scheduled = await kickWork({ inventionId, departmentStageId: stageId });
       setMessage(getDepartmentStartMessage(ensured.stageName, ensured.created, scheduled.scheduled));
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "InventSmith could not initialize this department.");
+      setError(userFacingError(cause, "InventSmith could not initialize this department."));
     } finally { setStarting(false); }
   };
 

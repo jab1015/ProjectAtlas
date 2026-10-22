@@ -9,6 +9,7 @@ import { api } from "@convex/_generated/api";
 import { Building2, CreditCard, ShieldCheck, UserRound, UsersRound } from "lucide-react";
 
 import { AppNav } from "@/components/atlas/app-nav";
+import { userFacingError } from "@/lib/userFacingError";
 import { MadeThisBadge } from "@/components/atlas/made-this-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -134,7 +135,7 @@ export default function AccountPage() {
       setOrganizationNameDrafts((current) => ({ ...current, [organizationId]: result.name }));
       setOrganizationNameMessage("Workspace name saved.");
     } catch (error) {
-      setOrganizationNameMessage(error instanceof Error ? error.message : "Could not save the workspace name.");
+      setOrganizationNameMessage(userFacingError(error, "Could not save the workspace name."));
     } finally {
       setRenamingOrganizationId(null);
     }
@@ -166,7 +167,7 @@ export default function AccountPage() {
     return <div className="min-h-screen bg-background"><AppNav /><AccountSkeleton /></div>;
   }
   const saveProfileName = async () => {
-    try { const result = await saveProfileNameMutation({ name: profileName.trim() }); setProfileName(result.name); setProfileNameMessage("Profile name saved."); } catch (error) { setProfileNameMessage(error instanceof Error ? error.message : "Could not save profile name."); }
+    try { const result = await saveProfileNameMutation({ name: profileName.trim() }); setProfileName(result.name); setProfileNameMessage("Profile name saved."); } catch (error) { setProfileNameMessage(userFacingError(error, "Could not save profile name.")); }
   };
 
   if (profile === null) {

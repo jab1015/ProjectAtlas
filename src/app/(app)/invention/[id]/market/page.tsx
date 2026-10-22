@@ -8,6 +8,7 @@ import { makeFunctionReference } from "convex/server";
 import type { Doc, Id } from "@convex/_generated/dataModel";
 import { ArrowLeft, ExternalLink, FileUp, LineChart, MessageCircle, Search, Users } from "lucide-react";
 import { AppNav } from "@/components/atlas/app-nav";
+import { userFacingError } from "@/lib/userFacingError";
 import { MarkdownContent } from "@/components/markdown-content";
 import { Button } from "@/components/ui/button";
 import { contentToReadableText, getDeliverableTrustLabel } from "@convex/deliverableLogic";
@@ -83,7 +84,7 @@ export default function MarketResearchPage() {
         await kickWork({ inventionId });
       } catch (error) {
         console.error("Could not initialize market research work:", error);
-        setQueueError(error instanceof Error ? error.message : "The autonomous work queue could not be initialized yet.");
+        setQueueError(userFacingError(error, "The autonomous work queue could not be initialized yet."));
       }
     })();
   }, [inventionId, isAuthenticated, isLoading, migrateWorkspace, kickWork]);

@@ -5,6 +5,7 @@ import { useParams, usePathname, useRouter } from "next/navigation";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import { Button } from "@/components/ui/button";
+import { userFacingError } from "@/lib/userFacingError";
 
 type RouteState = {
   inventionId: string;
@@ -103,7 +104,7 @@ export default function InventionRouteGuardLayout({ children }: { children: Reac
         setRetryError("There are no failed validation sections left to retry.");
       }
     } catch (error) {
-      setRetryError(error instanceof Error ? error.message : "Unable to retry failed validation sections.");
+      setRetryError(userFacingError(error, "Unable to retry failed validation sections."));
     } finally {
       setRetryingFailed(false);
     }

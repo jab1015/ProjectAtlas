@@ -8,6 +8,7 @@ import { makeFunctionReference } from "convex/server";
 import type { Doc, Id } from "@convex/_generated/dataModel";
 import { AlertTriangle, ArrowLeft, CheckCircle2, ShieldCheck } from "lucide-react";
 import { AppNav } from "@/components/atlas/app-nav";
+import { userFacingError } from "@/lib/userFacingError";
 import { MadeThisBadge } from "@/components/atlas/made-this-badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -72,7 +73,7 @@ export default function InventionReviewPage() {
     if (!currentDecision || !selectedOption) return;
     setSubmitting(true); setError(null);
     try { await decide({ decisionId: currentDecision._id, selectedOptionKey: selectedOption, rationale: rationale.trim() || undefined }); }
-    catch (reason) { setError(reason instanceof Error ? reason.message : "InventSmith could not record this decision."); }
+    catch (reason) { setError(userFacingError(reason, "InventSmith could not record this decision.")); }
     finally { setSubmitting(false); }
   };
 
@@ -80,7 +81,7 @@ export default function InventionReviewPage() {
     if (!currentApproval) return;
     setSubmitting(true); setError(null);
     try { await approve({ approvalRequestId: currentApproval._id, approved }); }
-    catch (reason) { setError(reason instanceof Error ? reason.message : "InventSmith could not record this response."); }
+    catch (reason) { setError(userFacingError(reason, "InventSmith could not record this response.")); }
     finally { setSubmitting(false); }
   };
 
@@ -88,7 +89,7 @@ export default function InventionReviewPage() {
     if (!currentBlockedWork || !canSupplyTextInput || !humanResponse.trim()) return;
     setSubmitting(true); setError(null);
     try { await respond({ workItemId: currentBlockedWork._id, response: humanResponse.trim() }); setHumanResponse(""); }
-    catch (reason) { setError(reason instanceof Error ? reason.message : "InventSmith could not record this input."); }
+    catch (reason) { setError(userFacingError(reason, "InventSmith could not record this input.")); }
     finally { setSubmitting(false); }
   };
 

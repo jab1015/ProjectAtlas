@@ -7,6 +7,7 @@ import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import { MoreVertical, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { userFacingError } from "@/lib/userFacingError";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -62,7 +63,7 @@ export function InventionCardMenu({
       }
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Failed to delete project.";
+        userFacingError(err, "Failed to delete project.");
       toast({ title: "Error", description: message, variant: "destructive" });
     } finally {
       setDeleting(false);

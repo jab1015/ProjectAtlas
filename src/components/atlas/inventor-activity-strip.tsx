@@ -33,7 +33,7 @@ function getActivity(briefing?: StatusBriefing | null) {
   const queued = briefing?.next.find((item) => item.status === "queued");
   if (queued) {
     return {
-      label: "Queued next",
+      label: "Queued work",
       detail: queued.title,
       tone: "border-primary/20 bg-primary/5 text-primary",
       Icon: CircleDot,
