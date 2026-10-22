@@ -5,7 +5,7 @@ import { classifyInvention } from "./inventionClassificationLogic";
 import { requireInventionReadAccess } from "./organizations";
 import { AUTONOMOUS_RESEARCH_KINDS, isAutonomousDecision } from "./statusBriefingLogic";
 import { getValidationFollowUpAction } from "./journeyNextActionLogic";
-import { getJourneyStageStatus } from "./journeyStageStatusLogic";
+import { getJourneyStageStatus, getJourneyStageStatusExplanation } from "./journeyStageStatusLogic";
 
 function activityForWork(kind: string, title: string) {
   const activities: Record<string, string> = {
@@ -104,21 +104,10 @@ export const getJourneyCenter = query({
         activeWorkCount: runningItems.length,
         queuedWorkCount: queuedItems.length,
         activityLabel: activeWork ? activityForWork(activeWork.kind, activeWork.title) : null,
-        statusExplanation: status === "complete"
-          ? "InventSmith finished the required work for this stage."
-          : status === "professional_review"
-            ? "InventSmith prepared the work; a qualified professional must review it."
-            : status === "blocked"
-              ? "InventSmith is waiting for the specific information or authorization shown above."
-              : status === "needs_refresh"
-                ? "New evidence changed this stage. InventSmith is refreshing it automatically."
-          : status === "failed"
-                  ? "InventSmith is retrying this failed step automatically."
-                  : status === "queued"
-                    ? "InventSmith has queued this stage’s work. It will start when its prerequisites and worker capacity are ready."
-                  : activeWork
-                    ? "InventSmith is working on this now."
-                    : "This stage will begin when its prerequisites are ready.",
+        statusExplanation: getJourneyStageStatusExplanation(status, {
+          runningWorkCount: runningItems.length,
+          queuedWorkCount: queuedItems.length,
+        }),
       };
     });
 

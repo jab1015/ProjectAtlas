@@ -19,6 +19,8 @@ function isEvidenceRequest(title: string, detail: string) {
 export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
   const primaryNeed = briefing.needsInventor[0];
   const evidenceNeeded = primaryNeed ? isEvidenceRequest(primaryNeed.title, primaryNeed.detail) : false;
+  const runningWorkCount = briefing.next.filter((item) => item.status === "running").length;
+  const queuedWorkCount = briefing.next.filter((item) => item.status === "queued").length;
 
   return (
     <section aria-labelledby="atlas-briefing-title" className="space-y-6">
@@ -60,9 +62,14 @@ export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
           <div className="flex items-start gap-3">
             <CheckCircle2 className="mt-0.5 h-5 w-5 text-success" aria-hidden="true" />
             <div>
-              <h3 className="text-base font-semibold">InventSmith has what it needs for now</h3>
+              <h3 className="text-base font-semibold">{runningWorkCount > 0 ? "InventSmith is working" : queuedWorkCount > 0 ? "Work is queued" : "InventSmith has what it needs for now"}</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Work will continue in the order shown below. InventSmith will ask only when your judgment, authorization, private input, professional review, payment, or physical-world action is genuinely required.
+                {queuedWorkCount > 0 && runningWorkCount === 0
+                  ? "Queued tasks will start when their prerequisites and worker capacity are ready. "
+                  : runningWorkCount > 0
+                    ? "Running tasks are shown below; queued tasks wait for their prerequisites and worker capacity. "
+                    : "Work will continue in the order shown below. "}
+                InventSmith will ask only when your judgment, authorization, private input, professional review, payment, or physical-world action is genuinely required.
               </p>
             </div>
           </div>

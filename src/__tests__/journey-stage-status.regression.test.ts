@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getJourneyStageStatus } from "@convex/journeyStageStatusLogic";
+import { getJourneyStageStatus, getJourneyStageStatusExplanation } from "@convex/journeyStageStatusLogic";
 
 const base = {
   requiredWorkCount: 8,
@@ -30,5 +30,14 @@ describe("journey stage status accuracy", () => {
     expect(getJourneyStageStatus({ ...base, staleWorkCount: 1, queuedWorkCount: 2 })).toBe("needs_refresh");
     expect(getJourneyStageStatus({ ...base, completedWorkCount: 8, pendingProfessionalReviews: 1 })).toBe("professional_review");
     expect(getJourneyStageStatus({ ...base, completedWorkCount: 8 })).toBe("complete");
+  });
+
+  it("describes stale and failed work according to whether it is running or queued", () => {
+    expect(getJourneyStageStatusExplanation("needs_refresh", { runningWorkCount: 0, queuedWorkCount: 2 }))
+      .toContain("Refresh work is queued");
+    expect(getJourneyStageStatusExplanation("needs_refresh", { runningWorkCount: 1, queuedWorkCount: 1 }))
+      .toContain("refreshing it now");
+    expect(getJourneyStageStatusExplanation("failed", { runningWorkCount: 0, queuedWorkCount: 0 }))
+      .toContain("has no retry queued");
   });
 });
