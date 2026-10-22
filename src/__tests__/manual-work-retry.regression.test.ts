@@ -43,7 +43,7 @@ const failedItem = (overrides: Record<string, unknown> = {}) => ({
   status: "failed",
   attemptCount: 3,
   maxAttempts: 3,
-  inputSnapshot: { product: "RiseJars" },
+  inputSnapshot: { product: "RiseJars", automaticRecoveryCount: 2 },
   ...overrides,
 });
 
@@ -62,7 +62,7 @@ describe("manual failed-work retry", () => {
     expect(mocks.requireInventionEditAccess).toHaveBeenCalledWith(state.ctx, "inv-1");
     expect(state.patch).toHaveBeenCalledWith("work-1", expect.objectContaining({
       status: "queued", maxAttempts: 4, lastError: undefined,
-      inputSnapshot: { product: "RiseJars", department: "market_research" },
+      inputSnapshot: expect.objectContaining({ product: "RiseJars", department: "market_research" }),
     }));
     expect(state.insert).toHaveBeenCalledWith("atlasExecutionEvents", expect.objectContaining({
       eventType: "work_queued", actorType: "inventor",
@@ -75,12 +75,13 @@ describe("manual failed-work retry", () => {
     const state = makeContext(failedItem({
       title: "Assess technical feasibility and product risks",
       kind: "technical_feasibility",
-      inputSnapshot: { product: "RiseJars", department: "unknown" },
+      inputSnapshot: { product: "RiseJars", department: "unknown", automaticRecoveryCount: 2 },
     }), { autonomousCostUnits: 0, reservedAutonomousCostUnits: 0 });
     await expect(retryFailedWorkItemHandler(state.ctx, { inventionId: "inv-1" as any, workItemId: "work-1" as any })).resolves.toEqual({ queued: true, reason: "scheduled" });
     expect(state.patch).toHaveBeenCalledWith("work-1", expect.objectContaining({
       status: "queued",
-      inputSnapshot: { product: "RiseJars", department: "canonical" },
+      maxAttempts: 4,
+      inputSnapshot: expect.objectContaining({ product: "RiseJars", department: "canonical" }),
     }));
     expect(state.insert).toHaveBeenCalledWith("atlasExecutionEvents", expect.objectContaining({
       metadata: expect.objectContaining({
@@ -89,6 +90,25 @@ describe("manual failed-work retry", () => {
       }),
     }));
     expect(state.runAfter).toHaveBeenCalledTimes(1);
+  });
+
+  it("repairs a bounded exhausted autonomous job through its registered department agent", async () => {
+    const state = makeContext(failedItem({
+      title: "Research materials and manufacturing approaches",
+      kind: "materials_manufacturing",
+      attemptCount: 7,
+      maxAttempts: 5,
+      inputSnapshot: { product: "RiseJars", department: "manufacturing", automaticRecoveryCount: 0 },
+    }), { autonomousCostUnits: 0, reservedAutonomousCostUnits: 0 });
+    await expect(retryFailedWorkItemHandler(state.ctx, { inventionId: "inv-1" as any, workItemId: "work-1" as any })).resolves.toEqual({ queued: true, reason: "scheduled" });
+    expect(state.patch).toHaveBeenCalledWith("work-1", expect.objectContaining({
+      status: "queued",
+      maxAttempts: 9,
+      inputSnapshot: expect.objectContaining({ department: "manufacturing", automaticRecoveryCount: 1 }),
+    }));
+    expect(state.insert).toHaveBeenCalledWith("atlasExecutionEvents", expect.objectContaining({
+      metadata: expect.objectContaining({ changeType: "bounded_automatic_recovery", departmentAgentId: "inventsmith.department.manufacturing.v1" }),
+    }));
   });
 
   it("requires edit access before any retry side effects", async () => {
