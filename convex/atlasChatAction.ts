@@ -8,6 +8,7 @@ import type { Id } from "./_generated/dataModel";
 import { CHAT_MODEL_CONTEXT_MAX_CHARACTERS, shouldUseExternalResearch, truncateModelContext } from "./chatPolicyLogic";
 import { summarizeKeyProjectOperations } from "./projectStateSummaryLogic";
 import { costUnitsFromTokens } from "./workOrchestratorLogic";
+import { buildLiveStatusAnswer } from "./chatStatusAnswerLogic";
 
 const getAnswerContext = makeFunctionReference<"query", { userMessageId: Id<"conversationMessages"> }, any>("atlasChat:getAnswerContext");
 const saveAnswer = makeFunctionReference<"mutation", {
@@ -50,6 +51,26 @@ export const answerQuestion = internalAction({
       const question = String(data.userMessage.content ?? "");
       const externalResearch = shouldUseExternalResearch(question);
       const operationalSummary = summarizeKeyProjectOperations(data.workItems);
+      const liveStatusAnswer = buildLiveStatusAnswer(
+        question,
+        data.invention.title,
+        data.invention.currentStageId,
+        data.journey.map((stage: any) => ({ id: stage.id, name: stage.name })),
+        data.workItems.map((item: any) => ({ kind: item.kind, title: item.title, status: item.status, blockedReason: item.blockedReason, lastError: item.lastError })),
+      );
+      if (liveStatusAnswer) {
+        await ctx.runMutation(saveAnswer, {
+          userMessageId,
+          assistantMessageId,
+          content: liveStatusAnswer,
+          completedAt: Date.now(),
+          actualCostUnits: 0,
+          externalResearch: false,
+          provider: "deterministic-project-ledger",
+          model: "live-status-summary",
+        });
+        return { answered: true, externalResearch: false };
+      }
       const client = new OpenAI({ apiKey });
       const model = process.env.ATLAS_OPENAI_MODEL ?? "gpt-5.4-mini";
       const response = await client.responses.create({
