@@ -53,7 +53,6 @@ interface StatusBriefing {
 const getJourneyCenter = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, JourneyCenterState>("journeyCenter:getJourneyCenter");
 const backfillWorkspace = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { addedWorkCount: number }>("inventionMigrations:backfillWorkspace");
 const kickAutonomousWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { scheduled: boolean; reason: string }>("inventionWorkspace:kickAutonomousWork");
-const listEvidenceRequests = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, Array<{ kind: "survey" | "interview"; title: string; status: "active" | "closed" }>>("evidenceRequests:list");
 const getStatusBriefing = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, StatusBriefing>("inventionWorkspace:getStatusBriefing");
 
 const STATUS: Record<JourneyStageRow["status"], { label: string; className: string }> = {
@@ -84,7 +83,6 @@ export default function JourneyCenterPage() {
   const inventionId = params.id as Id<"inventions">;
   const { isAuthenticated, isLoading } = useConvexAuth();
   const journey = useQuery(getJourneyCenter, isAuthenticated && inventionId ? { inventionId } : "skip");
-  const evidenceRequests = useQuery(listEvidenceRequests, isAuthenticated && inventionId ? { inventionId } : "skip");
   const briefing = useQuery(getStatusBriefing, isAuthenticated && inventionId ? { inventionId } : "skip");
   const migrateWorkspace = useMutation(backfillWorkspace);
   const kickWork = useMutation(kickAutonomousWork);
@@ -112,10 +110,7 @@ export default function JourneyCenterPage() {
   if (!journey) return null;
 
   const completion = Math.round((journey.completedStages / journey.totalStages) * 100);
-  const hasActiveValidationSurvey = evidenceRequests?.some((request) => request.kind === "survey" && request.status === "active" && request.title.startsWith("[Validation follow-up]")) ?? false;
-  const nextAction = journey.currentStage.name === "Validation" && hasActiveValidationSurvey
-    ? "Share your prepared survey with five people who may have this problem, then add their answers as evidence."
-    : journey.nextAction;
+  const nextAction = journey.nextAction;
   const attentionItems = briefing?.needsInventor ?? [];
   const attentionCount = journey.attention.pendingApprovals + journey.attention.openDecisions + journey.attention.blockedWork;
   const reviewHref = `/invention/${inventionId}/review`;

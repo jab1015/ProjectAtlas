@@ -72,9 +72,9 @@ export default function InventSmithChatPage() {
       // Material inventor facts, evidence links, test results, quotes and status observations
       // become governed project evidence. Capture failure never prevents the saved chat question.
       void captureEvidence({ inventionId, content }).catch(() => undefined);
-    } catch (reason) {
+    } catch {
       setMessage(content);
-      setError(reason instanceof Error ? reason.message : "InventSmith could not save your message.");
+      setError("We couldn’t send that message. Please retry; if the problem continues, contact support.");
     } finally {
       setSending(false);
     }
@@ -96,6 +96,7 @@ export default function InventSmithChatPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Ask InventSmith</p>
             <h1 className="text-2xl font-semibold">{conversation.invention.title}</h1>
             <p className="mt-1 text-sm text-muted-foreground">Ask across the complete invention project: evidence, research, departments, work queues, handoffs, design, CAD, reviews, decisions, deliverables, risks, and next steps. InventSmith distinguishes verified evidence from drafts and inventor-provided inputs.</p>
+            <p className="mt-2 text-xs text-muted-foreground">Project status can change. Treat earlier replies as snapshots and ask again when you need the current work ledger.</p>
           </div>
         </div>
 

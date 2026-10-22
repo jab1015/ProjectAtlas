@@ -33,14 +33,14 @@ function getActivity(briefing?: StatusBriefing | null) {
   const queued = briefing?.next.find((item) => item.status === "queued");
   if (queued) {
     return {
-      label: "Preparing the next step",
+      label: "Queued next",
       detail: queued.title,
       tone: "border-primary/20 bg-primary/5 text-primary",
       Icon: CircleDot,
     };
   }
   return {
-    label: "Up to date",
+    label: "No work currently queued",
     detail: "InventSmith will show the next action when new work is ready.",
     tone: "border-success/25 bg-success/5 text-success",
     Icon: CheckCircle2,

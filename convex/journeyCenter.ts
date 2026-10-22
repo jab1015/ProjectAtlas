@@ -4,6 +4,7 @@ import { journeyStagesForProductType, routeForJourneyStage } from "./fullJourney
 import { classifyInvention } from "./inventionClassificationLogic";
 import { requireInventionReadAccess } from "./organizations";
 import { AUTONOMOUS_RESEARCH_KINDS, isAutonomousDecision } from "./statusBriefingLogic";
+import { getValidationFollowUpAction } from "./journeyNextActionLogic";
 
 function activityForWork(kind: string, title: string) {
   const activities: Record<string, string> = {
@@ -125,15 +126,16 @@ export const getJourneyCenter = query({
     const pendingReviewCount = reviews.filter((item) => item.status !== "accepted" && item.status !== "declined").length;
     const completedStages = stageRows.filter((stage) => stage.status === "complete").length;
     const hasActiveValidationSurvey = evidenceRequests.some((request) => request.kind === "survey" && request.status === "active" && request.title.startsWith("[Validation follow-up]"));
+    const customerValidationResponses = evidence.filter((item) => item.metadata?.evidenceOrigin === "public_response" || item.metadata?.validationStatus === "counted_customer_signal").length;
 
     let nextAction = `Open ${firstIncomplete.name} and follow the first step.`;
     if (pendingApprovalCount > 0) nextAction = `Review an approval so InventSmith can continue (${pendingApprovalCount} waiting).`;
     else if (openDecisionCount > 0) nextAction = `Answer an open question so InventSmith can continue (${openDecisionCount} waiting).`;
     else if (blockedWorkCount > 0) nextAction = `Open ${firstIncomplete.name} to see what information is missing (${blockedWorkCount} item${blockedWorkCount === 1 ? "" : "s"}).`;
     else if (firstIncomplete.status === "professional_review") nextAction = `${firstIncomplete.name} is ready for a qualified professional to review.`;
+    else if (firstIncomplete.name === "Validation" && hasActiveValidationSurvey) nextAction = getValidationFollowUpAction(customerValidationResponses, firstIncomplete.status);
     else if (firstIncomplete.status === "needs_refresh") nextAction = `Open ${firstIncomplete.name}; new information means some work needs updating.`;
     else if (firstIncomplete.status === "failed") nextAction = `Open ${firstIncomplete.name} and retry the step that failed.`;
-    else if (firstIncomplete.name === "Validation" && hasActiveValidationSurvey) nextAction = "Share your prepared survey with five people who may have this problem, then add their answers as evidence.";
 
     return {
       invention: {
@@ -161,7 +163,7 @@ export const getJourneyCenter = query({
         verified: evidence.filter((item) => item.reliability !== "unverified").length,
         // Public responses created before validation metadata was added are still
         // traceable customer-validation evidence and must remain visible here.
-        customerValidationResponses: evidence.filter((item) => item.metadata?.evidenceOrigin === "public_response" || item.metadata?.validationStatus === "counted_customer_signal").length,
+        customerValidationResponses,
       },
     };
   },

@@ -40,6 +40,11 @@ describe("structured account export", () => {
     expect(page).toContain("privacyExport:getMyStructuredExport");
     expect(page).toContain("Download JSON export");
     expect(page).toContain("URL.createObjectURL");
+    expect(page).toContain("Retry export");
+    expect(page).toContain("Contact support");
+    expect(page).toContain("convex.query(getStructuredExport, {})");
+    expect(page).toContain("role=\"alert\"");
+    expect(page).not.toContain("useQuery(getStructuredExport");
     expect(nav).toContain('/account/data-export');
   });
 });

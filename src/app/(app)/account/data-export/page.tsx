@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useQuery, useConvexAuth } from "convex/react";
+import { useConvex, useConvexAuth } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import { Download, FileJson, ShieldCheck } from "lucide-react";
 import { AppNav } from "@/components/atlas/app-nav";
@@ -19,13 +19,28 @@ function sanitizeFilePart(value: string) {
 
 export default function DataExportPage() {
   const router = useRouter();
+  const convex = useConvex();
   const { isAuthenticated, isLoading } = useConvexAuth();
+  const [exportData, setExportData] = useState<any>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.push("/sign-in");
   }, [isAuthenticated, isLoading, router]);
 
-  const exportData = useQuery(getStructuredExport, isAuthenticated ? {} : "skip");
+  useEffect(() => {
+    if (isLoading || !isAuthenticated) return;
+    let active = true;
+    setExportData(null);
+    setLoadError(false);
+    void convex.query(getStructuredExport, {}).then((data) => {
+      if (active) setExportData(data);
+    }).catch(() => {
+      if (active) setLoadError(true);
+    });
+    return () => { active = false; };
+  }, [convex, isAuthenticated, isLoading, retryCount]);
   const serialized = useMemo(() => exportData ? JSON.stringify(exportData, null, 2) : "", [exportData]);
 
   const downloadExport = () => {
@@ -60,7 +75,15 @@ export default function DataExportPage() {
             <CardTitle className="flex items-center gap-2 text-lg"><FileJson className="h-5 w-5" />Structured account export</CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
-            {exportData === undefined ? (
+            {!exportData && loadError ? (
+              <div role="alert" className="space-y-3 text-sm">
+                <p>We couldn’t prepare your export. Your account data has not been changed. Please retry; if the problem continues, contact support.</p>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" onClick={() => setRetryCount((count) => count + 1)}>Retry export</Button>
+                  <Button asChild variant="ghost"><Link href="/support">Contact support</Link></Button>
+                </div>
+              </div>
+            ) : !exportData ? (
               <p className="text-sm text-muted-foreground">Preparing your structured export…</p>
             ) : (
               <>

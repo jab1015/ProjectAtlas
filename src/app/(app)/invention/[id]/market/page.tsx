@@ -11,6 +11,7 @@ import { AppNav } from "@/components/atlas/app-nav";
 import { MarkdownContent } from "@/components/markdown-content";
 import { Button } from "@/components/ui/button";
 import { contentToReadableText, getDeliverableTrustLabel } from "@convex/deliverableLogic";
+import { getMarketResearchNoDeliverableMessage } from "@/lib/marketResearchStatus";
 
 interface DeliverableLibrary {
   invention: { _id: Id<"inventions">; title: string };
@@ -98,6 +99,15 @@ export default function MarketResearchPage() {
   const marketWork = (library.workItems ?? []).filter((item) => MARKET_WORK_KINDS.has(item.kind));
   const completedMarketWork = marketWork.filter((item) => item.status === "completed").length;
   const marketProgress = marketWork.length > 0 ? Math.round((completedMarketWork / marketWork.length) * 100) : 0;
+  const marketCounts = {
+    total: marketWork.length,
+    completed: completedMarketWork,
+    queued: marketWork.filter((item) => item.status === "queued").length,
+    running: marketWork.filter((item) => item.status === "running").length,
+    failed: marketWork.filter((item) => item.status === "failed").length,
+    blocked: marketWork.filter((item) => item.status === "blocked" || item.status === "awaiting_approval").length,
+  };
+  const noDeliverableMessage = getMarketResearchNoDeliverableMessage(marketCounts);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -149,7 +159,7 @@ export default function MarketResearchPage() {
             {deliverables.length === 0 && completedMarketWork === 0 ? (
               <div className="rounded-2xl border border-dashed border-border p-8 text-center text-muted-foreground">No completed market findings are available yet. The work-status section above shows what InventSmith is doing next; findings will appear here when the corresponding work completes.</div>
             ) : deliverables.length === 0 ? (
-              <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 text-sm"><p className="font-semibold">Market research work is complete, but its findings are still being synchronized.</p><p className="mt-2 text-muted-foreground">InventSmith has completed the market work ledger. The findings will appear here as soon as the current deliverable sync finishes.</p></div>
+              <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 text-sm"><p className="font-semibold">{noDeliverableMessage.title}</p><p className="mt-2 text-muted-foreground">{noDeliverableMessage.detail}</p></div>
             ) : (
               <div className="space-y-4">
                 {deliverables.map((deliverable) => {

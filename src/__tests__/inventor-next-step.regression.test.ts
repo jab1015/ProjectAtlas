@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
+import { getValidationFollowUpAction } from "../../convex/journeyNextActionLogic";
 
 const read = (file: string) => fs.readFileSync(path.join(process.cwd(), file), "utf8");
 
@@ -29,7 +30,15 @@ describe("inventor next steps", () => {
     expect(journey).toContain("Do the next step");
     expect(journey).toContain("tasks done");
     expect(backend).toContain("Open ${firstIncomplete.name} and follow the first step.");
-    expect(journey).toContain('request.title.startsWith("[Validation follow-up]")');
-    expect(journey).toContain("Share your prepared survey with five people who may have this problem");
+    expect(backend).toContain('request.title.startsWith("[Validation follow-up]")');
+    expect(backend).toContain("getValidationFollowUpAction(customerValidationResponses, firstIncomplete.status)");
+    expect(journey).not.toContain("Share your prepared survey with five people who may have this problem");
+  });
+
+  it("reports only the remaining survey responses and switches to interviews after five", () => {
+    expect(getValidationFollowUpAction(0, "working")).toContain("5 more people");
+    expect(getValidationFollowUpAction(4, "working")).toContain("1 more person");
+    expect(getValidationFollowUpAction(5, "working")).toContain("Talk with a few people who use thick foods in jars");
+    expect(getValidationFollowUpAction(5, "needs_refresh")).toContain("review the refresh started by new evidence");
   });
 });
