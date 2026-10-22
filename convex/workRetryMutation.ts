@@ -8,6 +8,7 @@ import { requireInventionEditAccess } from "./organizations";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { getOrganizationUsageSnapshot } from "./organizationDailyUsage";
 import { MAX_AUTONOMOUS_RUN_BUDGET, remainingAutonomousCostUnitsAfterReservations, utcDateKey } from "./usagePolicyLogic";
+import { shouldAutomaticallyRecoverFailedWork } from "./workOrchestratorLogic";
 
 const runAvailableWork = makeFunctionReference<
   "action",
@@ -31,7 +32,13 @@ export async function retryFailedWorkItemHandler(
   const agent = resolveDepartmentAgent(item.inputSnapshot, item.kind);
   const currentLimit = item.maxAttempts ?? 3;
   const currentAttemptCeiling = Math.max(currentLimit, item.attemptCount);
-  if (currentAttemptCeiling >= MAX_MANUAL_WORK_RETRY_LIMIT) {
+  const boundedAutomaticRecovery = shouldAutomaticallyRecoverFailedWork(
+    item.kind,
+    item.inputSnapshot,
+    item.attemptCount,
+    currentLimit,
+  );
+  if (currentAttemptCeiling >= MAX_MANUAL_WORK_RETRY_LIMIT && !boundedAutomaticRecovery) {
     throw new ConvexError("This work item has reached its retry limit. Contact InventSmith support for help.");
   }
 
@@ -54,12 +61,19 @@ export async function retryFailedWorkItemHandler(
       );
   if (remaining <= 0) return { queued: false as const, reason: "daily_usage_limit" as const };
 
-  const nextAttemptLimit = currentAttemptCeiling + 1;
+  const nextAttemptLimit = boundedAutomaticRecovery ? currentAttemptCeiling + 2 : currentAttemptCeiling + 1;
+  const nextInputSnapshot = {
+    ...(item.inputSnapshot ?? {}),
+    department: agent.department,
+    ...(boundedAutomaticRecovery
+      ? { automaticRecoveryCount: Number(item.inputSnapshot?.automaticRecoveryCount ?? 0) + 1, lastAutomaticRecoveryAt: now }
+      : {}),
+  };
   await ctx.db.patch(item._id, {
     status: "queued",
     maxAttempts: nextAttemptLimit,
     lastError: undefined,
-    inputSnapshot: { ...(item.inputSnapshot ?? {}), department: agent.department },
+    inputSnapshot: nextInputSnapshot,
     updatedAt: now,
   });
   await ctx.db.insert("atlasExecutionEvents", {
@@ -67,10 +81,12 @@ export async function retryFailedWorkItemHandler(
     workItemId: item._id,
     eventType: "work_queued",
     actorType: "inventor",
-    summary: `Authorized collaborator retried ${item.title}.`,
+    summary: boundedAutomaticRecovery
+      ? `InventSmith repaired and requeued ${item.title} through its bounded automatic-recovery path.`
+      : `Authorized collaborator retried ${item.title}.`,
     attemptNumber: item.attemptCount,
     metadata: {
-      changeType: "manual_work_retry",
+      changeType: boundedAutomaticRecovery ? "bounded_automatic_recovery" : "manual_work_retry",
       priorAttemptCount: item.attemptCount,
       nextAttemptLimit,
       ...departmentAgentAuditMetadata({ ...(item.inputSnapshot ?? {}), department: agent.department }, item.kind),
