@@ -105,4 +105,22 @@ describe("InventSmith status briefing", () => {
       title: "Regulatory screening",
     });
   });
+
+  it("does not turn a stale autonomous brief-analysis gate into an inventor task", () => {
+    const briefing = buildStatusBriefing({
+      workItems: [
+        {
+          kind: "brief_analysis",
+          title: "Analyze the invention brief",
+          status: "blocked",
+          blockedReason: "A prototype specialist must validate torque and leakage.",
+          updatedAt: 10,
+        },
+      ],
+      decisions: [],
+      approvals: [],
+      findings: [],
+    });
+    expect(briefing.needsInventor).toEqual([]);
+  });
 });
