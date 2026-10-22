@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest";
 
 const workflow = readFileSync(join(process.cwd(), ".github", "workflows", "inventsmith-convex-development-deploy.yml"), "utf8");
 const netlifyConfig = readFileSync(join(process.cwd(), "netlify.toml"), "utf8");
+const vercelConfig = JSON.parse(readFileSync(join(process.cwd(), "vercel.json"), "utf8")) as { buildCommand?: string };
+const packageConfig = JSON.parse(readFileSync(join(process.cwd(), "package.json"), "utf8")) as { scripts?: { build?: string } };
 
 describe("InventSmith Convex development deployment workflow", () => {
   it("keeps all Netlify builds from deploying Convex", () => {
@@ -13,6 +15,13 @@ describe("InventSmith Convex development deployment workflow", () => {
     expect(buildCommands.every((command) => !/\bconvex\b/i.test(command))).toBe(true);
     expect(netlifyConfig).toContain('[context.deploy-preview]');
     expect(netlifyConfig).toContain('command = "npx next build"');
+  });
+
+  it("keeps Vercel preview builds website-only so they cannot upload Convex functions", () => {
+    expect(vercelConfig.buildCommand).toBe("npx next build");
+    expect(vercelConfig.buildCommand).not.toMatch(/convex/i);
+    expect(packageConfig.scripts?.build).toBe("next build");
+    expect(packageConfig.scripts?.build).not.toMatch(/convex/i);
   });
 
   it("is manual-only and requires explicit confirmation", () => {

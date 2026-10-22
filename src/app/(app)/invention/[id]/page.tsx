@@ -298,8 +298,7 @@ export default function InventionWorkspacePage() {
   }, []);
 
   const TOTAL_SECTIONS = 11;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sectionsList = (validationResearch?.sections ?? []) as Array<any>;
+  const sectionsList = (validationResearch?.sections ?? []) as Array<{ status: string }>;
   const completedSectionCount = sectionsList.filter((s) => s.status !== "pending").length;
 
   // When rebuilding: switch off once all sections are back (via useEffect to avoid setState-during-render)

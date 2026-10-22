@@ -15,7 +15,7 @@ export default function TermsPage() {
     <main className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
       <p className="text-xs font-semibold uppercase tracking-widest text-primary">Controlled-pilot terms · Draft for counsel review</p>
       <h1 className="mt-3 text-4xl font-bold tracking-tight">InventSmith Terms of Service</h1>
-      <p className="mt-4 text-sm leading-relaxed text-muted-foreground">Effective August 15, 2026. These terms reflect InventSmith's current safety and autonomy boundaries but are not approved for public launch.</p>
+      <p className="mt-4 text-sm leading-relaxed text-muted-foreground">Effective August 15, 2026. These terms reflect InventSmith’s current safety and autonomy boundaries but are not approved for public launch.</p>
       <div className="mt-10 space-y-8">{sections.map(([title, body]) => <section key={title}><h2 className="text-xl font-semibold">{title}</h2><p className="mt-2 leading-relaxed text-muted-foreground">{body}</p></section>)}</div>
     </main>
   );

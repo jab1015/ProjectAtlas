@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "npx convex codegen && next build",
+    "build": "next build",
     "start": "node server.js",
-    "lint": "next lint",
+    "lint": "eslint src convex next.config.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "readiness": "node scripts/check-deployment-readiness.mjs",
