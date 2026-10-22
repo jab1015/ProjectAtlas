@@ -18,7 +18,6 @@ import { ArrowLeft, ArrowRight, Mail, MessageSquare, PartyPopper, RefreshCw, Sha
 import Link from "next/link";
 import { trackStageCompleted, trackContinueClicked } from "@/lib/analytics";
 import { userFacingError } from "@/lib/userFacingError";
-import { truncateAtWordBoundary } from "@/lib/truncateAtWordBoundary";
 import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
 import { getSafeValidationFailureMessage, getValidationCompletionLabel, getValidationResearchViewState } from "@/lib/validationResearchView";
 import { makeFunctionReference } from "convex/server";
@@ -222,14 +221,11 @@ export default function InventionWorkspacePage() {
     }
     autoSurveyAttemptedRef.current = true;
     setSurveyPreparationError(null);
-    const idea = inventionState.invention;
-    const details = [idea.problemStatement?.trim(), idea.solutionDescription?.trim()].filter(Boolean).join(" A possible solution is: ");
-    const surveyDetails = truncateAtWordBoundary(details, 320);
     void createEvidenceRequest({
       inventionId,
       kind: "survey",
       title: fallbackTitle,
-      introduction: `InventSmith prepared this short survey because the current evidence score is ${Math.round(reportConfidenceAverage * 100)}%. Please share it with people who may have this problem${surveyDetails ? `: ${surveyDetails}` : ""}. Responses are logged on this site and counted as customer-validation signals in the next refresh.`,
+      introduction: "InventSmith prepared this short survey to learn how people experience the problem and what would make a solution useful. Responses are collected as customer-validation signals and are not independently verified.",
     }).catch((error) => {
       console.error("Could not prepare the validation follow-up survey:", error);
       setSurveyPreparationError("InventSmith could not prepare the survey link. Open Evidence Locker to create a survey page.");
@@ -446,7 +442,12 @@ export default function InventionWorkspacePage() {
               {reportIsCurrentAndComplete && reportConfidenceAverage !== null && reportConfidenceAverage <= 0.5 && (
                 <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm">
                   <p className="font-semibold text-foreground">Your next step</p>
-                  <p className="mt-1 text-muted-foreground">Your evidence score is {Math.round(reportConfidenceAverage * 100)}%. InventSmith has prepared a short survey. Share it with five people who might have this problem.</p>
+                  <p className="mt-1 text-muted-foreground">
+                    {`Your evidence score is ${Math.round(reportConfidenceAverage * 100)}%. InventSmith has prepared a short survey. `}
+                    {(evidenceReview?.surveyResponseCount ?? 0) >= 5
+                      ? `${evidenceReview?.surveyResponseCount} responses are recorded. Add a few direct customer conversations and save their answers as evidence.`
+                      : `Collect ${Math.max(1, 5 - (evidenceReview?.surveyResponseCount ?? 0))} more survey response${Math.max(1, 5 - (evidenceReview?.surveyResponseCount ?? 0)) === 1 ? "" : "s"} to reach the initial five-response target.`}
+                  </p>
                   {(() => {
                     const request = evidenceRequests?.find((item) => item.kind === "survey" && item.status === "active" && (item.purpose === "validation_follow_up" || item.title === `[Validation follow-up] ${invention.title}`));
                     return request ? (

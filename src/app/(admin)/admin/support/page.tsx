@@ -6,6 +6,7 @@ import { api } from "@convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 import { AdminHeader } from "@/components/admin";
 import { Button } from "@/components/ui/button";
+import { userFacingError } from "@/lib/userFacingError";
 
 const STATUSES = ["open", "investigating", "waiting_on_user", "resolved"] as const;
 type CaseStatus = (typeof STATUSES)[number];
@@ -26,7 +27,7 @@ export default function AdminSupportPage() {
       await updateCase({ caseId: item._id, status: data.get("status") as CaseStatus, adminNotes: String(data.get("adminNotes") ?? "") });
       setMessage(`Case updated: ${item.subject}`);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Could not update this case.");
+      setMessage(userFacingError(error, "Could not update this case."));
     } finally {
       setBusy(null);
     }

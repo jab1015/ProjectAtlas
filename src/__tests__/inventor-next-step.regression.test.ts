@@ -14,7 +14,9 @@ describe("inventor next steps", () => {
     expect(page).toContain('reportConfidenceAverage <= 0.5');
     expect(page).toContain("!Array.isArray(evidenceRequests)");
     expect(page).toContain('request.title === fallbackTitle');
-    expect(page).toContain("Share it with five people who might have this problem.");
+    expect(page).toContain("responses are recorded. Add a few direct customer conversations");
+    expect(page).toContain("Collect ${Math.max(1, 5 - (evidenceReview?.surveyResponseCount ?? 0))} more survey response");
+    expect(page).not.toContain("Share it with five people who might have this problem.");
     expect(page).toContain("Copy survey link");
     expect(page).toContain("createEvidenceRequest({");
     expect(page).toContain("[Validation follow-up]");

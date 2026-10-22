@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { REPRESENTATIVE_PILOT_INTAKE } from "@/lib/representativePilot";
+import { userFacingError } from "@/lib/userFacingError";
 
 interface Snapshot {
   generatedAt: number;
@@ -55,7 +56,7 @@ export default function AtlasOperationsPage() {
           : `Representative pilot created. Work was not scheduled yet (${result.reason ?? "unknown reason"}).`,
       });
     } catch (error) {
-      setPilotState({ creating: false, message: error instanceof Error ? error.message : "Could not create the representative pilot case." });
+      setPilotState({ creating: false, message: userFacingError(error, "Could not create the representative pilot case.") });
     }
   };
 

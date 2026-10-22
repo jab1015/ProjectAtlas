@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { userFacingError } from "@/lib/userFacingError";
+import { publicSurveyIntroduction } from "@/lib/publicSurveyIntroduction";
 
 type PublicSurvey = {
   title: string;
@@ -64,7 +66,7 @@ export default function PublicEvidenceResponsePage() {
       });
       setSubmitted(true);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "We could not save your response. Please try again.");
+      setError(userFacingError(cause, "We could not save your response. Please try again."));
     } finally {
       setSubmitting(false);
     }
@@ -75,7 +77,7 @@ export default function PublicEvidenceResponsePage() {
       <div className="mb-8 space-y-2">
         <p className="text-xs font-medium uppercase tracking-widest text-primary">InventSmith · {request && !(request instanceof Error) && request.kind === "interview" ? "Interview" : "Survey"}</p>
         <h1 className="text-3xl font-bold">{request && !(request instanceof Error) ? request.title : "Share your experience"}</h1>
-        <p className="text-sm text-muted-foreground">{request && !(request instanceof Error) ? request.introduction : "Your feedback helps an inventor understand this problem and evaluate an idea."}</p>
+        <p className="text-sm text-muted-foreground">{request && !(request instanceof Error) ? publicSurveyIntroduction(request.introduction) : "Your feedback helps an inventor understand this problem and evaluate an idea."}</p>
       </div>
 
       {request === undefined ? <p className="text-sm text-muted-foreground">Loading questions…</p> : request instanceof Error ? (

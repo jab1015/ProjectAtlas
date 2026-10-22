@@ -7,6 +7,7 @@ import { ShieldCheck } from "lucide-react";
 import { AdminHeader } from "@/components/admin/admin-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { userFacingError } from "@/lib/userFacingError";
 
 interface PrivacyRequest {
   _id: string;
@@ -45,7 +46,7 @@ export default function AdminPrivacyPage() {
       await resolve({ requestId, status, resolutionNotes: notes });
       setMessage(`Request marked ${status.replaceAll("_", " ")}.`);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Could not update the request.");
+      setMessage(userFacingError(error, "Could not update the request."));
     }
   };
 
@@ -60,7 +61,7 @@ export default function AdminPrivacyPage() {
       const result = await runDeletion({ requestId, externalBillingResolved, resolutionNotes: notes });
       setMessage(`Account deletion completed. ${result.summary.inventionsDeleted} invention(s) removed; ${result.summary.authSessionsDeleted} auth session(s) invalidated.`);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Could not execute account deletion.");
+      setMessage(userFacingError(error, "Could not execute account deletion."));
     }
   };
 

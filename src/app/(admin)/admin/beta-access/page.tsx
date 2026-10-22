@@ -6,6 +6,7 @@ import { api } from "@convex/_generated/api";
 import { AdminHeader } from "@/components/admin";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { userFacingError } from "@/lib/userFacingError";
 
 const PLANS = ["explorer", "inventor", "pro", "enterprise"] as const;
 
@@ -52,7 +53,7 @@ export default function BetaAccessPage() {
       setConfirmLifetime(false);
       setEditingUserId("");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Could not grant access.");
+      setMessage(userFacingError(error, "Could not grant access."));
     }
   }
 
@@ -63,7 +64,7 @@ export default function BetaAccessPage() {
       const result = await adjustCredits({ organizationId: organizationId as never, deltaUnits, reason: creditReason });
       setMessage(`Credit balance updated to ${result.balance} units.`);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Could not adjust credits.");
+      setMessage(userFacingError(error, "Could not adjust credits."));
     }
   }
 
