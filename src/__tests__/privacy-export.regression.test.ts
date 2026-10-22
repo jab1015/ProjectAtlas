@@ -41,6 +41,8 @@ describe("structured account export", () => {
     expect(page).toContain("Download JSON export");
     expect(page).toContain("URL.createObjectURL");
     expect(page).toContain("Retry export");
+    expect(page).toContain("Request coordinated export");
+    expect(page).toContain("/account#privacy-controls-title");
     expect(page).toContain("Contact support");
     expect(page).toContain("convex.query(getStructuredExport, {})");
     expect(page).toContain("role=\"alert\"");

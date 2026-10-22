@@ -77,9 +77,10 @@ export default function DataExportPage() {
           <CardContent className="space-y-5">
             {!exportData && loadError ? (
               <div role="alert" className="space-y-3 text-sm">
-                <p>We couldn’t prepare your export. Your account data has not been changed. Please retry; if the problem continues, contact support.</p>
+                <p>We couldn’t prepare your self-service export. Your account data has not been changed. Please retry. If your account exceeds the self-service limit, request a coordinated export from Account privacy controls.</p>
                 <div className="flex flex-wrap gap-2">
                   <Button variant="outline" onClick={() => setRetryCount((count) => count + 1)}>Retry export</Button>
+                  <Button asChild variant="outline"><Link href="/account#privacy-controls-title">Request coordinated export</Link></Button>
                   <Button asChild variant="ghost"><Link href="/support">Contact support</Link></Button>
                 </div>
               </div>
