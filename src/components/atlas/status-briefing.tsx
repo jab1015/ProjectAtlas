@@ -79,10 +79,10 @@ export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
             <ul className="space-y-3">
               {briefing.next.map((item) => (
                 <li key={`${item.status}-${item.title}`} className="flex items-start gap-3 text-sm">
-                  <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${item.status === "running" ? "bg-primary" : item.status === "locked" ? "bg-warning" : "bg-muted-foreground/45"}`} aria-hidden="true" />
+                  <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${item.status === "running" ? "bg-primary" : item.status === "locked" || item.status === "waiting" ? "bg-warning" : "bg-muted-foreground/45"}`} aria-hidden="true" />
                   <div>
                     <p className="font-medium text-foreground">{item.title}</p>
-                    <p className="text-xs capitalize text-muted-foreground">{item.status === "locked" ? `Available after ${item.requiredTier ?? "access"} is granted` : item.status === "running" ? "Working now" : "Next in line"}</p>
+                    <p className="text-xs capitalize text-muted-foreground">{item.status === "locked" ? `Available after ${item.requiredTier ?? "access"} is granted` : item.status === "waiting" ? `Waiting on ${item.waitingFor?.map((kind) => kind.replaceAll("_", " ")).join(", ") ?? "prerequisites"}` : item.status === "running" ? "Working now" : "Next in line"}</p>
                   </div>
                 </li>
               ))}

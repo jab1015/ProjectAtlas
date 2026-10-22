@@ -66,6 +66,18 @@ describe("InventSmith status briefing", () => {
     ]);
   });
 
+  it("does not present dependency-blocked queued work as next in line", () => {
+    const briefing = buildStatusBriefing({
+      workItems: [
+        { kind: "engineering_handoff", title: "Prepare engineering handoff", status: "queued", updatedAt: 1, dependsOnKinds: ["product_requirements", "development_risks"] },
+        { kind: "assumptions_unknowns", title: "Build assumptions register", status: "queued", updatedAt: 2 },
+      ],
+      decisions: [], approvals: [], findings: [],
+    });
+    expect(briefing.next[0]).toMatchObject({ title: "Build assumptions register", status: "queued" });
+    expect(briefing.next[1]).toMatchObject({ title: "Prepare engineering handoff", status: "waiting", waitingFor: ["product_requirements", "development_risks"] });
+  });
+
   it("excludes draft and low-confidence findings", () => {
     const briefing = buildStatusBriefing({
       workItems: [],

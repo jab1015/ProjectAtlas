@@ -39,6 +39,15 @@ function getActivity(briefing?: StatusBriefing | null) {
       Icon: CircleDot,
     };
   }
+  const waiting = briefing?.next.find((item) => item.status === "waiting");
+  if (waiting) {
+    return {
+      label: "Queued behind prerequisites",
+      detail: `${waiting.title} needs ${waiting.waitingFor?.map((kind) => kind.replaceAll("_", " ")).join(", ") ?? "earlier work"} first.`,
+      tone: "border-warning/30 bg-warning/5 text-warning",
+      Icon: Clock3,
+    };
+  }
   return {
     label: "No work currently queued",
     detail: "InventSmith will show the next action when new work is ready.",

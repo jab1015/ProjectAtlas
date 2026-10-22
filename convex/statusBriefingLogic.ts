@@ -5,6 +5,7 @@ export interface BriefingWorkItem {
   title: string;
   status: string;
   updatedAt: number;
+  dependsOnKinds?: string[];
   outputSummary?: string;
   blockedReason?: string;
 }
@@ -46,7 +47,7 @@ export interface StatusBriefing {
     detail: string;
     requestedAt: number;
   }>;
-  next: Array<{ title: string; status: "running" | "queued" | "locked"; requiredTier?: string }>;
+  next: Array<{ title: string; status: "running" | "queued" | "locked" | "waiting"; requiredTier?: string; waitingFor?: string[] }>;
 }
 
 // These are research assignments InventSmith is expected to perform before
@@ -142,9 +143,13 @@ export function buildStatusBriefing(input: StatusBriefingInput): StatusBriefing 
     .sort((a, b) => a.requestedAt - b.requestedAt)
     .slice(0, 10);
 
+  const completedKinds = new Set(input.workItems.filter((item) => item.status === "completed").map((item) => item.kind));
   const next = [...input.workItems]
     .filter((item) => item.status === "running" || item.status === "queued")
     .sort((a, b) => {
+      const aWaiting = a.status === "queued" && (a.dependsOnKinds ?? []).some((kind) => !completedKinds.has(kind));
+      const bWaiting = b.status === "queued" && (b.dependsOnKinds ?? []).some((kind) => !completedKinds.has(kind));
+      if (aWaiting !== bWaiting) return aWaiting ? 1 : -1;
       const aLocked = a.status === "queued" && input.subscriptionTier !== undefined && !canTierRunWorkKind(input.subscriptionTier, a.kind);
       const bLocked = b.status === "queued" && input.subscriptionTier !== undefined && !canTierRunWorkKind(input.subscriptionTier, b.kind);
       if (aLocked !== bLocked) return aLocked ? 1 : -1;
@@ -152,11 +157,16 @@ export function buildStatusBriefing(input: StatusBriefingInput): StatusBriefing 
       return a.status === "running" ? -1 : 1;
     })
     .slice(0, 5)
-    .map((item) => ({
-      title: item.title,
-      status: item.status === "queued" && input.subscriptionTier !== undefined && !canTierRunWorkKind(input.subscriptionTier, item.kind) ? "locked" as const : item.status as "running" | "queued",
-      requiredTier: item.kind ? minimumTierForWorkKind(item.kind) ?? undefined : undefined,
-    }));
+    .map((item) => {
+      const waitingFor = item.status === "queued" ? (item.dependsOnKinds ?? []).filter((kind) => !completedKinds.has(kind)) : [];
+      const locked = item.status === "queued" && input.subscriptionTier !== undefined && !canTierRunWorkKind(input.subscriptionTier, item.kind);
+      return {
+        title: item.title,
+        status: locked ? "locked" as const : waitingFor.length ? "waiting" as const : item.status as "running" | "queued",
+        requiredTier: item.kind ? minimumTierForWorkKind(item.kind) ?? undefined : undefined,
+        ...(waitingFor.length ? { waitingFor } : {}),
+      };
+    });
 
   return { completed, discoveries, needsInventor, next };
 }
