@@ -180,7 +180,10 @@ export const getProductDesignWorkspace = query({
       evidenceCount: evidence.length,
       inventorEvidenceCount: evidence.filter((item: any) => item.metadata?.provenance === "inventor_upload").length,
       cadStatus: {
-        specificationReady: deliverables.some((item: any) => item.kind === "cad_model_specification" && !item.staleReason),
+        // The CAD request mutation requires the current Product Design
+        // Specification. A CAD-model specification alone must not enable the
+        // button or expose a raw backend error before that upstream gate.
+        specificationReady: deliverables.some((item: any) => item.kind === "product_design_specification" && !item.staleReason),
         nativeCadFilesGenerated: deliverables.some((item: any) => ["model/step", "model/stl", "application/dxf"].includes(item.mediaType ?? "")),
       },
     };
