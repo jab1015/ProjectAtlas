@@ -127,7 +127,10 @@ export const getJourneyCenter = query({
     else if (openDecisionCount > 0) nextAction = `Answer an open question so InventSmith can continue (${openDecisionCount} waiting).`;
     else if (blockedWorkCount > 0) nextAction = `Open ${firstIncomplete.name} to see what information is missing (${blockedWorkCount} item${blockedWorkCount === 1 ? "" : "s"}).`;
     else if (firstIncomplete.status === "professional_review") nextAction = `${firstIncomplete.name} is ready for a qualified professional to review.`;
-    else if (firstIncomplete.name === "Validation" && hasActiveValidationSurvey) nextAction = getValidationFollowUpAction(customerValidationResponses, firstIncomplete.status);
+    else if (firstIncomplete.name === "Validation" && hasActiveValidationSurvey) nextAction = getValidationFollowUpAction(customerValidationResponses, firstIncomplete.status, {
+      runningWorkCount: firstIncomplete.activeWorkCount,
+      queuedWorkCount: firstIncomplete.queuedWorkCount,
+    });
     else if (firstIncomplete.status === "needs_refresh") nextAction = `Open ${firstIncomplete.name}; new information means some work needs updating.`;
     else if (firstIncomplete.status === "failed") nextAction = `Open ${firstIncomplete.name} and retry the step that failed.`;
 

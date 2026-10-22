@@ -31,9 +31,12 @@ describe("inventor next steps", () => {
     expect(workspace).not.toContain("Stages 5–15 — product design");
     expect(journey).toContain("Do the next step");
     expect(journey).toContain("tasks done");
+    expect(journey).toContain('return "Refresh queued"');
+    expect(journey).toContain("Qualified reviewers must complete these gates. They are not decisions for you to submit.");
+    expect(journey).not.toContain("Tap to see what the reviewer must check");
     expect(backend).toContain("Open ${firstIncomplete.name} and follow the first step.");
     expect(backend).toContain('request.title.startsWith("[Validation follow-up]")');
-    expect(backend).toContain("getValidationFollowUpAction(customerValidationResponses, firstIncomplete.status)");
+    expect(backend).toContain("getValidationFollowUpAction(customerValidationResponses, firstIncomplete.status, {");
     expect(journey).not.toContain("Share your prepared survey with five people who may have this problem");
   });
 
@@ -41,6 +44,8 @@ describe("inventor next steps", () => {
     expect(getValidationFollowUpAction(0, "working")).toContain("5 more people");
     expect(getValidationFollowUpAction(4, "working")).toContain("1 more person");
     expect(getValidationFollowUpAction(5, "working")).toContain("Talk with a few people who use thick foods in jars");
-    expect(getValidationFollowUpAction(5, "needs_refresh")).toContain("review the refresh started by new evidence");
+    expect(getValidationFollowUpAction(5, "needs_refresh", { runningWorkCount: 1, queuedWorkCount: 0 })).toContain("refreshing now");
+    expect(getValidationFollowUpAction(5, "needs_refresh", { runningWorkCount: 0, queuedWorkCount: 2 })).toContain("refresh is queued");
+    expect(getValidationFollowUpAction(5, "needs_refresh")).toContain("review the new evidence");
   });
 });

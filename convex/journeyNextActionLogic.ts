@@ -1,6 +1,12 @@
-export function getValidationFollowUpAction(responseCount: number, status: string): string {
+export function getValidationFollowUpAction(
+  responseCount: number,
+  status: string,
+  counts: { runningWorkCount: number; queuedWorkCount: number } = { runningWorkCount: 0, queuedWorkCount: 0 },
+): string {
   if (status === "needs_refresh") {
-    return "Open Validation to review the refresh started by new evidence.";
+    if (counts.runningWorkCount > 0) return "Validation is refreshing now. Check Journey Center for the latest progress.";
+    if (counts.queuedWorkCount > 0) return "Validation refresh is queued and will start when its prerequisites and worker capacity are ready.";
+    return "Open Validation to review the new evidence and the next available action.";
   }
 
   const remainingResponses = Math.max(0, 5 - Math.max(0, responseCount));

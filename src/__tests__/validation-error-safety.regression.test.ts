@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 import { buildFailedSectionEntry } from "@convex/validationResearchOrchestrationRunner";
-import { getSafeValidationFailureMessage } from "@/lib/validationResearchView";
+import { cleanValidationResearchContent, getSafeValidationFailureMessage, getValidationSectionTitle } from "@/lib/validationResearchView";
 
 describe("validation failure safety", () => {
   it("does not persist raw provider credential errors in failed sections", () => {
@@ -23,6 +23,17 @@ describe("validation failure safety", () => {
 
     expect(safeMessage).not.toContain("sk-proj-secret-value");
     expect(safeMessage).toContain("Ask an administrator");
+  });
+
+  it("uses human section headings and hides internal evidence record IDs in older reports", () => {
+    expect(getValidationSectionTitle("competitorAnalysis", "competitorAnalysis")).toBe("Competitor analysis");
+    expect(getValidationSectionTitle("customerSegments", "Customer segments")).toBe("Customer segments");
+    const clean = cleanValidationResearchContent(
+      "Data_All_260313 (`m972gg8jr7r4bcj1fpw08kdymx8gq6t1`) and sourceId: m972gg8jr7r4bcj1fpw08kdymx8gq6t1"
+    );
+    expect(clean).toContain("Data_All_260313");
+    expect(clean).not.toContain("m972gg8jr7r4bcj1fpw08kdymx8gq6t1");
+    expect(clean).not.toContain("sourceId");
   });
 
   it("keeps the validation page summary-first and makes failed-only retry the primary action", () => {

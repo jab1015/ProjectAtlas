@@ -28,6 +28,38 @@ export interface ValidationResearchViewInput {
   };
 }
 
+const VALIDATION_SECTION_TITLES: Record<string, string> = {
+  validationPlan: "Validation plan",
+  customerSegments: "Customer segments",
+  competitorAnalysis: "Competitor analysis",
+  marketSizing: "Market sizing",
+  validationMethods: "Validation methods",
+  timeline: "Validation timeline",
+  surveyQuestions: "Survey questions",
+  landingPageDraft: "Landing page draft",
+  interviewQuestions: "Interview questions",
+  riskAssessment: "Risk assessment",
+  recommendations: "Recommendations",
+};
+
+export function getValidationSectionTitle(sectionId?: string, title?: string): string {
+  if (title?.trim() && title.trim() !== sectionId) return title.trim();
+  if (!sectionId) return "Validation section";
+  return VALIDATION_SECTION_TITLES[sectionId] ?? sectionId.replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/^./, (char) => char.toUpperCase());
+}
+
+/** Hide internal Convex record identifiers that can leak into older generated reports. */
+export function cleanValidationResearchContent(content: string): string {
+  return content
+    .replace(/\s*\(sourceId:\s*m[a-z0-9]{20,}\)/gi, "")
+    .replace(/\bsourceId:\s*m[a-z0-9]{20,}\b/gi, "")
+    .replace(/\bm[a-z0-9]{24,}\b/gi, "")
+    .replace(/\(\s*\)/g, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 export interface ValidationResearchViewState {
   finishedSections: ValidationResearchSectionView[];
   failedSections: ValidationResearchSectionView[];

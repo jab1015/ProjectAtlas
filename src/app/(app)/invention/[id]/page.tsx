@@ -19,7 +19,7 @@ import Link from "next/link";
 import { trackStageCompleted, trackContinueClicked } from "@/lib/analytics";
 import { userFacingError } from "@/lib/userFacingError";
 import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
-import { getSafeValidationFailureMessage, getValidationCompletionLabel, getValidationResearchViewState } from "@/lib/validationResearchView";
+import { cleanValidationResearchContent, getSafeValidationFailureMessage, getValidationCompletionLabel, getValidationResearchViewState, getValidationSectionTitle } from "@/lib/validationResearchView";
 import { makeFunctionReference } from "convex/server";
 
 const createEvidenceRequestRef = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; kind: "survey" | "interview"; title?: string; introduction?: string }, { requestId: string; token: string }>("evidenceRequests:create");
@@ -594,13 +594,13 @@ export default function InventionWorkspacePage() {
                       className="text-base font-semibold text-foreground"
                       style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
                     >
-                      {section.title ?? section.sectionId ?? "Validation Section"}
+                      {getValidationSectionTitle(section.sectionId, section.title)}
                     </h3>
 
                     <p className="break-words text-sm text-foreground [overflow-wrap:anywhere] whitespace-pre-wrap leading-relaxed">
                       {section.status === "failed"
-                        ? getSafeValidationFailureMessage(section.editedContent ?? section.content ?? "")
-                        : section.editedContent ?? section.content ?? ""}
+                        ? getSafeValidationFailureMessage(cleanValidationResearchContent(section.editedContent ?? section.content ?? ""))
+                        : cleanValidationResearchContent(section.editedContent ?? section.content ?? "")}
                     </p>
 
                     {section.confidence && (
