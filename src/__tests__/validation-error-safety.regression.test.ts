@@ -36,6 +36,15 @@ describe("validation failure safety", () => {
     expect(clean).not.toContain("sourceId");
   });
 
+  it("removes unrendered citation tokens with internal source IDs from deliverables", () => {
+    const clean = cleanValidationResearchContent(
+      "A finding. citem976hsdfmy2bfe29a8r45m5b918gqcg5m974fnt7420frxf569xj352ewx8gpfp1 More text."
+    );
+    expect(clean).toBe("A finding. More text.");
+    expect(clean).not.toContain("cite");
+    expect(clean).not.toContain("m976hsdfmy2bfe29a8r45m5b918gqcg5");
+  });
+
   it("keeps the validation page summary-first and makes failed-only retry the primary action", () => {
     const page = fs.readFileSync(path.join(process.cwd(), "src/app/(app)/invention/[id]/page.tsx"), "utf8");
     expect(page).toContain("The short version");

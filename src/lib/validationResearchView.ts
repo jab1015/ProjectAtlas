@@ -51,6 +51,7 @@ export function getValidationSectionTitle(sectionId?: string, title?: string): s
 /** Hide internal Convex record identifiers that can leak into older generated reports. */
 export function cleanValidationResearchContent(content: string): string {
   return content
+    .replace(/cite(?:[a-z0-9_-]+)*/gi, "")
     .replace(/\s*\(sourceId:\s*m[a-z0-9]{20,}\)/gi, "")
     .replace(/\bsourceId:\s*m[a-z0-9]{20,}\b/gi, "")
     .replace(/\bm[a-z0-9]{24,}\b/gi, "")
