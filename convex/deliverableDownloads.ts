@@ -6,8 +6,22 @@ import {
   csvDataUrl,
   financialModelMarkdownToCsv,
   financialModelMarkdownToSpreadsheetXml,
+  competitorResearchMarkdownToSpreadsheetXml,
   spreadsheetXmlDataUrl,
 } from "./tabularExportLogic";
+
+export const getCompetitiveResearchExport = query({
+  args: { inventionId: v.id("inventions") },
+  handler: async (ctx, args) => {
+    await requireInventionReadAccess(ctx, args.inventionId);
+    const invention = await ctx.db.get(args.inventionId);
+    if (!invention) throw new ConvexError("Invention not found");
+    const deliverables = await ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect();
+    const competitor = deliverables.filter((item) => item.kind === "competitor_landscape").sort((a, b) => b.version - a.version)[0];
+    if (!competitor) return null;
+    return { title: `${invention.title} competitive research.xlsx`, version: competitor.version, staleReason: competitor.staleReason ?? null, downloadUrl: spreadsheetXmlDataUrl(competitorResearchMarkdownToSpreadsheetXml(contentToReadableText(competitor.content), invention.title)) };
+  },
+});
 
 export const getInventionArtifactDownloads = query({
   args: { inventionId: v.id("inventions") },
