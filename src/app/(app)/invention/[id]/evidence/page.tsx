@@ -349,7 +349,7 @@ export default function InventionEvidencePage() {
         <section className="space-y-4">
           <div>
             <h2 className="text-xl font-semibold text-foreground">Inventor-provided evidence</h2>
-            <p className="text-sm text-muted-foreground">Uploaded files remain inventor-provided and unverified until their provenance and relevance are reviewed. Responses collected through an InventSmith survey link are counted as customer-validation signals, but are not presented as independently verified market research.</p>
+            <p className="text-sm text-muted-foreground">Uploaded files and inventor interview notes are accepted as inventor-provided evidence and can be used by downstream work immediately. InventSmith keeps source provenance, independent corroboration, and professional review separate so optional review never blocks your supplied evidence.</p>
           </div>
 
           {evidence instanceof Error ? <p role="alert" className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">Evidence files could not be loaded. You can still use the upload form above. Retry this page; if the list still fails, <Link className="underline" href={`/support?inventionId=${inventionId}`}>contact support</Link> and mention that your evidence list did not load.</p> : evidence === undefined ? <p className="text-sm text-muted-foreground">Loading evidence…</p> : evidence.length === 0 ? (
@@ -370,7 +370,7 @@ export default function InventionEvidencePage() {
                         {item.extractionSummary && <p className="text-xs text-primary">Structured intake: {item.extractionSummary}</p>}
                         {statusLabel && <p className={`inline-flex items-center gap-1.5 text-xs ${item.extractionStatus === "failed" ? "text-destructive" : item.extractionStatus === "completed" ? "text-success" : "text-primary"}`}>{item.extractionStatus === "failed" ? <AlertTriangle className="h-3.5 w-3.5" /> : item.extractionStatus === "queued" || item.extractionStatus === "running" ? <DatabaseZap className="h-3.5 w-3.5" /> : null}{statusLabel}</p>}
                         {item.extractionError && <p className="max-w-2xl text-xs text-destructive">{item.extractionError}</p>}
-                        <p className={`text-xs ${item.evidenceOrigin === "public_response" || item.validationStatus === "counted_customer_signal" ? "text-success" : "text-amber-700 dark:text-amber-400"}`}>{item.evidenceOrigin === "public_response" || item.validationStatus === "counted_customer_signal" ? "Evidence state: counted customer-validation signal · collected on this site" : "Evidence state: unverified inventor upload"}</p>
+                        <p className={`text-xs ${item.evidenceOrigin === "public_response" || item.validationStatus === "counted_customer_signal" ? "text-success" : "text-primary"}`}>{item.evidenceOrigin === "public_response" || item.validationStatus === "counted_customer_signal" ? "Evidence state: counted customer-validation signal · collected on this site" : item.evidenceKind === "survey" ? "Evidence state: inventor-provided survey · accepted for validation; independent corroboration not performed" : "Evidence state: inventor-provided evidence · accepted for downstream analysis; independent corroboration not performed"}</p>
                       </div>
                     </div>
                     <div className="flex gap-2 shrink-0 self-start">

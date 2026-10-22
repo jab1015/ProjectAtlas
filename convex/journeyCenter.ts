@@ -108,6 +108,8 @@ export const getJourneyCenter = query({
         statusExplanation: getJourneyStageStatusExplanation(status, {
           runningWorkCount: runningItems.length,
           queuedWorkCount: queuedItems.length,
+          queuedWorkTitle: activeWork?.title,
+          staleReason: staleItems[0]?.lastError,
         }),
       };
     });
@@ -131,6 +133,7 @@ export const getJourneyCenter = query({
     else if (firstIncomplete.name === "Validation" && hasActiveValidationSurvey) nextAction = getValidationFollowUpAction(customerValidationResponses, firstIncomplete.status, {
       runningWorkCount: firstIncomplete.activeWorkCount,
       queuedWorkCount: firstIncomplete.queuedWorkCount,
+      queuedWorkTitle: firstIncomplete.activityLabel ?? undefined,
     });
     else if (firstIncomplete.status === "needs_refresh") nextAction = `Open ${firstIncomplete.name}; new information means some work needs updating.`;
     else if (firstIncomplete.status === "failed") nextAction = `Open ${firstIncomplete.name} and retry the step that failed.`;

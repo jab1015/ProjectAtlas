@@ -19,7 +19,7 @@ import Link from "next/link";
 import { trackStageCompleted, trackContinueClicked } from "@/lib/analytics";
 import { userFacingError } from "@/lib/userFacingError";
 import { InventionCardMenu } from "@/components/atlas/invention-card-menu";
-import { cleanValidationResearchContent, getSafeValidationFailureMessage, getValidationCompletionLabel, getValidationResearchViewState, getValidationSectionTitle } from "@/lib/validationResearchView";
+import { cleanValidationResearchContent, getSafeValidationFailureMessage, getValidationCompletionLabel, getValidationPageHeading, getValidationResearchViewState, getValidationSectionTitle } from "@/lib/validationResearchView";
 import { makeFunctionReference } from "convex/server";
 
 const createEvidenceRequestRef = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; kind: "survey" | "interview"; title?: string; introduction?: string }, { requestId: string; token: string }>("evidenceRequests:create");
@@ -370,6 +370,17 @@ export default function InventionWorkspacePage() {
     );
     const evidenceReview = (validationResearch as { evidenceReview?: { currentEvidenceMatchesRun: boolean; surveys: Array<{ title: string; sampleSize?: string; summary: string; findings: string[]; provenance: string }>; pendingSurveys?: Array<{ title: string; status: "processing" | "failed" }>; surveyResponseCount?: number } } | null)?.evidenceReview;
     const uploadedSurveys = evidenceReview?.surveys ?? [];
+    const validationHeading = getValidationPageHeading(validationResearch, {
+      finishedSections: completedSections,
+      failedSections,
+      isGenerating,
+      isFailed: validationResearch?.status === "failed",
+      isPartial: false,
+      allSectionsError,
+      progressCount,
+      progressPct,
+      statusLabel,
+    }, TOTAL_SECTIONS);
     const avgConfidence =
       sectionsWithConf.length > 0
         ? `${Math.round(
@@ -423,7 +434,7 @@ export default function InventionWorkspacePage() {
                 className="text-2xl font-bold text-foreground"
                 style={{ fontFamily: "var(--font-heading), ui-sans-serif, system-ui, sans-serif" }}
               >
-                InventSmith is validating your invention.
+                {validationHeading}
               </h1>
               <p className="text-muted-foreground">
                 {evidenceReview?.currentEvidenceMatchesRun === false

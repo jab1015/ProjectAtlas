@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import {
   getValidationCompletionLabel,
+  getValidationPageHeading,
   getValidationResearchViewState,
 } from "@/lib/validationResearchView";
 
@@ -47,6 +48,26 @@ describe("visible validation evidence review", () => {
     expect(staleRunning.statusLabel).toBe(
       "Refresh in progress — current evidence not reflected yet"
     );
+  });
+
+  it("keeps the validation page headline aligned with the report status", () => {
+    const completeResearch = {
+      status: "complete" as const,
+      sections: Array.from({ length: 11 }, () => ({ status: "generated" as const })),
+      evidenceReview: { currentEvidenceMatchesRun: true },
+    };
+    const completeState = getValidationResearchViewState(completeResearch, false, 11);
+    const runningResearch = { status: "running" as const, sections: [] };
+    const runningState = getValidationResearchViewState(runningResearch, false, 11);
+    const staleResearch = {
+      ...completeResearch,
+      evidenceReview: { currentEvidenceMatchesRun: false },
+    };
+    const staleState = getValidationResearchViewState(staleResearch, false, 11);
+
+    expect(getValidationPageHeading(completeResearch, completeState, 11)).toBe("Validation is complete.");
+    expect(getValidationPageHeading(runningResearch, runningState, 11)).toBe("InventSmith is validating your invention.");
+    expect(getValidationPageHeading(staleResearch, staleState, 11)).toBe("Validation update needed.");
   });
 
   it("returns current survey source details and marks reports stale against changed evidence", () => {

@@ -1,11 +1,11 @@
 export function getValidationFollowUpAction(
   responseCount: number,
   status: string,
-  counts: { runningWorkCount: number; queuedWorkCount: number } = { runningWorkCount: 0, queuedWorkCount: 0 },
+  counts: { runningWorkCount: number; queuedWorkCount: number; queuedWorkTitle?: string; staleReason?: string } = { runningWorkCount: 0, queuedWorkCount: 0 },
 ): string {
   if (status === "needs_refresh") {
     if (counts.runningWorkCount > 0) return "Validation is refreshing now. Check Journey Center for the latest progress.";
-    if (counts.queuedWorkCount > 0) return "Validation refresh is queued and will start when its prerequisites and worker capacity are ready.";
+    if (counts.queuedWorkCount > 0) return `Validation refresh is queued${counts.queuedWorkTitle ? ` for “${counts.queuedWorkTitle}”` : ""}${counts.staleReason ? ` because ${counts.staleReason}` : ""}. It will start when prerequisites and worker capacity are ready.`;
     return "Open Validation to review the new evidence and the next available action.";
   }
 

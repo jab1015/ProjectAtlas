@@ -135,7 +135,7 @@ export async function extractEvidenceFromFile(file: File, evidenceKind: string):
       textPreview: preview,
       limitations: [
         ...(text.length > MAX_TEXT_PREVIEW ? [`The source was longer than ${MAX_TEXT_PREVIEW.toLocaleString()} characters; only the leading text is included in the structured ingestion preview.`] : []),
-        "The text is inventor-provided evidence and remains unverified until InventSmith or a qualified reviewer evaluates its provenance and relevance.",
+        "The text is inventor-provided evidence and is available to downstream analysis immediately. Independent corroboration and qualified review are separate optional assessments and do not block use of the supplied evidence.",
       ],
     };
   }

@@ -145,7 +145,7 @@ export default function MarketResearchPage() {
             ) : (
               <div className="space-y-3">
                 {inventorEvidence.map((source) => {
-                  const metadata = source.metadata as { extractionStatus?: string; fileSize?: number; uploadedAt?: number; evidenceOrigin?: string; validationStatus?: string; collectionStatus?: string; capturedFrom?: string } | undefined;
+                  const metadata = source.metadata as { extractionStatus?: string; fileSize?: number; uploadedAt?: number; evidenceOrigin?: string; validationStatus?: string; collectionStatus?: string; capturedFrom?: string; evidenceKind?: string } | undefined;
                   // Keep legacy public responses visible as site-collected even if
                   // they predate the validation metadata fields.
                   const siteCollected = metadata?.evidenceOrigin === "public_response" || metadata?.validationStatus === "counted_customer_signal";
@@ -163,7 +163,7 @@ export default function MarketResearchPage() {
                             : metadata?.extractionStatus === "queued"
                               ? "Queued for structured extraction"
                               : "Inventor-provided material; source and methodology have not been independently reviewed.";
-                  const evidenceBadge = siteCollected ? "Counted customer-validation signal" : chatStatement ? "Unverified inventor statement" : "Unverified inventor upload";
+                  const evidenceBadge = siteCollected ? "Counted customer-validation signal" : chatStatement ? "Inventor-provided statement · accepted" : metadata?.evidenceKind === "survey" ? "Inventor-provided survey · accepted" : "Inventor-provided evidence · accepted";
                   return <article key={source._id} className="rounded-2xl border border-border bg-card p-5"><div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"><div><h3 className="font-semibold">{source.title}</h3><p className="mt-1 text-xs capitalize text-muted-foreground">{sourceEvidenceLabel(source)} · {siteCollected ? "site-collected" : source.reliability.replaceAll("_", " ")}</p></div><span className={`w-fit rounded-full px-3 py-1 text-xs font-medium ${siteCollected ? "bg-emerald-100 text-emerald-900" : "bg-amber-100 text-amber-900"}`}>{evidenceBadge}</span></div>{source.excerpt && <p className="mt-3 whitespace-pre-wrap text-sm text-muted-foreground">{source.excerpt.slice(0, 700)}{source.excerpt.length > 700 ? "…" : ""}</p>}<p className="mt-3 text-xs text-muted-foreground">{statusText}{metadata?.uploadedAt ? ` · Added ${new Date(metadata.uploadedAt).toLocaleDateString()}` : ""}</p></article>;
                 })}
               </div>

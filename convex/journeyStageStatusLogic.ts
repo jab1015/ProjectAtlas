@@ -2,14 +2,14 @@ export type JourneyStageStatus = "complete" | "professional_review" | "blocked" 
 
 export function getJourneyStageStatusExplanation(
   status: JourneyStageStatus,
-  counts: { runningWorkCount: number; queuedWorkCount: number },
+  counts: { runningWorkCount: number; queuedWorkCount: number; queuedWorkTitle?: string; staleReason?: string },
 ): string {
   if (status === "complete") return "InventSmith finished the required work for this stage.";
   if (status === "professional_review") return "InventSmith prepared the work; a qualified professional must review it.";
   if (status === "blocked") return "InventSmith is waiting for the specific information or authorization shown above.";
   if (status === "needs_refresh") {
     if (counts.runningWorkCount > 0) return "New evidence changed this stage. InventSmith is refreshing it now.";
-    if (counts.queuedWorkCount > 0) return "New evidence changed this stage. Refresh work is queued and will start when worker capacity is available.";
+    if (counts.queuedWorkCount > 0) return `New evidence changed this stage${counts.staleReason ? ` (${counts.staleReason})` : ""}. Refresh work is queued${counts.queuedWorkTitle ? `; next: ${counts.queuedWorkTitle}` : ""} and will start when prerequisites and worker capacity are ready.`;
     return "New evidence changed this stage. Open the stage to review its next available action.";
   }
   if (status === "failed") {

@@ -168,3 +168,20 @@ export function getValidationResearchViewState(
     statusLabel,
   };
 }
+
+export function getValidationPageHeading(
+  validationResearch: ValidationResearchViewInput | null | undefined,
+  viewState: ValidationResearchViewState,
+  totalSections: number,
+): string {
+  if (viewState.isGenerating) return "InventSmith is validating your invention.";
+  if (viewState.allSectionsError) return "Validation could not be completed.";
+  if (viewState.failedSections.length > 0) return "Some validation sections need another try.";
+  if (validationResearch?.evidenceReview?.currentEvidenceMatchesRun === false) {
+    return "Validation update needed.";
+  }
+  if (validationResearch?.status === "complete" && viewState.progressCount >= totalSections) {
+    return "Validation is complete.";
+  }
+  return "Validation overview.";
+}
