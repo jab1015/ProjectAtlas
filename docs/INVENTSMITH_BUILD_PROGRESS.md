@@ -592,3 +592,10 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Rise Jar Journey, dashboard destination, Support scope, and Work Library load without raw request IDs, retry-limit errors, or application-error pages.
 - Remaining gates are explicit qualified patent-professional reviews; they are shown as expert-review gates with reasons.
 
+# Internal Legal review routing — 2026-10-23
+
+- Patent-to-design review now routes through the internal Legal department first.
+- Authorized Legal reviewers with explicit invention review access can complete or return the patent review from the dedicated review page.
+- The Legal preparation agent still cannot claim patentability or clearance; it prepares the traceable packet and records unresolved questions for the authorized reviewer.
+- Outside patent counsel remains an escalation option when internal Legal identifies a matter outside its authority or needs an independent opinion.
+
