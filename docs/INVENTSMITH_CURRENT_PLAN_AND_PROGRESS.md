@@ -661,3 +661,12 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Convex production Run #38 succeeded against `agile-seahorse-379` for remote commit `c8b030bdbd0e912d1b79fd7b21c368fc950dc871`; CI reports 142 test files / 762 tests passed. The latest Vercel Preview `https://inventsmith-bqg6oqv39-inventors-os.vercel.app` is Ready on the same commit.
 - Fresh inventor authentication on that hostname returned “Invalid email or password.” Live Rise Jar exercise of the automatic loop and visible audit record remains pending; the patent gate is not claimed complete.
 
+# Legacy Internal Legal re-check repair — 2026-10-23
+
+- The authenticated inventor session confirmed that Rise Jar was a legacy pending handoff with no structured automated Legal disposition attached.
+- `kickAutonomousWork` now performs one bounded migration re-check for that state, queues the packet through the Internal Legal department, and records a `work_queued` audit event. It never re-queues indefinitely when Internal Legal returns outside-authority.
+- Local verification passed: 142 test files / 762 tests, TypeScript, lint with 0 errors and 10 existing warnings, `next build`, and `git diff --check`.
+- Convex production deployment Run #39 succeeded against `agile-seahorse-379` for commit `71fd229b29bd5d23697feb4b8e227aad196044ac`.
+- Newest Vercel Preview `https://inventsmith-rw4bdqzv1-inventors-os.vercel.app` is Ready from the same commit.
+- The inventor session is authenticated on an earlier Preview hostname and visibly loads Journey Center and Patent Readiness. It still shows the legacy pending gate until the new bounded re-check runs and produces a recorded Internal Legal disposition; no patent-gate completion is claimed yet.
+
