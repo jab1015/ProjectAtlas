@@ -704,3 +704,10 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Added a visible legal progress indicator, process explanation, and honest next-update expectation. It distinguishes working, queued, waiting for Legal disposition, and complete.
 - Verification passed: 143 test files / 766 tests, TypeScript, lint with 0 errors and 10 existing warnings, production build, and whitespace checks.
 - Protected Convex production deployment and newest Ready Vercel preview remain pending for this repair.
+
+# Current-work visibility deployment checkpoint — 2026-10-23
+
+- Convex production Run #41 succeeded for `717e8cc4f1fb972cc48f89e69632badcfab29f73`; 143 test files / 766 tests passed in the deployment job.
+- Vercel Preview `https://inventsmith-8uqfp8qzq-inventors-os.vercel.app` is Ready from the same branch commit.
+- Fresh authentication is still required on that hostname before the new current-work card can be accepted through a live Rise Jar browser exercise.
+- Internal Legal disposition and audit recording remain pending.
