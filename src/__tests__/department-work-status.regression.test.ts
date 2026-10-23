@@ -22,7 +22,9 @@ describe("department prerequisite visibility", () => {
     expect(query).toContain("progressForWorkKinds(workItems.filter((item: any) => stageKinds.has(item.kind)), stage.work.map((item) => item.kind))");
     expect(query).toContain('completedWorkKinds: currentStageWork.filter((item: any) => item.status === "completed").map((item: any) => item.kind)');
     expect(page).toContain("getNextUnmetWorkDependencies(departmentWork, department?.completedWorkKinds ?? [])");
-    expect(page).toContain("Waiting for earlier work");
+    expect(page).toContain("This department is queued behind earlier work");
+    expect(page).toContain("View current work");
+    expect(page).toContain("Open Journey Center");
     expect(page).toContain("Open Product Design + CAD");
     expect(page).toContain("Queued or running");
   });
