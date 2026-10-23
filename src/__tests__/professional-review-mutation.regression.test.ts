@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const authMocks = vi.hoisted(() => ({ isAdmin: vi.fn() }));
+const accessMocks = vi.hoisted(() => ({ requireInventionReadAccess: vi.fn() }));
 
-vi.mock("../../convex/authHelpers", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../../convex/authHelpers")>();
-  return { ...actual, isAdmin: authMocks.isAdmin };
+vi.mock("../../convex/organizations", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../convex/organizations")>();
+  return { ...actual, requireInventionReadAccess: accessMocks.requireInventionReadAccess };
 });
 
 import { recordProfessionalReviewHandler } from "../../convex/professionalReviewMutation";
@@ -102,7 +102,7 @@ describe("recordProfessionalReview mutation handler", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(Date, "now").mockReturnValue(Date.UTC(2026, 8, 15, 17, 0, 0));
-    authMocks.isAdmin.mockResolvedValue(true);
+    accessMocks.requireInventionReadAccess.mockResolvedValue({ userId: "reviewer-1", access: "review" });
   });
 
   it("promotes the exact newest fresh concrete CAD artifact after all required reviews are accepted", async () => {
@@ -230,10 +230,10 @@ describe("recordProfessionalReview mutation handler", () => {
     expect(state.insert).not.toHaveBeenCalled();
   });
 
-  it("rejects non-admin review recording before any write", async () => {
-    authMocks.isAdmin.mockResolvedValue(false);
+  it("rejects administrator/manage access without explicit invention review access", async () => {
+    accessMocks.requireInventionReadAccess.mockResolvedValue({ userId: "admin-1", access: "manage" });
     const state = makeContext();
-    await expect(recordProfessionalReviewHandler(state.ctx, acceptedArgs())).rejects.toThrow("Administrator authorization is required");
+    await expect(recordProfessionalReviewHandler(state.ctx, acceptedArgs())).rejects.toThrow("explicit invention review access");
     expect(state.patch).not.toHaveBeenCalled();
     expect(state.insert).not.toHaveBeenCalled();
   });
