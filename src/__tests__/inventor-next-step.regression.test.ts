@@ -32,7 +32,7 @@ describe("inventor next steps", () => {
     expect(journey).toContain("Do the next step");
     expect(journey).toContain("tasks done");
     expect(journey).toContain('return "Refresh queued"');
-    expect(journey).toContain("Qualified reviewers must complete these gates. They are not decisions for you to submit.");
+    expect(journey).toContain("Authorized Internal Legal reviewers complete these gates in the app. They are not decisions for you to submit.");
     expect(journey).not.toContain("Tap to see what the reviewer must check");
     expect(backend).toContain("Open ${firstIncomplete.name} and follow the first step.");
     expect(backend).toContain('request.title.startsWith("[Validation follow-up]")');
