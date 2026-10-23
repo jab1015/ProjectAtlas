@@ -1159,3 +1159,11 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Regression suite now passes 143 files / 765 tests; typecheck, lint, and production build pass.
 - Patent Readiness remains pending until the automated Internal Legal disposition and audit trail are visibly recorded.
 
+-
+# Patent Readiness versus downstream IP/Legal work — 2026-10-23
+
+- Stage 4 Patent Readiness is where Internal Legal reviews the patent packet and controls the patent-to-design handoff; Stage 9 is downstream IP/legal operations.
+- Stage 9 now shows explicit dependency status and a Journey Center link to current work.
+- Verification passed: 143 test files / 765 tests, TypeScript, lint with 0 errors and 10 existing warnings, production build, and whitespace checks.
+- Latest Stage 9 sequencing deployment was queued at checkpoint time; Convex Run #40 remains the latest verified production deployment.
+- Roadmap acceptance remains pending until the automated Internal Legal disposition and audit trail are visibly recorded for Rise Jar.
