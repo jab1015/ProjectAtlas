@@ -687,3 +687,19 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Regression verification passed: 143 test files / 765 tests, TypeScript, lint with 0 errors and 10 existing warnings, and production build.
 - Repair commit: `0eb5bff24a7ea0d5df6d722ab1dda782568ef6ef` (pushed through the branch’s GitHub API commits).
 
+-
+# Patent Readiness versus downstream IP/Legal work — 2026-10-23
+
+- Stage 4 Patent Readiness is the Internal Legal review gate for the patent packet and patent-to-design handoff.
+- Stage 9 Intellectual Property / Legal is downstream operations and waits for Patent Readiness, Product Design, and Manufacturing prerequisites.
+- Stage 9 queued pages now explicitly show the blocking prerequisites and link to Journey Center/current work.
+- Local verification passed: 143 test files / 765 tests, TypeScript, lint with 0 errors and 10 existing warnings, production build, and whitespace checks.
+- The newest Vercel deployment for this change was queued at checkpoint time; Convex production Run #40 remains the latest verified production deployment.
+- The patent gate is not claimed complete until Rise Jar has a visibly recorded Internal Legal disposition and audit trail.
+
+# Current-work visibility repair — 2026-10-23
+
+- The inventor activity strip was incorrectly surfacing a downstream engineering handoff as the current work while Rise Jar was waiting at Patent Readiness.
+- It now prioritizes Stage 4 Internal Legal work, shows Internal Legal / Patent Readiness status, displays preparation progress, explains the preparation-review-handoff process, and states when the next status update will appear.
+- Local verification passed: 143 test files / 766 tests, TypeScript, lint with 0 errors and 10 existing warnings, production build, and whitespace checks.
+- This repair is not claimed live until its protected Convex production deployment and newest Ready Vercel preview are verified.
