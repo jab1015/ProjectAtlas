@@ -40,6 +40,14 @@ describe("inventor next steps", () => {
     expect(journey).not.toContain("Share your prepared survey with five people who may have this problem");
   });
 
+  it("does not present the Internal Legal reviewer form to inventor/manage access", () => {
+    const review = read("src/app/(app)/invention/[id]/review/page.tsx");
+
+    expect(review).toContain('queue?.access === "review"');
+    expect(review).toContain("No action is required from you");
+    expect(review).toContain("handling the Internal Legal review automatically");
+  });
+
   it("reports only the remaining survey responses and switches to interviews after five", () => {
     expect(getValidationFollowUpAction(0, "working")).toContain("5 more people");
     expect(getValidationFollowUpAction(4, "working")).toContain("1 more person");
