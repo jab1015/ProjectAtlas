@@ -603,10 +603,10 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 
 # Latest live verification — 2026-10-23
 
-- The newest documentation Preview is Ready and admin-authenticated. Route rendering passed for Operations, Rise Jar Journey, Patent Readiness, and the Legal review page.
-- The live fail-closed check failed because Convex production has not yet received the repair: an invalid administrator submission was accepted and the Rise Jar professional-gate count moved from 24 to 23. This record is not valid professional acceptance.
-- Local verification passed: 142 test files / 759 tests, TypeScript, lint with 0 errors, and production build. Deploying Convex production is pending the owner-controlled workflow’s explicit `DEPLOY INVENTSMITH PROD` confirmation and production-scoped key.
-- Patent gate status remains blocked. After deployment, use a real internal Legal reviewer with explicit invention review access to test Request changes, Complete Legal review, qualification/reference validation, audit trail, and handoff status.
+- Documentation-only Preview `https://inventsmith-ipeqhaag7-inventors-os.vercel.app` is Ready and the administrator session authenticated successfully.
+- The Preview is still using the pre-repair Convex production functions: a second invalid administrator submission was accepted and the Rise Jar professional-gate count changed from 24 to 23. This is a failed live authorization check and must not be treated as Legal acceptance.
+- The repaired Convex code passed the full local suite (142 files / 759 tests), TypeScript, lint (0 errors; existing warnings only), and production build. Convex production deployment is pending because the repository’s production workflow requires the owner-controlled production deploy key and the explicit workflow confirmation `DEPLOY INVENTSMITH PROD`.
+- The invalid test record is now a live data-correction item. Do not delete or overwrite it without an explicit corrective procedure; preserve it in the audit trail and keep the patent gate blocked.
 
 # Account identity correction — 2026-10-23
 
@@ -619,3 +619,12 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - The Rise Jar inventor account is Enterprise, but the Journey Center reported that the daily autonomous-work allowance was exhausted.
 - Root cause: Enterprise still used the legacy numeric 600-unit autonomous cap. Enterprise autonomous work is now uncapped while usage continues to be recorded for cost visibility.
 - Repair verification passed: 142 test files / 759 tests, TypeScript, lint with 0 errors, and production build.
+
+# Internal Legal wording, Enterprise cap, and production deployment — 2026-10-23
+
+- Journey Center and stage status now identify the patent gate as **Internal Legal review needed**, route the next action to the Legal department, and state that outside counsel is escalation-only.
+- Patent Readiness and IP/Legal preparation agents now prepare packets for Internal Legal and remain prohibited from claiming patentability, freedom to operate, validity, enforceability, or legal clearance.
+- Newest Vercel Preview `https://inventsmith-crqn253bj-inventors-os.vercel.app` is Ready from branch head `c8deeb5`.
+- Convex production deployment Run #32 completed successfully against `agile-seahorse-379`; the workflow report records 142 test files and 759 passing tests.
+- The authenticated inventor workflow exercise on this fresh Preview hostname is still pending because the prior browser session does not transfer to the new Preview hostname. Do not claim the patent gate complete until an authorized internal Legal reviewer records the controlled review and audit trail.
+
