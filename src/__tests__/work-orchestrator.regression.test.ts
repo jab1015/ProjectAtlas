@@ -6,6 +6,7 @@ import {
   shouldScheduleAutonomousRetry,
   shouldRetryWork,
 } from "@convex/workOrchestratorLogic";
+import { canRunProductDesignWork, hasAcceptedPatentDesignReview } from "@convex/patentDesignGateLogic";
 
 const work = (overrides: Partial<Parameters<typeof selectNextWorkItem>[0][number]> = {}) => ({
   _id: "work-1",
@@ -70,6 +71,14 @@ describe("autonomous work selection", () => {
       work({ _id: "running-2", status: "running", leaseExpiresAt: 200 }),
       work({ _id: "running-3", status: "running", leaseExpiresAt: 200 }),
     ], 20, 100, undefined, undefined, undefined, 5).reason).toBe("already_running");
+  });
+
+  it("requires accepted Internal Legal review before Product Design work can run", () => {
+    expect(hasAcceptedPatentDesignReview("handoff-1", [{ deliverableId: "handoff-1", specialty: "patent", status: "required" }])).toBe(false);
+    expect(canRunProductDesignWork("design_candidate_generation", false)).toBe(false);
+    expect(hasAcceptedPatentDesignReview("handoff-1", [{ deliverableId: "handoff-1", specialty: "patent", status: "accepted" }])).toBe(true);
+    expect(canRunProductDesignWork("design_candidate_generation", true)).toBe(true);
+    expect(canRunProductDesignWork("competitor_discovery", false)).toBe(true);
   });
 });
 
