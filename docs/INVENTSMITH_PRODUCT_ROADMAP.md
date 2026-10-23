@@ -1080,3 +1080,9 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Explicit invention review access is now required to record any professional review; generic manage access cannot self-certify Legal, engineering, regulatory, or other professional gates.
 - The next acceptance step is to provision or use a real authorized internal Legal reviewer, exercise both Request changes and Complete Legal review, and verify the audit trail and downstream handoff on a controlled fixture.
 
+# Latest live verification — 2026-10-23
+
+- The newest documentation Preview is Ready and admin-authenticated. Route rendering passed for Operations, Rise Jar Journey, Patent Readiness, and the Legal review page.
+- The live fail-closed check failed because Convex production has not yet received the repair: an invalid administrator submission was accepted and the Rise Jar professional-gate count moved from 24 to 23. This record is not valid professional acceptance.
+- Local verification passed: 142 test files / 759 tests, TypeScript, lint with 0 errors, and production build. Deploying Convex production is pending the owner-controlled workflow’s explicit `DEPLOY INVENTSMITH PROD` confirmation and production-scoped key.
+- Patent gate status remains blocked. After deployment, use a real internal Legal reviewer with explicit invention review access to test Request changes, Complete Legal review, qualification/reference validation, audit trail, and handoff status.
