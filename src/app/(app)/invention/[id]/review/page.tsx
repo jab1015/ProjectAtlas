@@ -68,6 +68,7 @@ export default function InventionReviewPage() {
   const currentApproval = queue?.approvals[0];
   const currentBlockedWork = queue?.blockedWork[0];
   const currentProfessionalReview = queue?.professionalReviews[0];
+  const canCompleteProfessionalReview = currentProfessionalReview !== undefined && queue?.access === "review";
   const canSupplyTextInput = currentBlockedWork?.humanGateType === "private_information";
   const options = useMemo(() => readDecisionOptions(currentDecision?.options ?? []), [currentDecision]);
 
@@ -121,15 +122,26 @@ export default function InventionReviewPage() {
           <header className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Inventor review</p>
             <h1 className="text-3xl font-bold sm:text-4xl">{queue.invention.title}</h1>
-            <p className="text-muted-foreground">InventSmith pauses here because this step requires your judgment, evidence, professional review, or authorization.</p>
+            <p className="text-muted-foreground">{currentProfessionalReview && !canCompleteProfessionalReview ? "InventSmith is handling the Internal Legal review automatically. You do not need to complete a reviewer form." : "InventSmith pauses here because this step requires your judgment, evidence, professional review, or authorization."}</p>
           </header>
 
-          {currentProfessionalReview && (queue.access === "manage" || queue.access === "review") ? (
+          {currentProfessionalReview && canCompleteProfessionalReview ? (
             <section className="rounded-2xl border border-primary/20 bg-card p-6 shadow-sm sm:p-8" aria-labelledby="professional-review-title">
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">Legal department review</p><h2 id="professional-review-title" className="mt-2 text-2xl font-semibold">{currentProfessionalReview.scope}</h2><p className="mt-3 leading-relaxed text-muted-foreground">InventSmith prepared this review packet. An authorized internal Legal reviewer can complete it here; outside counsel is an escalation option, not the default path.</p>
               <div className="mt-6 grid gap-4 sm:grid-cols-2"><div><label htmlFor="reviewer-name" className="text-sm font-medium">Reviewer name</label><input id="reviewer-name" value={reviewerName} onChange={(event) => setReviewerName(event.target.value)} className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2" /></div><div><label htmlFor="reviewer-reference" className="text-sm font-medium">Internal qualification or matter reference</label><input id="reviewer-reference" value={reviewerReference} onChange={(event) => setReviewerReference(event.target.value)} className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2" /></div></div>
               <div className="mt-4"><label htmlFor="review-notes" className="text-sm font-medium">Review notes</label><Textarea id="review-notes" value={reviewNotes} onChange={(event) => setReviewNotes(event.target.value)} rows={5} placeholder="Record claim-scope findings, differentiation concerns, and any required changes…" /></div>
               {error && <p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}<div className="mt-6 flex flex-wrap justify-end gap-3"><Button variant="outline" onClick={() => void handleProfessionalReview(false)} disabled={submitting || !reviewerName.trim() || !reviewerReference.trim()}>Request changes</Button><Button onClick={() => void handleProfessionalReview(true)} disabled={submitting || !reviewerName.trim() || !reviewerReference.trim()}>{submitting ? "Recording…" : "Complete Legal review"}</Button></div>
+            </section>
+          ) : currentProfessionalReview ? (
+            <section className="rounded-2xl border border-primary/20 bg-primary/5 p-6 shadow-sm sm:p-8" aria-labelledby="internal-legal-status-title">
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary">Internal Legal processing</p>
+              <h2 id="internal-legal-status-title" className="mt-2 text-2xl font-semibold">No action is required from you</h2>
+              <p className="mt-3 leading-relaxed text-muted-foreground">InventSmith prepared the Legal review packet and sent the handoff to its internal Legal department. The internal Legal workflow will review it, record the disposition and audit trail, and either unlock Product Design or queue a redesign before checking Legal again.</p>
+              <div className="mt-5 rounded-xl border border-border bg-card p-4 text-sm">
+                <p className="font-medium">Current status: Internal Legal review needed</p>
+                <p className="mt-1 text-muted-foreground">Outside counsel is only considered if Internal Legal identifies a matter beyond its authority.</p>
+              </div>
+              <Button asChild variant="outline" className="mt-6"><Link href={`/invention/${inventionId}/journey`}>Return to Journey Center</Link></Button>
             </section>
           ) : currentDecision ? (
             <section className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8" aria-labelledby="decision-title">
