@@ -70,6 +70,12 @@ export const AUTONOMOUS_RESEARCH_KINDS = new Set([
   "design_candidate_generation",
 ]);
 
+// Professional gates can be stored as blocked until a qualified reviewer
+// records a decision, but they are not inventor actions.
+export const PROFESSIONAL_REVIEW_GATE_KINDS = new Set([
+  "patent_design_handoff",
+]);
+
 // Older records may contain an open decision created before design-candidate
 // generation became an autonomous InventSmith work item. Treat it as stale
 // system state instead of asking the inventor to choose before candidates are
@@ -131,7 +137,7 @@ export function buildStatusBriefing(input: StatusBriefingInput): StatusBriefing 
     }));
 
   const blockedWork = input.workItems
-    .filter((item) => item.status === "blocked" && item.blockedReason && !AUTONOMOUS_RESEARCH_KINDS.has(item.kind ?? ""))
+    .filter((item) => item.status === "blocked" && item.blockedReason && !AUTONOMOUS_RESEARCH_KINDS.has(item.kind ?? "") && !PROFESSIONAL_REVIEW_GATE_KINDS.has(item.kind ?? ""))
     .map((item) => ({
       type: "blocked_work" as const,
       title: item.title,

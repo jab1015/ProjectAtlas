@@ -118,6 +118,25 @@ describe("InventSmith status briefing", () => {
     });
   });
 
+  it("does not present a professional handoff gate as an inventor task", () => {
+    const briefing = buildStatusBriefing({
+      workItems: [
+        {
+          kind: "patent_design_handoff",
+          title: "Patent-to-design handoff",
+          status: "blocked",
+          blockedReason: "Qualified patent counsel review is required.",
+          updatedAt: 10,
+        },
+      ],
+      decisions: [],
+      approvals: [],
+      findings: [],
+    });
+
+    expect(briefing.needsInventor).toEqual([]);
+  });
+
   it("does not turn a stale autonomous brief-analysis gate into an inventor task", () => {
     const briefing = buildStatusBriefing({
       workItems: [

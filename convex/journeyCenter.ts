@@ -3,7 +3,7 @@ import { query } from "./_generated/server";
 import { journeyStagesForProductType, routeForJourneyStage } from "./fullJourneyDefinition";
 import { classifyInvention } from "./inventionClassificationLogic";
 import { requireInventionReadAccess } from "./organizations";
-import { AUTONOMOUS_RESEARCH_KINDS, isAutonomousDecision } from "./statusBriefingLogic";
+import { AUTONOMOUS_RESEARCH_KINDS, isAutonomousDecision, PROFESSIONAL_REVIEW_GATE_KINDS } from "./statusBriefingLogic";
 import { getValidationFollowUpAction } from "./journeyNextActionLogic";
 import { getJourneyStageStatus, getJourneyStageStatusExplanation } from "./journeyStageStatusLogic";
 import { isInventorEvidenceSource } from "./chatEvidenceLogic";
@@ -51,7 +51,7 @@ export const getJourneyCenter = query({
       const relevant = stage.requiredWorkKinds.map((kind) => workItems.find((item) => item.kind === kind)).filter(Boolean);
       const completedCount = relevant.filter((item) => item?.status === "completed").length;
       const blockedItems = relevant.filter((item) =>
-        (item && (item.status === "blocked" || item.status === "awaiting_approval") && !AUTONOMOUS_RESEARCH_KINDS.has(item.kind))
+        (item && (item.status === "blocked" || item.status === "awaiting_approval") && !AUTONOMOUS_RESEARCH_KINDS.has(item.kind) && !PROFESSIONAL_REVIEW_GATE_KINDS.has(item.kind))
       );
       const runningItems = relevant.filter((item) => item?.status === "running");
       const queuedItems = relevant.filter((item) => item?.status === "queued");
@@ -118,7 +118,7 @@ export const getJourneyCenter = query({
     const pendingApprovalCount = approvals.filter((item) => item.status === "pending").length;
     const openDecisionCount = decisions.filter((item) => item.status === "open" && !isAutonomousDecision(item)).length;
     const blockedWorkCount = workItems.filter((item) =>
-      (item.status === "blocked" || item.status === "awaiting_approval") && !AUTONOMOUS_RESEARCH_KINDS.has(item.kind)
+      (item.status === "blocked" || item.status === "awaiting_approval") && !AUTONOMOUS_RESEARCH_KINDS.has(item.kind) && !PROFESSIONAL_REVIEW_GATE_KINDS.has(item.kind)
     ).length;
     const pendingReviewCount = reviews.filter((item) => item.status !== "accepted" && item.status !== "declined").length;
     const completedStages = stageRows.filter((stage) => stage.status === "complete").length;
