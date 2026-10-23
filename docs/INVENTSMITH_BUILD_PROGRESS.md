@@ -672,3 +672,13 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Convex production Run #39 succeeded for `71fd229b29bd5d23697feb4b8e227aad196044ac`; Vercel Preview `https://inventsmith-rw4bdqzv1-inventors-os.vercel.app` is Ready.
 - Live inventor route checks passed on the authenticated earlier Preview, but the new migration’s resulting Legal audit record and Product Design handoff transition remain pending live exercise.
 
+# Canonical progress and production verification — 2026-10-23
+
+- Added one shared latest-work-by-kind calculation for Journey Center, lifecycle departments, and deliverable-library progress. Historical refreshed rows no longer inflate completion percentages.
+- Added a regression test for the stale-completed/latest-queued case; Product Design is also gated to 0% until Internal Legal accepts the current patent handoff.
+- Full suite: 143 test files / 764 tests passed. TypeScript, lint (0 errors; 10 existing warnings), production build, and whitespace checks passed.
+- Remote branch head `6d425dab92c7f23035f533af7c7bf49212284883` is deployed to Convex production in Run #40 (success).
+- Vercel Preview `https://inventsmith-pxwoucnq9-inventors-os.vercel.app` is Ready. Fresh authentication on that hostname remains a live-test prerequisite.
+- Authenticated Rise Jar checks on the existing inventor Preview: Market Research 100% / 2 of 2, Excel export control responds, Patent Readiness 80% / 4 of 5 and Internal Legal pending, Product Design 0% / queued.
+- No patent-gate completion is recorded because the automated Legal disposition and audit event have not yet been visibly exercised.
+
