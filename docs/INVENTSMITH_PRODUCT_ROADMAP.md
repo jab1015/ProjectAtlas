@@ -1152,3 +1152,10 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Latest Ready Preview: `https://inventsmith-pxwoucnq9-inventors-os.vercel.app`.
 - Remaining acceptance item: fresh authentication on that hostname and visible recording of the automated Internal Legal disposition, audit trail, and downstream handoff. Patent-gate completion is not claimed.
 
+# Inventor Legal review UX clarification — 2026-10-23
+
+- Inventors no longer see reviewer controls for a Legal gate they are not supposed to complete. Their page states that Internal Legal is processing automatically and that no action is required from them.
+- Only explicit Internal Legal `review` access can see and submit reviewer qualification, notes, Request changes, or Complete Legal review.
+- Regression suite now passes 143 files / 765 tests; typecheck, lint, and production build pass.
+- Patent Readiness remains pending until the automated Internal Legal disposition and audit trail are visibly recorded.
+
