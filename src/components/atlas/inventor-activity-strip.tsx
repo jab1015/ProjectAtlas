@@ -13,6 +13,15 @@ interface InventorActivityStripProps {
 }
 
 function getActivity(briefing?: StatusBriefing | null) {
+  if (briefing?.currentWork && briefing.currentWork.status !== "complete") {
+    const legal = briefing.currentWork;
+    return {
+      label: legal.status === "running" ? "Internal Legal is working" : legal.status === "waiting" ? "Internal Legal review pending" : "Internal Legal work queued",
+      detail: `${legal.stage}: ${legal.completedTasks}/${legal.totalTasks} preparation tasks complete. ${legal.status === "waiting" ? "Waiting for the Legal disposition." : "InventSmith will update this status automatically."}`,
+      tone: legal.status === "running" ? "border-primary/30 bg-primary/5 text-primary" : "border-warning/30 bg-warning/5 text-warning",
+      Icon: legal.status === "running" ? Activity : Clock3,
+    };
+  }
   if (briefing?.needsInventor.length) {
     const need = briefing.needsInventor[0];
     const professionalReview = /professional review|patent counsel|qualified reviewer|legal department/i.test(`${need.title} ${need.detail}`);
