@@ -1040,3 +1040,11 @@ The Convex GitHub device authorization page reported “Device connected,” but
 ### Status language policy
 
 Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or **completed** only when backed by the corresponding ledger/audit state. “Waiting for you” must be reserved for an inventor action that is actually available. Queue messages must identify what is queued, why it is queued, and what event will start it.
+
+## Repair checkpoint — 2026-10-23
+
+- Found and repaired the bounded-recovery defect: legacy human-readable work kinds such as `materials manufacturing` and `preliminary bom cost` now normalize to registered Manufacturing agents before retry.
+- Added regression coverage for both routing and retry behavior. Local verification: **141 test files / 751 tests passed**, TypeScript passed, ESLint passed.
+- Pushed one consolidated branch update: `efb6c710c8a14932661c49467e1e578e19f1aa81`. Vercel status is pending; live backend acceptance remains pending until the new preview and matching Convex deployment are verified.
+- Before this repair, live Rise Jar and pilot items still displayed attempt 7 / missing-agent errors. Re-test must confirm the retry button queues work and records a bounded recovery audit event; do not mark the failure cleared until that live check passes.
+
