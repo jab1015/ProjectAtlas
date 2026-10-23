@@ -689,3 +689,11 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Added regression coverage for the permission-aware copy and form boundary.
 - Verification passed: 143 test files / 765 tests, TypeScript, lint with 0 errors and 10 existing warnings, and production build.
 
+-
+# Patent Readiness versus downstream IP/Legal work — 2026-10-23
+
+- Stage 4 is the Internal Legal Patent Readiness gate. Stage 9 is downstream IP/legal operations and remains queued until prerequisites are complete.
+- The Stage 9 page now reports its queued-behind-prerequisites state and links to Journey Center/current work.
+- Verification passed: 143 test files / 765 tests, TypeScript, lint with 0 errors and 10 existing warnings, production build, and whitespace checks.
+- The latest Stage 9 sequencing deployment was queued at checkpoint time; Convex Run #40 is the latest verified production deployment.
+- Automated Internal Legal disposition and audit recording for Rise Jar remain pending live acceptance.
