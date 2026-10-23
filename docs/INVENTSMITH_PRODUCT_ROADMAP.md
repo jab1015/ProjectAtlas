@@ -1086,3 +1086,9 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - The live fail-closed check failed because Convex production has not yet received the repair: an invalid administrator submission was accepted and the Rise Jar professional-gate count moved from 24 to 23. This record is not valid professional acceptance.
 - Local verification passed: 142 test files / 759 tests, TypeScript, lint with 0 errors, and production build. Deploying Convex production is pending the owner-controlled workflow’s explicit `DEPLOY INVENTSMITH PROD` confirmation and production-scoped key.
 - Patent gate status remains blocked. After deployment, use a real internal Legal reviewer with explicit invention review access to test Request changes, Complete Legal review, qualification/reference validation, audit trail, and handoff status.
+
+# Account identity correction — 2026-10-23
+
+- Administrator: `jerry.brown1015@gmail.com`.
+- Inventor/Rise Jar account: `jerry@modernmethods.it.com`, organization `RiseJars`.
+- The newest Preview was re-authenticated with the inventor account and the Rise Jar Journey Center and Legal review page passed the rendering check.
