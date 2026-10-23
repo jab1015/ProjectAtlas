@@ -7,6 +7,7 @@ import { AUTONOMOUS_RESEARCH_KINDS, isAutonomousDecision, PROFESSIONAL_REVIEW_GA
 import { getValidationFollowUpAction } from "./journeyNextActionLogic";
 import { getJourneyStageStatus, getJourneyStageStatusExplanation } from "./journeyStageStatusLogic";
 import { isInventorEvidenceSource } from "./chatEvidenceLogic";
+import { progressForWorkKinds } from "./workLedgerProgressLogic";
 
 function activityForWork(kind: string, title: string) {
   const activities: Record<string, string> = {
@@ -46,12 +47,7 @@ export const getJourneyCenter = query({
       ctx.db.query("evidenceRequests").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).order("desc").collect(),
     ]);
 
-    const latestWorkByKind = new Map<string, (typeof workItems)[number]>();
-    for (const item of workItems) {
-      const current = latestWorkByKind.get(item.kind);
-      if (!current || item.updatedAt > current.updatedAt) latestWorkByKind.set(item.kind, item);
-    }
-    const currentWorkItems = [...latestWorkByKind.values()];
+    const currentWorkItems = progressForWorkKinds(workItems, [...new Set(journeyStages.flatMap((stage) => stage.requiredWorkKinds))]).relevant;
     const latestDeliverableByKind = new Map<string, (typeof deliverables)[number]>();
     for (const item of deliverables) {
       const current = latestDeliverableByKind.get(item.kind);
@@ -60,15 +56,19 @@ export const getJourneyCenter = query({
     const currentDeliverables = [...latestDeliverableByKind.values()];
     const deliverableById = new Map(currentDeliverables.map((item) => [String(item._id), item]));
     const stageRows = journeyStages.map((stage) => {
-      const relevant = stage.requiredWorkKinds.map((kind) => currentWorkItems.find((item) => item.kind === kind)).filter(Boolean);
-      const completedCount = relevant.filter((item) => item?.status === "completed").length;
+      const stageProgress = progressForWorkKinds(currentWorkItems, stage.requiredWorkKinds);
+      const relevant = stageProgress.relevant;
+      const legalHandoff = currentDeliverables.find((item) => item.kind === "patent_design_handoff");
+      const internalLegalAccepted = Boolean(legalHandoff && reviews.some((review) => String(review.deliverableId) === String(legalHandoff._id) && review.specialty === "patent" && review.status === "accepted"));
+      const legalPrerequisitePending = stage.id === 5 && Boolean(legalHandoff) && !internalLegalAccepted;
+      const completedCount = legalPrerequisitePending ? 0 : stageProgress.completed;
       const professionalGateItems = relevant.filter((item) => item && (item.humanGateType === "professional_review" || (item.kind === "patent_design_handoff" && /patent counsel|qualified patent/i.test(item.blockedReason ?? ""))));
       const blockedItems = relevant.filter((item) =>
         (item && (item.status === "blocked" || item.status === "awaiting_approval") && !AUTONOMOUS_RESEARCH_KINDS.has(item.kind) && !professionalGateItems.includes(item))
       );
-      const runningItems = relevant.filter((item) => item?.status === "running");
+      const runningItems = legalPrerequisitePending ? [] : relevant.filter((item) => item?.status === "running");
       const queuedItems = relevant.filter((item) => item?.status === "queued");
-      const failedItems = relevant.filter((item) => item?.status === "failed");
+      const failedItems = legalPrerequisitePending ? [] : relevant.filter((item) => item?.status === "failed");
       const staleItems = relevant.filter((item) => item?.status === "stale");
       const relevantWorkIds = new Set(relevant.map((item) => item ? String(item._id) : ""));
       const stageDeliverables = currentDeliverables.filter((item) => item.workItemId && relevantWorkIds.has(String(item.workItemId)));
@@ -78,17 +78,13 @@ export const getJourneyCenter = query({
       });
       const pendingReviews = stageReviews.filter((review) => review.status !== "accepted");
       const initialized = relevant.length > 0;
-      const allWorkComplete = stage.requiredWorkKinds.length > 0 && completedCount === stage.requiredWorkKinds.length;
+      const allWorkComplete = !legalPrerequisitePending && stageProgress.allComplete;
       const hasStaleDeliverable = stageDeliverables.some((item) => Boolean(item.staleReason));
-      const progressPercent = allWorkComplete
-        ? 100
-        : runningItems.length > 0
-          ? Math.max(1, Math.min(99, Math.round(((completedCount + 0.25) / Math.max(stage.requiredWorkKinds.length, 1)) * 100)))
-          : Math.round((completedCount / Math.max(stage.requiredWorkKinds.length, 1)) * 100);
+      const progressPercent = legalPrerequisitePending ? 0 : stageProgress.progressPercent;
       const activeWork = runningItems[0] ?? queuedItems[0];
 
       // Keep queued work distinct from work that is actively running.
-      const status = getJourneyStageStatus({
+      const status = legalPrerequisitePending ? "queued" : getJourneyStageStatus({
         requiredWorkCount: stage.requiredWorkKinds.length,
         completedWorkCount: completedCount,
         pendingProfessionalReviews: pendingReviews.length,
@@ -119,7 +115,9 @@ export const getJourneyCenter = query({
         activeWorkCount: runningItems.length,
         queuedWorkCount: queuedItems.length,
         activityLabel: activeWork ? activityForWork(activeWork.kind, activeWork.title) : null,
-        statusExplanation: getJourneyStageStatusExplanation(status, {
+        statusExplanation: legalPrerequisitePending
+          ? "Product Design and CAD are queued behind the Patent Readiness handoff. Internal Legal must process that handoff before design work can begin or count as complete."
+          : getJourneyStageStatusExplanation(status, {
           runningWorkCount: runningItems.length,
           queuedWorkCount: queuedItems.length,
           queuedWorkTitle: activeWork?.title,
