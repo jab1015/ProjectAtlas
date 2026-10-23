@@ -1092,3 +1092,8 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Administrator: `jerry.brown1015@gmail.com`.
 - Inventor/Rise Jar account: `jerry@modernmethods.it.com`, organization `RiseJars`.
 - The newest Preview was re-authenticated with the inventor account and the Rise Jar Journey Center and Legal review page passed the rendering check.
+
+# Enterprise autonomous-work cap repair — 2026-10-23
+
+- Enterprise users must not be stopped by the ordinary daily autonomous-work allowance. The legacy 600-unit enforcement was removed for Enterprise while actual usage remains tracked.
+- The repaired policy is repository-green: 142 test files / 759 tests, TypeScript, lint with 0 errors, and production build.
