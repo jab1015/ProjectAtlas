@@ -143,7 +143,7 @@ export const getJourneyCenter = query({
     if (pendingApprovalCount > 0) nextAction = `Review an approval so InventSmith can continue (${pendingApprovalCount} waiting).`;
     else if (openDecisionCount > 0) nextAction = `Answer an open question so InventSmith can continue (${openDecisionCount} waiting).`;
     else if (blockedWorkCount > 0) nextAction = `Open ${firstIncomplete.name} to see what information is missing (${blockedWorkCount} item${blockedWorkCount === 1 ? "" : "s"}).`;
-    else if (firstIncomplete.status === "professional_review") nextAction = `${firstIncomplete.name} is ready for a qualified professional to review.`;
+    else if (firstIncomplete.status === "professional_review") nextAction = `${firstIncomplete.name} is ready for Internal Legal review in the Legal department.`;
     else if (firstIncomplete.name === "Validation" && hasActiveValidationSurvey) nextAction = getValidationFollowUpAction(customerValidationResponses, firstIncomplete.status, {
       runningWorkCount: firstIncomplete.activeWorkCount,
       queuedWorkCount: firstIncomplete.queuedWorkCount,
