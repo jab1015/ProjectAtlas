@@ -14,7 +14,7 @@ export interface SchedulableWorkItem {
 
 export interface WorkSelectionResult<T> {
   selected: T | null;
-  reason: "selected" | "already_running" | "budget_exceeded" | "entitlement_required" | "no_eligible_work";
+  reason: "selected" | "already_running" | "budget_exceeded" | "entitlement_required" | "professional_review_required" | "no_eligible_work";
 }
 
 /** Keep provider spend and database contention bounded while allowing independent departments to work together. */
