@@ -17,8 +17,9 @@ import type { Id } from "@convex/_generated/dataModel";
 
 interface AppNavProps { className?: string; }
 interface AccessibleInvention { _id: string; title: string; access: "manage" | "edit" | "view" | "review"; }
+interface InventionRouteState { inventionId: Id<"inventions">; title: string; access: AccessibleInvention["access"]; }
 const getActiveAccessibleInvention = makeFunctionReference<"query", Record<string, never>, AccessibleInvention | null>("organizationNavigation:getActiveAccessibleInvention");
-const getInventionRouteState = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, AccessibleInvention | null>("organizationNavigation:getInventionRouteState");
+const getInventionRouteState = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, InventionRouteState | null>("organizationNavigation:getInventionRouteState");
 const getStatusBriefing = makeFunctionReference<"query", { inventionId: string }, StatusBriefing>("inventionWorkspace:getStatusBriefing");
 
 export function AppNav({ className }: AppNavProps) {
@@ -28,7 +29,8 @@ export function AppNav({ className }: AppNavProps) {
   const { isAuthenticated } = useConvexAuth();
   const user = useQuery(api.authHelpers.getCurrentUser);
   const routeId = pathname?.match(/^\/invention\/([^/]+)/)?.[1] as Id<"inventions"> | undefined;
-  const routeInvention = useQuery(getInventionRouteState, isAuthenticated && routeId ? { inventionId: routeId } : "skip");
+  const routeState = useQuery(getInventionRouteState, isAuthenticated && routeId ? { inventionId: routeId } : "skip");
+  const routeInvention = routeState ? { _id: String(routeState.inventionId), title: routeState.title, access: routeState.access } : null;
   const fallbackInvention = useQuery(getActiveAccessibleInvention, isAuthenticated && !routeId ? {} : "skip");
   const activeInvention = routeInvention ?? fallbackInvention;
   const briefing = useQuery(getStatusBriefing, activeInvention ? { inventionId: activeInvention._id } : "skip");
