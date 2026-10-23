@@ -52,6 +52,18 @@ function PatentReviewAction({ review }: { review: Doc<"professionalReviews"> }) 
   const needsAction = review.status !== "accepted";
 
   const submit = async (accepted: boolean) => {
+    if (!reviewerName.trim()) {
+      setError("Enter the qualified reviewer’s name before recording this decision.");
+      return;
+    }
+    if (!reviewerReference.trim()) {
+      setError("Add the reviewer’s patent credentials or internal Legal reference before continuing.");
+      return;
+    }
+    if (!notes.trim()) {
+      setError(accepted ? "Add review notes describing the scope and differentiation decision." : "Add notes describing the changes Legal requires.");
+      return;
+    }
     setSubmitting(true);
     setMessage(null);
     setError(null);
