@@ -1114,3 +1114,11 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Authenticated Rise Jar inventor testing confirmed the browser download event succeeds.
 - Patent Readiness remains an Internal Legal review gate and is still pending a qualified, auditable review.
 
+# Internal Legal-to-Design gate repair — 2026-10-23
+
+- Product Design is now blocked by the latest Patent Readiness handoff until an authorized Internal Legal reviewer accepts it; this dependency is enforced in the UI, workspace initializer, and worker claim path.
+- Inventor verification passed on the newest Ready Preview: the Product Design action is disabled and the page explains that Internal Legal must accept the latest handoff first.
+- Reviewer qualification/reference validation and the backend explicit `review` access check remain in force; AI preparation cannot claim patentability, legal clearance, or freedom to operate.
+- Convex production Run #36 passed with 142 test files and 761 tests; typecheck, lint, and production build passed locally.
+- Roadmap status remains pending at the legal gate until a real Internal Legal reviewer completes the auditable review and the accepted handoff visibly unlocks Product Design.
+

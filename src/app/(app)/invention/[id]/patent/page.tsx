@@ -22,6 +22,7 @@ interface DeliverableLibrary {
 }
 
 const getDeliverableLibrary = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, DeliverableLibrary>("inventionWorkspace:getDeliverableLibrary");
+const getMyInventionAccess = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, "manage" | "edit" | "view" | "review" | null>("organizations:getMyInventionAccess");
 const backfillWorkspace = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { addedWorkCount: number }>("inventionMigrations:backfillWorkspace");
 const kickAutonomousWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions">; departmentStageId?: number }, { scheduled: boolean; reason: string }>("inventionWorkspace:kickAutonomousWork");
 
@@ -41,7 +42,7 @@ const recordProfessionalReview = makeFunctionReference<"mutation", {
   accepted: boolean;
 }, { success: boolean; trustState: string; artifactMaturity?: string; idempotent: boolean }>("inventionWorkspace:recordProfessionalReview");
 
-function PatentReviewAction({ review }: { review: Doc<"professionalReviews"> }) {
+function PatentReviewAction({ review, canReview }: { review: Doc<"professionalReviews">; canReview: boolean }) {
   const record = useMutation(recordProfessionalReview);
   const [reviewerName, setReviewerName] = useState(review.reviewerName ?? "");
   const [reviewerReference, setReviewerReference] = useState(review.reviewerReference ?? "");
@@ -89,11 +90,12 @@ function PatentReviewAction({ review }: { review: Doc<"professionalReviews"> }) 
         <Gavel className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden="true" />
         <div>
           <p className="text-sm font-semibold">Internal Legal review {review.status === "accepted" ? "recorded" : "required"}</p>
-          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">A qualified patent attorney or registered patent agent in your Legal department must review the exact scope and differentiation. This administrator action records that professional decision; it is not an inventor self-certification.</p>
+      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">A qualified patent attorney or registered patent agent in your Legal department must review the exact scope and differentiation. InventSmith records that decision only for an authorized Internal Legal reviewer with explicit review access; it is not an inventor self-certification.</p>
         </div>
       </div>
       {review.status === "accepted" && review.reviewerName && <p className="mt-3 text-xs text-muted-foreground">Accepted by {review.reviewerName}{review.reviewerReference ? ` · ${review.reviewerReference}` : ""}.</p>}
-      {needsAction && <>
+      {needsAction && !canReview && <p className="mt-3 text-sm text-muted-foreground">Waiting for an authorized Internal Legal reviewer. Your current account can inspect this packet but cannot approve it.</p>}
+      {needsAction && canReview && <>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <label className="text-xs font-medium">Reviewer name<input value={reviewerName} onChange={(event) => setReviewerName(event.target.value)} className="mt-1 block h-10 w-full rounded-md border border-input bg-background px-3 text-sm" placeholder="Qualified patent reviewer" /></label>
           <label className="text-xs font-medium">Credentials / reference<input value={reviewerReference} onChange={(event) => setReviewerReference(event.target.value)} className="mt-1 block h-10 w-full rounded-md border border-input bg-background px-3 text-sm" placeholder="Bar or patent-agent registration, firm, or internal record" /></label>
@@ -117,6 +119,7 @@ export default function PatentReadinessPage() {
   const inventionId = params.id as Id<"inventions">;
   const { isAuthenticated, isLoading } = useConvexAuth();
   const library = useQuery(getDeliverableLibrary, isAuthenticated && inventionId ? { inventionId } : "skip");
+  const inventionAccess = useQuery(getMyInventionAccess, isAuthenticated && inventionId ? { inventionId } : "skip");
   const migrateWorkspace = useMutation(backfillWorkspace);
   const kickWork = useMutation(kickAutonomousWork);
 
@@ -136,7 +139,7 @@ export default function PatentReadinessPage() {
     })();
   }, [inventionId, isAuthenticated, isLoading, migrateWorkspace, kickWork]);
 
-  if (isLoading || !isAuthenticated || library === undefined) {
+  if (isLoading || !isAuthenticated || library === undefined || inventionAccess === undefined) {
     return <div className="min-h-screen bg-background"><AppNav /><main className="mx-auto max-w-5xl px-4 py-12 text-sm text-muted-foreground sm:px-6">Loading patent readiness workspace…</main></div>;
   }
   if (!library) return null;
@@ -190,7 +193,7 @@ export default function PatentReadinessPage() {
                     <article key={deliverable._id} className="rounded-2xl border border-border bg-card p-6 sm:p-7">
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{deliverable.kind.replaceAll("_", " ")} · Version {deliverable.version}</p><h3 className="mt-1 text-xl font-semibold">{deliverable.title}</h3></div><span className="w-fit rounded-full bg-muted px-3 py-1 text-xs font-medium">{getDeliverableTrustLabel(deliverable.trustState)}</span></div>
                       <div className="mt-4"><MarkdownContent content={contentToReadableText(deliverable.content)} className="text-sm" /></div>
-                      {reviews.filter((review) => review.specialty === "patent").map((review) => <PatentReviewAction key={review._id} review={review} />)}
+                      {reviews.filter((review) => review.specialty === "patent").map((review) => <PatentReviewAction key={review._id} review={review} canReview={inventionAccess === "review"} />)}
                       <div className="mt-5 grid gap-3 border-t border-border pt-4 sm:grid-cols-4"><div><p className="text-xs uppercase tracking-wider text-muted-foreground">Sources</p><p className="mt-1 text-sm font-medium">{sources.length}</p></div><div><p className="text-xs uppercase tracking-wider text-muted-foreground">Coverage</p><p className="mt-1 text-sm font-medium">{deliverable.sourceCoverage === undefined ? "Not measured" : `${Math.round(deliverable.sourceCoverage * 100)}%`}</p></div><div><p className="text-xs uppercase tracking-wider text-muted-foreground">Confidence</p><p className="mt-1 text-sm font-medium">{deliverable.confidence === undefined ? "Not measured" : `${Math.round(deliverable.confidence * 100)}%`}</p></div><div><p className="text-xs uppercase tracking-wider text-muted-foreground">Professional reviews</p><p className="mt-1 text-sm font-medium">{reviews.length}</p></div></div>
                       {sources.length > 0 && <details className="mt-4"><summary className="cursor-pointer text-sm font-medium text-primary">Inspect sources</summary><ul className="mt-3 space-y-2">{sources.map((source) => <li key={source._id} className="text-sm text-muted-foreground">{isWebLocator(source.locator) ? <a href={source.locator} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary">{source.title}<ExternalLink className="h-3.5 w-3.5" /></a> : source.title}<span className="block text-xs capitalize">{source.reliability.replaceAll("_", " ")}</span></li>)}</ul></details>}
                     </article>

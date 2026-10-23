@@ -637,3 +637,12 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Newest Vercel Preview `https://inventsmith-i8n0ocdkj-inventors-os.vercel.app` is Ready from commit `361135a`; the authenticated inventor session visibly downloaded the competitor research file.
 - Patent gate status is unchanged: internal Legal review has not been exercised and recorded, so the gate remains pending.
 
+# Internal Legal-to-Design gate repair — 2026-10-23
+
+- Product Design now has a hard backend and UI dependency on an accepted Internal Legal review for the latest Patent Readiness handoff. The inventor session visibly shows Product Design paused and disables the Continue design work control until that review exists.
+- Product Design work cannot be initialized or claimed by the worker before the accepted review; the AI Legal/Patent preparation work remains preparation only and cannot self-certify legal clearance.
+- The Patent Readiness page now shows reviewer controls only to accounts with explicit invention `review` access. Inventors and administrators can inspect the packet but cannot approve it.
+- Convex production deployment Run #36 succeeded against `agile-seahorse-379`; CI reported 142 test files and 761 passing tests. Local typecheck, lint (0 errors; existing warnings only), and production build also passed.
+- Newest Vercel Preview `https://inventsmith-ixc76al8z-inventors-os.vercel.app` is Ready. Inventor authentication, dashboard, Journey Center, Patent Readiness, and the fail-closed Product Design screen were exercised live.
+- The patent gate is not claimed complete: a real authorized Internal Legal reviewer still must record Request changes or Complete Legal review and visibly confirm the qualification/reference validation, audit trail, handoff status, and Product Design unlock.
+

@@ -642,3 +642,11 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Live inventor-session acceptance passed: the Save competitor research to Excel control produced a browser download.
 - Internal Legal patent-gate acceptance remains pending and is not claimed complete.
 
+# Internal Legal-to-Design gate repair — 2026-10-23
+
+- Product Design now requires an accepted Internal Legal review on the latest Patent Readiness handoff at both workspace initialization and worker claim time.
+- Live inventor verification on `https://inventsmith-ixc76al8z-inventors-os.vercel.app` showed the disabled Continue design work control and the explicit “Product Design is waiting for Internal Legal” status with a Patent Readiness link.
+- Patent review controls are now permission-aware: only explicit invention `review` access can record a decision; inventor and administrator sessions remain read-only for this gate.
+- Convex production Run #36 passed with 142 test files and 761 tests. Local typecheck, lint (0 errors; existing warnings only), and production build passed.
+- The legal gate remains pending until a real authorized Internal Legal reviewer records an accepted or changes-requested decision and the audit trail/handoff transition is verified live.
+
