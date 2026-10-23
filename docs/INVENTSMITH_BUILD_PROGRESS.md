@@ -516,3 +516,10 @@ A fresh authenticated reload after the Convex deployment clarified the post-retr
 - The repair adds a safe fallback status so an unknown or newly introduced backend status renders as `In progress` instead of crashing the page. Inventor-facing labels were also simplified: `Needs your input`, `Your evidence`, `Expert reviews`, and `Waiting for earlier work`.
 - Local verification after the repair: **133 test files / 721 tests passed**, TypeScript passed, and `git diff --check` passed. Administrator, support, organization, usage, beta-access, and professional-review regression coverage passed **45/45** targeted tests.
 - The repair is being reconciled onto the current `inventsmith/full-product-build` branch, which has since gained structured competitor-pricing export work. The final consolidated commit must be pushed before reporting front-end live acceptance or beginning administrator live acceptance.
+
+### Live preview verification — October 23, 2026
+
+- Consolidated release commit `c2f8241c128fdcf31aeebcc18100c8c8652c20d7` is pushed to `inventsmith/full-product-build`; Vercel preview `inventsmith-git-codex-live-frontend-hardening-v2-inventors-os.vercel.app` is ready and authenticated.
+- Live route sweep passed for dashboard, inventions, organizations, usage, account, data export, support, invention overview, Journey Center, Ask InventSmith, review, Work Library, Evidence Locker, Design + CAD, access, Patent Readiness, Market Research, and departments 6–15. Journey now renders the previously crashing unknown stage status as `In progress`.
+- Administrator routes correctly enforce the administrator gate for this inventor account. Full administrator/support-console mutation acceptance remains pending a signed-in administrator account.
+- One backend deployment boundary remains: the frontend can call `deliverableDownloads:getCompetitiveResearchExport`, but Convex production has not yet received the matching function. The local CLI reported `401 MissingAccessToken`; deploy through the owner-controlled production workflow before treating the competitive-research export as live-accepted.

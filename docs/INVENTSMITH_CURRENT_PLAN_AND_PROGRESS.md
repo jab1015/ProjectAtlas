@@ -20,6 +20,8 @@ Open acceptance items: confirm live per-department outputs and downstream handof
 
 The current release branch includes the latest competitive-research export work and the Journey Center hardening fix. The authenticated Vercel pass found one real frontend failure: a newly returned journey status crashed the page while reading its status styling. The UI now falls back to **In progress** for unknown statuses, and inventor-facing queue labels use plain language. Full automated verification and live re-test are still required before this checkpoint is considered released.
 
+The release is now live on the authenticated Vercel preview and the inventor route sweep is clean. Administrator screens remain intentionally restricted for the inventor account, so administrator acceptance still requires an admin session. Convex production deployment is also still pending the owner-controlled production workflow because this environment has no Convex access token; until that deployment runs, the competitive-research export query must be treated as pending backend acceptance.
+
 ## New infrastructure workstream — secure storage for large CAD and 3-D files
 
 **Status: Planned and open — complete this soon, before native CAD is treated as production-ready.**
