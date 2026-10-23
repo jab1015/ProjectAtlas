@@ -664,3 +664,11 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Convex production Run #38 succeeded. Vercel Preview `https://inventsmith-bqg6oqv39-inventors-os.vercel.app` is Ready from commit `c8b030bdbd0e912d1b79fd7b21c368fc950dc871`.
 - Fresh inventor authentication returned “Invalid email or password,” so live Rise Jar Legal-loop exercise is still pending and no patent-gate completion is claimed.
 
+# Legacy Internal Legal re-check repair — 2026-10-23
+
+- Added a one-time bounded scheduler migration for legacy Patent Readiness handoffs that remain `required` without a structured `legalDisposition`.
+- The migration queues an automated Internal Legal re-check and audit event; it does not grant blanket approval or claim legal clearance, and it will not loop after an outside-authority result.
+- Full local verification passed: 142 test files / 762 tests, TypeScript, lint with 0 errors and 10 existing warnings, production build, and whitespace checks.
+- Convex production Run #39 succeeded for `71fd229b29bd5d23697feb4b8e227aad196044ac`; Vercel Preview `https://inventsmith-rw4bdqzv1-inventors-os.vercel.app` is Ready.
+- Live inventor route checks passed on the authenticated earlier Preview, but the new migration’s resulting Legal audit record and Product Design handoff transition remain pending live exercise.
+
