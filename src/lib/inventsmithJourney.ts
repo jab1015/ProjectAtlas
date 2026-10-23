@@ -13,7 +13,7 @@ export const INVENTSMITH_PUBLIC_JOURNEY: readonly PublicJourneyStage[] = [
   { id: 6, name: "Prototype", description: "Plan and evaluate physical prototypes against measurable tests, then feed real findings back into the design." },
   { id: 7, name: "Manufacturing", description: "Prepare factory requirements, RFQs, sourcing, quote comparison, quality considerations, unit economics, and production readiness." },
   { id: 8, name: "Branding", description: "Develop evidence-backed positioning, naming, preliminary trademark screening, visual direction, and brand assets." },
-  { id: 9, name: "Intellectual Property / Legal", description: "Prepare IP strategy, invention disclosure, NDA and contract working packages, status tracking, and Internal Legal review; escalate to outside counsel only when needed." },
+  { id: 9, name: "Intellectual Property / Legal", description: "After Patent Readiness and Product Design, prepare IP strategy, invention disclosure, NDA and contract working packages, status tracking, and professional handoffs. Stage 4 is the Internal Legal patent-readiness review gate." },
   { id: 10, name: "Pricing", description: "Turn market, value, manufacturing, channel, and willingness-to-pay evidence into pricing and break-even strategy." },
   { id: 11, name: "Marketing", description: "Build the messaging, channels, launch plan, core marketing assets, and pre-launch calendar." },
   { id: 12, name: "Sales", description: "Create the channel strategy, buyer toolkit, funnel model, projections, and post-purchase customer experience." },
