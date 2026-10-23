@@ -4,8 +4,8 @@ import { query } from "./_generated/server";
 import { requireInventionReadAccess, resolveInventionAccess } from "./organizations";
 
 export const getActiveAccessibleInvention = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { inventionId: v.optional(v.id("inventions")) },
+  handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
@@ -36,6 +36,7 @@ export const getActiveAccessibleInvention = query({
       }
     }
 
+    if (args.inventionId) return visible.get(String(args.inventionId)) ?? null;
     return [...visible.values()].sort((a, b) => b.updatedAt - a.updatedAt)[0] ?? null;
   },
 });
