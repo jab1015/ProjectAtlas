@@ -26,7 +26,7 @@ describe("journey completion semantics", () => {
 
   it("keeps professional-review completion language scoped to required stage work", () => {
     expect(journeyCenter).toContain(
-      "${firstIncomplete.name} is ready for a qualified professional to review.",
+      "${firstIncomplete.name} is ready for Internal Legal review in the Legal department.",
     );
   });
 });
