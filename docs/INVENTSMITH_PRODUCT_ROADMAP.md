@@ -1097,3 +1097,12 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 
 - Enterprise users must not be stopped by the ordinary daily autonomous-work allowance. The legacy 600-unit enforcement was removed for Enterprise while actual usage remains tracked.
 - The repaired policy is repository-green: 142 test files / 759 tests, TypeScript, lint with 0 errors, and production build.
+
+# Internal Legal wording, Enterprise cap, and production deployment — 2026-10-23
+
+- Journey Center and stage status now identify the patent gate as **Internal Legal review needed**, route the next action to the Legal department, and state that outside counsel is escalation-only.
+- Patent Readiness and IP/Legal preparation agents now prepare packets for Internal Legal and remain prohibited from claiming patentability, freedom to operate, validity, enforceability, or legal clearance.
+- Newest Vercel Preview `https://inventsmith-crqn253bj-inventors-os.vercel.app` is Ready from branch head `c8deeb5`.
+- Convex production deployment Run #32 completed successfully against `agile-seahorse-379`; the workflow report records 142 test files and 759 passing tests.
+- The authenticated inventor workflow exercise on this fresh Preview hostname is still pending because the prior browser session does not transfer to the new Preview hostname. Do not claim the patent gate complete until an authorized internal Legal reviewer records the controlled review and audit trail.
+
