@@ -18,16 +18,18 @@ type Row = Record<string, unknown> & { _id?: string };
 
 function fakeCtx(args?: {
   inventions?: Record<string, Row>;
+  users?: Record<string, Row>;
   memberships?: Row[];
   grants?: Row[];
 }) {
   const inventions = args?.inventions ?? {};
+  const users = args?.users ?? {};
   const memberships = args?.memberships ?? [];
   const grants = args?.grants ?? [];
 
   return {
     db: {
-      get: vi.fn(async (id: string) => inventions[id] ?? null),
+      get: vi.fn(async (id: string) => inventions[id] ?? users[id] ?? null),
       query: vi.fn((table: string) => ({
         withIndex: (_index: string, apply: (q: any) => any) => {
           const filters: Record<string, unknown> = {};
@@ -89,6 +91,17 @@ describe("invention authorization behavior", () => {
     await expect(requireInventionReadAccess(ctx, "inv1" as any)).resolves.toMatchObject({ access: "manage" });
     await expect(requireInventionEditAccess(ctx, "inv1" as any)).resolves.toMatchObject({ access: "manage" });
     await expect(requireInventionManageAccess(ctx, "inv1" as any)).resolves.toMatchObject({ access: "manage" });
+  });
+
+  it("allows a controlled application administrator to support any invention", async () => {
+    authState.userId = "admin1";
+    const ctx = fakeCtx({
+      users: { admin1: { _id: "admin1", role: "admin" } },
+      inventions: { inv1: { _id: "inv1", userId: "owner1", organizationId: "org1" } },
+    });
+
+    await expect(requireInventionReadAccess(ctx, "inv1" as any)).resolves.toMatchObject({ access: "manage" });
+    await expect(requireInventionEditAccess(ctx, "inv1" as any)).resolves.toMatchObject({ access: "manage" });
   });
 
   it("requires active organization membership even when a stale explicit grant exists", async () => {

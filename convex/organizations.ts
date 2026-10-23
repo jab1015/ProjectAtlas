@@ -67,6 +67,13 @@ export async function resolveInventionAccess(
   const invention = await ctx.db.get(inventionId);
   if (!invention) return null;
 
+  // Application administrators are the controlled support/recovery boundary.
+  // They may inspect and repair invention work without being added to every
+  // customer organization. This does not grant GitHub, Convex, or provider
+  // credentials; those remain separate owner-controlled deployment secrets.
+  const user = await ctx.db.get(userId);
+  if (user?.role === "admin") return "manage";
+
   // Legacy ownership remains valid until the migration has attached an organization.
   if (!invention.organizationId) {
     return invention.userId === userId ? "manage" : null;
