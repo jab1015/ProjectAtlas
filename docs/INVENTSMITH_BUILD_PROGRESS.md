@@ -697,3 +697,10 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Verification passed: 143 test files / 765 tests, TypeScript, lint with 0 errors and 10 existing warnings, production build, and whitespace checks.
 - The latest Stage 9 sequencing deployment was queued at checkpoint time; Convex Run #40 is the latest verified production deployment.
 - Automated Internal Legal disposition and audit recording for Rise Jar remain pending live acceptance.
+
+# Current-work visibility repair — 2026-10-23
+
+- Corrected the inventor status briefing so a downstream engineering handoff cannot hide the active Stage 4 Internal Legal / Patent Readiness gate.
+- Added a visible legal progress indicator, process explanation, and honest next-update expectation. It distinguishes working, queued, waiting for Legal disposition, and complete.
+- Verification passed: 143 test files / 766 tests, TypeScript, lint with 0 errors and 10 existing warnings, production build, and whitespace checks.
+- Protected Convex production deployment and newest Ready Vercel preview remain pending for this repair.
