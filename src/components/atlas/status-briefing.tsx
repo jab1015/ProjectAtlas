@@ -81,6 +81,34 @@ export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
         </div>
       )}
 
+      {briefing.currentWork && briefing.currentWork.status !== "complete" && (
+        <article className="rounded-2xl border border-primary/25 bg-primary/5 p-6 sm:p-7" aria-label="Current Internal Legal work">
+          <div className="flex items-start gap-3">
+            <Compass className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+            <div className="min-w-0 space-y-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Current work · {briefing.currentWork.department}</p>
+                <h3 className="mt-1 text-xl font-semibold text-foreground">{briefing.currentWork.stage}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{briefing.currentWork.detail}</p>
+              </div>
+              <div>
+                <div className="mb-1 flex items-center justify-between text-xs font-medium text-muted-foreground">
+                  <span>{briefing.currentWork.completedTasks}/{briefing.currentWork.totalTasks} preparation tasks complete</span>
+                  <span>{briefing.currentWork.progressPercent}%</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-muted" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={briefing.currentWork.progressPercent} aria-label={`${briefing.currentWork.stage} progress`}>
+                  <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${briefing.currentWork.progressPercent}%` }} />
+                </div>
+              </div>
+              <div className="grid gap-3 text-xs text-muted-foreground sm:grid-cols-2">
+                <p><span className="font-semibold text-foreground">Process:</span> {briefing.currentWork.process}</p>
+                <p><span className="font-semibold text-foreground">When to expect an update:</span> {briefing.currentWork.expectation}</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      )}
+
       <div className="grid gap-4 md:grid-cols-2">
         <article className="rounded-xl border border-border bg-card p-5 shadow-sm">
           <div className="mb-4 flex items-center gap-2">
