@@ -418,3 +418,222 @@ Live department execution is still not established: Journey Center reports 1/15 
 **Signed-in Preview:** 15/15 stage routes load without an app error. Validation is current (11/11, 45%) and credits the uploaded survey. Market Research has no saved market deliverable; Patent Readiness has no completed first deliverable and its design handoff is pending; Product Design + CAD is 0/17; stages 6–15 have no completed deliverables and show prerequisite waits.
 
 **Not yet proven:** independent live agent runs, persisted deliverables, evidence citations, retry/idempotency, and downstream handoffs for each department. No paid/model-backed work was started because available shared usage was not visible in the account UI.
+
+## Lifecycle agent-routing defect fixed — 2026-10-19
+
+The audit found that lifecycle initialization saved display labels (for example, `Prototype`) where provider routing requires registered keys (for example, `prototype`). Such work could fail at execution with “missing a registered department agent.” Lifecycle initialization now derives and validates the registered key from the stage label before queueing work. Regression coverage checks all 10 lifecycle departments resolve to their own stable agent identity, mission prompt, and audit metadata, and verifies the initializer uses this mapping.
+
+Verification after the fix: focused agent/lifecycle tests **18/18 passed**; full suite **130 files / 704 tests passed**; web TypeScript **passed**. This is not yet live provider acceptance: no workers were started because the signed-in account does not display remaining shared AI/research/CAD usage. A fresh Netlify Preview for the code fix is the next verification gate.
+
+
+### Department isolation and current verification — October 20, 2026
+
+The Product Design “Continue design work” action (stage 5) and lifecycle department “Continue” action (stages 6–15) now carry their requested stage ID through the authenticated scheduler, worker pool, retries, and atomic work selector. The selector recognizes both canonical `stageId` and lifecycle `departmentStageId` tags, only claims work items tagged for the requested department, and counts active work invention-wide for concurrency safety. This prevents a department check from silently processing unrelated departments. Dependency prerequisites must already be complete; a scoped run will stop cleanly if its department has no eligible work. General background work without a stage ID retains the existing invention-wide behavior.
+
+A regression test covers stage isolation and the shared concurrency cap. Current local checks: **130 test files / 705 tests passed; TypeScript passed**. The focused department routing and work-selector tests passed **18/18**. The routing and isolation changes have been pushed to the PR branch; Netlify Preview acceptance is pending for the latest commit. Netlify Preview for routing commit `7178a89` is currently building; neither live provider-backed department completion nor generated artifacts are yet verified. Shared AI/research/CAD usage remaining is not visible in the signed-in account, so do not trigger a live run until a bounded usage ceiling is known.
+
+
+### Final authenticated Preview acceptance — October 20, 2026
+
+Netlify Deploy Preview **`6f2d15a`** completed successfully for PR #24 (Next.js build generated all **36/36** static pages). Signed-in smoke tests loaded all 15 inventor journey stages and verified each expected page title without an app-level error. Validation is current at **11/11 sections, 45% evidence-support confidence**; the page explicitly says `Data_All_260313` was included, identifies it as inventor-provided/unverified, displays the inventor-shareable survey link, and no longer shows the stale/refreshing message. The 45% value is a support score, not a probability of success.
+
+Autonomous work isolation is implemented for Product Design/CAD (stage 5) and the lifecycle departments (stages 6–15): the selected stage ID follows the authenticated scheduler, worker pool, and retries; work selection recognizes canonical and lifecycle stage tags and preserves invention-wide concurrency limits. Agent registration/routing and scoped selection are covered by deterministic tests. Local verification: TypeScript passed; **130 test files / 705 tests passed**. The browser emitted extension metadata errors only; no InventSmith page errors were observed.
+
+**Remaining acceptance boundary:** no live model, research, rendering, or CAD worker was started, so per-agent generated output, saved artifact, evidence citations, retries, and downstream handoffs are not yet end-to-end verified. This account does not expose remaining shared AI/research/CAD capacity. Do not run provider-backed work until a usage ceiling can be enforced. The ordinary Production deploy remains unpublished; the Production-context build for `6f2d15a` was canceled, and Netlify auto-publishing remains locked.
+
+### Authenticated department execution check — October 19, 2026
+
+The signed-in PR #24 Netlify Preview renders the Validation report with the uploaded `Data_All_260313` survey explicitly included, current evidence language, the 45% evidence-support score, and the survey link; the previous stale/refreshing confidence message is absent. A live Product Design + CAD run exposed a hard Preview/backend mismatch: the frontend sends `departmentStageId: 5`, while the Convex function deployed at the Preview's configured test target (`quick-fox-785`) rejects that field as unknown. The run did not start and no generated department artifact or provider usage is claimed. Lifecycle stage 6 also remains queued with prerequisites unmet; no fabricated upstream evidence was added.
+
+The Convex GitHub device authorization page reported “Device connected,” but the workspace CLI then failed because its request to `auth.convex.dev` was blocked by the environment network policy. No backend deployment occurred, no department provider work ran, and Production and other Convex deployments were not touched. Full department acceptance remains blocked until the authenticated CLI can reach Convex, deploy the matching PR code to `quick-fox-785`, and re-run each eligible department against its real upstream evidence and gates.
+
+
+### Convex GitHub device retry — October 19, 2026
+
+The Convex GitHub device authorization page reported “Device connected,” but the workspace CLI then failed because its request to `auth.convex.dev` was blocked by the environment network policy. No backend deployment occurred, no department provider work ran, and Production and other Convex deployments were not touched. Full department acceptance remains blocked until the authenticated CLI can reach Convex, deploy the matching PR code to `quick-fox-785`, and re-run each eligible department against its real upstream evidence and gates.
+
+
+### Authenticated Preview and work-recovery checkpoint — October 20, 2026
+
+- Verified the latest authenticated Netlify Preview #24 against the signed-in InventSmith account and the RiseJars invention. The Validation page now says the report matches current evidence, explicitly states the uploaded survey was included, shows a 45% evidence-support score (not a success probability), and offers a shareable follow-up survey because the score is below 50%. The survey link opens a working five-question respondent form; no response was submitted or distributed.
+- Confirmed the document summary preserves its inventor-uploaded / independently-unverified provenance. Confidence is not held behind a stale/refreshing state after the completed report.
+- Remaining blocker: Work Library still shows two terminal failures from October 18 (competitor discovery and brief analysis), each at three attempts, and 19 required deliverables are missing. They were created before department metadata was present. The resolver fix is deployed to the isolated test backend, but terminal rows are not automatically reclaimed; an authenticated, audited retry/recovery path is needed before we can verify end-to-end department execution and downstream deliverables.
+- The authenticated GitHub Actions Convex development deployment to quick-fox-785 completed successfully (run 39370245122); the Netlify Preview build completed. Production Convex agile-seahorse-379 and Netlify production were not touched. Do not mark all departments complete: only Preview surfaces and the Validation/survey flow were verified here; independent live execution across departments remains open.
+
+
+### Retry workflow CI status — October 20, 2026
+
+The inventor-facing retry implementation is on branch commit `386cd38`. Its first isolated development workflow passed web and Convex typechecks but failed one existing acceptance test: `docs/INVENTSMITH_BUILD_PROGRESS.md` no longer contained the controlled-pilot completion guardrail required by the test. The other 708 tests passed (130 test files passed; one file had one failed assertion). CI skipped audit, production build, and Convex deployment after that failure. This is being corrected as a documentation-contract issue, then the full workflow must pass before deploying this code to `quick-fox-785`. Netlify production and production Convex are not to be changed.
+
+
+### Retry release and authenticated department retest — October 20, 2026
+
+- GitHub Actions development workflow **39371563085** passed its complete gate sequence: web and Convex typechecks, full regression suite, audit, Next.js production build, and Convex deployment. Logs confirm the exact target was development deployment `quick-fox-785` (`dev/inventsmith-test`), not production Convex `agile-seahorse-379`.
+- The latest signed-in Netlify Preview #24 (deploy `6ad6f2287cf772d73b5a64e7`) loads the authenticated RiseJars Work Library and exposes the audited **Retry this step** control for eligible editor/manager roles. I retried the Market Research competing-products item and then the separate Idea brief-analysis item. Both disappeared from the terminal-failure list after scheduling; this confirms the retry requests were accepted, but does not prove the workers completed.
+- After the retries, Work Library still reports **19/19 required deliverables missing**. The dashboard’s broad queued view is dominated by older backlog, and a specific saved output plus matching execution audit record has not yet been verified. Therefore independent department execution, deliverable persistence, evidence citations, and downstream handoffs remain **unaccepted**; do not mark all departments working or complete.
+- Validation acceptance remains: current 11/11 report; 45% evidence-support score; uploaded `Data_All_260313` survey attributed as inventor-provided/unverified; a follow-up survey is available because the score is below 50%. The evidence is credited as support, not independent market proof. No respondent answer was submitted/distributed.
+- Production Netlify remains unpublished/locked and Production Convex was not changed. Continue by tracing the two retried work-item IDs through their terminal status, saved deliverables, and execution events in `quick-fox-785`; if either failed again, use its recorded failure to repair the worker path before further broad department claims.
+
+
+### Audit-record correction — retried department work — October 20, 2026
+
+Read-only inspection of `atlasExecutionEvents` and `atlasDeliverables` on `quick-fox-785` now confirms the outcomes of the two manual retries:
+
+- **Idea / brief analysis** (`jn7d1ct7fyv5zmfk88tm01sgfs8ghjpp`): the retry event identifies `inventsmith.department.idea.v1`; the agent claimed and completed the item. A saved `invention_brief_analysis` deliverable is present and references that same work-item ID. This is verified completion for this one Idea task.
+- **Market Research / competing products** (`jn7ft3g8538eym3vwhcx8cdfhn8ggzy3`): the retry event identifies `inventsmith.department.market_research.v1` and the agent claimed it. Its next recorded event is `work_blocked` with a professional patent/FTO review requirement. No matching Market Research deliverable was present in the deliverables table at inspection. This agent is registered and routed correctly, but that job is not accepted as completed.
+- The signed-in Work Library showed no remaining terminal-failure cards after retry and still listed 19 required deliverables missing, consistent with downstream gaps. A blocked item must be surfaced as a review dependency and cannot count as successful department completion.
+- The execution-event table also confirms the inventor upload/extraction audit for `Data_All_260313` and its source ID; the authenticated Preview’s current Validation report credits the survey as inventor-provided/unverified. It is evidence support, not independent demand verification.
+
+Overall department acceptance remains partial: one Idea output is saved; Market Research correctly encountered a human/professional gate; no per-department end-to-end completion has been established for the remaining departments. Keep Production Netlify unpublished and Production Convex untouched.
+
+
+### Verified authenticated work-recovery retest — October 20, 2026
+
+- GitHub Actions development deployment **39372376784** completed successfully for exact branch head `bb3613fe54b629d19d1c78eed6848575bc013842`. Web and Convex TypeScript, the full regression suite, production dependency audit, and Next.js production build passed. The deploy log names `decideforusapp:projectatlas:dev/inventsmith-test` and `https://quick-fox-785.convex.cloud`; no deployment went to Production Convex `agile-seahorse-379`.
+- Netlify Deploy Preview #24 for that app commit completed successfully as deploy `6ad6f4b8751877c35fae6e68`. In the signed-in RiseJars session, Validation now shows **complete, 11/11 sections, 45% evidence-support score**, says the current report includes uploaded `Data_All_260313`, preserves inventor-provided/unverified provenance and limits, and offers the prepared five-question survey because confidence is below 50%. The report no longer shows the contradictory “confidence hidden until refresh” message. No survey response was submitted or shared.
+- The same authenticated Preview now shows **Idea 2/2 tasks complete and 1 saved result** in Journey Center, confirming the saved `invention_brief_analysis` is counted in its stage. Backend audit records confirm Idea agent `inventsmith.department.idea.v1` completed that item and its deliverable references the work-item ID.
+- Market Research agent `inventsmith.department.market_research.v1` was routed and claimed its competing-products work, then correctly blocked it for required professional patent/FTO review. It has no saved Market Research result. Work Library has no remaining terminal-failure cards; **19 required deliverables remain missing**. This is evidence of routing and gate enforcement, not full department completion.
+- **Department acceptance remains partial.** Only the Idea brief-analysis task has a saved live result; the Market Research task is professionally blocked; the other departments have not been proven end-to-end with their own saved outputs, evidence references, and handoffs. The survey remains prepared but undistributed. PR #24 stays draft and unmerged; Netlify Production remains unpublished and Production Convex remains untouched.
+
+
+### Work Library reconciliation — October 20, 2026
+
+A fresh authenticated reload after the Convex deployment clarified the post-retry state: Work Library shows the saved Idea brief-analysis artifact, **18 of 19 required deliverables missing**, and one separate failed work item, “Assess technical feasibility and product risks,” at three attempts. The package export remains locked (required deliverables and concept visualization are missing, and the failed job requires attention). Therefore, earlier retry notes that described zero remaining failed cards or 19 missing deliverables are superseded by this live Work Library observation. The two specifically retried items remain as recorded: Idea brief analysis completed and saved; Market Research was blocked at a professional patent/FTO review gate. No retry of the remaining technical-feasibility failure was initiated during this verification.
+
+
+### Legacy feasibility retry hardening — October 20, 2026
+
+- A live retry attempt exposed a legacy `technical_feasibility` work item with an unknown department label. The retry correctly failed closed before mutation rather than misrouting it.
+- Added an explicit compatibility mapping to the registered Discovery & Feasibility agent (`inventsmith.department.canonical.v1`) and regression coverage for routing, audit metadata, and queued retry behavior. This preserves department identity for old rows while keeping unknown work kinds fail-closed.
+- Focused retry and department-routing tests pass (**12/12**); web and Convex TypeScript checks and `git diff --check` pass locally. Pushed as branch updates after commit `9d7da44` (remote content commits `2af098a`, `1979c87`, `b773938`). A new Netlify Preview and isolated Convex workflow are required before retrying the live item.
+
+
+### Netlify-independent verification — October 20, 2026
+
+- Local verification after the legacy mapping fix: **131 test files / 711 tests passed**, web and Convex TypeScript passed, `npm audit --omit=dev --audit-level=high` reported **0 vulnerabilities**, and direct `npx next build` completed all **36/36** pages. The combined `npm run build` wrapper remains environment-dependent because local Convex codegen requires `CONVEX_DEPLOYMENT`; the direct Next build passed.
+- GitHub Actions **run 39373720916** completed successfully for the branch workflow dispatch. It passed both typechecks, the full regression suite, dependency audit, production build, and isolated Convex deployment. The log confirms target `decideforusapp:projectatlas:dev/inventsmith-test` at `https://quick-fox-785.convex.cloud`. Netlify was not used because the team’s operational credits paused production deploys and Agent Runners; no production service was touched.
+- The updated backend is ready for the next authenticated retry of the legacy technical-feasibility item. Its compatibility mapping routes the old row to the registered Discovery & Feasibility agent and preserves fail-closed behavior for unknown work kinds. Netlify Preview acceptance of this specific fix remains pending until credits resume.
+
+
+### Backend-only retry acceptance — October 20, 2026
+
+- After run **39373720916** deployed the mapping fix to `quick-fox-785`, the signed-in Work Library retry for the legacy `technical_feasibility` item succeeded through the existing Preview UI.
+- The failure card disappeared and a saved **RiseJars — Technical Feasibility and Product Risk Assessment** artifact appeared. It is correctly marked **Professional review required**; no engineering approval or external-use authorization was inferred.
+- Package quality checks improved from **18 to 17 required deliverables missing** and now show no autonomous work failure. The remaining work is still gated by missing upstream deliverables, concept visualization, and required professional/physical evidence.
+
+
+### Vercel login and Convex target checkpoint — October 20, 2026
+
+- The owner changed the GitHub default branch to `inventsmith/full-product-build`. The Vercel site `inventsmith.vercel.app` now serves the intended branch; its login page includes **Forgot password?**. This confirms branch selection and the correct frontend are live.
+- Live login is **not accepted**: the owner reports the sign-in button remains at “Signing in…”. No successful Vercel login has been verified.
+- Vercel's `NEXT_PUBLIC_CONVEX_URL` was shown as `https://quick-fox-785.convex.cloud/`, with type **Config** and scope **All Environments**. The owner then checked the working Netlify deployment and found it uses `agile-seahorse-379`. Therefore the Vercel/Netlify backend-target mismatch is the leading explanation for the stalled login, but the correction has not yet been confirmed by a successful sign-in.
+- To test against the same Convex data/auth as the working Netlify deployment, set Vercel `NEXT_PUBLIC_CONVEX_URL` to `https://agile-seahorse-379.convex.cloud/` (Config, All Environments), save, and create a fresh Production deployment. Then test sign-in. Do not change Convex data or deploy backend functions as part of this URL-only check.
+- Keep the separate test deployment `quick-fox-785` documented as an isolated test target; do not treat it as the backend containing the account that works on Netlify. Do not use or modify `fiery-gazelle-628`.
+- Status boundary: branch deployment and login-page rendering are verified by the owner's report/screenshots; Vercel authentication, post-change login, and backend end-to-end acceptance remain unverified. No credentials were entered or tested by the assistant.
+
+
+## Consolidated operational status — 2026-10-23
+
+### Confirmed release boundary
+
+- Repository: `jab1015/ProjectAtlas`
+- Working branch: `inventsmith/full-product-build`; PR #24 remains the review boundary and must not be merged to `main` without explicit approval.
+- Latest verified frontend release commit: `50e05c756f6f78ff1b619a0e48087885f287c710`.
+- Latest verified Vercel Preview: https://inventsmith-r6b6q0j3o-inventors-os.vercel.app (Ready and authenticated). The branch alias is also authenticated.
+- Convex production target: `agile-seahorse-379`. A previous production deployment is confirmed successful, but the attempted follow-up workflow did not produce a verifiable new run. Therefore the branch’s newer backend navigation schema is **not** claimed as deployed to production.
+- Do not reset, delete, or migrate production Convex data. Do not use the isolated `quick-fox-785` deployment as production.
+
+### Verification completed
+
+- Local full suite: **141 test files / 750 tests passed**.
+- TypeScript: **passed**.
+- ESLint: **passed**.
+- Authenticated Preview checks: dashboard, Journey Center, Ask InventSmith, review queue, Work Library, Evidence Locker, Product Design + CAD, invention access, Patent Readiness, Market Research, support, account, organization, usage, and administrator operations loaded without raw application errors.
+- Support navigation now honors the invention in the URL and no longer shows a misleading active-invention status strip for a different invention. Legacy Convex query compatibility is guarded until the backend schema deployment is confirmed.
+- Legal review controls are visible and empty submission gives an actionable instruction to enter the qualified reviewer’s name. No professional/legal decision was fabricated or recorded.
+- Administrator operations correctly exposes the current failed-work and human-gate queues. No destructive recovery, billing, user, or legal mutation was performed during this pass.
+
+### Known open work
+
+- Admin operations currently shows two failed autonomous items at attempt 7: Rise Jar materials/manufacturing and a pilot preliminary-BOM-cost item. Both report a missing registered department agent and need a bounded recovery/agent-registration repair before they can be accepted as completed.
+- Rise Jar’s patent-to-design handoff remains blocked on qualified patent counsel review. Product Design must not be treated as started until that gate is recorded through its dedicated workflow.
+- The current Convex production deployment status for the newer scoped-navigation backend is unconfirmed. This is an infrastructure verification item, not an inventor action.
+- Full administrator/support-console mutation acceptance still requires the signed-in administrator session and safe test fixtures. Do not use production data as a disposable test fixture.
+
+### Next execution plan
+
+1. Verify the owner-controlled Convex production workflow run and deploy the matching backend only after the branch checks pass.
+2. Repair/register the missing department-agent mappings and add bounded automatic recovery for exhausted autonomous work; preserve fail-closed behavior for unknown work kinds.
+3. Re-run read-only administrator/support checks, then exercise only reversible, fixture-backed recovery actions and verify audit events, idempotency, and user-facing status.
+4. Continue the live Preview sweep for every available route and action, recording pass/fail evidence and actionable error text.
+5. Update this status record after each verified deployment; do not claim live backend acceptance from local tests alone.
+6. Submit the actual patent-counsel review only when the legal department supplies it through the dedicated professional-review workflow.
+
+### Status language policy
+
+Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or **completed** only when backed by the corresponding ledger/audit state. “Waiting for you” must be reserved for an inventor action that is actually available. Queue messages must identify what is queued, why it is queued, and what event will start it.
+
+### Journey-status repair checkpoint — October 23, 2026
+
+- Live authenticated Preview inspection found that Patent Readiness could show “waiting for you” when the blocked item was the qualified patent-review handoff, which is not an inventor task. The Journey Center/status briefing now excludes professional-review gate records from inventor-action counts.
+- Repair committed and pushed to `inventsmith/full-product-build`: local `11952da`, remote `36b2f91325ae8da9acd0446a816c4cbac2c55d72`. Verification: 141 test files / 752 tests, TypeScript, and ESLint passed.
+- Read-only live route checks passed for all administrator pages, Operations, Support filters, Rise Jar Journey Center, Patent Readiness, Work Library, and Product Design without raw error pages.
+- The exact Preview still shows the older Convex production missing-agent failure records because matching Convex production deployment remains unverified. Live bounded-recovery success must not be claimed until the backend is deployed and retry is exercised.
+# Verified live checkpoint — 2026-10-23
+
+- Branch `inventsmith/full-product-build` is at commit `9730571` with production Convex deployment #30 successful.
+- Preview `https://inventsmith-1a73k241c-inventors-os.vercel.app` was authenticated and verified in-browser.
+- Administrator Operations reports 0 failed work and 0 expired leases after the bounded department-assignment recovery.
+- Rise Jar Journey, dashboard destination, Support scope, and Work Library load without raw request IDs, retry-limit errors, or application-error pages.
+- Remaining gates are explicit qualified patent-professional reviews; they are shown as expert-review gates with reasons.
+
+# Internal Legal review routing — 2026-10-23
+
+- Patent-to-design review now routes through the internal Legal department first.
+- Authorized Legal reviewers with explicit invention review access can complete or return the patent review from the dedicated review page.
+- The Legal preparation agent still cannot claim patentability or clearance; it prepares the traceable packet and records unresolved questions for the authorized reviewer.
+- Outside patent counsel remains an escalation option when internal Legal identifies a matter outside its authority or needs an independent opinion.
+
+# Legal reviewer authorization repair — 2026-10-23
+
+- Live administrator testing on the documentation-only Vercel Preview exposed that a generic administrator could submit arbitrary reviewer text and reduce the professional-gate count. This was not accepted as a valid Legal review.
+- Repair pushed in commits 406049e and 034d244: recording a professional review now requires authenticated explicit invention review access; manage/administrator access alone cannot certify a professional review.
+- Regression coverage passes with the complete suite. The live Rise Jar gate record created by the invalid test remains a data-correction item and must not be treated as qualified Legal acceptance.
+- No patent gate is complete until a real authorized internal Legal reviewer records the review with a genuine qualification or matter reference, substantive notes, and an auditable event.
+
+# Latest live verification — 2026-10-23
+
+- Documentation-only Preview `https://inventsmith-ipeqhaag7-inventors-os.vercel.app` is Ready and the administrator session authenticated successfully.
+- The Preview is still using the pre-repair Convex production functions: a second invalid administrator submission was accepted and the Rise Jar professional-gate count changed from 24 to 23. This is a failed live authorization check and must not be treated as Legal acceptance.
+- The repaired Convex code passed the full local suite (142 files / 759 tests), TypeScript, lint (0 errors; existing warnings only), and production build. Convex production deployment is pending because the repository’s production workflow requires the owner-controlled production deploy key and the explicit workflow confirmation `DEPLOY INVENTSMITH PROD`.
+- The invalid test record is now a live data-correction item. Do not delete or overwrite it without an explicit corrective procedure; preserve it in the audit trail and keep the patent gate blocked.
+
+# Account identity correction — 2026-10-23
+
+- Administrator account: `jerry.brown1015@gmail.com`.
+- Rise Jar inventor account: `jerry@modernmethods.it.com`, personal organization `RiseJars`.
+- The correct inventor session was authenticated on the newest Preview. Dashboard, Journey Center, and the Legal review page load successfully; the Legal gate remains pending.
+
+# Enterprise autonomous-work cap repair — 2026-10-23
+
+- The Rise Jar inventor account is Enterprise, but the Journey Center reported that the daily autonomous-work allowance was exhausted.
+- Root cause: Enterprise still used the legacy numeric 600-unit autonomous cap. Enterprise autonomous work is now uncapped while usage continues to be recorded for cost visibility.
+- Repair verification passed: 142 test files / 759 tests, TypeScript, lint with 0 errors, and production build.
+
+# Internal Legal wording, Enterprise cap, and production deployment — 2026-10-23
+
+- Journey Center and stage status now identify the patent gate as **Internal Legal review needed**, route the next action to the Legal department, and state that outside counsel is escalation-only.
+- Patent Readiness and IP/Legal preparation agents now prepare packets for Internal Legal and remain prohibited from claiming patentability, freedom to operate, validity, enforceability, or legal clearance.
+- Newest Vercel Preview `https://inventsmith-crqn253bj-inventors-os.vercel.app` is Ready from branch head `c8deeb5`.
+- Convex production deployment Run #32 completed successfully against `agile-seahorse-379`; the workflow report records 142 test files and 759 passing tests.
+- The authenticated inventor workflow exercise on this fresh Preview hostname is still pending because the prior browser session does not transfer to the new Preview hostname. Do not claim the patent gate complete until an authorized internal Legal reviewer records the controlled review and audit trail.
+
+# Competitor research Excel export repair — 2026-10-23
+
+- Reproduced the inventor-side failure on Rise Jar: the old direct `data:`-URL anchor did not produce a browser download.
+- Repaired the export to use a browser Blob download with an explicit error message, and corrected the Excel XML workbook extension from misleading `.xlsx` to `.xls`.
+- Regression verification passed: 142 test files / 760 tests, TypeScript, lint with 0 errors, and production build.
+- Convex production deployment Run #33 completed successfully against `agile-seahorse-379`.
+- Newest Vercel Preview `https://inventsmith-i8n0ocdkj-inventors-os.vercel.app` is Ready from commit `361135a`; the authenticated inventor session visibly downloaded the competitor research file.
+- Patent gate status is unchanged: internal Legal review has not been exercised and recorded, so the gate remains pending.
+
