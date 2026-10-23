@@ -65,6 +65,8 @@ describe("dedicated department agent routing", () => {
     expect(resolveDepartmentAgent({ department: "unknown" }, "technical_feasibility").department).toBe("canonical");
     expect(resolveDepartmentAgent({ department: "canonical" }, "patent_design_handoff").department).toBe("patent_readiness");
     expect(resolveDepartmentAgent({ department: "canonical" }, "regulatory_screening").department).toBe("regulatory");
+    expect(resolveDepartmentAgent({ department: "unknown" }, "materials manufacturing").department).toBe("manufacturing");
+    expect(resolveDepartmentAgent({ department: "unknown" }, "preliminary bom cost").department).toBe("manufacturing");
   });
 
   it("fails closed before provider execution when a work item lacks a registered department", () => {

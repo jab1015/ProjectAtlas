@@ -80,6 +80,7 @@ const WORK_KIND_DEPARTMENT: Readonly<Record<string, DepartmentAgentKey>> = {
   manufacturing_research: "manufacturing",
   materials_manufacturing_research: "manufacturing",
   materials_manufacturing_approaches: "manufacturing",
+  preliminary_bom_cost: "manufacturing",
   preliminary_prior_art: "patent_readiness",
   feature_prior_art_comparison: "patent_readiness",
   distinguishing_features: "patent_readiness",
@@ -91,10 +92,16 @@ const WORK_KIND_DEPARTMENT: Readonly<Record<string, DepartmentAgentKey>> = {
 export function resolveDepartmentAgent(inputSnapshot: unknown, workKind?: string): DepartmentAgentProfile {
   const input = inputSnapshot && typeof inputSnapshot === "object" ? inputSnapshot as Record<string, unknown> : null;
   const declaredDepartment = input?.department;
+  // A few early work rows stored human-readable labels (for example,
+  // "materials manufacturing" or "preliminary bom cost") instead of the
+  // canonical snake_case kind. Normalize those legacy values before routing.
+  const normalizedWorkKind = typeof workKind === "string"
+    ? workKind.toLowerCase().replaceAll(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "")
+    : undefined;
   // Older canonical jobs carried a single umbrella label. Route those by their
   // actual assignment so each department gets its own mission and audit identity.
-  const department = (declaredDepartment === "canonical" || !isDepartmentAgentKey(declaredDepartment)) && workKind && WORK_KIND_DEPARTMENT[workKind]
-    ? WORK_KIND_DEPARTMENT[workKind]
+  const department = (declaredDepartment === "canonical" || !isDepartmentAgentKey(declaredDepartment)) && normalizedWorkKind && WORK_KIND_DEPARTMENT[normalizedWorkKind]
+    ? WORK_KIND_DEPARTMENT[normalizedWorkKind]
     : declaredDepartment;
   if (!isDepartmentAgentKey(department)) {
     throw new Error(`Work item is missing a registered department agent: ${String(department ?? "unknown")}`);
@@ -114,8 +121,11 @@ export function departmentAgentSystemPrompt(agent: DepartmentAgentProfile): stri
 export function departmentAgentAuditMetadata(inputSnapshot: unknown, workKind?: string) {
   const input = inputSnapshot && typeof inputSnapshot === "object" ? inputSnapshot as Record<string, unknown> : null;
   const declaredDepartment = input?.department;
-  const department = (declaredDepartment === "canonical" || !isDepartmentAgentKey(declaredDepartment)) && workKind && WORK_KIND_DEPARTMENT[workKind]
-    ? WORK_KIND_DEPARTMENT[workKind]
+  const normalizedWorkKind = typeof workKind === "string"
+    ? workKind.toLowerCase().replaceAll(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "")
+    : undefined;
+  const department = (declaredDepartment === "canonical" || !isDepartmentAgentKey(declaredDepartment)) && normalizedWorkKind && WORK_KIND_DEPARTMENT[normalizedWorkKind]
+    ? WORK_KIND_DEPARTMENT[normalizedWorkKind]
     : declaredDepartment;
   if (!isDepartmentAgentKey(department)) return { departmentAgentRegistered: false, department: typeof department === "string" ? department : undefined };
   const agent = DEPARTMENT_AGENT_PROFILES[department];

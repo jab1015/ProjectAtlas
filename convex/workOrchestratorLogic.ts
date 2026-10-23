@@ -34,6 +34,12 @@ const AUTOMATICALLY_RECOVERABLE_KINDS = new Set([
   "preliminary_bom_cost", "concept_image_generation", "product_render_generation",
 ]);
 
+function normalizeWorkKind(kind: string | undefined): string | undefined {
+  return typeof kind === "string"
+    ? kind.toLowerCase().replaceAll(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "")
+    : undefined;
+}
+
 export function automaticRecoveryCount(inputSnapshot: Record<string, unknown> | undefined): number {
   const value = inputSnapshot?.automaticRecoveryCount;
   return typeof value === "number" && Number.isFinite(value) ? value : 0;
@@ -45,8 +51,9 @@ export function shouldAutomaticallyRecoverFailedWork(
   attemptCount: number,
   maxAttempts = 3,
 ): boolean {
+  const normalizedKind = normalizeWorkKind(kind);
   return Boolean(
-    kind && AUTOMATICALLY_RECOVERABLE_KINDS.has(kind) && attemptCount >= maxAttempts &&
+    normalizedKind && AUTOMATICALLY_RECOVERABLE_KINDS.has(normalizedKind) && attemptCount >= maxAttempts &&
       automaticRecoveryCount(inputSnapshot) < MAX_AUTOMATIC_RECOVERY_CYCLES,
   );
 }

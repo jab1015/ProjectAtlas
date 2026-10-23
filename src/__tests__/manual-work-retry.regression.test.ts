@@ -130,6 +130,24 @@ describe("manual failed-work retry", () => {
     }));
   });
 
+  it("repairs legacy human-readable manufacturing kinds through bounded recovery", async () => {
+    const state = makeContext(failedItem({
+      title: "Prepare a preliminary bill of materials and cost range",
+      kind: "preliminary bom cost",
+      attemptCount: 7,
+      maxAttempts: 5,
+      inputSnapshot: { product: "RiseJars", department: "unknown", automaticRecoveryCount: 0 },
+    }), { autonomousCostUnits: 0, reservedAutonomousCostUnits: 0 });
+    await expect(retryFailedWorkItemHandler(state.ctx, { inventionId: "inv-1" as any, workItemId: "work-1" as any })).resolves.toEqual({ queued: true, reason: "scheduled" });
+    expect(state.patch).toHaveBeenCalledWith("work-1", expect.objectContaining({
+      status: "queued",
+      inputSnapshot: expect.objectContaining({ department: "manufacturing", automaticRecoveryCount: 1 }),
+    }));
+    expect(state.insert).toHaveBeenCalledWith("atlasExecutionEvents", expect.objectContaining({
+      metadata: expect.objectContaining({ changeType: "bounded_automatic_recovery", departmentAgentId: "inventsmith.department.manufacturing.v1" }),
+    }));
+  });
+
   it("requires edit access before any retry side effects", async () => {
     mocks.requireInventionEditAccess.mockRejectedValue(new Error("Invention edit access required"));
     const state = makeContext(failedItem(), { autonomousCostUnits: 0 });
