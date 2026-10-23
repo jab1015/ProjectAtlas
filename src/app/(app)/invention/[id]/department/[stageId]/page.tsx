@@ -180,10 +180,10 @@ export default function LifecycleDepartmentPage() {
               <h1 className="text-3xl font-bold sm:text-4xl">{department.stage.name} — {department.invention.title}</h1>
               <p className="max-w-3xl text-muted-foreground">{department.stage.description}</p>
             </div>
-            <Button size="lg" onClick={() => void startDepartment()} disabled={starting} className="gap-2">
+            {nextWorkDependencies.length > 0 ? <Button asChild size="lg" className="gap-2"><Link href={`/invention/${inventionId}/journey`}><Play className="h-4 w-4" />View current work</Link></Button> : <Button size="lg" onClick={() => void startDepartment()} disabled={starting} className="gap-2">
               {starting ? <RefreshCw className="h-4 w-4 animate-spin" /> : fullyInitialized ? <Play className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
               {starting ? "Starting…" : fullyInitialized ? "Continue department" : `Start ${department.stage.name}`}
-            </Button>
+            </Button>}
           </header>
 
           {message && <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm">{message}</div>}
@@ -197,8 +197,10 @@ export default function LifecycleDepartmentPage() {
           </section>
 
           {nextWorkDependencies.length > 0 && <section role="status" className="rounded-2xl border border-warning/30 bg-warning/5 p-5">
-            <h2 className="font-semibold">Waiting for earlier work</h2>
-            <p className="mt-2 text-sm text-muted-foreground">The next task needs {nextWorkDependencies.map((kind) => kind.replaceAll("_", " ")).join(", ")} finished first. InventSmith will check again automatically.</p>
+            <h2 className="font-semibold">This department is queued behind earlier work</h2>
+            <p className="mt-2 text-sm text-muted-foreground">No Stage {department.stage.id} task is running yet. The next task needs {nextWorkDependencies.map((kind) => kind.replaceAll("_", " ")).join(", ")} finished first. InventSmith will check again automatically.</p>
+            <p className="mt-2 text-sm text-muted-foreground">To see what InventSmith is working on now, open the Journey Center and follow the current stage.</p>
+            <Button asChild variant="outline" size="sm" className="mt-4"><Link href={`/invention/${inventionId}/journey`}>Open Journey Center</Link></Button>
             {stageId === 6 && nextWorkDependencies.includes("product_design_specification") && <Button asChild variant="outline" size="sm" className="mt-4"><Link href={`/invention/${inventionId}/design`}>Open Product Design + CAD</Link></Button>}
           </section>}
 
