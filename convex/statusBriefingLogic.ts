@@ -48,6 +48,17 @@ export interface StatusBriefing {
     requestedAt: number;
   }>;
   next: Array<{ title: string; status: "running" | "queued" | "locked" | "waiting"; requiredTier?: string; waitingFor?: string[] }>;
+  currentWork?: {
+    department: "Internal Legal";
+    stage: "Patent Readiness";
+    status: "running" | "queued" | "waiting" | "complete";
+    progressPercent: number;
+    completedTasks: number;
+    totalTasks: number;
+    detail: string;
+    process: string;
+    expectation: string;
+  };
 }
 
 // These are research assignments InventSmith is expected to perform before
@@ -75,6 +86,47 @@ export const AUTONOMOUS_RESEARCH_KINDS = new Set([
 export const PROFESSIONAL_REVIEW_GATE_KINDS = new Set([
   "patent_design_handoff",
 ]);
+
+const PATENT_READINESS_KINDS = [
+  "preliminary_prior_art",
+  "feature_prior_art_comparison",
+  "distinguishing_features",
+  "ip_readiness",
+  "patent_design_handoff",
+] as const;
+
+const PATENT_READINESS_KIND_SET = new Set<string>(PATENT_READINESS_KINDS);
+
+function patentReadinessBriefing(workItems: BriefingWorkItem[]) {
+  const patentItems = workItems.filter((item) => PATENT_READINESS_KIND_SET.has(item.kind ?? ""));
+  if (!patentItems.length) return undefined;
+
+  const completedTasks = patentItems.filter((item) => item.status === "completed").length;
+  const totalTasks = PATENT_READINESS_KINDS.length;
+  const handoff = patentItems.find((item) => item.kind === "patent_design_handoff");
+  const running = patentItems.find((item) => item.status === "running");
+  const queued = patentItems.find((item) => item.status === "queued");
+  const waiting = handoff && (handoff.status === "blocked" || handoff.status === "awaiting_approval");
+  const status = running ? "running" as const : waiting ? "waiting" as const : queued ? "queued" as const : completedTasks === totalTasks ? "complete" as const : "queued" as const;
+
+  return {
+    department: "Internal Legal" as const,
+    stage: "Patent Readiness" as const,
+    status,
+    progressPercent: Math.round((completedTasks / totalTasks) * 100),
+    completedTasks,
+    totalTasks,
+    detail: running
+      ? "Internal Legal preparation agents are processing the patent-readiness packet."
+      : waiting
+        ? "The packet is ready for the Internal Legal review step; downstream design work remains paused until that disposition is recorded."
+        : queued
+          ? "Internal Legal preparation is queued and will be claimed automatically when the worker wakes."
+          : "Internal Legal has finished preparing the patent-readiness packet.",
+    process: "InventSmith prepares the prior-art comparison and design-around questions, Internal Legal reviews the packet, and only an accepted disposition can release Product Design.",
+    expectation: "The next update will appear here when a Legal task is claimed, completed, returned for changes, or records its audit result. No inventor action is required.",
+  };
+}
 
 // Older records may contain an open decision created before design-candidate
 // generation became an autonomous InventSmith work item. Treat it as stale
@@ -150,9 +202,13 @@ export function buildStatusBriefing(input: StatusBriefingInput): StatusBriefing 
     .slice(0, 10);
 
   const completedKinds = new Set(input.workItems.filter((item) => item.status === "completed").map((item) => item.kind));
+  const currentWork = patentReadinessBriefing(input.workItems);
   const next = [...input.workItems]
     .filter((item) => item.status === "running" || item.status === "queued")
     .sort((a, b) => {
+      const aPatent = PATENT_READINESS_KIND_SET.has(a.kind ?? "");
+      const bPatent = PATENT_READINESS_KIND_SET.has(b.kind ?? "");
+      if (aPatent !== bPatent) return aPatent ? -1 : 1;
       const aWaiting = a.status === "queued" && (a.dependsOnKinds ?? []).some((kind) => !completedKinds.has(kind));
       const bWaiting = b.status === "queued" && (b.dependsOnKinds ?? []).some((kind) => !completedKinds.has(kind));
       if (aWaiting !== bWaiting) return aWaiting ? 1 : -1;
@@ -174,5 +230,9 @@ export function buildStatusBriefing(input: StatusBriefingInput): StatusBriefing 
       };
     });
 
-  return { completed, discoveries, needsInventor, next };
+  if (currentWork?.status === "waiting" && !next.some((item) => /patent|legal/i.test(item.title))) {
+    next.unshift({ title: "Internal Legal review of Patent Readiness", status: "waiting", requiredTier: undefined, waitingFor: ["Internal Legal disposition"] });
+  }
+
+  return { completed, discoveries, needsInventor, next, ...(currentWork ? { currentWork } : {}) };
 }
