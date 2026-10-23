@@ -21,7 +21,7 @@ describe("department prerequisite visibility", () => {
     const page = read("src/app/(app)/invention/[id]/department/[stageId]/page.tsx");
     expect(query).toContain('completedWorkKinds: workItems.filter((item: any) => item.status === "completed").map((item: any) => item.kind)');
     expect(page).toContain("getNextUnmetWorkDependencies(departmentWork, department?.completedWorkKinds ?? [])");
-    expect(page).toContain("Waiting for prerequisite work");
+    expect(page).toContain("Waiting for earlier work");
     expect(page).toContain("Open Product Design + CAD");
     expect(page).toContain("Queued or running");
   });

@@ -197,8 +197,8 @@ export default function LifecycleDepartmentPage() {
           </section>
 
           {nextWorkDependencies.length > 0 && <section role="status" className="rounded-2xl border border-warning/30 bg-warning/5 p-5">
-            <h2 className="font-semibold">Waiting for prerequisite work</h2>
-            <p className="mt-2 text-sm text-muted-foreground">The next queued task needs {nextWorkDependencies.map((kind) => kind.replaceAll("_", " ")).join(", ")} to be completed first. InventSmith will check the queue again after its prerequisites are complete.</p>
+            <h2 className="font-semibold">Waiting for earlier work</h2>
+            <p className="mt-2 text-sm text-muted-foreground">The next task needs {nextWorkDependencies.map((kind) => kind.replaceAll("_", " ")).join(", ")} finished first. InventSmith will check again automatically.</p>
             {stageId === 6 && nextWorkDependencies.includes("product_design_specification") && <Button asChild variant="outline" size="sm" className="mt-4"><Link href={`/invention/${inventionId}/design`}>Open Product Design + CAD</Link></Button>}
           </section>}
 

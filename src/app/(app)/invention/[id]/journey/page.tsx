@@ -57,8 +57,8 @@ const getStatusBriefing = makeFunctionReference<"query", { inventionId: Id<"inve
 
 const STATUS: Record<JourneyStageRow["status"], { label: string; className: string }> = {
   complete: { label: "Done", className: "bg-success/10 text-success" },
-  professional_review: { label: "Needs expert review", className: "bg-warning/10 text-warning" },
-  blocked: { label: "Waiting for you", className: "bg-warning/10 text-warning" },
+  professional_review: { label: "Expert review needed", className: "bg-warning/10 text-warning" },
+  blocked: { label: "Your input needed", className: "bg-warning/10 text-warning" },
   working: { label: "In progress", className: "bg-primary/10 text-primary" },
   queued: { label: "Queued", className: "bg-muted text-muted-foreground" },
   ready_to_start: { label: "Ready to start", className: "bg-primary/10 text-primary" },
@@ -84,7 +84,7 @@ function stageStatusLabel(stage: JourneyStageRow) {
     if (stage.queuedWorkCount > 0) return "Refresh queued";
     return "Review update";
   }
-  return STATUS[stage.status].label;
+  return STATUS[stage.status]?.label ?? "In progress";
 }
 
 export default function JourneyCenterPage() {
@@ -182,7 +182,10 @@ export default function JourneyCenterPage() {
             <div className="space-y-3">
               {journey.stages.map((stage) => {
                 const Icon = stageIcon(stage.status);
-                const status = STATUS[stage.status];
+                const status = STATUS[stage.status] ?? {
+                  label: "In progress",
+                  className: "bg-primary/10 text-primary",
+                };
                 return (
                   <Link key={stage.id} href={stage.status === "blocked" || stage.status === "professional_review" ? reviewHref : stage.href} className="block rounded-2xl border border-border bg-card p-5 no-underline transition-colors hover:border-primary/30 hover:bg-muted/20">
                     <div className="flex items-start gap-4">

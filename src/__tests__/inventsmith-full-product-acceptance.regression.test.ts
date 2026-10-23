@@ -103,6 +103,7 @@ describe("InventSmith complete idea-to-market repository acceptance contract", (
     expect(journey).toContain("Stage-work completion does not by itself represent an external real-world action");
     expect(journey).toContain("journey.stages.map");
     expect(journey).toContain("journey.totalStages");
+    expect(journey).toContain("STATUS[stage.status] ??");
     expect(department).toContain("Department deliverables");
     expect(department).toContain("Evidence Locker");
     expect(legacyGuard).toContain("state.currentStageId >= 5");
