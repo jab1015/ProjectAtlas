@@ -4,6 +4,7 @@ import { canTierRunWorkKind } from "./entitlementPolicyLogic";
 import { requireInventionEditAccess, requireInventionReadAccess } from "./organizations";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { isInventorEvidenceSource } from "./chatEvidenceLogic";
+import { hasAcceptedPatentDesignReview } from "./patentDesignGateLogic";
 
 export const DESIGN_WORK = [
   {
@@ -81,10 +82,21 @@ export const ensureProductDesignWorkspace = mutation({
       throw new ConvexError("Product Design requires a Pro or higher entitlement");
     }
 
-    const existing = await ctx.db
-      .query("atlasWorkItems")
-      .withIndex("by_inventionId", (q: any) => q.eq("inventionId", args.inventionId))
-      .collect();
+    const [existing, deliverables, professionalReviews] = await Promise.all([
+      ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q: any) => q.eq("inventionId", args.inventionId)).collect(),
+      ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q: any) => q.eq("inventionId", args.inventionId)).collect(),
+      ctx.db.query("professionalReviews").withIndex("by_inventionId", (q: any) => q.eq("inventionId", args.inventionId)).collect(),
+    ]);
+    const latestPatentHandoff = deliverables
+      .filter((item: any) => item.kind === "patent_design_handoff")
+      .sort((a: any, b: any) => b.version - a.version)[0];
+    const legalReviewAccepted = hasAcceptedPatentDesignReview(
+      latestPatentHandoff ? String(latestPatentHandoff._id) : undefined,
+      professionalReviews.map((review: any) => ({ deliverableId: String(review.deliverableId), specialty: review.specialty, status: review.status }))
+    );
+    if (!legalReviewAccepted) {
+      throw new ConvexError("Product Design is paused until Internal Legal accepts the latest Patent Readiness handoff");
+    }
     const existingKinds = new Set(existing.map((item: any) => item.kind));
     const now = Date.now();
     let created = 0;
@@ -130,10 +142,11 @@ export const getProductDesignWorkspace = query({
     await requireInventionReadAccess(ctx, args.inventionId);
     const invention = await ctx.db.get(args.inventionId);
     if (!invention) throw new ConvexError("Invention not found");
-    const [workItems, deliverables, evidence] = await Promise.all([
+    const [workItems, deliverables, evidence, professionalReviews] = await Promise.all([
       ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q: any) => q.eq("inventionId", args.inventionId)).collect(),
       ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q: any) => q.eq("inventionId", args.inventionId)).collect(),
       ctx.db.query("evidenceSources").withIndex("by_inventionId", (q: any) => q.eq("inventionId", args.inventionId)).collect(),
+      ctx.db.query("professionalReviews").withIndex("by_inventionId", (q: any) => q.eq("inventionId", args.inventionId)).collect(),
     ]);
 
     const designKinds = new Set(DESIGN_WORK.map((item) => item.kind));
@@ -162,6 +175,9 @@ export const getProductDesignWorkspace = query({
     const handoffDeliverable = deliverables
       .filter((item: any) => item.kind === "patent_design_handoff")
       .sort((a: any, b: any) => b.updatedAt - a.updatedAt)[0];
+    const patentReview = handoffDeliverable
+      ? professionalReviews.find((review: any) => String(review.deliverableId) === String(handoffDeliverable._id) && review.specialty === "patent")
+      : null;
 
     return {
       invention: { _id: invention._id, title: invention.title },
@@ -172,6 +188,11 @@ export const getProductDesignWorkspace = query({
         deliverableId: handoffDeliverable?._id ?? null,
         trustState: handoffDeliverable?.trustState ?? null,
         updatedAt: handoffDeliverable?.updatedAt ?? handoffWork?.updatedAt ?? null,
+      },
+      patentLegalReview: {
+        required: Boolean(handoffDeliverable),
+        accepted: patentReview?.status === "accepted",
+        reviewerName: patentReview?.reviewerName ?? null,
       },
       workItems: designWork,
       deliverables: await Promise.all(designDeliverables.map(async (deliverable: any) => ({
