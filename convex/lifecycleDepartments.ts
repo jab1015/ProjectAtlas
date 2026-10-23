@@ -83,7 +83,7 @@ export const lifecycleStages: LifecycleStageDefinition[] = [
   {
     id: 9,
     name: "Intellectual Property / Legal",
-    description: "Prepare the inventor for competent legal action: IP protection, NDAs, assignments, manufacturing/licensing contracts, deadlines, and professional handoffs.",
+    description: "After Patent Readiness and Product Design are complete, prepare the inventor for competent legal action: IP protection, NDAs, assignments, manufacturing/licensing contracts, deadlines, and professional handoffs. This is downstream IP operations, not the current Patent Readiness review gate.",
     work: [
       work("ip_strategy_plan", "Develop IP protection strategy", "ip_strategy_plan", 42, ["ip_readiness", "product_design_specification"], "Synthesize prior-art work, design evolution, disclosure history, business strategy, manufacturing exposure, brand plans, and budget into options for provisional/utility/design patent, trademark, trade secret, copyright, contractual protection, or deliberate no-filing. Identify deadlines and questions for counsel.", { professionalGate: "patent" }),
       work("invention_disclosure_package", "Prepare Internal Legal invention disclosure", "invention_disclosure_package", 41, ["ip_strategy_plan", "product_design_specification"], "Prepare a structured disclosure for Internal Legal review: problem, embodiments, mechanisms, variants, drawings/CAD references, chronology, inventor contributions, known prior art, distinguishing hypotheses, public disclosures, testing evidence, and open legal questions. Internal Legal may escalate a matter to outside counsel when it identifies work beyond its authority. Do not draft claims as approved legal claims.", { professionalGate: "patent" }),
