@@ -94,7 +94,7 @@ export const getReviewQueue = query({
   args: { inventionId: v.id("inventions") },
   handler: async (ctx, { inventionId }) => {
     const { invention } = await getAccessibleInvention(ctx, inventionId);
-    const [decisions, approvals, blockedWork] = await Promise.all([
+    const [decisions, approvals, blockedWork, professionalReviews] = await Promise.all([
       ctx.db
         .query("inventionDecisions")
         .withIndex("by_inventionId_status", (q) =>
@@ -113,15 +113,18 @@ export const getReviewQueue = query({
           q.eq("inventionId", inventionId).eq("status", "blocked")
         )
         .collect(),
+      ctx.db.query("professionalReviews").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
     ]);
 
     return {
       invention: { _id: invention._id, title: invention.title },
+      access: (await getAccessibleInvention(ctx, inventionId)).access,
       decisions: decisions.filter((decision) => !isAutonomousDecision(decision)).sort((a, b) => a.createdAt - b.createdAt),
       approvals: approvals.sort((a, b) => a.requestedAt - b.requestedAt),
       blockedWork: blockedWork
         .filter((item) => !AUTONOMOUS_RESEARCH_KINDS.has(item.kind))
         .sort((a, b) => a.updatedAt - b.updatedAt),
+      professionalReviews: professionalReviews.filter((review) => review.status !== "accepted").sort((a, b) => a.createdAt - b.createdAt),
     };
   },
 });

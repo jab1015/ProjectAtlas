@@ -18,12 +18,15 @@ interface ReviewQueue {
   decisions: Doc<"inventionDecisions">[];
   approvals: Doc<"approvalRequests">[];
   blockedWork: Doc<"atlasWorkItems">[];
+  professionalReviews: Doc<"professionalReviews">[];
+  access: "manage" | "edit" | "view" | "review";
 }
 
 const getReviewQueue = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, ReviewQueue>("inventionWorkspace:getReviewQueue");
 const resolveDecision = makeFunctionReference<"mutation", { decisionId: Id<"inventionDecisions">; selectedOptionKey: string; rationale?: string }, { success: boolean }>("inventionWorkspace:resolveDecision");
 const resolveApprovalRequest = makeFunctionReference<"mutation", { approvalRequestId: Id<"approvalRequests">; approved: boolean }, { success: boolean }>("consequentialApprovalMutation:resolveConsequentialApproval");
 const respondToBlockedWork = makeFunctionReference<"mutation", { workItemId: Id<"atlasWorkItems">; response: string }, { success: boolean }>("inventionWorkspace:respondToBlockedWork");
+const recordProfessionalReview = makeFunctionReference<"mutation", { reviewId: Id<"professionalReviews">; reviewerName: string; reviewerReference?: string; notes?: string; accepted: boolean }, { success: boolean }>("inventionWorkspace:recordProfessionalReview");
 
 interface DecisionOption { key: string; label: string; description: string; }
 
@@ -48,10 +51,14 @@ export default function InventionReviewPage() {
   const decide = useMutation(resolveDecision);
   const approve = useMutation(resolveApprovalRequest);
   const respond = useMutation(respondToBlockedWork);
+  const recordReview = useMutation(recordProfessionalReview);
   const queue = useQuery(getReviewQueue, isAuthenticated && inventionId ? { inventionId } : "skip");
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [rationale, setRationale] = useState("");
   const [humanResponse, setHumanResponse] = useState("");
+  const [reviewerName, setReviewerName] = useState("");
+  const [reviewerReference, setReviewerReference] = useState("");
+  const [reviewNotes, setReviewNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,6 +67,7 @@ export default function InventionReviewPage() {
   const currentDecision = queue?.decisions[0];
   const currentApproval = queue?.approvals[0];
   const currentBlockedWork = queue?.blockedWork[0];
+  const currentProfessionalReview = queue?.professionalReviews[0];
   const canSupplyTextInput = currentBlockedWork?.humanGateType === "private_information";
   const options = useMemo(() => readDecisionOptions(currentDecision?.options ?? []), [currentDecision]);
 
@@ -92,10 +100,17 @@ export default function InventionReviewPage() {
     catch (reason) { setError(userFacingError(reason, "InventSmith could not record this input.")); }
     finally { setSubmitting(false); }
   };
+  const handleProfessionalReview = async (accepted: boolean) => {
+    if (!currentProfessionalReview || !reviewerName.trim() || !reviewerReference.trim()) return;
+    setSubmitting(true); setError(null);
+    try { await recordReview({ reviewId: currentProfessionalReview._id, reviewerName: reviewerName.trim(), reviewerReference: reviewerReference.trim(), notes: reviewNotes.trim() || undefined, accepted }); }
+    catch (reason) { setError(userFacingError(reason, "InventSmith could not record the Legal department review.")); }
+    finally { setSubmitting(false); }
+  };
 
   if (isLoading || !isAuthenticated || queue === undefined) return <div className="min-h-screen bg-background"><AppNav /><ReviewSkeleton /></div>;
   if (!queue) return null;
-  const remainingCount = queue.decisions.length + queue.approvals.length + queue.blockedWork.length;
+  const remainingCount = queue.decisions.length + queue.approvals.length + queue.blockedWork.length + queue.professionalReviews.length;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -109,7 +124,14 @@ export default function InventionReviewPage() {
             <p className="text-muted-foreground">InventSmith pauses here because this step requires your judgment, evidence, professional review, or authorization.</p>
           </header>
 
-          {currentDecision ? (
+          {currentProfessionalReview && (queue.access === "manage" || queue.access === "review") ? (
+            <section className="rounded-2xl border border-primary/20 bg-card p-6 shadow-sm sm:p-8" aria-labelledby="professional-review-title">
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary">Legal department review</p><h2 id="professional-review-title" className="mt-2 text-2xl font-semibold">{currentProfessionalReview.scope}</h2><p className="mt-3 leading-relaxed text-muted-foreground">InventSmith prepared this review packet. An authorized internal Legal reviewer can complete it here; outside counsel is an escalation option, not the default path.</p>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2"><div><label htmlFor="reviewer-name" className="text-sm font-medium">Reviewer name</label><input id="reviewer-name" value={reviewerName} onChange={(event) => setReviewerName(event.target.value)} className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2" /></div><div><label htmlFor="reviewer-reference" className="text-sm font-medium">Internal qualification or matter reference</label><input id="reviewer-reference" value={reviewerReference} onChange={(event) => setReviewerReference(event.target.value)} className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2" /></div></div>
+              <div className="mt-4"><label htmlFor="review-notes" className="text-sm font-medium">Review notes</label><Textarea id="review-notes" value={reviewNotes} onChange={(event) => setReviewNotes(event.target.value)} rows={5} placeholder="Record claim-scope findings, differentiation concerns, and any required changes…" /></div>
+              {error && <p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}<div className="mt-6 flex flex-wrap justify-end gap-3"><Button variant="outline" onClick={() => void handleProfessionalReview(false)} disabled={submitting || !reviewerName.trim() || !reviewerReference.trim()}>Request changes</Button><Button onClick={() => void handleProfessionalReview(true)} disabled={submitting || !reviewerName.trim() || !reviewerReference.trim()}>{submitting ? "Recording…" : "Complete Legal review"}</Button></div>
+            </section>
+          ) : currentDecision ? (
             <section className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8" aria-labelledby="decision-title">
               <div className="mb-6 flex items-start justify-between gap-4"><div className="space-y-2"><p className="text-xs font-semibold uppercase tracking-widest text-primary">Decision required</p><h2 id="decision-title" className="text-2xl font-semibold">{currentDecision.title}</h2><p className="leading-relaxed text-muted-foreground">{currentDecision.question}</p></div><span className="shrink-0 rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">{remainingCount} remaining</span></div>
               <fieldset className="space-y-3"><legend className="sr-only">Choose an option</legend>{options.map((option) => { const recommended = option.key === currentDecision.recommendedOptionKey; return <label key={option.key} className={`block cursor-pointer rounded-xl border p-4 transition-colors ${selectedOption === option.key ? "border-primary bg-accent/60" : "border-border hover:bg-muted/40"}`}><span className="flex items-start gap-3"><input type="radio" name="decision-option" value={option.key} checked={selectedOption === option.key} onChange={() => setSelectedOption(option.key)} className="mt-1 accent-[var(--primary)]" /><span className="min-w-0"><span className="flex flex-wrap items-center gap-2 font-medium text-foreground">{option.label}{recommended && <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">InventSmith recommends</span>}</span>{option.description && <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">{option.description}</span>}</span></span></label>; })}</fieldset>
