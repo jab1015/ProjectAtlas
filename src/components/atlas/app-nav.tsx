@@ -12,27 +12,29 @@ import { InventorActivityStrip } from "@/components/atlas/inventor-activity-stri
 import type { StatusBriefing } from "@convex/statusBriefingLogic";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import type { Id } from "@convex/_generated/dataModel";
 
 interface AppNavProps { className?: string; }
 interface AccessibleInvention { _id: string; title: string; access: "manage" | "edit" | "view" | "review"; }
-const getActiveAccessibleInvention = makeFunctionReference<"query", Record<string, never>, AccessibleInvention | null>("organizationNavigation:getActiveAccessibleInvention");
+const getActiveAccessibleInvention = makeFunctionReference<"query", { inventionId?: string }, AccessibleInvention | null>("organizationNavigation:getActiveAccessibleInvention");
 const getStatusBriefing = makeFunctionReference<"query", { inventionId: string }, StatusBriefing>("inventionWorkspace:getStatusBriefing");
 
 export function AppNav({ className }: AppNavProps) {
   const { signOut } = useAuthActions();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { isAuthenticated } = useConvexAuth();
   const user = useQuery(api.authHelpers.getCurrentUser);
   const routeId = pathname?.match(/^\/invention\/([^/]+)/)?.[1] as Id<"inventions"> | undefined;
+  const queryInventionId = searchParams.get("inventionId") as Id<"inventions"> | null;
   // The route already contains the authoritative invention id. Avoid a second
   // access lookup in global navigation: during auth/query hydration that lookup
   // can transiently fail and take the entire page to the generic error boundary.
   // Route links remain scoped to the page the inventor is already viewing.
   const routeInvention = routeId ? { _id: String(routeId), title: "", access: "manage" as const } : null;
-  const fallbackInvention = useQuery(getActiveAccessibleInvention, isAuthenticated && !routeId ? {} : "skip");
+  const fallbackInvention = useQuery(getActiveAccessibleInvention, isAuthenticated && !routeId ? (queryInventionId ? { inventionId: queryInventionId } : {}) : "skip");
   const activeInvention = routeInvention ?? fallbackInvention;
   const briefing = useQuery(getStatusBriefing, activeInvention?.title ? { inventionId: activeInvention._id } : "skip");
   const ensureProfile = useMutation(api.users.ensureUserProfile);
