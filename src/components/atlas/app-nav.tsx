@@ -37,7 +37,10 @@ export function AppNav({ className }: AppNavProps) {
   // can transiently fail and take the entire page to the generic error boundary.
   // Route links remain scoped to the page the inventor is already viewing.
   const routeInvention = routeId ? { _id: String(routeId), title: "", access: "manage" as const } : null;
-  const fallbackInvention = useQuery(getActiveAccessibleInvention, isAuthenticated && !routeId ? (queryInventionId ? { inventionId: queryInventionId } : {}) : "skip");
+  // Support pages already carry their authoritative invention ID. Do not call
+  // the legacy no-argument fallback there: older production Convex schemas
+  // reject the newer scoped argument until their deployment catches up.
+  const fallbackInvention = useQuery(getActiveAccessibleInvention, isAuthenticated && !routeId && !queryInventionId ? {} : "skip");
   const activeInvention = routeInvention ?? fallbackInvention;
   const briefing = useQuery(getStatusBriefing, activeInvention?.title ? { inventionId: activeInvention._id } : "skip");
   const ensureProfile = useMutation(api.users.ensureUserProfile);
