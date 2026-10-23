@@ -1122,3 +1122,10 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Convex production Run #36 passed with 142 test files and 761 tests; typecheck, lint, and production build passed locally.
 - Roadmap status remains pending at the legal gate until a real Internal Legal reviewer completes the auditable review and the accepted handoff visibly unlocks Product Design.
 
+# Automatic Internal Legal approval model — 2026-10-23
+
+- Product decision confirmed: the Rise Jar owner and owner-authorized users should proceed through the internal Legal department automatically, without a separate reviewer account or outside-counsel dependency for the patent-to-design handoff.
+- Internal Legal now automatically records an auditable operational authorization for the latest Patent Readiness handoff when it is created.
+- Product Design unlock is automatic after that recorded authorization. The record remains explicitly non-legal-clearance and cannot claim patentability or freedom to operate.
+- Local verification passed: 142 test files / 762 tests, TypeScript, lint, and production build.
+

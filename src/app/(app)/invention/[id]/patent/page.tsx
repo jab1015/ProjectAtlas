@@ -93,7 +93,7 @@ function PatentReviewAction({ review, canReview }: { review: Doc<"professionalRe
       <p className="mt-1 text-xs leading-relaxed text-muted-foreground">A qualified patent attorney or registered patent agent in your Legal department must review the exact scope and differentiation. InventSmith records that decision only for an authorized Internal Legal reviewer with explicit review access; it is not an inventor self-certification.</p>
         </div>
       </div>
-      {review.status === "accepted" && review.reviewerName && <p className="mt-3 text-xs text-muted-foreground">Accepted by {review.reviewerName}{review.reviewerReference ? ` · ${review.reviewerReference}` : ""}.</p>}
+      {review.status === "accepted" && review.reviewerName && <p className="mt-3 text-xs text-muted-foreground">{review.reviewerName === "InventSmith Internal Legal Department" ? "Automatically authorized for Product Design by Internal Legal. This is an operational handoff authorization, not patentability, freedom-to-operate, or legal-clearance approval." : `Accepted by ${review.reviewerName}${review.reviewerReference ? ` · ${review.reviewerReference}` : ""}.`}</p>}
       {needsAction && !canReview && <p className="mt-3 text-sm text-muted-foreground">Waiting for an authorized Internal Legal reviewer. Your current account can inspect this packet but cannot approve it.</p>}
       {needsAction && canReview && <>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">

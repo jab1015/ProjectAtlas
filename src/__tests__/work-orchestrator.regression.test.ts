@@ -7,6 +7,7 @@ import {
   shouldRetryWork,
 } from "@convex/workOrchestratorLogic";
 import { canRunProductDesignWork, hasAcceptedPatentDesignReview } from "@convex/patentDesignGateLogic";
+import { shouldAutoApproveInternalLegal } from "@convex/internalLegalAutomationLogic";
 
 const work = (overrides: Partial<Parameters<typeof selectNextWorkItem>[0][number]> = {}) => ({
   _id: "work-1",
@@ -79,6 +80,11 @@ describe("autonomous work selection", () => {
     expect(hasAcceptedPatentDesignReview("handoff-1", [{ deliverableId: "handoff-1", specialty: "patent", status: "accepted" }])).toBe(true);
     expect(canRunProductDesignWork("design_candidate_generation", true)).toBe(true);
     expect(canRunProductDesignWork("competitor_discovery", false)).toBe(true);
+  });
+
+  it("automatically authorizes the patent-to-design handoff through Internal Legal", () => {
+    expect(shouldAutoApproveInternalLegal("patent_design_handoff", "patent")).toBe(true);
+    expect(shouldAutoApproveInternalLegal("product_design_specification", "engineering")).toBe(false);
   });
 });
 

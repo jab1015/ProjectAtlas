@@ -8,6 +8,7 @@ import { buildDeliverablePersistencePlan } from "./deliverablePersistenceLogic";
 import { canTierRunWorkKind } from "./entitlementPolicyLogic";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { PRODUCT_DESIGN_WORK_KINDS, hasAcceptedPatentDesignReview, canRunProductDesignWork } from "./patentDesignGateLogic";
+import { AUTOMATED_INTERNAL_LEGAL_NOTES, AUTOMATED_INTERNAL_LEGAL_REFERENCE, AUTOMATED_INTERNAL_LEGAL_REVIEWER, shouldAutoApproveInternalLegal } from "./internalLegalAutomationLogic";
 import { ensureOrganizationDailyUsage, findOrganizationDailyUsage } from "./organizationDailyUsage";
 import { conservativeAttemptSettlementCost } from "./usageSettlementLogic";
 import { isManufacturingMaturityEligible } from "./manufacturingMaturityLogic";
@@ -516,16 +517,40 @@ export const completeWork = internalMutation({
       updatedAt: args.completedAt,
     });
     for (const review of requiredReviews) {
+      const autoApprovedByInternalLegal = shouldAutoApproveInternalLegal(deliverableKind, review.specialty);
       await ctx.db.insert("professionalReviews", {
         inventionId: workItem.inventionId,
         deliverableId,
         specialty: review.specialty,
         requiredCredentials: review.requiredCredentials,
         scope: review.scope,
-        status: "required",
+        status: autoApprovedByInternalLegal ? "accepted" : "required",
+        reviewerName: autoApprovedByInternalLegal ? AUTOMATED_INTERNAL_LEGAL_REVIEWER : undefined,
+        reviewerReference: autoApprovedByInternalLegal ? AUTOMATED_INTERNAL_LEGAL_REFERENCE : undefined,
+        notes: autoApprovedByInternalLegal ? AUTOMATED_INTERNAL_LEGAL_NOTES : undefined,
+        reviewedAt: autoApprovedByInternalLegal ? args.completedAt : undefined,
         createdAt: args.completedAt,
         updatedAt: args.completedAt,
       });
+      if (autoApprovedByInternalLegal) {
+        await ctx.db.insert("atlasExecutionEvents", {
+          inventionId: workItem.inventionId,
+          eventType: "professional_review_recorded",
+          actorType: "system",
+          summary: "Internal Legal automatically authorized the Patent Readiness handoff for Product Design.",
+          metadata: {
+            deliverableId: String(deliverableId),
+            deliverableKind,
+            specialty: review.specialty,
+            status: "accepted",
+            automated: true,
+            reviewerChannel: "internal_legal_department_automation",
+            operationalAuthorizationOnly: true,
+            legalClearanceClaimed: false,
+          },
+          createdAt: args.completedAt,
+        });
+      }
     }
     for (const findingId of findingIds) {
       await ctx.db.insert("deliverableDependencies", {

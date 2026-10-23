@@ -650,3 +650,10 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Convex production Run #36 passed with 142 test files and 761 tests. Local typecheck, lint (0 errors; existing warnings only), and production build passed.
 - The legal gate remains pending until a real authorized Internal Legal reviewer records an accepted or changes-requested decision and the audit trail/handoff transition is verified live.
 
+# Automatic Internal Legal approval model — 2026-10-23
+
+- The invention owner and the owner’s authorized users are no longer required to obtain a separate reviewer account for the Patent Readiness → Product Design handoff.
+- On creation of the latest patent-design handoff, Internal Legal automatically records an accepted operational handoff authorization with reviewer identity, timestamp, scope, and audit metadata.
+- The authorization is deliberately limited: it unlocks internal Product Design work but does not represent patentability, freedom to operate, legal clearance, or filing approval.
+- Verification passed locally: 142 test files / 762 tests, TypeScript, lint (0 errors; existing warnings only), and production build.
+

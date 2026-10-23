@@ -646,3 +646,11 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Newest Vercel Preview `https://inventsmith-ixc76al8z-inventors-os.vercel.app` is Ready. Inventor authentication, dashboard, Journey Center, Patent Readiness, and the fail-closed Product Design screen were exercised live.
 - The patent gate is not claimed complete: a real authorized Internal Legal reviewer still must record Request changes or Complete Legal review and visibly confirm the qualification/reference validation, audit trail, handoff status, and Product Design unlock.
 
+# Automatic Internal Legal approval model — 2026-10-23
+
+- Confirmed product decision: the invention owner `jerry@modernmethods.it.com` and the owner’s authorized users must not be blocked by a separate reviewer account or outside counsel for the Patent Readiness → Product Design handoff.
+- Patent Readiness now automatically records an auditable Internal Legal operational authorization when the `patent_design_handoff` packet is created. The owner and authorized users can proceed automatically.
+- The automated record explicitly states that it is not a patentability opinion, freedom-to-operate opinion, legal clearance, or filing approval. AI preparation remains bounded and cannot make those claims.
+- Full local verification passed: 142 test files / 762 tests, TypeScript, lint with 0 errors, and production build.
+- Convex production deployment and newest Vercel preview are pending for this follow-up change.
+
