@@ -7,10 +7,10 @@ import { AUTONOMOUS_RESEARCH_KINDS } from "./statusBriefingLogic";
 
 function activityForWork(kind: string, title: string) {
   const activities: Record<string, string> = {
-    preliminary_prior_art: "Searching USPTO, Google Patents, and related patent sources",
-    feature_prior_art_comparison: "Comparing proposed features against prior-art references",
-    distinguishing_features: "Developing alternative embodiments and design-around options",
-    patent_design_handoff: "Preparing patent-to-design constraints for Product Design",
+    preliminary_prior_art: "Searching patent sources and related inventions",
+    feature_prior_art_comparison: "Comparing your features with earlier patents",
+    distinguishing_features: "Finding ways the design could be different",
+    patent_design_handoff: "Giving Product Design the patent findings and limits",
     competitor_discovery: "Researching competing products and alternatives",
     market_feasibility: "Assessing demand signals, customer pain, and market evidence",
     assumptions_unknowns: "Building the assumptions and unknowns register",
@@ -103,16 +103,16 @@ export const getJourneyCenter = query({
         statusExplanation: status === "complete"
           ? "InventSmith finished the required work for this stage."
           : status === "professional_review"
-            ? "InventSmith prepared the work; a qualified professional must review it."
+          ? "InventSmith prepared the work; an appropriate expert should review it."
             : status === "blocked"
               ? "InventSmith is waiting for the specific information or authorization shown above."
               : status === "needs_refresh"
-                ? "New evidence changed this stage. InventSmith is refreshing it automatically."
+                ? "New evidence changed this stage. InventSmith is updating it automatically."
                 : status === "failed"
                   ? "InventSmith is retrying this failed step automatically."
                   : activeWork
-                    ? (runningItems.length > 0 ? "InventSmith is working on this now." : "InventSmith has queued this next.")
-                    : "This stage will begin when its prerequisites are ready.",
+                    ? (runningItems.length > 0 ? "InventSmith is working on this now." : "InventSmith has placed this next in line.")
+                    : "This stage will begin after the earlier work is ready.",
       };
     });
 

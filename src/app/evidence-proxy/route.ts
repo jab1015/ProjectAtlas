@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isAllowedConvexUploadTarget } from "@/lib/convexUploadTarget";
 
 const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
-const ALLOWED_CONVEX_HOSTS = new Set(["agile-seahorse-379.convex.cloud", "agile-seahorse-379.convex.site"]);
 
 export async function GET() {
   return NextResponse.json({ ok: true, route: "evidence-proxy" });
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid upload target." }, { status: 400 });
   }
 
-  if (target.protocol !== "https:" || !ALLOWED_CONVEX_HOSTS.has(target.hostname)) {
+  if (!isAllowedConvexUploadTarget(target)) {
     return NextResponse.json({ error: "Upload target is not allowed." }, { status: 400 });
   }
 

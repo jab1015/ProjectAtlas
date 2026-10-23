@@ -11,11 +11,13 @@ const configuredConvexUrl = process.env.NEXT_PUBLIC_CONVEX_URL?.trim();
 // URL makes a missing Vercel build variable look like a login hang, because
 // the Convex WebSocket retries forever. Keep the production deployment
 // usable while making the failure visible during development.
-const convexUrl = configuredConvexUrl || productionConvexUrl;
+const convexUrl =
+  configuredConvexUrl ||
+  (process.env.NODE_ENV === "production" ? productionConvexUrl : "http://127.0.0.1:3210");
 
 if (!configuredConvexUrl && process.env.NODE_ENV !== "production") {
   console.warn(
-    "[InventSmith] NEXT_PUBLIC_CONVEX_URL is missing; using the production Convex deployment."
+    "[InventSmith] NEXT_PUBLIC_CONVEX_URL is missing; using the local Convex deployment. Start `npx convex dev`."
   );
 }
 

@@ -42,6 +42,10 @@ Open acceptance items: confirm live per-department outputs and downstream handof
 
 # InventSmith Current Plan and Progress
 
+## October 23, 2026 live-testing checkpoint
+
+The authenticated Vercel preview was tested across the inventor dashboard, Journey Center, AI chat, review queue, Work Library, Evidence Locker, Product Design + CAD, access, Patent Readiness, Market Research, support, account, organization, usage, and all downstream department pages. The Journey Center exposed a deployed frontend/backend status mismatch and crashed on an unrecognized stage status. A defensive frontend fallback and plain-language status labels are now implemented. The full suite is green at 133 test files and 721 tests, TypeScript passes, and 45 targeted administrator/support/organization tests pass. The fix must be deployed and re-tested live before the administrator backend is accepted.
+
 ## Current acceptance checkpoint — October 19, 2026
 
 At branch head `45f1cd401ab845701774dd1335e7ee8518b91d93`, the full automated suite passes (**127 files / 694 tests**) and compile-only Next build passes (**36/36 pages**). Netlify Preview `6ad696b5133e4f3f729431c7` is available; PR #24 remains draft/unmerged, and no full-product publication occurred.

@@ -84,7 +84,7 @@ export default function DashboardPage() {
           <header className="space-y-5">
             <div className="flex items-center justify-between"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Active invention · <span className="capitalize">{activeInvention.access}</span> access</p>{canManage && <InventionCardMenu inventionId={activeInvention._id} inventionTitle={activeInvention.title} onDeleted={() => router.push("/inventions")} />}</div>
             <h1 className="max-w-3xl text-3xl font-bold leading-tight text-foreground sm:text-5xl">{activeInvention.title}</h1>
-            <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">InventSmith owns the process from idea to market. Authorized collaborators share one invention record, evidence base, work ledger, and organization resource allowance while consequential actions remain permission-gated.</p>
+            <p className="max-w-3xl text-base leading-relaxed text-muted-foreground">InventSmith keeps your invention organized from idea to market. Team members can work from the same record, while important outside actions still require your approval.</p>
           </header>
 
           <section className="rounded-2xl border border-primary/20 bg-primary/5 p-6 sm:p-7">
@@ -93,9 +93,9 @@ export default function DashboardPage() {
 
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Idea-to-market stage work</p><p className="mt-2 text-2xl font-semibold">{journey.completedStages}/{journey.totalStages}</p><div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary" style={{ width: `${completionPct}%` }} /></div></div>
-            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Evidence</p><p className="mt-2 text-2xl font-semibold">{journey.evidence.inventorProvided}</p><p className="mt-1 text-xs text-muted-foreground">inventor inputs · {journey.evidence.verified} verified</p></div>
-            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Needs authorized input</p><p className="mt-2 text-2xl font-semibold">{attentionTotal}</p><p className="mt-1 text-xs text-muted-foreground">decisions, approvals, or blocked work</p></div>
-            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Professional reviews</p><p className="mt-2 text-2xl font-semibold">{journey.attention.pendingProfessionalReviews}</p><p className="mt-1 text-xs text-muted-foreground">open specialist gates</p></div>
+            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Your evidence</p><p className="mt-2 text-2xl font-semibold">{journey.evidence.inventorProvided}</p><p className="mt-1 text-xs text-muted-foreground">{journey.evidence.verified} independently checked</p></div>
+            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Needs your input</p><p className="mt-2 text-2xl font-semibold">{attentionTotal}</p><p className="mt-1 text-xs text-muted-foreground">questions, approvals, or blocked work</p></div>
+            <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Expert reviews</p><p className="mt-2 text-2xl font-semibold">{journey.attention.pendingProfessionalReviews}</p><p className="mt-1 text-xs text-muted-foreground">reviews still needed</p></div>
           </section>
 
           <StatusBriefing briefing={briefing} inventionId={activeInvention._id} />
