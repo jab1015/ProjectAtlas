@@ -24,6 +24,7 @@ interface DesignWorkspace {
   evidenceCount: number;
   inventorEvidenceCount: number;
   cadStatus: { specificationReady: boolean; nativeCadFilesGenerated: boolean };
+  patentLegalReview: { required: boolean; accepted: boolean; reviewerName: string | null };
 }
 
 interface NativeCadArtifact {
@@ -161,6 +162,7 @@ export default function ProductDesignStudioPage() {
   const cadRunning = workspace.workItems.some((item) => item.kind === "native_cad_generation" && item.status === "running");
   const completeCadPackage = latestCadGeneration.length === 6;
   const specificationReady = workspace.cadStatus.specificationReady;
+  const legalReviewAccepted = workspace.patentLegalReview.accepted;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -175,7 +177,7 @@ export default function ProductDesignStudioPage() {
               <h1 className="text-3xl font-bold sm:text-4xl">Design Studio — {workspace.invention.title}</h1>
               <p className="max-w-3xl text-muted-foreground">InventSmith turns validation, prior-art intelligence, requirements, manufacturing evidence, cost constraints, and inventor evidence into competing design directions, scores the tradeoffs, selects/refines the strongest path, and creates native CAD artifacts for supported geometry.</p>
             </div>
-            <Button onClick={() => void startDesign()} disabled={starting} size="lg" className="gap-2">
+            <Button onClick={() => void startDesign()} disabled={starting || !legalReviewAccepted} size="lg" className="gap-2">
               {starting ? <RefreshCw className="h-4 w-4 animate-spin" /> : workspace.initialized ? <Play className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
               {starting ? "Starting…" : workspace.initialized ? "Continue design work" : "Start Product Design"}
             </Button>
@@ -183,6 +185,7 @@ export default function ProductDesignStudioPage() {
 
           {message && <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">{message}</div>}
           {error && <div role="alert" className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{error}</div>}
+          {!legalReviewAccepted && <div role="status" className="rounded-xl border border-warning/30 bg-warning/5 p-4 text-sm"><p className="font-semibold">Product Design is waiting for Internal Legal.</p><p className="mt-1 text-muted-foreground">The latest Patent Readiness handoff must be accepted by an authorized Internal Legal reviewer before design work can be started or resumed.</p><Link href={`/invention/${inventionId}/patent`} className="mt-2 inline-flex text-primary underline underline-offset-4">Open Patent Readiness review</Link></div>}
 
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-2xl border border-border bg-card p-5"><p className="text-xs uppercase tracking-wider text-muted-foreground">Design work</p><p className="mt-2 text-2xl font-semibold">{completed}/{workspace.workItems.length}</p><p className="mt-1 text-xs text-muted-foreground">completed</p></div>
