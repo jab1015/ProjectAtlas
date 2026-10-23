@@ -1174,3 +1174,10 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - The status surface includes a progress bar, current department, process description, and the event that will trigger the next update; it does not invent a completion time.
 - Verification passed: 143 test files / 766 tests, TypeScript, lint with 0 errors and 10 existing warnings, production build, and whitespace checks.
 - Live acceptance remains pending protected Convex deployment and a Ready Vercel preview for this repair.
+
+# Current-work visibility deployment checkpoint — 2026-10-23
+
+- Convex production Run #41 succeeded for branch commit `717e8cc4f1fb972cc48f89e69632badcfab29f73`, with 143 test files / 766 tests passing.
+- Ready Preview: `https://inventsmith-8uqfp8qzq-inventors-os.vercel.app`.
+- Roadmap acceptance still requires fresh inventor authentication on that Preview and visible confirmation that Rise Jar shows Internal Legal / Patent Readiness as current work.
+- The patent gate remains incomplete until the Internal Legal disposition and audit trail are visibly recorded.
