@@ -256,7 +256,11 @@ export const kickAutonomousWork = mutation({
         );
     if (remaining === 0) return { scheduled: false, reason: "daily_usage_limit" as const };
     const now = Date.now();
-    const workItems = await ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect();
+    const [workItems, deliverables, professionalReviews] = await Promise.all([
+      ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+      ctx.db.query("professionalReviews").withIndex("by_inventionId", (q) => q.eq("inventionId", inventionId)).collect(),
+    ]);
     for (const item of workItems) {
       // These assignments are InventSmith's preparation work. Recover stale
       // records regardless of the old gate type so a prior prototype or
@@ -302,6 +306,50 @@ export const kickAutonomousWork = mutation({
       } catch {
         // Leave genuinely unmapped or exhausted failures visible for repair.
       }
+    }
+    // Migrate legacy patent handoffs into the current internal Legal model.
+    // Older packets were correctly held for professional review but predate
+    // structured legalDisposition output. Give each such invention one
+    // bounded automated Legal re-check; never keep re-queuing a packet that
+    // remains outside Internal Legal's authority.
+    const latestPatentHandoff = deliverables
+      .filter((item) => item.kind === "patent_design_handoff")
+      .sort((a, b) => b.version - a.version)[0];
+    const legacyPatentReview = latestPatentHandoff
+      ? professionalReviews.find((review) => String(review.deliverableId) === String(latestPatentHandoff._id) && review.specialty === "patent")
+      : undefined;
+    const hasAutomatedLegalRecheck = workItems.some((item) => item.kind === "patent_design_handoff" && Boolean((item.inputSnapshot as any)?.automaticInternalLegalReview));
+    const hasActiveAutomatedLegalRecheck = workItems.some((item) => item.kind === "patent_design_handoff" && Boolean((item.inputSnapshot as any)?.automaticInternalLegalReview) && (item.status === "queued" || item.status === "running"));
+    if (latestPatentHandoff && legacyPatentReview?.status === "required" && !hasAutomatedLegalRecheck && !hasActiveAutomatedLegalRecheck) {
+      await ctx.db.insert("atlasWorkItems", {
+        inventionId,
+        kind: "patent_design_handoff",
+        title: "Automatically re-check Patent Readiness through Internal Legal",
+        status: "queued",
+        priority: 58,
+        inputSnapshot: {
+          department: "patent_readiness",
+          stageId: 4,
+          legalIteration: 0,
+          automaticInternalLegalReview: true,
+          instructions: "Re-check the current Patent Readiness packet through InventSmith's Internal Legal department. Return the required structured legalDisposition. This is an automated operational routing decision for the Product Design handoff only; do not claim patentability, freedom to operate, legal clearance, validity, enforceability, or filing approval.",
+        },
+        attemptCount: 0,
+        maxAttempts: 3,
+        estimatedCostUnits: 10,
+        deliverableKind: "patent_design_handoff",
+        dependsOnKinds: ["distinguishing_features"],
+        createdAt: now,
+        updatedAt: now,
+      });
+      await ctx.db.insert("atlasExecutionEvents", {
+        inventionId,
+        eventType: "work_queued",
+        actorType: "system",
+        summary: "InventSmith automatically re-queued the legacy Patent Readiness packet for an Internal Legal department re-check.",
+        metadata: { automated: true, migration: "legacy_internal_legal_review", triggeringDeliverableId: String(latestPatentHandoff._id) },
+        createdAt: now,
+      });
     }
     await ctx.scheduler.runAfter(0, runAvailableWork, {
       inventionId,
