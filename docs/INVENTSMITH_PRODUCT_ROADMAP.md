@@ -998,3 +998,45 @@ The Convex GitHub device authorization page reported “Device connected,” but
 ### Convex GitHub device retry — October 19, 2026
 
 The Convex GitHub device authorization page reported “Device connected,” but the workspace CLI then failed because its request to `auth.convex.dev` was blocked by the environment network policy. No backend deployment occurred, no department provider work ran, and Production and other Convex deployments were not touched. Full department acceptance remains blocked until the authenticated CLI can reach Convex, deploy the matching PR code to `quick-fox-785`, and re-run each eligible department against its real upstream evidence and gates.
+
+
+## Consolidated operational status — 2026-10-23
+
+### Confirmed release boundary
+
+- Repository: `jab1015/ProjectAtlas`
+- Working branch: `inventsmith/full-product-build`; PR #24 remains the review boundary and must not be merged to `main` without explicit approval.
+- Latest verified frontend release commit: `50e05c756f6f78ff1b619a0e48087885f287c710`.
+- Latest verified Vercel Preview: https://inventsmith-r6b6q0j3o-inventors-os.vercel.app (Ready and authenticated). The branch alias is also authenticated.
+- Convex production target: `agile-seahorse-379`. A previous production deployment is confirmed successful, but the attempted follow-up workflow did not produce a verifiable new run. Therefore the branch’s newer backend navigation schema is **not** claimed as deployed to production.
+- Do not reset, delete, or migrate production Convex data. Do not use the isolated `quick-fox-785` deployment as production.
+
+### Verification completed
+
+- Local full suite: **141 test files / 750 tests passed**.
+- TypeScript: **passed**.
+- ESLint: **passed**.
+- Authenticated Preview checks: dashboard, Journey Center, Ask InventSmith, review queue, Work Library, Evidence Locker, Product Design + CAD, invention access, Patent Readiness, Market Research, support, account, organization, usage, and administrator operations loaded without raw application errors.
+- Support navigation now honors the invention in the URL and no longer shows a misleading active-invention status strip for a different invention. Legacy Convex query compatibility is guarded until the backend schema deployment is confirmed.
+- Legal review controls are visible and empty submission gives an actionable instruction to enter the qualified reviewer’s name. No professional/legal decision was fabricated or recorded.
+- Administrator operations correctly exposes the current failed-work and human-gate queues. No destructive recovery, billing, user, or legal mutation was performed during this pass.
+
+### Known open work
+
+- Admin operations currently shows two failed autonomous items at attempt 7: Rise Jar materials/manufacturing and a pilot preliminary-BOM-cost item. Both report a missing registered department agent and need a bounded recovery/agent-registration repair before they can be accepted as completed.
+- Rise Jar’s patent-to-design handoff remains blocked on qualified patent counsel review. Product Design must not be treated as started until that gate is recorded through its dedicated workflow.
+- The current Convex production deployment status for the newer scoped-navigation backend is unconfirmed. This is an infrastructure verification item, not an inventor action.
+- Full administrator/support-console mutation acceptance still requires the signed-in administrator session and safe test fixtures. Do not use production data as a disposable test fixture.
+
+### Next execution plan
+
+1. Verify the owner-controlled Convex production workflow run and deploy the matching backend only after the branch checks pass.
+2. Repair/register the missing department-agent mappings and add bounded automatic recovery for exhausted autonomous work; preserve fail-closed behavior for unknown work kinds.
+3. Re-run read-only administrator/support checks, then exercise only reversible, fixture-backed recovery actions and verify audit events, idempotency, and user-facing status.
+4. Continue the live Preview sweep for every available route and action, recording pass/fail evidence and actionable error text.
+5. Update this status record after each verified deployment; do not claim live backend acceptance from local tests alone.
+6. Submit the actual patent-counsel review only when the legal department supplies it through the dedicated professional-review workflow.
+
+### Status language policy
+
+Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or **completed** only when backed by the corresponding ledger/audit state. “Waiting for you” must be reserved for an inventor action that is actually available. Queue messages must identify what is queued, why it is queued, and what event will start it.
