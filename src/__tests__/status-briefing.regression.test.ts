@@ -154,4 +154,28 @@ describe("InventSmith status briefing", () => {
     });
     expect(briefing.needsInventor).toEqual([]);
   });
+
+  it("prioritizes Internal Legal Patent Readiness over downstream handoff work", () => {
+    const briefing = buildStatusBriefing({
+      workItems: [
+        { kind: "engineering_handoff", title: "Prepare engineering handoff", status: "queued", updatedAt: 1, dependsOnKinds: ["development_risks"] },
+        { kind: "preliminary_prior_art", title: "Preliminary prior-art landscape", status: "completed", updatedAt: 2 },
+        { kind: "feature_prior_art_comparison", title: "Compare features against prior art", status: "completed", updatedAt: 3 },
+        { kind: "distinguishing_features", title: "Develop distinguishing features", status: "completed", updatedAt: 4 },
+        { kind: "ip_readiness", title: "Prepare patent readiness packet", status: "completed", updatedAt: 5 },
+        { kind: "patent_design_handoff", title: "Patent-to-design handoff", status: "blocked", updatedAt: 6, blockedReason: "Internal Legal review" },
+      ],
+      decisions: [], approvals: [], findings: [],
+    });
+
+    expect(briefing.currentWork).toMatchObject({
+      department: "Internal Legal",
+      stage: "Patent Readiness",
+      status: "waiting",
+      completedTasks: 4,
+      totalTasks: 5,
+      progressPercent: 80,
+    });
+    expect(briefing.next[0]).toMatchObject({ title: "Internal Legal review of Patent Readiness", status: "waiting" });
+  });
 });
