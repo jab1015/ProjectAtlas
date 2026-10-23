@@ -14,9 +14,11 @@ interface InventorActivityStripProps {
 
 function getActivity(briefing?: StatusBriefing | null) {
   if (briefing?.needsInventor.length) {
+    const need = briefing.needsInventor[0];
+    const professionalReview = /professional review|patent counsel|qualified reviewer|legal department/i.test(`${need.title} ${need.detail}`);
     return {
-      label: "Waiting for you",
-      detail: briefing.needsInventor[0].title,
+      label: professionalReview ? "Professional review required" : "Waiting for you",
+      detail: professionalReview ? `${need.title}. This is assigned to a qualified reviewer, not the inventor.` : need.title,
       tone: "border-warning/30 bg-warning/5 text-warning",
       Icon: Clock3,
     };
