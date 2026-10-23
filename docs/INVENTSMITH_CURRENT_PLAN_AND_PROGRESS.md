@@ -703,3 +703,10 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - It now prioritizes Stage 4 Internal Legal work, shows Internal Legal / Patent Readiness status, displays preparation progress, explains the preparation-review-handoff process, and states when the next status update will appear.
 - Local verification passed: 143 test files / 766 tests, TypeScript, lint with 0 errors and 10 existing warnings, production build, and whitespace checks.
 - This repair is not claimed live until its protected Convex production deployment and newest Ready Vercel preview are verified.
+
+# Current-work visibility deployment checkpoint — 2026-10-23
+
+- Convex production Run #41 succeeded for branch commit `717e8cc4f1fb972cc48f89e69632badcfab29f73` against `agile-seahorse-379`; the job summary reports 143 test files and 766 passing tests.
+- Newest Ready Vercel Preview: `https://inventsmith-8uqfp8qzq-inventors-os.vercel.app` from the same branch commit.
+- The fresh preview requires a new inventor sign-in; the existing authenticated browser session is on an older Preview hostname. Therefore the new current-work card is deployed but not yet accepted by a fresh authenticated Rise Jar browser check.
+- No patent-gate completion is claimed: Rise Jar still needs a visibly recorded Internal Legal disposition and audit trail.
