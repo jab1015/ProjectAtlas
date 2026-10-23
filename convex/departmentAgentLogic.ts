@@ -74,6 +74,10 @@ const WORK_KIND_DEPARTMENT: Readonly<Record<string, DepartmentAgentKey>> = {
   // department identity they should run under when snapshots lack metadata.
   product_requirements: "product_design",
   materials_manufacturing: "manufacturing",
+  // Some early records stored the deliverable kind rather than the work kind.
+  // Keep those records recoverable through the same bounded retry path.
+  materials_manufacturing_assessment: "manufacturing",
+  manufacturing_research: "manufacturing",
   preliminary_prior_art: "patent_readiness",
   feature_prior_art_comparison: "patent_readiness",
   distinguishing_features: "patent_readiness",
