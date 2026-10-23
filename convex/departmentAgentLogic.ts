@@ -78,6 +78,8 @@ const WORK_KIND_DEPARTMENT: Readonly<Record<string, DepartmentAgentKey>> = {
   // Keep those records recoverable through the same bounded retry path.
   materials_manufacturing_assessment: "manufacturing",
   manufacturing_research: "manufacturing",
+  materials_manufacturing_research: "manufacturing",
+  materials_manufacturing_approaches: "manufacturing",
   preliminary_prior_art: "patent_readiness",
   feature_prior_art_comparison: "patent_readiness",
   distinguishing_features: "patent_readiness",
