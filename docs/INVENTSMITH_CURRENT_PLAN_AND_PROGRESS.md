@@ -579,3 +579,11 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Repair committed and pushed to `inventsmith/full-product-build`: local `11952da`, remote `36b2f91325ae8da9acd0446a816c4cbac2c55d72`. Verification: 141 test files / 752 tests, TypeScript, and ESLint passed.
 - Read-only live route checks passed for all administrator pages, Operations, Support filters, Rise Jar Journey Center, Patent Readiness, Work Library, and Product Design without raw error pages.
 - The exact Preview still shows the older Convex production missing-agent failure records because matching Convex production deployment remains unverified. Live bounded-recovery success must not be claimed until the backend is deployed and retry is exercised.
+# Verified live checkpoint — 2026-10-23
+
+- Branch `inventsmith/full-product-build` is at commit `9730571` with production Convex deployment #30 successful.
+- Preview `https://inventsmith-1a73k241c-inventors-os.vercel.app` was authenticated and verified in-browser.
+- Administrator Operations reports 0 failed work and 0 expired leases after the bounded department-assignment recovery.
+- Rise Jar Journey, dashboard destination, Support scope, and Work Library load without raw request IDs, retry-limit errors, or application-error pages.
+- Remaining gates are explicit qualified patent-professional reviews; they are shown as expert-review gates with reasons.
+

@@ -1059,3 +1059,11 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Professional patent-review gates are no longer counted as inventor “waiting for you” actions in Journey Center/status briefing.
 - Remote repair commit: `36b2f91325ae8da9acd0446a816c4cbac2c55d72`; local verification: 141 files / 752 tests, TypeScript, and ESLint passed.
 - Live read-only route sweep passed; Convex production retry acceptance remains pending because the matching backend deployment is unverified.
+# Verified live checkpoint — 2026-10-23
+
+- Branch `inventsmith/full-product-build` is at commit `9730571` with production Convex deployment #30 successful.
+- Preview `https://inventsmith-1a73k241c-inventors-os.vercel.app` was authenticated and verified in-browser.
+- Administrator Operations reports 0 failed work and 0 expired leases after the bounded department-assignment recovery.
+- Rise Jar Journey, dashboard destination, Support scope, and Work Library load without raw request IDs, retry-limit errors, or application-error pages.
+- Remaining gates are explicit qualified patent-professional reviews; they are shown as expert-review gates with reasons.
+
