@@ -6,14 +6,18 @@ import {
   MAX_AUTONOMOUS_RUN_BUDGET,
   remainingAutonomousCostUnits,
   remainingAutonomousCostUnitsAfterReservations,
+  hasUnlimitedAutonomousWork,
   utcDateKey,
 } from "@convex/usagePolicyLogic";
 
 describe("InventSmith usage policy", () => {
-  it("normalizes legacy tiers without creating an unlimited plan", () => {
+  it("normalizes legacy tiers and leaves enterprise autonomous work uncapped", () => {
     expect(normalizeAtlasTier("starter")).toBe("inventor");
     expect(normalizeAtlasTier("inventor_pro")).toBe("pro");
-    expect(getDailyUsageLimits("enterprise").autonomousCostUnits).toBeLessThan(1000);
+    expect(getDailyUsageLimits("enterprise").autonomousCostUnits).toBe(600);
+    expect(hasUnlimitedAutonomousWork("enterprise")).toBe(true);
+    expect(remainingAutonomousCostUnits("enterprise", 1_000_000)).toBe(Number.MAX_SAFE_INTEGER);
+    expect(hasUnlimitedAutonomousWork("pro")).toBe(false);
   });
 
   it("calculates a bounded remaining autonomous budget", () => {
