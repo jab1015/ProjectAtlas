@@ -682,3 +682,10 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Authenticated Rise Jar checks on the existing inventor Preview: Market Research 100% / 2 of 2, Excel export control responds, Patent Readiness 80% / 4 of 5 and Internal Legal pending, Product Design 0% / queued.
 - No patent-gate completion is recorded because the automated Legal disposition and audit event have not yet been visibly exercised.
 
+# Inventor Legal review UX clarification — 2026-10-23
+
+- Corrected the review page so inventor/manage access cannot mistake the Internal Legal packet for an inventor action. It now explains that the internal Legal workflow is processing automatically and provides a Journey Center link.
+- The reviewer form remains available only to explicit invention `review` access.
+- Added regression coverage for the permission-aware copy and form boundary.
+- Verification passed: 143 test files / 765 tests, TypeScript, lint with 0 errors and 10 existing warnings, and production build.
+
