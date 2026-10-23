@@ -6,6 +6,7 @@ export interface DailyUsageLimits {
 }
 
 export const MAX_AUTONOMOUS_RUN_BUDGET = 40;
+export const UNLIMITED_AUTONOMOUS_COST_UNITS = Number.MAX_SAFE_INTEGER;
 
 const LIMITS: Record<AtlasTier, DailyUsageLimits> = {
   free: { autonomousCostUnits: 25, chatQuestions: 30 },
@@ -36,11 +37,18 @@ export function getDailyUsageLimits(value: unknown): DailyUsageLimits {
   return LIMITS[normalizeAtlasTier(value)];
 }
 
+/** Enterprise usage is still recorded for cost visibility, but it must never
+ * block eligible autonomous work on a daily allowance. */
+export function hasUnlimitedAutonomousWork(value: unknown): boolean {
+  return normalizeAtlasTier(value) === "enterprise";
+}
+
 export function utcDateKey(timestamp: number): string {
   return new Date(timestamp).toISOString().slice(0, 10);
 }
 
 export function remainingAutonomousCostUnits(tier: unknown, used: number): number {
+  if (hasUnlimitedAutonomousWork(tier)) return UNLIMITED_AUTONOMOUS_COST_UNITS;
   return Math.max(0, getDailyUsageLimits(tier).autonomousCostUnits - Math.max(0, used));
 }
 
