@@ -92,6 +92,25 @@ describe("manual failed-work retry", () => {
     expect(state.runAfter).toHaveBeenCalledTimes(1);
   });
 
+  it("routes legacy product and manufacturing jobs to their registered agents", async () => {
+    for (const [kind, department, agentId] of [
+      ["product_requirements", "product_design", "inventsmith.department.product_design.v1"],
+      ["materials_manufacturing", "manufacturing", "inventsmith.department.manufacturing.v1"],
+    ] as const) {
+      const state = makeContext(failedItem({
+        kind,
+        inputSnapshot: { product: "RiseJars", department: "unknown", automaticRecoveryCount: 0 },
+      }), { autonomousCostUnits: 0, reservedAutonomousCostUnits: 0 });
+      await expect(retryFailedWorkItemHandler(state.ctx, { inventionId: "inv-1" as any, workItemId: "work-1" as any })).resolves.toEqual({ queued: true, reason: "scheduled" });
+      expect(state.patch).toHaveBeenCalledWith("work-1", expect.objectContaining({
+        inputSnapshot: expect.objectContaining({ department }),
+      }));
+      expect(state.insert).toHaveBeenCalledWith("atlasExecutionEvents", expect.objectContaining({
+        metadata: expect.objectContaining({ departmentAgentId: agentId }),
+      }));
+    }
+  });
+
   it("repairs a bounded exhausted autonomous job through its registered department agent", async () => {
     const state = makeContext(failedItem({
       title: "Research materials and manufacturing approaches",

@@ -1,5 +1,6 @@
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { getEffectiveOrganizationPlanKey } from "./betaAccessLogic";
 
 export type UsageScopeCtx = QueryCtx | MutationCtx;
@@ -24,7 +25,12 @@ export async function resolveInventionUsageScope(
   // so internal workers can preserve the administrator's exemption without
   // relying on an interactive auth context.
   const owner = await ctx.db.get(invention.userId);
-  const isAdmin = owner?.role === "admin";
+  // Interactive support/admin mutations must use the current operator's role,
+  // not only the invention owner's role. Worker contexts have no auth user, so
+  // preserving the owner check keeps internal/admin-owned jobs compatible.
+  const currentUserId = await getAuthUserId(ctx);
+  const currentUser = currentUserId ? await ctx.db.get(currentUserId) : null;
+  const isAdmin = currentUser?.role === "admin" || owner?.role === "admin";
 
   if (invention.organizationId) {
     const organization = await ctx.db.get(invention.organizationId);
