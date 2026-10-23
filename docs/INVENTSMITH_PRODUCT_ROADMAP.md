@@ -1074,3 +1074,9 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - The Legal preparation agent still cannot claim patentability or clearance; it prepares the traceable packet and records unresolved questions for the authorized reviewer.
 - Outside patent counsel remains an escalation option when internal Legal identifies a matter outside its authority or needs an independent opinion.
 
+# Legal gate acceptance boundary — 2026-10-23
+
+- Internal Legal is the default review path, but administrator status is not professional qualification.
+- Explicit invention review access is now required to record any professional review; generic manage access cannot self-certify Legal, engineering, regulatory, or other professional gates.
+- The next acceptance step is to provision or use a real authorized internal Legal reviewer, exercise both Request changes and Complete Legal review, and verify the audit trail and downstream handoff on a controlled fixture.
+

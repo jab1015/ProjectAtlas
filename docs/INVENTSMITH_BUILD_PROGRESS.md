@@ -599,3 +599,10 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - The Legal preparation agent still cannot claim patentability or clearance; it prepares the traceable packet and records unresolved questions for the authorized reviewer.
 - Outside patent counsel remains an escalation option when internal Legal identifies a matter outside its authority or needs an independent opinion.
 
+# Legal reviewer authorization repair — 2026-10-23
+
+- Preview acceptance found a real authorization defect: administrator/manage access could record a professional review without explicit invention review access.
+- Fixed and pushed as 406049e plus test update 034d244. The mutation now fails closed unless the authenticated user has explicit invention review access.
+- Verification: 142 test files / 759 tests passed; TypeScript passed; ESLint passed with existing warnings; Next production build passed.
+- Live acceptance remains blocked pending a genuine internal Legal reviewer session and correction of the invalid test record. Production Convex deployment was not performed.
+

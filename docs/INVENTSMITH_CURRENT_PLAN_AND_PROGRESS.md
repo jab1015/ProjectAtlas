@@ -594,3 +594,10 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - The Legal preparation agent still cannot claim patentability or clearance; it prepares the traceable packet and records unresolved questions for the authorized reviewer.
 - Outside patent counsel remains an escalation option when internal Legal identifies a matter outside its authority or needs an independent opinion.
 
+# Legal reviewer authorization repair — 2026-10-23
+
+- Live administrator testing on the documentation-only Vercel Preview exposed that a generic administrator could submit arbitrary reviewer text and reduce the professional-gate count. This was not accepted as a valid Legal review.
+- Repair pushed in commits 406049e and 034d244: recording a professional review now requires authenticated explicit invention review access; manage/administrator access alone cannot certify a professional review.
+- Regression coverage passes with the complete suite. The live Rise Jar gate record created by the invalid test remains a data-correction item and must not be treated as qualified Legal acceptance.
+- No patent gate is complete until a real authorized internal Legal reviewer records the review with a genuine qualification or matter reference, substantive notes, and an auditable event.
+
