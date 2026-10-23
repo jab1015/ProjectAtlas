@@ -5,7 +5,7 @@ export function getJourneyStageStatusExplanation(
   counts: { runningWorkCount: number; queuedWorkCount: number; queuedWorkTitle?: string; staleReason?: string },
 ): string {
   if (status === "complete") return "InventSmith finished the required work for this stage.";
-  if (status === "professional_review") return "InventSmith prepared the work; a qualified professional must review it.";
+  if (status === "professional_review") return "InventSmith prepared the packet; Internal Legal review is needed in the Legal department. Outside counsel is an escalation option only when Internal Legal identifies work beyond its authority.";
   if (status === "blocked") return "InventSmith is waiting for the specific information or authorization shown above.";
   if (status === "needs_refresh") {
     if (counts.runningWorkCount > 0) return "New evidence changed this stage. InventSmith is refreshing it now.";
