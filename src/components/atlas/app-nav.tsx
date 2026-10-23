@@ -10,9 +10,9 @@ import { Button } from "@/components/ui/button";
 import { AtlasLogo } from "@/components/atlas/atlas-logo";
 import { InventorActivityStrip } from "@/components/atlas/inventor-activity-strip";
 import type { StatusBriefing } from "@convex/statusBriefingLogic";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import type { Id } from "@convex/_generated/dataModel";
 
 interface AppNavProps { className?: string; }
@@ -24,11 +24,14 @@ export function AppNav({ className }: AppNavProps) {
   const { signOut } = useAuthActions();
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { isAuthenticated } = useConvexAuth();
   const user = useQuery(api.authHelpers.getCurrentUser);
   const routeId = pathname?.match(/^\/invention\/([^/]+)/)?.[1] as Id<"inventions"> | undefined;
-  const queryInventionId = searchParams.get("inventionId") as Id<"inventions"> | null;
+  const [queryInventionId, setQueryInventionId] = useState<Id<"inventions"> | null>(null);
+  useEffect(() => {
+    const value = new URLSearchParams(window.location.search).get("inventionId");
+    setQueryInventionId(value as Id<"inventions"> | null);
+  }, [pathname]);
   // The route already contains the authoritative invention id. Avoid a second
   // access lookup in global navigation: during auth/query hydration that lookup
   // can transiently fail and take the entire page to the generic error boundary.
