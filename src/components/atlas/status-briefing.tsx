@@ -19,6 +19,7 @@ function isEvidenceRequest(title: string, detail: string) {
 export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
   const primaryNeed = briefing.needsInventor[0];
   const evidenceNeeded = primaryNeed ? isEvidenceRequest(primaryNeed.title, primaryNeed.detail) : false;
+  const professionalReviewNeeded = primaryNeed ? isProfessionalReviewRequest(primaryNeed.title, primaryNeed.detail) : false;
   const runningWorkCount = briefing.next.filter((item) => item.status === "running").length;
   const queuedWorkCount = briefing.next.filter((item) => item.status === "queued").length;
 
@@ -39,9 +40,9 @@ export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
         <div className="rounded-2xl border border-primary/25 bg-accent/65 p-6 sm:p-7">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="max-w-xl space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Your input is needed</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">{professionalReviewNeeded ? "Professional review required" : "Your input is needed"}</p>
               <h3 className="text-xl font-semibold text-foreground">{primaryNeed.title}</h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">{primaryNeed.detail}</p>
+              <p className="text-sm leading-relaxed text-muted-foreground">{professionalReviewNeeded ? `${primaryNeed.detail} This is assigned to a qualified reviewer in the Legal department, not an inventor response.` : primaryNeed.detail}</p>
               {briefing.needsInventor.length > 1 && (
                 <p className="text-xs text-muted-foreground">
                   {briefing.needsInventor.length - 1} additional inventor item{briefing.needsInventor.length === 2 ? "" : "s"} remain in the review queue. InventSmith will surface each only when it becomes actionable.
@@ -49,9 +50,9 @@ export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
               )}
             </div>
             <Button asChild className="shrink-0 gap-2">
-              <Link href={evidenceNeeded ? `/invention/${inventionId}/evidence` : `/invention/${inventionId}/review`}>
+              <Link href={evidenceNeeded ? `/invention/${inventionId}/evidence` : professionalReviewNeeded ? `/invention/${inventionId}/patent` : `/invention/${inventionId}/review`}>
                 {evidenceNeeded ? <FileUp className="h-4 w-4" aria-hidden="true" /> : null}
-                {evidenceNeeded ? "Upload requested evidence" : "Review and decide"}
+                {evidenceNeeded ? "Upload requested evidence" : professionalReviewNeeded ? "Open Legal review" : "Review and decide"}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </Button>
