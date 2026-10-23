@@ -613,3 +613,9 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Administrator account: `jerry.brown1015@gmail.com`.
 - Rise Jar inventor account: `jerry@modernmethods.it.com`, personal organization `RiseJars`.
 - The correct inventor session was authenticated on the newest Preview. Dashboard, Journey Center, and the Legal review page load successfully; the Legal gate remains pending.
+
+# Enterprise autonomous-work cap repair — 2026-10-23
+
+- The Rise Jar inventor account is Enterprise, but the Journey Center reported that the daily autonomous-work allowance was exhausted.
+- Root cause: Enterprise still used the legacy numeric 600-unit autonomous cap. Enterprise autonomous work is now uncapped while usage continues to be recorded for cost visibility.
+- Repair verification passed: 142 test files / 759 tests, TypeScript, lint with 0 errors, and production build.
