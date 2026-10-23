@@ -601,3 +601,9 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Regression coverage passes with the complete suite. The live Rise Jar gate record created by the invalid test remains a data-correction item and must not be treated as qualified Legal acceptance.
 - No patent gate is complete until a real authorized internal Legal reviewer records the review with a genuine qualification or matter reference, substantive notes, and an auditable event.
 
+# Latest live verification — 2026-10-23
+
+- The newest documentation Preview is Ready and admin-authenticated. Route rendering passed for Operations, Rise Jar Journey, Patent Readiness, and the Legal review page.
+- The live fail-closed check failed because Convex production has not yet received the repair: an invalid administrator submission was accepted and the Rise Jar professional-gate count moved from 24 to 23. This record is not valid professional acceptance.
+- Local verification passed: 142 test files / 759 tests, TypeScript, lint with 0 errors, and production build. Deploying Convex production is pending the owner-controlled workflow’s explicit `DEPLOY INVENTSMITH PROD` confirmation and production-scoped key.
+- Patent gate status remains blocked. After deployment, use a real internal Legal reviewer with explicit invention review access to test Request changes, Complete Legal review, qualification/reference validation, audit trail, and handoff status.
