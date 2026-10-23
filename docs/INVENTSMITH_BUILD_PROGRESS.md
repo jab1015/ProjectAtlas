@@ -618,3 +618,9 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - `jerry.brown1015@gmail.com` is the administrator account.
 - `jerry@modernmethods.it.com` is the inventor account containing Rise Jar under the `RiseJars` personal organization.
 - The correct inventor session was verified on the newest Preview. Journey Center and Legal review render cleanly, with the gate still pending.
+
+# Enterprise autonomous-work cap repair — 2026-10-23
+
+- Root cause confirmed: the Enterprise plan still enforced the legacy 600-unit daily autonomous-work cap.
+- Enterprise autonomous work is now uncapped in the usage policy; the ledger continues recording actual usage for cost visibility.
+- Local verification passed: 142 test files / 759 tests, TypeScript, lint with 0 errors, and production build.
