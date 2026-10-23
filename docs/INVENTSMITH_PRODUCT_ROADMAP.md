@@ -1136,3 +1136,10 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Convex Run #38 succeeded and the newest Preview is Ready at `https://inventsmith-bqg6oqv39-inventors-os.vercel.app`.
 - Remaining acceptance item: fresh inventor authentication failed on that hostname, so live Rise Jar exercise and visible audit-record verification remain pending.
 
+# Legacy Internal Legal re-check repair — 2026-10-23
+
+- Existing inventions with a pre-automation pending Patent Readiness handoff are now automatically migrated through one bounded Internal Legal re-check when the owner opens the Journey Center.
+- A successful structured `proceed_to_product_design` result creates the auditable operational authorization required for Product Design; redesign and outside-authority results remain fail-closed.
+- Convex production Run #39 succeeded and the newest Vercel Preview `https://inventsmith-rw4bdqzv1-inventors-os.vercel.app` is Ready from commit `71fd229b29bd5d23697feb4b8e227aad196044ac`.
+- Roadmap acceptance remains pending until the authenticated inventor session shows the new Legal disposition, audit event, and downstream Product Design handoff status.
+
