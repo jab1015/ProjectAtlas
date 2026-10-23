@@ -1,7 +1,6 @@
 import { ConvexError } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
-import { isAdmin } from "./authHelpers";
 import { requireInventionReadAccess } from "./organizations";
 import { isNativeCadDeliverableKind } from "./cadArtifactKinds";
 import {
@@ -32,19 +31,13 @@ export async function recordProfessionalReviewHandler(
   ctx: MutationCtx,
   args: RecordProfessionalReviewArgs
 ) {
-  const administrator = await isAdmin(ctx);
   const review = await ctx.db.get(args.reviewId);
   if (!review) throw new ConvexError("Professional review not found");
-  let userId: Id<"users"> | undefined;
-  let access: "manage" | "review" | "edit" | "view" = administrator ? "manage" : "view";
-  if (!administrator) {
-    if (!(ctx as unknown as { auth?: unknown }).auth) {
-      throw new ConvexError("Administrator authorization is required to record a professional review");
-    }
-    const authorization = await requireInventionReadAccess(ctx, review.inventionId);
-    userId = authorization.userId;
-    access = authorization.access;
-    if (access !== "review" && access !== "manage") throw new ConvexError("An authorized Legal reviewer or administrator is required to record this review");
+  const authorization = await requireInventionReadAccess(ctx, review.inventionId);
+  const userId = authorization.userId;
+  const access = authorization.access;
+  if (access !== "review") {
+    throw new ConvexError("An authorized internal Legal reviewer with explicit invention review access is required to record this review");
   }
   const deliverable = await ctx.db.get(review.deliverableId);
   if (!deliverable || deliverable.inventionId !== review.inventionId) {
@@ -157,8 +150,8 @@ export async function recordProfessionalReviewHandler(
       artifactMaturity,
       isCurrentRevision,
       externalUseAuthorizationPreserved: preserveExternalUseAuthorization,
-      reviewedByUserId: userId ? String(userId) : "administrator",
-      reviewerChannel: access === "review" ? "internal_legal_team" : "administrator",
+      reviewedByUserId: String(userId),
+      reviewerChannel: "internal_legal_team",
     },
     createdAt: now,
   });

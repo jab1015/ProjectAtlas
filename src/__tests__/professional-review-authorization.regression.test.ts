@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const authMocks = vi.hoisted(() => ({ isAdmin: vi.fn() }));
-vi.mock("../../convex/authHelpers", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../../convex/authHelpers")>();
-  return { ...actual, isAdmin: authMocks.isAdmin };
+const accessMocks = vi.hoisted(() => ({ requireInventionReadAccess: vi.fn() }));
+vi.mock("../../convex/organizations", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../convex/organizations")>();
+  return { ...actual, requireInventionReadAccess: accessMocks.requireInventionReadAccess };
 });
 
 import { recordProfessionalReviewHandler } from "../../convex/professionalReviewMutation";
@@ -60,10 +60,10 @@ const acceptedArgs = {
   accepted: true,
 };
 
-describe("professional review / external authorization separation", () => {
+describe("professional review authorization / external authorization separation", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    authMocks.isAdmin.mockResolvedValue(true);
+    accessMocks.requireInventionReadAccess.mockResolvedValue({ userId: "reviewer-1", access: "review" });
   });
 
   it("keeps a current external-use authorization on an exact accepted-review replay", async () => {
