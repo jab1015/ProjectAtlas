@@ -618,3 +618,100 @@ export const failWork = internalMutation({
     const nextInputSnapshot = automaticRecovery
       ? {
           ...(item.inputSnapshot ?? {}),
+          automaticRecoveryCount: automaticRecoveryCount(item.inputSnapshot) + 1,
+          lastAutomaticRecoveryAt: args.failedAt,
+        }
+      : item.inputSnapshot;
+    const settledCostUnits = conservativeAttemptSettlementCost({
+      usageKnown: args.usageKnown,
+      actualCostUnits: args.actualCostUnits,
+      reservedCostUnits: item.reservedCostUnits,
+    });
+    await settleUsageReservation(ctx, item, item.inventionId, settledCostUnits, 0, args.failedAt);
+    await ctx.db.patch(item._id, {
+      status: willRetry ? "queued" : "failed",
+      maxAttempts: automaticRecovery ? item.attemptCount + 2 : item.maxAttempts,
+      lastError: willRetry ? undefined : args.error.slice(0, 1000),
+      inputSnapshot: nextInputSnapshot,
+      leaseExpiresAt: undefined,
+      reservedCostUnits: undefined,
+      reservedDailyCostUnits: undefined,
+      reservedCreditUnits: undefined,
+      reservationDateKey: undefined,
+      updatedAt: args.failedAt,
+    });
+    await ctx.db.insert("atlasExecutionEvents", {
+      inventionId: item.inventionId,
+      workItemId: item._id,
+      eventType: "work_failed",
+      actorType: "atlas",
+      summary: automaticRecovery
+        ? "Autonomous work failed at its retry limit and was automatically requeued for recovery."
+        : "Autonomous work attempt failed.",
+      attemptNumber: args.attemptNumber,
+      costUnits: args.usageKnown ? args.actualCostUnits : undefined,
+      metadata: { ...departmentAgentAuditMetadata(nextInputSnapshot, item.kind), retryScheduled: willRetry, automaticRecovery, usageKnown: args.usageKnown, budgetDebitUnits: settledCostUnits },
+      createdAt: args.failedAt,
+    });
+    return { willRetry, staleAttempt: false };
+  },
+});
+
+export const blockWorkForHuman = internalMutation({
+  args: {
+    workItemId: v.id("atlasWorkItems"),
+    attemptNumber: v.number(),
+    reason: v.string(),
+    gateType: v.union(v.literal("decision"), v.literal("authorization"), v.literal("private_information"), v.literal("professional_review"), v.literal("payment"), v.literal("physical_work")),
+    actualCostUnits: v.number(),
+    usageKnown: v.boolean(),
+    blockedAt: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const item = await ctx.db.get(args.workItemId);
+    if (!item) throw new ConvexError("Work item not found");
+
+    if (item.status !== "running" || item.attemptCount !== args.attemptNumber) {
+      await settleLateAttemptCostOnce(
+        ctx,
+        item,
+        args.attemptNumber,
+        args.actualCostUnits,
+        args.usageKnown,
+        args.blockedAt,
+        "A late human-gate result was ignored because a newer attempt owns this work item."
+      );
+      return { accepted: false };
+    }
+
+    const settledCostUnits = conservativeAttemptSettlementCost({
+      usageKnown: args.usageKnown,
+      actualCostUnits: args.actualCostUnits,
+      reservedCostUnits: item.reservedCostUnits,
+    });
+    await settleUsageReservation(ctx, item, item.inventionId, settledCostUnits, 0, args.blockedAt);
+    await ctx.db.patch(args.workItemId, {
+      status: "blocked",
+      blockedReason: args.reason,
+      humanGateType: args.gateType,
+      leaseExpiresAt: undefined,
+      reservedCostUnits: undefined,
+      reservedDailyCostUnits: undefined,
+      reservedCreditUnits: undefined,
+      reservationDateKey: undefined,
+      updatedAt: args.blockedAt,
+    });
+    await ctx.db.insert("atlasExecutionEvents", {
+      inventionId: item.inventionId,
+      workItemId: item._id,
+      eventType: "work_blocked",
+      actorType: "atlas",
+      summary: args.reason.slice(0, 500),
+      attemptNumber: args.attemptNumber,
+      costUnits: args.usageKnown ? args.actualCostUnits : undefined,
+      metadata: { ...departmentAgentAuditMetadata(item.inputSnapshot, item.kind), gateType: args.gateType, usageKnown: args.usageKnown, budgetDebitUnits: settledCostUnits },
+      createdAt: args.blockedAt,
+    });
+    return { accepted: true };
+  },
+});
