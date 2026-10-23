@@ -16,6 +16,10 @@ function isEvidenceRequest(title: string, detail: string) {
   return /survey|surveymonkey|interview|transcript|evidence|prototype\s*(test|result)|test\s*result|factory\s*quote|manufacturer\s*quote|rfq|document|report|upload/i.test(`${title} ${detail}`);
 }
 
+function isProfessionalReviewRequest(title: string, detail: string) {
+  return /professional review|patent counsel|qualified reviewer|legal department/i.test(`${title} ${detail}`);
+}
+
 export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
   const primaryNeed = briefing.needsInventor[0];
   const evidenceNeeded = primaryNeed ? isEvidenceRequest(primaryNeed.title, primaryNeed.detail) : false;
