@@ -75,6 +75,10 @@ const PRO_WORK = new Set([
 
 export function canTierRunWorkKind(tier: unknown, kind: string | undefined): boolean {
   if (!kind) return false;
+  if (/^design_around_directions_[1-3]$/.test(kind)) {
+    const normalized = normalizeAtlasTier(tier);
+    return normalized === "enterprise" || normalized === "pro";
+  }
   const normalized = normalizeAtlasTier(tier);
   if (normalized === "enterprise" || normalized === "pro") return PRO_WORK.has(kind);
   if (normalized === "inventor") return INVENTOR_WORK.has(kind);

@@ -82,8 +82,20 @@ describe("autonomous work selection", () => {
     expect(canRunProductDesignWork("competitor_discovery", false)).toBe(true);
   });
 
-  it("automatically authorizes the patent-to-design handoff through Internal Legal", () => {
-    expect(shouldAutoApproveInternalLegal("patent_design_handoff", "patent")).toBe(true);
+  it("authorizes only a sufficiently differentiated patent-to-design handoff", () => {
+    expect(shouldAutoApproveInternalLegal("patent_design_handoff", "patent", {
+      outcome: "proceed_to_product_design",
+      conflictLevel: "none_identified",
+      designDirectionRequired: false,
+      reason: "No material overlap remains in the current packet.",
+    })).toBe(true);
+    expect(shouldAutoApproveInternalLegal("patent_design_handoff", "patent", {
+      outcome: "redesign_required",
+      conflictLevel: "material_overlap",
+      designDirectionRequired: true,
+      reason: "The force-transfer arrangement remains too close.",
+    })).toBe(false);
+    expect(shouldAutoApproveInternalLegal("patent_design_handoff", "patent")).toBe(false);
     expect(shouldAutoApproveInternalLegal("product_design_specification", "engineering")).toBe(false);
   });
 });

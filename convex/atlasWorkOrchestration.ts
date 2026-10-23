@@ -41,8 +41,14 @@ const resultSchema = {
       sourceUrl: { type: "string" }, status: { type: "string", enum: ["verified_primary", "verified_authoritative_secondary", "verified_secondary", "unverified", "disputed"] }, notes: { type: "string" },
     }, required: ["sourceUrl", "status", "notes"] } },
     conceptImagePrompt: { type: "string" },
+    legalDisposition: { anyOf: [{ type: "null" }, { type: "object", additionalProperties: false, properties: {
+      outcome: { type: "string", enum: ["proceed_to_product_design", "redesign_required", "outside_authority"] },
+      conflictLevel: { type: "string", enum: ["none_identified", "preliminary_overlap", "material_overlap", "unclear"] },
+      designDirectionRequired: { type: "boolean" },
+      reason: { type: "string" },
+    }, required: ["outcome", "conflictLevel", "designDirectionRequired", "reason"] }] },
   },
-  required: ["summary", "deliverableTitle", "markdown", "findings", "assumptions", "limitations", "needsHuman", "humanReason", "humanGateType", "verifiedSources", "conceptImagePrompt"],
+  required: ["summary", "deliverableTitle", "markdown", "findings", "assumptions", "limitations", "needsHuman", "humanReason", "humanGateType", "verifiedSources", "conceptImagePrompt", "legalDisposition"],
 } as const;
 
 const RESEARCH_WORK = new Set([
@@ -55,6 +61,7 @@ const AUTONOMOUS_RESEARCH_KINDS = new Set([
   "materials_manufacturing", "evidence_verification", "preliminary_bom_cost",
   "preliminary_prior_art", "feature_prior_art_comparison", "distinguishing_features",
   "ip_readiness", "market_feasibility", "regulatory_screening", "design_candidate_generation",
+  "design_around_directions_1", "design_around_directions_2", "design_around_directions_3",
 ]);
 
 function assignmentInstructions(kind: string): string {
@@ -71,6 +78,7 @@ function assignmentInstructions(kind: string): string {
     ip_readiness: "Prepare an organized invention disclosure and patent-professional handoff brief using existing work. Clearly separate inventor contribution, prior-art observations, and legal questions.",
     feature_prior_art_comparison: "Build a feature-by-feature comparison between the proposed invention and the most relevant preliminary prior art. For each reference, carry forward its status classification: active/pending/in-force, expired/lapsed, abandoned/withdrawn/discontinued, or unknown/unverified. Active or unclear status can raise current conflict risk; inactive status remains prior-art context but is not an active enforceability blocker. Cite source locators, distinguish absence of evidence from evidence of difference, and do not offer a patentability or design-around opinion.",
     distinguishing_features: "Develop potentially distinguishing feature hypotheses and alternative embodiments from the comparison. For every potentially overlapping reference or crowded feature, state the concern, its active/inactive/unknown status, identify the specific mechanism or arrangement to avoid, and propose one or more materially different design-around directions for Product Design. If a reference is active or status is unclear and the overlap is material, automatically recommend a new design direction for the next design-generation work item. If no potentially blocking reference is found in the searched record, say so as a bounded research result—not legal clearance. Preserve inventor contribution, explain tradeoffs, and label every novelty statement as a hypothesis for patent-professional review.",
+    design_around_directions: "Create materially different product design directions that address the Internal Legal conflict findings in the inventor record and Patent Readiness packet. Explicitly avoid the identified overlap zones, preserve the user problem and core constraints where possible, and document tradeoffs. This is an automated design-around exploration, not a patentability, freedom-to-operate, legal-clearance, or engineering-approval conclusion.",
     product_requirements: "Draft testable initial product requirements covering users, functions, performance hypotheses, interfaces, constraints, usability, safety questions, compliance questions, and acceptance evidence. Do not represent them as engineering-approved requirements.",
     design_directions: "Prepare multiple concept-level product design directions with form, mechanism, user interaction, materials, assembly, tradeoffs, and image-generation prompts. Label them Concept Visualization directions, not CAD or production engineering.",
     concept_image_generation: "Use the prior design-directions deliverable to specify one professional concept board showing three clearly labeled product directions. Return the exact detailed image prompt in conceptImagePrompt. The visualization must avoid dimensions, tolerances, certifications, patent claims, or production-ready representations.",
@@ -92,7 +100,10 @@ function resolvedInstructions(workItem: any): string {
   if (workItem.kind === "brand_asset_brief") {
     return `${base} In addition to the written production brief, create the exact complete image-generation direction for one coherent visual product-brand concept board and return it in conceptImagePrompt. Ground it in the recommended naming direction, positioning, customer evidence, product character, messaging, palette/typography direction and packaging/presentation principles already in the project. Do not claim trademark clearance or invent certifications, proof points, product performance, legal status, or a different name.`;
   }
-  return base;
+  if (workItem.kind === "patent_design_handoff") {
+    return `${base} Return legalDisposition as a required structured operational routing result. Use proceed_to_product_design only when the current design has no material active or unclear overlap, conflictLevel is none_identified, and designDirectionRequired is false. Use redesign_required when the current design is too close, has material overlap, or needs a design-around. Use outside_authority only when Internal Legal cannot evaluate the matter within its authority. This disposition must never be described as patentability, freedom to operate, legal clearance, validity, enforceability, or filing approval. For all other work kinds, return legalDisposition as null.`;
+  }
+  return `${base} Return legalDisposition as null for this work item.`;
 }
 function needsWebResearch(workItem: any): boolean {
   const input = workInput(workItem);
@@ -259,6 +270,7 @@ export const runAvailableWork = internalAction({
           generationPrompt,
           actualCostUnits: incurredCostUnits,
           completedAt: Date.now(),
+          legalDisposition: result.legalDisposition ?? null,
         });
         remainingBudget = Math.max(0, remainingBudget - incurredCostUnits);
       } catch (error) {

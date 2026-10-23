@@ -556,6 +556,13 @@ export default defineSchema({
     searchDate: v.optional(v.number()),
     missingInformation: v.optional(v.array(v.string())),
     staleReason: v.optional(v.string()),
+    internalLegalDisposition: v.optional(v.object({
+      outcome: v.union(v.literal("proceed_to_product_design"), v.literal("redesign_required"), v.literal("outside_authority")),
+      conflictLevel: v.union(v.literal("none_identified"), v.literal("preliminary_overlap"), v.literal("material_overlap"), v.literal("unclear")),
+      designDirectionRequired: v.boolean(),
+      reason: v.string(),
+      iteration: v.optional(v.number()),
+    })),
     createdAt: v.number(),
     updatedAt: v.number(),
   })

@@ -8,7 +8,7 @@ import { buildDeliverablePersistencePlan } from "./deliverablePersistenceLogic";
 import { canTierRunWorkKind } from "./entitlementPolicyLogic";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { PRODUCT_DESIGN_WORK_KINDS, hasAcceptedPatentDesignReview, canRunProductDesignWork } from "./patentDesignGateLogic";
-import { AUTOMATED_INTERNAL_LEGAL_NOTES, AUTOMATED_INTERNAL_LEGAL_REFERENCE, AUTOMATED_INTERNAL_LEGAL_REVIEWER, shouldAutoApproveInternalLegal } from "./internalLegalAutomationLogic";
+import { AUTOMATED_DESIGN_AROUND_INSTRUCTIONS, AUTOMATED_INTERNAL_LEGAL_NOTES, AUTOMATED_INTERNAL_LEGAL_REFERENCE, AUTOMATED_INTERNAL_LEGAL_REVIEWER, MAX_AUTOMATED_LEGAL_ITERATIONS, shouldAutoApproveInternalLegal, shouldRouteToAutomatedRedesign, type InternalLegalDisposition } from "./internalLegalAutomationLogic";
 import { ensureOrganizationDailyUsage, findOrganizationDailyUsage } from "./organizationDailyUsage";
 import { conservativeAttemptSettlementCost } from "./usageSettlementLogic";
 import { isManufacturingMaturityEligible } from "./manufacturingMaturityLogic";
@@ -339,6 +339,12 @@ export const completeWork = internalMutation({
     mediaType: v.optional(v.string()),
     artifactMaturity: v.optional(v.union(v.literal("concept_visualization"), v.literal("preliminary_cad"), v.literal("prototype_candidate"), v.literal("engineering_reviewed"), v.literal("manufacturing_released"))),
     generationPrompt: v.optional(v.string()),
+    legalDisposition: v.optional(v.object({
+      outcome: v.union(v.literal("proceed_to_product_design"), v.literal("redesign_required"), v.literal("outside_authority")),
+      conflictLevel: v.union(v.literal("none_identified"), v.literal("preliminary_overlap"), v.literal("material_overlap"), v.literal("unclear")),
+      designDirectionRequired: v.boolean(),
+      reason: v.string(),
+    })),
     actualCostUnits: v.number(),
     completedAt: v.number(),
   },
@@ -513,21 +519,30 @@ export const completeWork = internalMutation({
       confidence,
       searchDate: args.completedAt,
       missingInformation: [...new Set(findings.flatMap((finding) => finding.limitations))],
+      internalLegalDisposition: args.legalDisposition ? { ...args.legalDisposition, iteration: Number((workItem.inputSnapshot as any)?.legalIteration ?? 0) } : undefined,
       createdAt: args.completedAt,
       updatedAt: args.completedAt,
     });
     for (const review of requiredReviews) {
-      const autoApprovedByInternalLegal = shouldAutoApproveInternalLegal(deliverableKind, review.specialty);
+      const disposition = args.legalDisposition as InternalLegalDisposition | undefined;
+      const autoApprovedByInternalLegal = shouldAutoApproveInternalLegal(deliverableKind, review.specialty, disposition);
+      const redesignRequired = shouldRouteToAutomatedRedesign(deliverableKind, review.specialty, disposition);
+      const iteration = Number((workItem.inputSnapshot as any)?.legalIteration ?? 0);
+      const canAutomaticallyRedesign = redesignRequired && iteration < MAX_AUTOMATED_LEGAL_ITERATIONS;
       await ctx.db.insert("professionalReviews", {
         inventionId: workItem.inventionId,
         deliverableId,
         specialty: review.specialty,
         requiredCredentials: review.requiredCredentials,
         scope: review.scope,
-        status: autoApprovedByInternalLegal ? "accepted" : "required",
-        reviewerName: autoApprovedByInternalLegal ? AUTOMATED_INTERNAL_LEGAL_REVIEWER : undefined,
-        reviewerReference: autoApprovedByInternalLegal ? AUTOMATED_INTERNAL_LEGAL_REFERENCE : undefined,
-        notes: autoApprovedByInternalLegal ? AUTOMATED_INTERNAL_LEGAL_NOTES : undefined,
+        status: autoApprovedByInternalLegal ? "accepted" : canAutomaticallyRedesign ? "changes_requested" : "required",
+        reviewerName: autoApprovedByInternalLegal || canAutomaticallyRedesign ? AUTOMATED_INTERNAL_LEGAL_REVIEWER : undefined,
+        reviewerReference: autoApprovedByInternalLegal || canAutomaticallyRedesign ? AUTOMATED_INTERNAL_LEGAL_REFERENCE : undefined,
+        notes: autoApprovedByInternalLegal
+          ? AUTOMATED_INTERNAL_LEGAL_NOTES
+          : canAutomaticallyRedesign
+            ? `Internal Legal automatically identified a design-around requirement: ${disposition?.reason ?? "The current packet has unresolved overlap or conflict risk."} The work is being routed back through automated design-around exploration before Legal re-checks it.`
+            : disposition?.reason,
         reviewedAt: autoApprovedByInternalLegal ? args.completedAt : undefined,
         createdAt: args.completedAt,
         updatedAt: args.completedAt,
@@ -550,6 +565,61 @@ export const completeWork = internalMutation({
           },
           createdAt: args.completedAt,
         });
+      }
+      if (canAutomaticallyRedesign) {
+        const designAroundKind = `design_around_directions_${iteration + 1}`;
+        const nextNow = args.completedAt;
+        const existingWork = await ctx.db.query("atlasWorkItems").withIndex("by_inventionId", (q) => q.eq("inventionId", workItem.inventionId)).collect();
+        if (!existingWork.some((item) => item.kind === designAroundKind)) {
+          await ctx.db.insert("atlasWorkItems", {
+            inventionId: workItem.inventionId,
+            kind: designAroundKind,
+            title: `Explore automated design-around directions (Legal iteration ${iteration + 1})`,
+            status: "queued",
+            priority: 57,
+            inputSnapshot: {
+              department: "product_design",
+              stageId: 5,
+              legalIteration: iteration + 1,
+              instructions: `${AUTOMATED_DESIGN_AROUND_INSTRUCTIONS} Internal Legal identified: ${disposition?.reason ?? "unresolved overlap"}`,
+            },
+            attemptCount: 0,
+            maxAttempts: 3,
+            estimatedCostUnits: 14,
+            deliverableKind: "product_design_directions",
+            dependsOnKinds: ["distinguishing_features"],
+            createdAt: nextNow,
+            updatedAt: nextNow,
+          });
+          await ctx.db.insert("atlasWorkItems", {
+            inventionId: workItem.inventionId,
+            kind: "patent_design_handoff",
+            title: `Re-check Patent Readiness after design-around (Legal iteration ${iteration + 1})`,
+            status: "queued",
+            priority: 56,
+            inputSnapshot: {
+              department: "patent_readiness",
+              stageId: 4,
+              legalIteration: iteration + 1,
+              instructions: "Re-evaluate the current invention and the newly generated design-around directions against the prior-art record. Return a structured legalDisposition. Proceed only when no material active or unclear overlap remains in the current design; otherwise request another bounded redesign iteration. This is an operational internal Legal routing decision, not a patentability, freedom-to-operate, legal-clearance, validity, enforceability, or filing opinion.",
+            },
+            attemptCount: 0,
+            maxAttempts: 3,
+            estimatedCostUnits: 10,
+            deliverableKind: "patent_design_handoff",
+            dependsOnKinds: [designAroundKind],
+            createdAt: nextNow,
+            updatedAt: nextNow,
+          });
+          await ctx.db.insert("atlasExecutionEvents", {
+            inventionId: workItem.inventionId,
+            eventType: "work_queued",
+            actorType: "system",
+            summary: `Internal Legal routed the invention into automated design-around iteration ${iteration + 1} before the next Legal re-check.`,
+            metadata: { automated: true, legalIteration: iteration + 1, designAroundKind, triggeringDeliverableId: String(deliverableId), conflictLevel: disposition?.conflictLevel, reason: disposition?.reason },
+            createdAt: nextNow,
+          });
+        }
       }
     }
     for (const findingId of findingIds) {
