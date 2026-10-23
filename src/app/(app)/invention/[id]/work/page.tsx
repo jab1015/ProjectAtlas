@@ -108,7 +108,9 @@ export default function InventionWorkPage() {
     setRetryError(null); setRetryingId(workItemId);
     try {
       const result = await retryWorkItem({ inventionId, workItemId: workItemId as Id<"atlasWorkItems"> });
-      if (!result.queued) setRetryError("This project has reached its daily autonomous work limit. The failed step is saved and can be retried when work is available.");
+      if (!result.queued) setRetryError(result.reason === "retry_limit"
+        ? "This step used all of its recovery attempts. Open Support so the team can investigate and restart it after a repair. Your saved results are safe."
+        : "This project has reached its daily autonomous work limit. The failed step is saved and can be retried when work is available.");
     } catch (error) {
       setRetryError(simpleRetryMessage(error));
     } finally { setRetryingId(null); }

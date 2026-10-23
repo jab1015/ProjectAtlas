@@ -12,17 +12,30 @@ import { userFacingError } from "@/lib/userFacingError";
 import { Button } from "@/components/ui/button";
 
 const STATUS_LABELS = { open: "Open", investigating: "Being investigated", waiting_on_user: "Waiting on you", resolved: "Resolved" } as const;
-const listMyCases = makeFunctionReference<"query", Record<string, never>, Array<{
+type SupportCaseView = {
   _id: Id<"supportCases">; subject: string; category: keyof typeof STATUS_LABELS | "bug" | "other" | "account" | "billing" | "invention";
   status: keyof typeof STATUS_LABELS; createdAt: number; description: string; inventionId?: Id<"inventions">;
-}>>("supportCases:listMine");
+  publicMessage?: string; customerReplies?: Array<{ message: string; createdAt: number }>;
+};
+const listMyCases = makeFunctionReference<"query", Record<string, never>, SupportCaseView[]>("supportCases:listMine");
+
+function SupportReplyForm({ caseId }: { caseId: Id<"supportCases"> }) {
+  const reply = useMutation(api.supportCases.replyToCase);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+  return <form className="mt-4 space-y-3" onSubmit={event => {
+    event.preventDefault(); setSaving(true); setError("");
+    void reply({ caseId, message }).then(() => setMessage("")).catch(error => setError(userFacingError(error, "Could not send your reply. Try again."))).finally(() => setSaving(false));
+  }}><label className="grid gap-1.5 text-sm font-medium">Your reply<textarea required maxLength={5000} rows={3} value={message} onChange={event => setMessage(event.target.value)} className="rounded-md border bg-background px-3 py-2 font-normal" /></label>{error && <p role="alert" className="text-sm text-destructive">{error}</p>}<Button type="submit" disabled={saving}>{saving ? "Sending…" : "Send reply"}</Button></form>;
+}
 
 function SupportForm() {
   const searchParams = useSearchParams();
   const initialInventionId = searchParams.get("inventionId") ?? "";
   const supportQueries = useMemo(() => ({ cases: { query: listMyCases, args: {} } }), []);
   const queryResults = useQueries(supportQueries);
-  const cases = queryResults.cases as Array<{ _id: Id<"supportCases">; subject: string; category: string; status: keyof typeof STATUS_LABELS; createdAt: number; description: string; inventionId?: Id<"inventions"> }> | undefined | Error;
+  const cases = queryResults.cases as SupportCaseView[] | undefined | Error;
   const createCase = useMutation(api.supportCases.create);
   const [category, setCategory] = useState<"account" | "billing" | "invention" | "bug" | "other">("bug");
   const [subject, setSubject] = useState("");
@@ -50,7 +63,7 @@ function SupportForm() {
       {message && <p role="status" className="text-sm text-muted-foreground">{message}</p>}
       <Button type="submit" disabled={saving}>{saving ? "Submitting…" : "Submit support case"}</Button>
     </form>
-    <section className="space-y-3"><h2 className="text-xl font-semibold">Your reports</h2>{cases === undefined ? <p className="text-sm text-muted-foreground">Loading…</p> : cases instanceof Error ? <div role="alert" className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950"><p>Your reports could not be loaded. You can still submit a support case.</p><Link href="/support" className="mt-2 inline-block font-medium underline">Open the support form</Link></div> : cases.length === 0 ? <p className="text-sm text-muted-foreground">You have not submitted a support case yet.</p> : cases.map(item => <article key={String(item._id)} className="rounded-lg border p-4"><div className="flex flex-wrap justify-between gap-2"><h3 className="font-medium">{item.subject}</h3><span className="text-sm text-muted-foreground">{STATUS_LABELS[item.status]}</span></div><p className="mt-1 text-xs text-muted-foreground">{item.category} · {new Date(item.createdAt).toLocaleString()}</p><p className="mt-3 whitespace-pre-wrap text-sm">{item.description}</p>{item.inventionId && <Link className="mt-2 inline-block text-sm text-primary underline" href={`/invention/${item.inventionId}/evidence`}>Open related invention workspace</Link>}</article>)}</section>
+    <section className="space-y-3"><h2 className="text-xl font-semibold">Your reports</h2>{cases === undefined ? <p className="text-sm text-muted-foreground">Loading…</p> : cases instanceof Error ? <div role="alert" className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950"><p>Your reports could not be loaded. You can still submit a support case.</p><Link href="/support" className="mt-2 inline-block font-medium underline">Open the support form</Link></div> : cases.length === 0 ? <p className="text-sm text-muted-foreground">You have not submitted a support case yet.</p> : cases.map(item => <article key={String(item._id)} className="rounded-lg border p-4"><div className="flex flex-wrap justify-between gap-2"><h3 className="font-medium">{item.subject}</h3><span className="text-sm text-muted-foreground">{STATUS_LABELS[item.status]}</span></div><p className="mt-1 text-xs text-muted-foreground">{item.category} · {new Date(item.createdAt).toLocaleString()}</p><p className="mt-3 whitespace-pre-wrap text-sm">{item.description}</p>{item.publicMessage && <div className="mt-3 rounded-md border bg-muted/30 p-3 text-sm"><p className="font-medium">From support</p><p className="mt-1 whitespace-pre-wrap">{item.publicMessage}</p></div>}{item.customerReplies?.map((reply, index) => <p key={index} className="mt-3 whitespace-pre-wrap text-sm"><span className="font-medium">Your reply:</span> {reply.message}</p>)}{item.status === "waiting_on_user" && <SupportReplyForm caseId={item._id} />}{item.inventionId && <Link className="mt-2 inline-block text-sm text-primary underline" href={`/invention/${item.inventionId}/evidence`}>Open related invention workspace</Link>}</article>)}</section>
     <Link href="/dashboard" className="text-sm text-primary underline">Back to dashboard</Link>
   </main></>;
 }

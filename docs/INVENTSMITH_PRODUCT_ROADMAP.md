@@ -1,3 +1,16 @@
+## Verified production deployment and live-test checkpoint — October 23, 2026
+
+- Repository: `jab1015/ProjectAtlas`; active branch: `inventsmith/full-product-build`; current pushed commit: `d3c280ad6bcfc78be4c3f39881a8611671be85bd`.
+- Vercel Preview is Ready for that commit: `https://inventsmith-5i0fcjbf1-inventors-os.vercel.app/` (deployment `2tfHe29B8dWKBo5mipN6gbtkr91D`).
+- Convex production workflow #29 succeeded for the same commit. Run: `https://github.com/jab1015/ProjectAtlas/actions/runs/39968775894`; job log confirms deployment to `https://agile-seahorse-379.convex.cloud` at 10:21 AM EDT.
+- Deployment verification: Convex TypeScript passed; full suite passed 141 files / 752 tests; production function deployment passed. Prior local web TypeScript and ESLint passed.
+- Backend health returned HTTP 200 with ready=true, databaseReachable=true, AI configured, and authentication configured. PLATFORM_FULFILLMENT_SECRET and ATLAS_SUBSCRIPTION_WEBHOOK_SECRET are not reported configured; billing/fulfillment acceptance remains open.
+- The professional-review status fix is included: a blocked patent-review handoff is excluded from inventor-action counts. The qualified review itself must still be recorded through its dedicated workflow.
+- The newest Preview landing and sign-in pages rendered in the interactive browser. This hostname needs a fresh login. Command-line frontend verification timed out on the landing route and did not see app sign-in text in its response, so it is not accepted as authenticated frontend proof.
+- Remaining live work: authenticate the newest Preview as administrator; retry the exhausted Rise Jar materials/manufacturing step once and verify bounded recovery, agent identity, saved result and audit history; continue support-agent, department, evidence, survey and export acceptance. App completion has not been declared.
+- The current frontend and backend now share a verified deployed commit. No new Vercel deployment was requested during this continuation; documentation changes will be included in the next consolidated GitHub batch.
+
+
 # InventSmith Product Roadmap
 
 ## Cross-stage infrastructure workstream — secure storage for CAD and 3-D artifacts

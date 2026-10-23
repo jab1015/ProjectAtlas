@@ -148,6 +148,25 @@ describe("manual failed-work retry", () => {
     }));
   });
 
+  it("recovers a repaired agent assignment once after both automatic cycles were exhausted", async () => {
+    const item = failedItem({ kind: "materials_manufacturing", attemptCount: 7, maxAttempts: 7,
+      lastError: "Work item is missing a registered department agent: unknown",
+      inputSnapshot: { department: "unknown", automaticRecoveryCount: 2 } });
+    const state = makeContext(item);
+    await expect(retryFailedWorkItemHandler(state.ctx, { inventionId: "inv-1" as any, workItemId: "work-1" as any }))
+      .resolves.toEqual({ queued: true, reason: "scheduled" });
+    expect(state.patch).toHaveBeenCalledWith("work-1", expect.objectContaining({ maxAttempts: 9,
+      inputSnapshot: expect.objectContaining({ department: "manufacturing", automaticRecoveryCount: 2, departmentAgentRecoveryVersion: 1 }) }));
+    expect(state.insert).toHaveBeenCalledWith("atlasExecutionEvents", expect.objectContaining({
+      metadata: expect.objectContaining({ changeType: "department_agent_recovery" }) }));
+    const exhausted = makeContext({ ...item, attemptCount: 9, maxAttempts: 9,
+      inputSnapshot: { department: "manufacturing", automaticRecoveryCount: 2, departmentAgentRecoveryVersion: 1 } });
+    await expect(retryFailedWorkItemHandler(exhausted.ctx, { inventionId: "inv-1" as any, workItemId: "work-1" as any }))
+      .resolves.toEqual({ queued: false, reason: "retry_limit" });
+    expect(exhausted.patch).not.toHaveBeenCalled();
+    expect(exhausted.runAfter).not.toHaveBeenCalled();
+  });
+
   it("requires edit access before any retry side effects", async () => {
     mocks.requireInventionEditAccess.mockRejectedValue(new Error("Invention edit access required"));
     const state = makeContext(failedItem(), { autonomousCostUnits: 0 });
@@ -161,7 +180,7 @@ describe("manual failed-work retry", () => {
     const unknown = makeContext(failedItem({ kind: "unmapped_work_kind" }), { autonomousCostUnits: 0 });
     await expect(retryFailedWorkItemHandler(unknown.ctx, { inventionId: "inv-1" as any, workItemId: "work-1" as any })).rejects.toThrow("missing a registered department agent");
     const exhausted = makeContext(failedItem({ maxAttempts: 5 }), { autonomousCostUnits: 0 });
-    await expect(retryFailedWorkItemHandler(exhausted.ctx, { inventionId: "inv-1" as any, workItemId: "work-1" as any })).rejects.toThrow("reached its retry limit");
+    await expect(retryFailedWorkItemHandler(exhausted.ctx, { inventionId: "inv-1" as any, workItemId: "work-1" as any })).resolves.toEqual({ queued: false, reason: "retry_limit" });
     expect(exhausted.patch).not.toHaveBeenCalled();
   });
 

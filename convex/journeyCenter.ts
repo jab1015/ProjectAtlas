@@ -46,19 +46,32 @@ export const getJourneyCenter = query({
       ctx.db.query("evidenceRequests").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).order("desc").collect(),
     ]);
 
-    const deliverableById = new Map(deliverables.map((item) => [String(item._id), item]));
+    const latestWorkByKind = new Map<string, (typeof workItems)[number]>();
+    for (const item of workItems) {
+      const current = latestWorkByKind.get(item.kind);
+      if (!current || item.updatedAt > current.updatedAt) latestWorkByKind.set(item.kind, item);
+    }
+    const currentWorkItems = [...latestWorkByKind.values()];
+    const latestDeliverableByKind = new Map<string, (typeof deliverables)[number]>();
+    for (const item of deliverables) {
+      const current = latestDeliverableByKind.get(item.kind);
+      if (!current || item.version > current.version || (item.version === current.version && item.updatedAt > current.updatedAt)) latestDeliverableByKind.set(item.kind, item);
+    }
+    const currentDeliverables = [...latestDeliverableByKind.values()];
+    const deliverableById = new Map(currentDeliverables.map((item) => [String(item._id), item]));
     const stageRows = journeyStages.map((stage) => {
-      const relevant = stage.requiredWorkKinds.map((kind) => workItems.find((item) => item.kind === kind)).filter(Boolean);
+      const relevant = stage.requiredWorkKinds.map((kind) => currentWorkItems.find((item) => item.kind === kind)).filter(Boolean);
       const completedCount = relevant.filter((item) => item?.status === "completed").length;
+      const professionalGateItems = relevant.filter((item) => item && (item.humanGateType === "professional_review" || (item.kind === "patent_design_handoff" && /patent counsel|qualified patent/i.test(item.blockedReason ?? ""))));
       const blockedItems = relevant.filter((item) =>
-        (item && (item.status === "blocked" || item.status === "awaiting_approval") && !AUTONOMOUS_RESEARCH_KINDS.has(item.kind) && !PROFESSIONAL_REVIEW_GATE_KINDS.has(item.kind))
+        (item && (item.status === "blocked" || item.status === "awaiting_approval") && !AUTONOMOUS_RESEARCH_KINDS.has(item.kind) && !professionalGateItems.includes(item))
       );
       const runningItems = relevant.filter((item) => item?.status === "running");
       const queuedItems = relevant.filter((item) => item?.status === "queued");
       const failedItems = relevant.filter((item) => item?.status === "failed");
       const staleItems = relevant.filter((item) => item?.status === "stale");
       const relevantWorkIds = new Set(relevant.map((item) => item ? String(item._id) : ""));
-      const stageDeliverables = deliverables.filter((item) => item.workItemId && relevantWorkIds.has(String(item.workItemId)));
+      const stageDeliverables = currentDeliverables.filter((item) => item.workItemId && relevantWorkIds.has(String(item.workItemId)));
       const stageReviews = reviews.filter((review) => {
         const deliverable = deliverableById.get(String(review.deliverableId));
         return Boolean(deliverable?.workItemId && relevantWorkIds.has(String(deliverable.workItemId)));
@@ -79,6 +92,7 @@ export const getJourneyCenter = query({
         requiredWorkCount: stage.requiredWorkKinds.length,
         completedWorkCount: completedCount,
         pendingProfessionalReviews: pendingReviews.length,
+        professionalGateCount: professionalGateItems.length,
         staleWorkCount: staleItems.length,
         hasStaleDeliverable,
         failedWorkCount: failedItems.length,

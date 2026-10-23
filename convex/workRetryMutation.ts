@@ -3,7 +3,7 @@ import { makeFunctionReference } from "convex/server";
 import { mutation } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
-import { departmentAgentAuditMetadata, resolveDepartmentAgent } from "./departmentAgentLogic";
+import { canRecoverAgentAssignment, departmentAgentAuditMetadata, resolveDepartmentAgent } from "./departmentAgentLogic";
 import { requireInventionEditAccess } from "./organizations";
 import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { getOrganizationUsageSnapshot } from "./organizationDailyUsage";
@@ -31,6 +31,7 @@ export async function retryFailedWorkItemHandler(
   // missing-agent failure that caused this work item to stop.
   const agent = resolveDepartmentAgent(item.inputSnapshot, item.kind);
   const currentLimit = item.maxAttempts ?? 3;
+  const assignmentRecovery = canRecoverAgentAssignment(item.inputSnapshot, item.kind, item.lastError);
   const currentAttemptCeiling = Math.max(currentLimit, item.attemptCount);
   const boundedAutomaticRecovery = shouldAutomaticallyRecoverFailedWork(
     item.kind,
@@ -38,8 +39,8 @@ export async function retryFailedWorkItemHandler(
     item.attemptCount,
     currentLimit,
   );
-  if (currentAttemptCeiling >= MAX_MANUAL_WORK_RETRY_LIMIT && !boundedAutomaticRecovery) {
-    throw new ConvexError("This work item has reached its retry limit. Contact InventSmith support for help.");
+  if (currentAttemptCeiling >= MAX_MANUAL_WORK_RETRY_LIMIT && !boundedAutomaticRecovery && !assignmentRecovery) {
+    return { queued: false as const, reason: "retry_limit" as const };
   }
 
   const usageScope = await resolveInventionUsageScope(ctx, args.inventionId);
@@ -61,10 +62,11 @@ export async function retryFailedWorkItemHandler(
       );
   if (remaining <= 0) return { queued: false as const, reason: "daily_usage_limit" as const };
 
-  const nextAttemptLimit = boundedAutomaticRecovery ? currentAttemptCeiling + 2 : currentAttemptCeiling + 1;
+  const nextAttemptLimit = boundedAutomaticRecovery || assignmentRecovery ? currentAttemptCeiling + 2 : currentAttemptCeiling + 1;
   const nextInputSnapshot = {
     ...(item.inputSnapshot ?? {}),
     department: agent.department,
+    ...(assignmentRecovery ? { departmentAgentRecoveryVersion: 1, lastDepartmentAgentRecoveryAt: now } : {}),
     ...(boundedAutomaticRecovery
       ? { automaticRecoveryCount: Number(item.inputSnapshot?.automaticRecoveryCount ?? 0) + 1, lastAutomaticRecoveryAt: now }
       : {}),
@@ -81,12 +83,14 @@ export async function retryFailedWorkItemHandler(
     workItemId: item._id,
     eventType: "work_queued",
     actorType: "inventor",
-    summary: boundedAutomaticRecovery
+    summary: assignmentRecovery
+      ? `InventSmith repaired the department assignment for ${item.title} and queued one bounded recovery window.`
+      : boundedAutomaticRecovery
       ? `InventSmith repaired and requeued ${item.title} through its bounded automatic-recovery path.`
       : `Authorized collaborator retried ${item.title}.`,
     attemptNumber: item.attemptCount,
     metadata: {
-      changeType: boundedAutomaticRecovery ? "bounded_automatic_recovery" : "manual_work_retry",
+      changeType: assignmentRecovery ? "department_agent_recovery" : boundedAutomaticRecovery ? "bounded_automatic_recovery" : "manual_work_retry",
       priorAttemptCount: item.attemptCount,
       nextAttemptLimit,
       ...departmentAgentAuditMetadata({ ...(item.inputSnapshot ?? {}), department: agent.department }, item.kind),

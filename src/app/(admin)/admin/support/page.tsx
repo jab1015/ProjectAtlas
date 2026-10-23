@@ -24,7 +24,7 @@ export default function AdminSupportPage() {
     setBusy(String(item._id));
     setMessage("");
     try {
-      await updateCase({ caseId: item._id, status: data.get("status") as CaseStatus, adminNotes: String(data.get("adminNotes") ?? "") });
+      await updateCase({ caseId: item._id, status: data.get("status") as CaseStatus, adminNotes: String(data.get("adminNotes") ?? ""), publicMessage: String(data.get("publicMessage") ?? "") });
       setMessage(`Case updated: ${item.subject}`);
     } catch (error) {
       setMessage(userFacingError(error, "Could not update this case."));
@@ -49,9 +49,11 @@ export default function AdminSupportPage() {
         {item.linkedInvention && <div className="text-sm"><p className="text-muted-foreground">Linked invention · Stage {item.linkedInvention.currentStageId}</p><Link className="font-medium text-primary underline" href={`/invention/${item.linkedInvention.id}/evidence`}>{item.linkedInvention.title} — open in authorized workspace</Link><p className="mt-1 max-w-sm text-xs text-muted-foreground">This link uses normal invention access controls. A support case does not grant access to private invention evidence.</p></div>}
       </div>
       <p className="my-4 whitespace-pre-wrap text-sm">{item.description}</p>
+      {item.customerReplies?.map((reply, index) => <div key={index} className="my-3 rounded-md border p-3 text-sm"><p className="font-medium">Inventor reply · {new Date(reply.createdAt).toLocaleString()}</p><p className="mt-1 whitespace-pre-wrap">{reply.message}</p></div>)}
       <form className="grid gap-3 border-t pt-4 md:grid-cols-[220px_1fr_auto] md:items-end" onSubmit={event => { event.preventDefault(); void saveCase(item, event.currentTarget); }}>
         <label className="grid gap-1 text-sm font-medium">Case status<select name="status" defaultValue={item.status} className="h-10 rounded-md border bg-background px-3 font-normal">{STATUSES.map(status => <option key={status} value={status}>{STATUS_LABELS[status]}</option>)}</select></label>
         <label className="grid gap-1 text-sm font-medium">Private internal notes<textarea name="adminNotes" defaultValue={item.adminNotes ?? ""} maxLength={5000} rows={2} className="rounded-md border bg-background px-3 py-2 font-normal" placeholder="Investigation notes; not visible to the reporter." /></label>
+        <label className="grid gap-1 text-sm font-medium">Message to inventor<textarea name="publicMessage" defaultValue={item.publicMessage ?? ""} maxLength={5000} rows={3} className="rounded-md border bg-background px-3 py-2 font-normal" placeholder="Explain the requested action or the resolution. This is visible to the reporter." /></label>
         <Button type="submit" disabled={busy === String(item._id)}>{busy === String(item._id) ? "Saving…" : "Save case"}</Button>
       </form>
     </article>)}</div>}

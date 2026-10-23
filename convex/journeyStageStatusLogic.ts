@@ -26,6 +26,7 @@ export function getJourneyStageStatus(input: {
   requiredWorkCount: number;
   completedWorkCount: number;
   pendingProfessionalReviews: number;
+  professionalGateCount?: number;
   staleWorkCount: number;
   hasStaleDeliverable: boolean;
   failedWorkCount: number;
@@ -35,6 +36,7 @@ export function getJourneyStageStatus(input: {
   initialized: boolean;
   stageId: number;
 }): JourneyStageStatus {
+  if ((input.professionalGateCount ?? 0) > 0) return "professional_review";
   if (input.requiredWorkCount > 0 && input.completedWorkCount === input.requiredWorkCount && input.pendingProfessionalReviews > 0) return "professional_review";
   if (input.requiredWorkCount > 0 && input.completedWorkCount === input.requiredWorkCount) return "complete";
   if (input.staleWorkCount > 0 || input.hasStaleDeliverable) return "needs_refresh";

@@ -4,7 +4,7 @@ import type { Id } from "./_generated/dataModel";
 import { hasRecoverableAutonomousWork, shouldQueueEvidenceRefresh } from "./autonomyMaintenanceLogic";
 import { MAX_AUTONOMOUS_RUN_BUDGET } from "./usagePolicyLogic";
 import { EVIDENCE_FRESHNESS_STALE_REASON, isSourceEligibleForPromotion } from "./evidenceIntegrityLogic";
-import { departmentAgentAuditMetadata, resolveDepartmentAgent } from "./departmentAgentLogic";
+import { canRecoverAgentAssignment, departmentAgentAuditMetadata, resolveDepartmentAgent } from "./departmentAgentLogic";
 import { shouldAutomaticallyRecoverFailedWork } from "./workOrchestratorLogic";
 
 const findCandidates = makeFunctionReference<"query", Record<string, never>, Id<"inventions">[]>("autonomyMaintenance:findResumeCandidates");
@@ -88,16 +88,18 @@ export const recoverFailedWork = internalMutation({
         const maxAttempts = item.maxAttempts ?? 3;
         const withinRetryBudget = item.attemptCount < maxAttempts;
         const boundedAutomaticRecovery = shouldAutomaticallyRecoverFailedWork(item.kind, item.inputSnapshot, item.attemptCount, maxAttempts);
-        if (!withinRetryBudget && !boundedAutomaticRecovery) continue;
+        const assignmentRecovery = canRecoverAgentAssignment(item.inputSnapshot, item.kind, item.lastError);
+        if (!withinRetryBudget && !boundedAutomaticRecovery && !assignmentRecovery) continue;
         let agent;
         try { agent = resolveDepartmentAgent(item.inputSnapshot, item.kind); } catch { continue; }
         await ctx.db.patch(item._id, {
           status: "queued",
           lastError: undefined,
-          maxAttempts: boundedAutomaticRecovery ? item.attemptCount + 2 : item.maxAttempts,
+          maxAttempts: boundedAutomaticRecovery || assignmentRecovery ? Math.max(maxAttempts, item.attemptCount) + 2 : item.maxAttempts,
           inputSnapshot: {
             ...(item.inputSnapshot ?? {}),
             department: agent.department,
+            ...(assignmentRecovery ? { departmentAgentRecoveryVersion: 1, lastDepartmentAgentRecoveryAt: now } : {}),
             ...(boundedAutomaticRecovery
               ? { automaticRecoveryCount: Number(item.inputSnapshot?.automaticRecoveryCount ?? 0) + 1, lastAutomaticRecoveryAt: now }
               : {}),
@@ -111,7 +113,7 @@ export const recoverFailedWork = internalMutation({
           actorType: "system",
           summary: `InventSmith automatically recovered ${item.title} and returned it to the worker queue.`,
           attemptNumber: item.attemptCount,
-          metadata: { changeType: "automatic_failure_recovery", ...departmentAgentAuditMetadata({ ...(item.inputSnapshot ?? {}), department: agent.department }, item.kind) },
+          metadata: { changeType: assignmentRecovery ? "department_agent_recovery" : "automatic_failure_recovery", ...departmentAgentAuditMetadata({ ...(item.inputSnapshot ?? {}), department: agent.department }, item.kind) },
           createdAt: now,
         });
         requeued += 1;

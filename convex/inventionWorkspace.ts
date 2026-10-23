@@ -20,7 +20,7 @@ import {
   requestApprovalHandler,
   resolveApprovalRequestHandler,
 } from "./consequentialApprovalMutation";
-import { departmentAgentAuditMetadata, resolveDepartmentAgent } from "./departmentAgentLogic";
+import { canRecoverAgentAssignment, departmentAgentAuditMetadata, resolveDepartmentAgent } from "./departmentAgentLogic";
 import { shouldAutomaticallyRecoverFailedWork } from "./workOrchestratorLogic";
 
 const runAvailableWork = makeFunctionReference<
@@ -259,7 +259,9 @@ export const kickAutonomousWork = mutation({
       // records regardless of the old gate type so a prior prototype or
       // professional-review response cannot strand autonomous work.
       const recoverableResearchGate = item.status === "blocked" && AUTONOMOUS_RESEARCH_KINDS.has(item.kind);
+      const assignmentRecovery = item.status === "failed" && canRecoverAgentAssignment(item.inputSnapshot, item.kind, item.lastError);
       const recoverableFailure = item.status === "failed" && (
+        assignmentRecovery ||
         item.attemptCount < (item.maxAttempts ?? 3) ||
         shouldAutomaticallyRecoverFailedWork(item.kind, item.inputSnapshot, item.attemptCount, item.maxAttempts ?? 3)
       );
@@ -275,7 +277,8 @@ export const kickAutonomousWork = mutation({
           inputSnapshot: {
             ...(item.inputSnapshot ?? {}),
             department: agent.department,
-            ...(item.attemptCount >= (item.maxAttempts ?? 3)
+            ...(assignmentRecovery ? { departmentAgentRecoveryVersion: 1, lastDepartmentAgentRecoveryAt: now } : {}),
+            ...(!assignmentRecovery && item.attemptCount >= (item.maxAttempts ?? 3)
               ? { automaticRecoveryCount: Number(item.inputSnapshot?.automaticRecoveryCount ?? 0) + 1, lastAutomaticRecoveryAt: now }
               : {}),
           },
@@ -290,7 +293,7 @@ export const kickAutonomousWork = mutation({
             ? `InventSmith resumed ${item.title}; preliminary research can run autonomously before professional review.`
             : `InventSmith automatically recovered ${item.title} and returned it to the worker queue.`,
           attemptNumber: item.attemptCount,
-          metadata: { changeType: recoverableResearchGate ? "autonomous_research_gate_recovery" : "automatic_failure_recovery", ...departmentAgentAuditMetadata({ ...(item.inputSnapshot ?? {}), department: agent.department }, item.kind) },
+          metadata: { changeType: recoverableResearchGate ? "autonomous_research_gate_recovery" : assignmentRecovery ? "department_agent_recovery" : "automatic_failure_recovery", ...departmentAgentAuditMetadata({ ...(item.inputSnapshot ?? {}), department: agent.department }, item.kind) },
           createdAt: now,
         });
       } catch {

@@ -826,6 +826,8 @@ export default defineSchema({
     inventionId: v.optional(v.id("inventions")),
     status: v.union(v.literal("open"), v.literal("investigating"), v.literal("waiting_on_user"), v.literal("resolved")),
     adminNotes: v.optional(v.string()),
+    publicMessage: v.optional(v.string()),
+    customerReplies: v.optional(v.array(v.object({ message: v.string(), createdAt: v.number() }))),
     createdAt: v.number(),
     updatedAt: v.number(),
     resolvedAt: v.optional(v.number()),

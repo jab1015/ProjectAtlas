@@ -118,6 +118,17 @@ export function departmentAgentSystemPrompt(agent: DepartmentAgentProfile): stri
   ].join(" ");
 }
 
+/** A repaired registration gets one recovery window, separate from provider retries. */
+export function canRecoverAgentAssignment(inputSnapshot: Record<string, unknown> | undefined, workKind: string | undefined, lastError: string | undefined): boolean {
+  if (!lastError?.includes("missing a registered department agent") || inputSnapshot?.departmentAgentRecoveryVersion !== undefined) return false;
+  try {
+    resolveDepartmentAgent(inputSnapshot, workKind);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function departmentAgentAuditMetadata(inputSnapshot: unknown, workKind?: string) {
   const input = inputSnapshot && typeof inputSnapshot === "object" ? inputSnapshot as Record<string, unknown> : null;
   const declaredDepartment = input?.department;
