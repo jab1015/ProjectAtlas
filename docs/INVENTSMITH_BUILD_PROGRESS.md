@@ -509,6 +509,21 @@ A fresh authenticated reload after the Convex deployment clarified the post-retr
 - Keep the separate test deployment `quick-fox-785` documented as an isolated test target; do not treat it as the backend containing the account that works on Netlify. Do not use or modify `fiery-gazelle-628`.
 - Status boundary: branch deployment and login-page rendering are verified by the owner's report/screenshots; Vercel authentication, post-change login, and backend end-to-end acceptance remain unverified. No credentials were entered or tested by the assistant.
 
+### Live Vercel exhaustive front-end pass — October 23, 2026
+
+- Authenticated live testing covered the dashboard, Journey Center, Ask InventSmith, review queue, Work Library, Evidence Locker, Product Design + CAD, invention access, Patent Readiness, Market Research, support, account, organization, usage, and all ten downstream department routes for Rise Jar.
+- All routes loaded without raw errors except Journey Center. Journey Center crashed when the backend returned a stage status that the deployed frontend did not recognize, producing `Cannot read properties of undefined (reading 'className')`.
+- The repair adds a safe fallback status so an unknown or newly introduced backend status renders as `In progress` instead of crashing the page. Inventor-facing labels were also simplified: `Needs your input`, `Your evidence`, `Expert reviews`, and `Waiting for earlier work`.
+- Local verification after the repair: **133 test files / 721 tests passed**, TypeScript passed, and `git diff --check` passed. Administrator, support, organization, usage, beta-access, and professional-review regression coverage passed **45/45** targeted tests.
+- The repair is being reconciled onto the current `inventsmith/full-product-build` branch, which has since gained structured competitor-pricing export work. The final consolidated commit must be pushed before reporting front-end live acceptance or beginning administrator live acceptance.
+
+### Live preview verification — October 23, 2026
+
+- Consolidated release commit `c2f8241c128fdcf31aeebcc18100c8c8652c20d7` is pushed to `inventsmith/full-product-build`; Vercel preview `inventsmith-git-codex-live-frontend-hardening-v2-inventors-os.vercel.app` is ready and authenticated.
+- Live route sweep passed for dashboard, inventions, organizations, usage, account, data export, support, invention overview, Journey Center, Ask InventSmith, review, Work Library, Evidence Locker, Design + CAD, access, Patent Readiness, Market Research, and departments 6–15. Journey now renders the previously crashing unknown stage status as `In progress`.
+- Administrator routes correctly enforce the administrator gate for this inventor account. Full administrator/support-console mutation acceptance remains pending a signed-in administrator account.
+- Convex production deployment workflow run **#24** completed successfully after the live verification. The matching `deliverableDownloads:getCompetitiveResearchExport` function is now deployed to `agile-seahorse-379`; a fresh Market Research load shows the Excel export link and no Convex request-ID error. The local CLI still has no token, so future production deploys should continue through the owner-controlled workflow.
+
 
 ## Consolidated operational status — 2026-10-23
 
@@ -551,10 +566,8 @@ A fresh authenticated reload after the Convex deployment clarified the post-retr
 
 Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or **completed** only when backed by the corresponding ledger/audit state. “Waiting for you” must be reserved for an inventor action that is actually available. Queue messages must identify what is queued, why it is queued, and what event will start it.
 
-## Repair checkpoint — 2026-10-23
+### Journey-status repair checkpoint — October 23, 2026
 
-- Found and repaired the bounded-recovery defect: legacy human-readable work kinds such as `materials manufacturing` and `preliminary bom cost` now normalize to registered Manufacturing agents before retry.
-- Added regression coverage for both routing and retry behavior. Local verification: **141 test files / 751 tests passed**, TypeScript passed, ESLint passed.
-- Pushed one consolidated branch update: `efb6c710c8a14932661c49467e1e578e19f1aa81`. Vercel status is pending; live backend acceptance remains pending until the new preview and matching Convex deployment are verified.
-- Before this repair, live Rise Jar and pilot items still displayed attempt 7 / missing-agent errors. Re-test must confirm the retry button queues work and records a bounded recovery audit event; do not mark the failure cleared until that live check passes.
-
+- Professional patent-review gates are no longer counted as inventor “waiting for you” actions in Journey Center/status briefing.
+- Remote repair commit: `36b2f91325ae8da9acd0446a816c4cbac2c55d72`; local verification: 141 files / 752 tests, TypeScript, and ESLint passed.
+- Live read-only route sweep passed; Convex production retry acceptance remains pending because the matching backend deployment is unverified.
