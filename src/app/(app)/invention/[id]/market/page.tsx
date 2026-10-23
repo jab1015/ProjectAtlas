@@ -74,6 +74,29 @@ export default function MarketResearchPage() {
   const migrateWorkspace = useMutation(backfillWorkspace);
   const kickWork = useMutation(kickAutonomousWork);
   const [queueError, setQueueError] = useState<string | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
+
+  async function downloadCompetitiveResearch() {
+    if (!competitiveExport?.downloadUrl) return;
+    setExportError(null);
+    try {
+      // Downloading the data URL directly is unreliable in Chrome, especially
+      // for large reports. Materialize it as a Blob and trigger a normal file
+      // download instead.
+      const response = await fetch(competitiveExport.downloadUrl);
+      if (!response.ok) throw new Error(`Export request failed (${response.status})`);
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = objectUrl;
+      anchor.download = competitiveExport.title;
+      anchor.click();
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    } catch (error) {
+      console.error("Could not download competitor research:", error);
+      setExportError("The Excel export could not be downloaded. Please try again.");
+    }
+  }
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.push("/sign-in");
@@ -130,8 +153,9 @@ export default function MarketResearchPage() {
             <div className="flex flex-wrap gap-2">
               <Button asChild variant="outline"><Link href={`/invention/${inventionId}/evidence`}><FileUp className="mr-2 h-4 w-4" />Upload surveys, interviews or market evidence</Link></Button>
               <Button asChild variant="outline"><Link href={`/invention/${inventionId}/chat`}><MessageCircle className="mr-2 h-4 w-4" />Ask InventSmith what is happening</Link></Button>
-              {competitiveExport?.downloadUrl && <Button asChild variant="outline"><a href={competitiveExport.downloadUrl} download={competitiveExport.title}><Download className="mr-2 h-4 w-4" />Save competitor research to Excel</a></Button>}
+              {competitiveExport?.downloadUrl && <Button type="button" variant="outline" onClick={() => void downloadCompetitiveResearch()}><Download className="mr-2 h-4 w-4" />Save competitor research to Excel</Button>}
             </div>
+            {exportError && <p role="alert" className="text-sm text-destructive">{exportError}</p>}
           </header>
 
           <section className="grid gap-4 md:grid-cols-4">
