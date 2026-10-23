@@ -100,4 +100,10 @@ describe("InventSmith financial model structured export", () => {
     expect(source).toContain("spreadsheetXmlDataUrl");
     expect(source).toContain("groups.flat()");
   });
+
+  it("uses an Excel XML-compatible extension for competitor research", () => {
+    const source = readFileSync(join(process.cwd(), "convex/deliverableDownloads.ts"), "utf8");
+    expect(source).toContain("competitive research.xls");
+    expect(source).not.toContain("competitive research.xlsx");
+  });
 });
