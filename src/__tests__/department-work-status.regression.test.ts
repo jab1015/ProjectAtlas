@@ -19,7 +19,8 @@ describe("department prerequisite visibility", () => {
   it("returns completed dependency kinds from the invention record and renders the gate", () => {
     const query = read("convex/lifecycleDepartments.ts");
     const page = read("src/app/(app)/invention/[id]/department/[stageId]/page.tsx");
-    expect(query).toContain('completedWorkKinds: workItems.filter((item: any) => item.status === "completed").map((item: any) => item.kind)');
+    expect(query).toContain("progressForWorkKinds(workItems.filter((item: any) => stageKinds.has(item.kind)), stage.work.map((item) => item.kind))");
+    expect(query).toContain('completedWorkKinds: currentStageWork.filter((item: any) => item.status === "completed").map((item: any) => item.kind)');
     expect(page).toContain("getNextUnmetWorkDependencies(departmentWork, department?.completedWorkKinds ?? [])");
     expect(page).toContain("Waiting for earlier work");
     expect(page).toContain("Open Product Design + CAD");
