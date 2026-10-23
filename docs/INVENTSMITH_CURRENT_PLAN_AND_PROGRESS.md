@@ -680,3 +680,10 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Live Rise Jar inventor checks show Market Research at 100% / 2 of 2 complete, the Excel export control responds without a raw error, Patent Readiness at 80% / 4 of 5 with Internal Legal review needed, and Product Design + CAD at 0% / queued behind the Legal handoff.
 - The patent gate is still not claimed complete: no new automated Internal Legal disposition and audit event are visibly recorded yet, so downstream Product Design remains correctly blocked.
 
+# Inventor Legal review UX clarification — 2026-10-23
+
+- The inventor account was incorrectly shown the Internal Legal reviewer form, creating the impression that Jerry had to approve his own patent handoff.
+- The page now shows **No action is required from you** and explains that Internal Legal is processing the handoff automatically. Reviewer name, qualification reference, Request changes, and Complete Legal review are shown only to explicit `review` access.
+- Regression verification passed: 143 test files / 765 tests, TypeScript, lint with 0 errors and 10 existing warnings, and production build.
+- Repair commit: `0eb5bff24a7ea0d5df6d722ab1dda782568ef6ef` (pushed through the branch’s GitHub API commits).
+
