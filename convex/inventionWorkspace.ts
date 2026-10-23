@@ -22,6 +22,7 @@ import {
 } from "./consequentialApprovalMutation";
 import { canRecoverAgentAssignment, departmentAgentAuditMetadata, resolveDepartmentAgent } from "./departmentAgentLogic";
 import { shouldAutomaticallyRecoverFailedWork } from "./workOrchestratorLogic";
+import { latestWorkByKind } from "./workLedgerProgressLogic";
 
 const runAvailableWork = makeFunctionReference<
   "action",
@@ -157,7 +158,7 @@ export const getDeliverableLibrary = query({
       sources,
       reviews,
       executionEvents: executionEvents.sort((a, b) => b.createdAt - a.createdAt).slice(0, 50),
-      workItems: workItems
+      workItems: latestWorkByKind(workItems)
         .sort((a, b) => a.priority - b.priority || a.createdAt - b.createdAt)
         .map((item) => ({
           workItemId: item._id,
