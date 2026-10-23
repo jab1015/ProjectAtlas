@@ -1129,3 +1129,10 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Product Design unlock is automatic after that recorded authorization. The record remains explicitly non-legal-clearance and cannot claim patentability or freedom to operate.
 - Local verification passed: 142 test files / 762 tests, TypeScript, lint, and production build.
 
+# Automatic Legal conflict-to-redesign loop — 2026-10-23
+
+- Product direction: prior-art conflict or unclear material overlap automatically routes the invention to design-around work, then back to Internal Legal. Only a sufficiently differentiated handoff unlocks Product Design.
+- The routing is auditable and explicitly does not claim patentability, freedom to operate, legal clearance, validity, enforceability, or filing approval. The loop is bounded at three iterations.
+- Convex Run #38 succeeded and the newest Preview is Ready at `https://inventsmith-bqg6oqv39-inventors-os.vercel.app`.
+- Remaining acceptance item: fresh inventor authentication failed on that hostname, so live Rise Jar exercise and visible audit-record verification remain pending.
+

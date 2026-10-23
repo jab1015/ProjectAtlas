@@ -657,3 +657,10 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - The authorization is deliberately limited: it unlocks internal Product Design work but does not represent patentability, freedom to operate, legal clearance, or filing approval.
 - Verification passed locally: 142 test files / 762 tests, TypeScript, lint (0 errors; existing warnings only), and production build.
 
+# Automatic Legal conflict-to-redesign loop — 2026-10-23
+
+- Internal Legal now proceeds automatically only after a structured no-material-overlap disposition. Conflicts or unclear material overlap create `changes_requested`, queue design-around directions, and queue a fresh Legal handoff; Product Design remains locked until the re-check passes.
+- Local verification passed: 142 test files / 762 tests, TypeScript, lint with 0 errors and 10 existing warnings, and production build.
+- Convex production Run #38 succeeded. Vercel Preview `https://inventsmith-bqg6oqv39-inventors-os.vercel.app` is Ready from commit `c8b030bdbd0e912d1b79fd7b21c368fc950dc871`.
+- Fresh inventor authentication returned “Invalid email or password,” so live Rise Jar Legal-loop exercise is still pending and no patent-gate completion is claimed.
+

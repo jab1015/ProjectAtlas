@@ -654,3 +654,10 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Full local verification passed: 142 test files / 762 tests, TypeScript, lint with 0 errors, and production build.
 - Convex production deployment and newest Vercel preview are pending for this follow-up change.
 
+# Automatic Legal conflict-to-redesign loop — 2026-10-23
+
+- Blanket auto-approval was replaced. Only a structured `proceed_to_product_design` disposition with `conflictLevel: none_identified` and no required design-around unlocks Product Design.
+- `redesign_required` records an auditable Internal Legal changes request, queues numbered automated design-around work, and queues a fresh Patent Readiness handoff for re-check. `outside_authority` remains fail-closed. The loop is bounded at three iterations.
+- Convex production Run #38 succeeded against `agile-seahorse-379` for remote commit `c8b030bdbd0e912d1b79fd7b21c368fc950dc871`; CI reports 142 test files / 762 tests passed. The latest Vercel Preview `https://inventsmith-bqg6oqv39-inventors-os.vercel.app` is Ready on the same commit.
+- Fresh inventor authentication on that hostname returned “Invalid email or password.” Live Rise Jar exercise of the automatic loop and visible audit record remains pending; the patent gate is not claimed complete.
+
