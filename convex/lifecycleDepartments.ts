@@ -5,6 +5,7 @@ import { resolveInventionUsageScope } from "./organizationUsageScope";
 import { getOrganizationPlanPolicy } from "./organizationPolicyLogic";
 import { departmentAgentKeyFromDisplayName } from "./departmentAgentLogic";
 import { isInventorEvidenceSource } from "./chatEvidenceLogic";
+import { progressForWorkKinds } from "./workLedgerProgressLogic";
 
 interface LifecycleWorkDefinition {
   kind: string;
@@ -232,12 +233,13 @@ export const getLifecycleDepartment = query({
     ]);
     const stageKinds = new Set(stage.work.map((item) => item.kind));
     const deliverableKinds = new Set(stage.work.map((item) => item.deliverableKind));
+    const currentStageWork = progressForWorkKinds(workItems.filter((item: any) => stageKinds.has(item.kind)), stage.work.map((item) => item.kind)).relevant;
     return {
       stage: { id: stage.id, name: stage.name, description: stage.description, workCount: stage.work.length },
       invention: { _id: invention._id, title: invention.title },
-      initialized: stage.work.every((definition) => workItems.some((item: any) => item.kind === definition.kind)),
-      workItems: workItems.filter((item: any) => stageKinds.has(item.kind)).sort((a: any, b: any) => b.priority - a.priority),
-      completedWorkKinds: workItems.filter((item: any) => item.status === "completed").map((item: any) => item.kind),
+      initialized: currentStageWork.length === stage.work.length,
+      workItems: currentStageWork.sort((a: any, b: any) => b.priority - a.priority),
+      completedWorkKinds: currentStageWork.filter((item: any) => item.status === "completed").map((item: any) => item.kind),
       deliverables: deliverables.filter((item: any) => deliverableKinds.has(item.kind)).sort((a: any, b: any) => b.updatedAt - a.updatedAt),
       evidenceCount: evidence.length,
       inventorEvidenceCount: evidence.filter((item: any) => isInventorEvidenceSource(item.metadata, item.excerpt)).length,
