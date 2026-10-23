@@ -612,3 +612,9 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Live authorization check failed because the Preview still targets the old Convex production deployment: an intentionally invalid administrator submission was accepted, reducing the Rise Jar professional-gate count from 24 to 23.
 - Repair code is repository-green: 142 test files / 759 tests, TypeScript, lint with 0 errors, and production build passed. Convex production deployment remains pending behind the owner-controlled workflow confirmation and production-scoped deploy key.
 - No Legal gate is complete. A genuine internal Legal reviewer with explicit invention review access must still exercise Request changes and Complete Legal review, with qualification/reference validation, audit trail, and downstream handoff verified after deployment.
+
+# Account identity correction — 2026-10-23
+
+- `jerry.brown1015@gmail.com` is the administrator account.
+- `jerry@modernmethods.it.com` is the inventor account containing Rise Jar under the `RiseJars` personal organization.
+- The correct inventor session was verified on the newest Preview. Journey Center and Legal review render cleanly, with the gate still pending.
