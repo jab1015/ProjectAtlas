@@ -670,3 +670,13 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Newest Vercel Preview `https://inventsmith-rw4bdqzv1-inventors-os.vercel.app` is Ready from the same commit.
 - The inventor session is authenticated on an earlier Preview hostname and visibly loads Journey Center and Patent Readiness. It still shows the legacy pending gate until the new bounded re-check runs and produces a recorded Internal Legal disposition; no patent-gate completion is claimed yet.
 
+# Canonical progress and production verification — 2026-10-23
+
+- Canonical work-ledger progress now deduplicates refreshed work by kind before calculating completion. Journey Center, department pages, and deliverable summaries use the same latest-row calculation.
+- Product Design + CAD is explicitly forced to 0% / queued until the latest Patent Readiness handoff has an accepted Internal Legal disposition; stale design rows cannot make it appear complete.
+- Local verification passed: 143 test files / 764 tests, TypeScript, lint with 0 errors and 10 existing warnings, production build, and whitespace checks.
+- Latest branch head is `6d425dab92c7f23035f533af7c7bf49212284883`. Convex production Run #40 succeeded against `agile-seahorse-379`.
+- Latest Vercel Preview `https://inventsmith-pxwoucnq9-inventors-os.vercel.app` is Ready. A fresh session on that hostname requires authentication; the existing inventor session remains on the earlier authenticated Preview.
+- Live Rise Jar inventor checks show Market Research at 100% / 2 of 2 complete, the Excel export control responds without a raw error, Patent Readiness at 80% / 4 of 5 with Internal Legal review needed, and Product Design + CAD at 0% / queued behind the Legal handoff.
+- The patent gate is still not claimed complete: no new automated Internal Legal disposition and audit event are visibly recorded yet, so downstream Product Design remains correctly blocked.
+
