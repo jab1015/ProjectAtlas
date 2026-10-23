@@ -19,7 +19,10 @@ export const getCompetitiveResearchExport = query({
     const deliverables = await ctx.db.query("atlasDeliverables").withIndex("by_inventionId", (q) => q.eq("inventionId", args.inventionId)).collect();
     const competitor = deliverables.filter((item) => item.kind === "competitor_landscape").sort((a, b) => b.version - a.version)[0];
     if (!competitor) return null;
-    return { title: `${invention.title} competitive research.xlsx`, version: competitor.version, staleReason: competitor.staleReason ?? null, downloadUrl: spreadsheetXmlDataUrl(competitorResearchMarkdownToSpreadsheetXml(contentToReadableText(competitor.content), invention.title)) };
+    // This is Excel's XML 2003 workbook format, not an OOXML .xlsx package.
+    // Keep the extension honest so Excel and browser download handlers select
+    // the correct parser.
+    return { title: `${invention.title} competitive research.xls`, version: competitor.version, staleReason: competitor.staleReason ?? null, downloadUrl: spreadsheetXmlDataUrl(competitorResearchMarkdownToSpreadsheetXml(contentToReadableText(competitor.content), invention.title)) };
   },
 });
 
