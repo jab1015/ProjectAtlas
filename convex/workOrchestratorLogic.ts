@@ -30,6 +30,7 @@ const AUTOMATICALLY_RECOVERABLE_KINDS = new Set([
   "market_feasibility", "preliminary_prior_art", "feature_prior_art_comparison",
   "distinguishing_features", "ip_readiness", "patent_design_handoff",
   "materials_manufacturing", "regulatory_screening", "evidence_verification",
+  "materials_manufacturing_assessment", "manufacturing_research", "materials_manufacturing_research",
   "preliminary_bom_cost", "concept_image_generation", "product_render_generation",
 ]);
 
