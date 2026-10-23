@@ -1143,3 +1143,12 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Convex production Run #39 succeeded and the newest Vercel Preview `https://inventsmith-rw4bdqzv1-inventors-os.vercel.app` is Ready from commit `71fd229b29bd5d23697feb4b8e227aad196044ac`.
 - Roadmap acceptance remains pending until the authenticated inventor session shows the new Legal disposition, audit event, and downstream Product Design handoff status.
 
+# Canonical progress and production verification — 2026-10-23
+
+- Progress reporting is now canonical across Journey Center, department pages, and deliverable summaries: refreshed work is deduplicated by kind and only the latest row counts.
+- Legal-first sequencing is visible in the live Rise Jar journey: Patent Readiness is 80% / 4 of 5 and awaiting Internal Legal; Product Design + CAD is 0% / queued and cannot count as complete before that handoff.
+- Market Research is consistent at 100% / 2 of 2 on the authenticated inventor route. The competitor Excel export control responds without a raw UI error.
+- Verification passed with 143 test files / 764 tests, TypeScript, lint (0 errors), production build, and Convex production Run #40 success.
+- Latest Ready Preview: `https://inventsmith-pxwoucnq9-inventors-os.vercel.app`.
+- Remaining acceptance item: fresh authentication on that hostname and visible recording of the automated Internal Legal disposition, audit trail, and downstream handoff. Patent-gate completion is not claimed.
+
