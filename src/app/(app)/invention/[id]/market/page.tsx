@@ -45,7 +45,7 @@ const getDeliverableLibrary = makeFunctionReference<"query", { inventionId: Id<"
 const getCompetitiveResearchExport = makeFunctionReference<"query", { inventionId: Id<"inventions"> }, { title: string; version: number; staleReason: string | null; downloadUrl: string } | null>("deliverableDownloads:getCompetitiveResearchExport");
 const backfillWorkspace = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { addedWorkCount: number }>("inventionMigrations:backfillWorkspace");
 const kickAutonomousWork = makeFunctionReference<"mutation", { inventionId: Id<"inventions"> }, { scheduled: boolean; reason: string }>("inventionWorkspace:kickAutonomousWork");
-const MARKET_KINDS = new Set(["competitor_discovery", "market_feasibility"]);
+const MARKET_KINDS = new Set(["competitor_discovery", "competitor_landscape", "market_feasibility"]);
 const MARKET_WORK_KINDS = new Set(["competitor_discovery", "market_feasibility"]);
 
 function isWebLocator(locator?: string): locator is string {
