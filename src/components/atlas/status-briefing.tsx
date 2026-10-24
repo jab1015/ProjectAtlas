@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, CheckCircle2, CircleDot, Compass, FileUp, Lightbulb, MessageCircle } from "lucide-react";
 import type { StatusBriefing as StatusBriefingData } from "@convex/statusBriefingLogic";
 import { Button } from "@/components/ui/button";
+import { InternalLegalReviewTracker } from "@/components/atlas/internal-legal-review-tracker";
 
 interface StatusBriefingProps {
   briefing: StatusBriefingData;
@@ -104,6 +105,7 @@ export function StatusBriefing({ briefing, inventionId }: StatusBriefingProps) {
                 <p><span className="font-semibold text-foreground">Process:</span> {briefing.currentWork.process}</p>
                 <p><span className="font-semibold text-foreground">When to expect an update:</span> {briefing.currentWork.expectation}</p>
               </div>
+              <InternalLegalReviewTracker state={briefing.currentWork.status === "running" ? "running" : "waiting"} />
             </div>
           </div>
         </article>

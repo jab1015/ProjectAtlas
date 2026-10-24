@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { contentToReadableText, getDeliverableTrustLabel } from "@convex/deliverableLogic";
 import { hasAcceptedInternalLegalHandoff } from "@/lib/internalLegalHandoffState";
 import { userFacingError } from "@/lib/userFacingError";
+import { InternalLegalReviewTracker } from "@/components/atlas/internal-legal-review-tracker";
 
 interface DeliverableLibrary {
   invention: { _id: Id<"inventions">; title: string };
@@ -193,6 +194,7 @@ export default function PatentReadinessPage() {
               <p className="text-xs font-semibold uppercase tracking-wider text-amber-700">Internal Legal gate</p>
               <h2 className="mt-2 text-xl font-semibold">Product Design is paused until Internal Legal accepts this handoff</h2>
               <p className="mt-3 text-sm text-muted-foreground">The packet is prepared and under Internal Legal review. If the current design is too close to prior art, Internal Legal sends it back for automated design-around work. The handoff becomes recorded only after an accepted Legal review is saved.</p>
+              <div className="mt-5"><InternalLegalReviewTracker /></div>
             </section>
           )}
 

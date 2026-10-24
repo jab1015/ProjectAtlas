@@ -11,6 +11,7 @@ import { AppNav } from "@/components/atlas/app-nav";
 import { userFacingError } from "@/lib/userFacingError";
 import { MadeThisBadge } from "@/components/atlas/made-this-badge";
 import { Button } from "@/components/ui/button";
+import { InternalLegalReviewTracker } from "@/components/atlas/internal-legal-review-tracker";
 import { Textarea } from "@/components/ui/textarea";
 
 interface ReviewQueue {
@@ -141,6 +142,7 @@ export default function InventionReviewPage() {
                 <p className="font-medium">Current status: Internal Legal review needed</p>
                 <p className="mt-1 text-muted-foreground">Outside counsel is only considered if Internal Legal identifies a matter beyond its authority.</p>
               </div>
+              <div className="mt-5"><InternalLegalReviewTracker /></div>
               <Button asChild variant="outline" className="mt-6"><Link href={`/invention/${inventionId}/journey`}>Return to Journey Center</Link></Button>
             </section>
           ) : currentDecision ? (

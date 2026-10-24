@@ -10,6 +10,7 @@ import { AlertTriangle, ArrowLeft, CheckCircle2, CircleDashed, FileUp, Gavel, Lo
 import { AppNav } from "@/components/atlas/app-nav";
 import { MadeThisBadge } from "@/components/atlas/made-this-badge";
 import { Button } from "@/components/ui/button";
+import { InternalLegalReviewTracker } from "@/components/atlas/internal-legal-review-tracker";
 
 interface JourneyStageRow {
   id: number;
@@ -164,6 +165,7 @@ export default function JourneyCenterPage() {
             <h2 className="mt-2 text-xl font-semibold">{nextAction}</h2>
             <p className="mt-2 text-sm text-muted-foreground">Current focus: Stage {journey.currentStage.id} — {journey.currentStage.name}.</p>
             {workerNotice && <p role="status" className="mt-4 rounded-xl border border-primary/20 bg-background/70 px-4 py-3 text-sm text-foreground">{workerNotice}</p>}
+            {journey.currentStage.id === 4 && journey.currentStage.status === "professional_review" && <div className="mt-4"><InternalLegalReviewTracker compact /></div>}
           </section>
 
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
