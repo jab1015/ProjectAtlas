@@ -6,8 +6,11 @@ import { shouldAutomaticallyRecoverFailedWork } from "@convex/workOrchestratorLo
 describe("unattended autonomy recovery", () => {
   it("treats canonical prerequisite synthesis as recoverable autonomous work", () => {
     expect(shouldAutomaticallyRecoverFailedWork("development_risks", { department: "canonical" }, 3, 3)).toBe(true);
+    expect(shouldAutomaticallyRecoverFailedWork("development_risks_costs_dependencies", { department: "canonical" }, 3, 3)).toBe(true);
     expect(shouldAutomaticallyRecoverFailedWork("engineering_handoff", { department: "canonical" }, 3, 3)).toBe(true);
+    expect(shouldAutomaticallyRecoverFailedWork("engineering_handoff_brief", { department: "canonical" }, 3, 3)).toBe(true);
     expect(shouldAutomaticallyRecoverFailedWork("evidence_verification", { department: "canonical" }, 3, 3)).toBe(true);
+    expect(shouldAutomaticallyRecoverFailedWork("evidence_verification_report", { department: "canonical" }, 3, 3)).toBe(true);
   });
 
   it("resumes queued work and expired leases without touching healthy or human-blocked work", () => {

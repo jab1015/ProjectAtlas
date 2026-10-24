@@ -94,8 +94,11 @@ const WORK_KIND_DEPARTMENT: Readonly<Record<string, DepartmentAgentKey>> = {
   // omitted from the retry router. Keep legacy snapshots recoverable when
   // their declared department is the umbrella "canonical" assignment.
   development_risks: "canonical",
+  development_risks_costs_dependencies: "canonical",
   engineering_handoff: "canonical",
+  engineering_handoff_brief: "canonical",
   evidence_verification: "canonical",
+  evidence_verification_report: "canonical",
 };
 
 export function resolveDepartmentAgent(inputSnapshot: unknown, workKind?: string): DepartmentAgentProfile {
