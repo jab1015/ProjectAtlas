@@ -11,6 +11,7 @@ import { AppNav } from "@/components/atlas/app-nav";
 import { MarkdownContent } from "@/components/markdown-content";
 import { Button } from "@/components/ui/button";
 import { contentToReadableText, getDeliverableTrustLabel } from "@convex/deliverableLogic";
+import { hasAcceptedInternalLegalHandoff } from "@/lib/internalLegalHandoffState";
 import { userFacingError } from "@/lib/userFacingError";
 
 interface DeliverableLibrary {
@@ -150,6 +151,14 @@ export default function PatentReadinessPage() {
   const comparison = deliverables.find((item) => item.kind === "feature_prior_art_comparison");
   const distinguishing = deliverables.find((item) => item.kind === "distinguishing_features");
   const priorArt = deliverables.find((item) => item.kind === "preliminary_prior_art");
+  const handoffAccepted = hasAcceptedInternalLegalHandoff(
+    handoff ? String(handoff._id) : undefined,
+    library.reviews.map((review) => ({
+      deliverableId: String(review.deliverableId),
+      specialty: review.specialty,
+      status: review.status,
+    })),
+  );
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -169,14 +178,21 @@ export default function PatentReadinessPage() {
             <div className="rounded-2xl border border-border bg-card p-5"><FileSearch className="h-5 w-5 text-primary" /><p className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">Prior-art landscape</p><p className="mt-1 font-semibold">{priorArt ? "Available" : "In progress"}</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><ShieldCheck className="h-5 w-5 text-primary" /><p className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">Feature comparison</p><p className="mt-1 font-semibold">{comparison ? "Available" : "In progress"}</p></div>
             <div className="rounded-2xl border border-border bg-card p-5"><Sparkles className="h-5 w-5 text-primary" /><p className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">Differentiation hypotheses</p><p className="mt-1 font-semibold">{distinguishing ? "Available" : "In progress"}</p></div>
-            <div className="rounded-2xl border border-border bg-card p-5"><Gavel className="h-5 w-5 text-primary" /><p className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">Patent → Design handoff</p><p className="mt-1 font-semibold">{handoff ? "Recorded" : "Pending"}</p></div>
+            <div className="rounded-2xl border border-border bg-card p-5"><Gavel className="h-5 w-5 text-primary" /><p className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">Patent → Design handoff</p><p className="mt-1 font-semibold">{handoffAccepted ? "Recorded" : handoff ? "Internal Legal review in progress" : "Pending"}</p></div>
           </section>
 
-          {handoff && (
+          {handoff && handoffAccepted && (
             <section className="rounded-2xl border border-primary/25 bg-primary/5 p-6 sm:p-7">
               <p className="text-xs font-semibold uppercase tracking-wider text-primary">Design-around handoff</p>
               <h2 className="mt-2 text-xl font-semibold">Product Design is required to consume these patent-readiness constraints</h2>
               <div className="mt-4"><MarkdownContent content={contentToReadableText(handoff.content)} className="text-sm" /></div>
+            </section>
+          )}
+          {handoff && !handoffAccepted && (
+            <section className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-6 sm:p-7">
+              <p className="text-xs font-semibold uppercase tracking-wider text-amber-700">Internal Legal gate</p>
+              <h2 className="mt-2 text-xl font-semibold">Product Design is paused until Internal Legal accepts this handoff</h2>
+              <p className="mt-3 text-sm text-muted-foreground">The packet is prepared and under Internal Legal review. If the current design is too close to prior art, Internal Legal sends it back for automated design-around work. The handoff becomes recorded only after an accepted Legal review is saved.</p>
             </section>
           )}
 
