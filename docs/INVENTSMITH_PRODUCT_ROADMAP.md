@@ -1206,3 +1206,15 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Authenticated Rise Jar live test passed: Market Research shows 6 deliverables, 100% autonomous progress, 2 of 2 work items complete, and the Save competitor research to Excel control completed without a visible request-ID or application error.
 - No Convex production deployment was required for this UI/export-only repair; latest verified backend remains Convex production Run #41.
 - Patent Readiness remains an Internal Legal gate and is not claimed complete; no accepted or redesign Legal disposition/audit result has been recorded.
+
+
+# Mobile Market Research and production export checkpoint — 2026-10-24
+
+- The mobile Market Research page was hardened with explicit full-width/min-width rules on the page shell and shared navigation so phone browsers do not collapse the app into a narrow left column. Code commit: `3c42dd8` (published as `3c42a753c0337aee14b0d02210b5cf1bca546e9a`).
+- Vercel Preview for that commit is Ready: https://inventsmith-llkbgofxx-inventors-os.vercel.app
+- Convex production deployment Run #43 completed successfully from the same commit against `agile-seahorse-379`: https://github.com/jab1015/ProjectAtlas/actions/runs/40050797393
+- The production deploy report passed 145 test files / 772 tests. Local TypeScript, lint (0 errors; 10 existing warnings), production build, and whitespace checks also passed.
+- The authenticated Rise Jar Market Research export control was exercised on the authenticated preview; the download event completed without a visible request-ID or application error. The production backend now contains the populated competitive-retailer worksheet export, plus Research details, Sources, Research images, and Research report sheets.
+- The current Rise Jar research has no image references to embed. The exporter preserves legitimate AI research image URLs whenever the research deliverable contains them.
+- Patent Readiness remains an Internal Legal gate. No accepted or redesign Legal disposition and audit result has been recorded, so the patent-to-design gate is not claimed complete.
+- Remaining acceptance work: verify the newest preview on the user’s phone, complete administrator-session acceptance, exercise/record Internal Legal disposition and audit trail, and continue broader production-safe route/action coverage.
