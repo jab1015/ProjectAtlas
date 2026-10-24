@@ -89,12 +89,12 @@ function PatentReviewAction({ review, canReview }: { review: Doc<"professionalRe
       <div className="flex items-start gap-3">
         <Gavel className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden="true" />
         <div>
-          <p className="text-sm font-semibold">Internal Legal review {review.status === "accepted" ? "recorded" : "required"}</p>
-      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">A qualified patent attorney or registered patent agent in your Legal department must review the exact scope and differentiation. InventSmith records that decision only for an authorized Internal Legal reviewer with explicit review access; it is not an inventor self-certification.</p>
+          <p className="text-sm font-semibold">Internal Legal certification {review.status === "accepted" ? "recorded" : review.status === "changes_requested" ? "sent back for redesign" : "in progress"}</p>
+      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">InventSmith’s Internal Legal department analyzes the packet against the prior-art record. If the current design is too close, Legal routes it back to automated design-around work; when the redesigned direction clears the operational Legal check, Legal records the handoff to Product Design. This is an internal routing certification—not a patentability, freedom-to-operate, or legal-clearance opinion.</p>
         </div>
       </div>
       {review.status === "accepted" && review.reviewerName && <p className="mt-3 text-xs text-muted-foreground">{review.reviewerName === "InventSmith Internal Legal Department" ? "Automatically authorized for Product Design by Internal Legal. This is an operational handoff authorization, not patentability, freedom-to-operate, or legal-clearance approval." : `Accepted by ${review.reviewerName}${review.reviewerReference ? ` · ${review.reviewerReference}` : ""}.`}</p>}
-      {needsAction && !canReview && <p className="mt-3 text-sm text-muted-foreground">Waiting for an authorized Internal Legal reviewer. Your current account can inspect this packet but cannot approve it.</p>}
+      {needsAction && !canReview && <p className="mt-3 text-sm text-muted-foreground">Internal Legal is handling this review automatically. No action is required from the inventor. Product Design remains paused until Internal Legal records either an approved handoff or a redesign request.</p>}
       {needsAction && canReview && <>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <label className="text-xs font-medium">Reviewer name<input value={reviewerName} onChange={(event) => setReviewerName(event.target.value)} className="mt-1 block h-10 w-full rounded-md border border-input bg-background px-3 text-sm" placeholder="Qualified patent reviewer" /></label>
