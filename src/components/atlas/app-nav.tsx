@@ -64,7 +64,7 @@ export function AppNav({ className }: AppNavProps) {
   return (
     <>
       <header className={`sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 ${className ?? ""}`}>
-      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex h-16 w-full min-w-0 max-w-5xl items-center justify-between px-4 sm:px-6">
         <Link href="/dashboard" className="no-underline transition-opacity hover:opacity-80"><AtlasLogo size="sm" className="text-primary" /></Link>
         <div className="flex items-center gap-1 sm:gap-2">
           {user?.role === "admin" && <span className="hidden sm:inline-flex items-center rounded-full bg-foreground px-2.5 py-0.5 text-xs font-medium text-background">Administrator</span>}

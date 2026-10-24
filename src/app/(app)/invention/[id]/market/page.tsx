@@ -117,7 +117,7 @@ export default function MarketResearchPage() {
   }, [inventionId, isAuthenticated, isLoading, migrateWorkspace, kickWork]);
 
   if (isLoading || !isAuthenticated || library === undefined) {
-    return <div className="min-h-screen bg-background"><AppNav /><main className="mx-auto max-w-5xl px-4 py-12 text-sm text-muted-foreground sm:px-6">Loading Market Research…</main></div>;
+    return <div className="min-h-screen w-full min-w-0 bg-background"><AppNav /><main className="mx-auto w-full min-w-0 max-w-5xl px-4 py-12 text-sm text-muted-foreground sm:px-6">Loading Market Research…</main></div>;
   }
   if (!library) return null;
 
@@ -141,10 +141,10 @@ export default function MarketResearchPage() {
   const noDeliverableMessage = getMarketResearchNoDeliverableMessage(marketCounts);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen w-full min-w-0 flex-col overflow-x-hidden bg-background">
       <AppNav />
-      <main className="flex-1">
-        <div className="mx-auto max-w-5xl space-y-8 px-4 py-10 sm:px-6 sm:py-14">
+      <main className="min-w-0 flex-1">
+        <div className="mx-auto w-full min-w-0 max-w-5xl space-y-8 px-4 py-10 sm:px-6 sm:py-14">
           <Link href={`/invention/${inventionId}/journey`} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" />Back to Journey Center</Link>
           <header className="space-y-4">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Stage 3 — Market Research</p>
