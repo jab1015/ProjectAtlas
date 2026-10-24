@@ -724,3 +724,15 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Internal Legal remains the active Stage 4 gate for Rise Jar. The UI correctly shows 4/5 preparation tasks complete, Internal Legal disposition pending, Product Design paused, expected timing after worker claim, and no inventor action required.
 - The patent gate is **not** claimed complete: no accepted or redesign Internal Legal disposition and audit result has yet been visibly recorded. No new Convex production deployment was required for this UI-only repair; the latest verified production backend remains Convex Run #41.
 - Remaining acceptance work: record and verify the automated Internal Legal disposition/audit trail and downstream handoff; complete administrator-session acceptance separately; continue broader exhaustive action coverage where production-safe fixtures permit.
+
+
+# Populated competitor worksheet repair — 2026-10-24
+
+- Root cause confirmed: the competitor deliverable was narrative research rather than a Markdown table, while the exporter only populated table rows; the result was a workbook with headers but no competitor data.
+- The exporter now converts the AI-generated narrative research into a populated competitive-retailer worksheet with category, company, product, evidence type, retailer/marketplace, price, source/product URLs, research date, and notes. It preserves blank prices when the source did not publish a price rather than inventing one.
+- The workbook is shaped for the attached competitive-shopping worksheet use case: researched prior-art references, commercial substitutes, indirect alternatives, pricing signals, and cited sources are placed into structured rows instead of a blank fallback row.
+- Regression test added for narrative-only research; full local verification passed: **145 test files / 772 tests**, TypeScript, lint with 0 errors and 10 existing warnings, production build, and whitespace checks.
+- Code commits: `7d69986d08393d4d4a6b02e4f8591a85d5ae0412` (export repair) and `a24765efdad4c625b733e9613440d9f29975e376` (regression test). Newest Ready Preview: https://inventsmith-c6eg2f56v-inventors-os.vercel.app
+- Authenticated Rise Jar live test passed: Market Research shows 6 deliverables, 100% autonomous progress, 2 of 2 work items complete, and the Save competitor research to Excel control completed without a visible request-ID or application error.
+- No Convex production deployment was required for this UI/export-only repair; latest verified backend remains Convex production Run #41.
+- Patent Readiness remains an Internal Legal gate and is not claimed complete; no accepted or redesign Legal disposition/audit result has been recorded.
