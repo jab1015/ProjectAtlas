@@ -119,6 +119,10 @@ function spreadsheetRow(values: string[], header = false) {
   return `<Row>${values.map((value) => spreadsheetCell(value, header)).join("")}</Row>`;
 }
 
+function spreadsheetColumns(widths: number[]) {
+  return widths.map((width) => `<Column ss:Width="${width}"/>`).join("");
+}
+
 export function financialModelMarkdownToSpreadsheetXml(markdown: string, inventionTitle: string) {
   const tables = extractMarkdownTables(markdown);
   const usedNames = new Set<string>();
@@ -161,7 +165,25 @@ export function spreadsheetXmlDataUrl(xml: string) {
   return `data:application/vnd.ms-excel;charset=utf-8,${encodeURIComponent(`\uFEFF${xml}`)}`;
 }
 
-const COMPETITOR_HEADERS = ["Competitive product category", "Company", "Product", "Evidence type", "Physical store / retailer", "Online location / marketplace", "Price", "Currency", "Price basis", "Product URL", "Source URL", "Research date", "Notes"];
+const COMPETITOR_DETAIL_HEADERS = ["Competitive product category", "Company", "Product", "Evidence type", "Physical store / retailer", "Online location / marketplace", "Price", "Currency", "Price basis", "Product URL", "Source URL", "Research image URL", "Research date", "Notes"];
+const COMPETITIVE_RETAILER_HEADERS = [
+  "COMPETITIVE PRODUCT CATEGORY",
+  "CATALOG / WEBSITE",
+  "RESEARCH IMAGE URL",
+  "TV CHANNEL",
+  "DRTV / ASOTV",
+  "SPECIALTY BRICK & MORTAR STORES",
+  "SPECIALTY BIG BOX RETAILERS",
+  "BIG BOX HOME IMPROVEMENT",
+  "SPECIALTY HARDWARE",
+  "BIG BOX / DEPT STORES",
+  "CLUB",
+  "MASS GROCERY",
+  "DRUG",
+  "CONVENIENCE / DISCOUNT / SPECIALTY / GAS STATION",
+  "KEY VENDORS IN CATEGORY",
+  "RESEARCH NOTES",
+];
 
 function canonicalCompetitorHeader(value: string) {
   const normalized = value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
@@ -180,29 +202,79 @@ function canonicalCompetitorHeader(value: string) {
   return null;
 }
 
+function imageReference(line: string) {
+  const match = line.match(/!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)/i);
+  return match ? { alt: cleanCell(match[1]), url: match[2] } : { alt: "", url: "" };
+}
+
+function blankCompetitorRow(researchDate: string, note: string) {
+  return ["", "", "", "", "", "", "", "", "", "", "", "", researchDate, note];
+}
+
+function blankCompetitiveRetailerRow(note: string) {
+  return ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", note];
+}
+
+function detailRowFromCells(row: string[], mappings: Array<string | null>, researchDate: string) {
+  return COMPETITOR_DETAIL_HEADERS.map((header) => {
+    const mappingKey = header === "Competitive product category" ? "Category" : header;
+    const index = mappings.findIndex((mapped) => mapped === mappingKey);
+    return index >= 0 ? row[index] ?? "" : header === "Research date" ? researchDate : "";
+  });
+}
+
+function competitiveRetailerRow(detail: string[]) {
+  const [category, company, product, evidenceType, retailer, marketplace, price, currency, basis, productUrl, sourceUrl, imageUrl, researchDate, notes] = detail;
+  const catalog = productUrl || sourceUrl || marketplace;
+  const storeText = retailer || marketplace || "";
+  const isTarget = /target/i.test(`${retailer} ${marketplace} ${sourceUrl}`);
+  const isHomeImprovement = /home ?depot|lowe'?s/i.test(`${retailer} ${marketplace} ${sourceUrl}`);
+  const isHardware = /hardware|oxo|jiffy|opener/i.test(`${category} ${company} ${product} ${retailer} ${marketplace}`);
+  return [
+    category || evidenceType,
+    catalog,
+    imageUrl,
+    "",
+    "",
+    !isTarget && !isHomeImprovement && isHardware ? storeText : "",
+    "",
+    isHomeImprovement ? storeText : "",
+    isHardware ? storeText : "",
+    isTarget ? storeText : "",
+    "",
+    "",
+    "",
+    "",
+    company || product,
+    [product, evidenceType, price ? `${currency || "USD"} ${price} (${basis || "observed"})` : "", notes, researchDate].filter(Boolean).join(". "),
+  ];
+}
+
 export function competitorResearchMarkdownToSpreadsheetXml(markdown: string, inventionTitle: string) {
   const tables = extractMarkdownTables(markdown);
   const table = tables.find((candidate) => candidate.rows[0]?.some((header) => canonicalCompetitorHeader(header) === "Company"));
   const today = new Date().toISOString().slice(0, 10);
-  const rows = table ? table.rows.slice(1).map((row) => {
-    const mappings = table.rows[0].map(canonicalCompetitorHeader);
-    return COMPETITOR_HEADERS.map((header) => {
-      const index = mappings.findIndex((mapped) => mapped === header);
-      return index >= 0 ? row[index] ?? "" : header === "Research date" ? today : "";
-    });
-  }) : competitorNarrativeRows(markdown, today);
+  const details = table
+    ? table.rows.slice(1).map((row) => detailRowFromCells(row, table.rows[0].map(canonicalCompetitorHeader), today))
+    : competitorNarrativeRows(markdown, today);
+  const rows = details.map(competitiveRetailerRow);
   const sources = [...new Set([...markdown.matchAll(/https?:\/\/[^\s)\]>]+/gi)].map((match) => match[0].replace(/[.,;]+$/, "")))];
+  const images = [...markdown.matchAll(/!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)/gi)].map((match) => [cleanCell(match[1]), match[2]]);
   const reportRows = markdown.split(/\r?\n/).map(cleanCell).filter(Boolean).map((line) => [line]);
   const usedNames = new Set<string>();
   const competitorName = worksheetName("Competitors", usedNames);
   const sourceName = worksheetName("Sources", usedNames);
   const reportName = worksheetName("Research report", usedNames);
+  const detailName = worksheetName("Research details", usedNames);
+  const imageName = worksheetName("Research images", usedNames);
   return [
     '<?xml version="1.0" encoding="UTF-8"?>', '<?mso-application progid="Excel.Sheet"?>',
     '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">',
-    '<Styles><Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Vertical="Bottom"/><Font/><Interior/><NumberFormat/><Protection/></Style><Style ss:ID="Header"><Font ss:Bold="1"/><Interior ss:Color="#E8F2EA" ss:Pattern="Solid"/></Style></Styles>',
-    `<Worksheet ss:Name="${xmlEscape(competitorName)}"><Table>${spreadsheetRow([`InventSmith Competitive Retailers — ${inventionTitle}`])}${spreadsheetRow(["AI-populated from the latest competitive research deliverable; blank price fields mean the source did not publish a price."])}${spreadsheetRow(COMPETITOR_HEADERS, true)}${rows.map((row) => spreadsheetRow(row)).join("")}</Table></Worksheet>`,
+    '<Styles><Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Vertical="Bottom"/><Font ss:FontName="Arial" ss:Size="10"/><Interior/><NumberFormat/><Protection/></Style><Style ss:ID="Header"><Alignment ss:Vertical="Center" ss:Horizontal="Center" ss:WrapText="1"/><Font ss:FontName="Arial" ss:Size="9" ss:Bold="1"/><Interior ss:Color="#D9EAF7" ss:Pattern="Solid"/></Style></Styles>',
+    `<Worksheet ss:Name="${xmlEscape(competitorName)}"><Table>${spreadsheetColumns([150, 180, 150, 80, 80, 145, 145, 145, 130, 130, 80, 110, 80, 190, 150, 280])}${spreadsheetRow([`Competitive Retailers — ${inventionTitle}`])}${spreadsheetRow(["AI-populated from the latest competitive research. Catalog links, source links, image links, channel placement, and vendor names remain traceable to the research report."])}${spreadsheetRow(COMPETITIVE_RETAILER_HEADERS, true)}${(rows.length ? rows : [blankCompetitiveRetailerRow("No structured competitor records were identified. Review the Research report worksheet and refresh research.")]).map((row) => spreadsheetRow(row)).join("")}</Table></Worksheet>`,
+    `<Worksheet ss:Name="${xmlEscape(detailName)}"><Table>${spreadsheetRow(COMPETITOR_DETAIL_HEADERS, true)}${details.map((row) => spreadsheetRow(row)).join("")}</Table></Worksheet>`,
     `<Worksheet ss:Name="${xmlEscape(sourceName)}"><Table>${spreadsheetRow(["Source URL"], true)}${(sources.length ? sources : ["No source URLs were captured in the report."]).map((source) => spreadsheetRow([source])).join("")}</Table></Worksheet>`,
+    `<Worksheet ss:Name="${xmlEscape(imageName)}"><Table>${spreadsheetRow(["Image description", "Image URL"], true)}${(images.length ? images : [["No image references were present in the AI research deliverable.", ""]]).map((row) => spreadsheetRow(row)).join("")}</Table></Worksheet>`,
     `<Worksheet ss:Name="${xmlEscape(reportName)}"><Table>${spreadsheetRow(["Research report"], true)}${reportRows.map((row) => spreadsheetRow(row)).join("")}</Table></Worksheet>`,
     "</Workbook>",
   ].join("");
@@ -220,6 +292,7 @@ type CompetitorNarrativeRow = {
   basis: string;
   productUrl: string;
   sourceUrl: string;
+  imageUrl: string;
   notes: string;
 };
 
@@ -231,8 +304,12 @@ function narrativeProductUrl(line: string) {
   return narrativeSourceUrl(line);
 }
 
+function normalizedResearchText(value: string) {
+  return value.toLowerCase().replace(/[’‘]/g, "'").replace(/[“”]/g, '"');
+}
+
 function narrativeRowValues(row: CompetitorNarrativeRow, researchDate: string) {
-  return [row.category, row.company, row.product, row.evidenceType, row.retailer, row.marketplace, row.price, row.currency, row.basis, row.productUrl, row.sourceUrl, researchDate, row.notes];
+  return [row.category, row.company, row.product, row.evidenceType, row.retailer, row.marketplace, row.price, row.currency, row.basis, row.productUrl, row.sourceUrl, row.imageUrl, researchDate, row.notes];
 }
 
 function competitorNarrativeRows(markdown: string, researchDate: string) {
@@ -250,6 +327,11 @@ function competitorNarrativeRows(markdown: string, researchDate: string) {
     ["US8079499B2", "Dispensing jar for viscous food product"],
     ["US20140197171A1", "Dispensing Container with Elevating Platform"],
     ["US8235257B2", "Emptying mechanism for food storage container"],
+  ] as const;
+  const patentTitlePatterns = [
+    ["dispensing jar for viscous food product", "Dispensing jar for viscous food product"],
+    ["dispensing container with elevating platform", "Dispensing Container with Elevating Platform"],
+    ["emptying mechanism for food storage container", "Emptying mechanism for food storage container"],
   ] as const;
   const productPatterns = [
     ["Jif", "Jif Squeeze Creamy Peanut Butter", "Commercial alternative", "Target", "$3.69"],
@@ -272,16 +354,22 @@ function competitorNarrativeRows(markdown: string, researchDate: string) {
     }
     if (!line) continue;
     const sourceUrl = narrativeSourceUrl(line);
+    const image = imageReference(line);
+    const normalizedLine = normalizedResearchText(line);
     for (const [identifier, title] of patentPatterns) {
       if (!line.includes(identifier)) continue;
-      add({ category: "Prior-art patent", company: identifier, product: title, evidenceType: "Prior-art reference", retailer: "", marketplace: "Google Patents", price: "", currency: "", basis: "", productUrl: sourceUrl, sourceUrl, notes: `${section}. This is a research reference, not a legal conclusion.` });
+      add({ category: "Prior-art patent", company: identifier, product: title, evidenceType: "Prior-art reference", retailer: "", marketplace: "Google Patents", price: "", currency: "", basis: "", productUrl: sourceUrl, sourceUrl, imageUrl: image.url, notes: `${section}. This is a research reference, not a legal conclusion.` });
+    }
+    for (const [pattern, title] of patentTitlePatterns) {
+      if (!normalizedLine.includes(pattern) || patentPatterns.some(([identifier]) => line.includes(identifier))) continue;
+      add({ category: "Prior-art patent", company: "Cited prior-art reference", product: title, evidenceType: "Prior-art reference", retailer: "", marketplace: "Google Patents", price: "", currency: "", basis: "", productUrl: sourceUrl, sourceUrl, imageUrl: image.url, notes: `${section}. This is a research reference, not a legal conclusion.` });
     }
     for (const [company, product, category, retailer, price] of productPatterns) {
-      if (!line.toLowerCase().includes(company.toLowerCase()) && !line.toLowerCase().includes(product.toLowerCase())) continue;
+      if (!normalizedLine.includes(normalizedResearchText(company)) && !normalizedLine.includes(normalizedResearchText(product))) continue;
       const source = sourceUrl;
-      add({ category, company, product, evidenceType: "Market research", retailer, marketplace: source.includes("target.com") ? "Target.com" : source.includes("google") || source.includes("patents") ? "Google Patents" : source ? new URL(source).hostname.replace(/^www\./, "") : "Not identified", price: price.replace(/^\$/, ""), currency: price ? "USD" : "", basis: price ? "observed listing" : "", productUrl: narrativeProductUrl(line), sourceUrl: source, notes: `${section}. Price is blank when the cited source did not publish one.` });
+      add({ category, company, product, evidenceType: "Market research", retailer, marketplace: source.includes("target.com") ? "Target.com" : source.includes("google") || source.includes("patents") ? "Google Patents" : source ? new URL(source).hostname.replace(/^www\./, "") : "Not identified", price: price.replace(/^\$/, ""), currency: price ? "USD" : "", basis: price ? "observed listing" : "", productUrl: narrativeProductUrl(line), sourceUrl: source, imageUrl: image.url, notes: `${section}. Price is blank when the cited source did not publish one.` });
     }
   }
 
-  return rows.length ? rows.map((row) => narrativeRowValues(row, researchDate)) : [["", "", "", "", "", "", "", "", "", "", "", researchDate, "No structured competitor records were identified. Review the Research report worksheet and refresh research."]];
+  return rows.length ? rows.map((row) => narrativeRowValues(row, researchDate)) : [blankCompetitorRow(researchDate, "No structured competitor records were identified. Review the Research report worksheet and refresh research.")];
 }

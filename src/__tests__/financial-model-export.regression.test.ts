@@ -84,6 +84,10 @@ describe("InventSmith financial model structured export", () => {
     expect(workbook).toContain('ss:Name="Competitors"');
     expect(workbook).toContain("Physical store / retailer");
     expect(workbook).toContain("Online location / marketplace");
+    expect(workbook).toContain("COMPETITIVE PRODUCT CATEGORY");
+    expect(workbook).toContain("SPECIALTY BRICK &amp; MORTAR STORES");
+    expect(workbook).toContain('ss:Name="Research details"');
+    expect(workbook).toContain('ss:Name="Research images"');
     expect(workbook).toContain("12.99");
     expect(workbook).toContain("https://acme.example/product");
     expect(workbook).toContain('ss:Name="Sources"');
@@ -103,6 +107,10 @@ describe("InventSmith financial model structured export", () => {
     expect(workbook).toContain("3.69");
     expect(workbook).toContain("US8079499B2");
     expect(workbook).toContain("Prior-art patent");
+    expect(workbook).toContain("COMPETITIVE PRODUCT CATEGORY");
+    expect(workbook).toContain("SPECIALTY BIG BOX RETAILERS");
+    expect(workbook).toContain('ss:Name="Research details"');
+    expect(workbook).toContain('ss:Name="Research images"');
     expect(workbook).not.toContain("No structured competitor records were identified");
   });
 
