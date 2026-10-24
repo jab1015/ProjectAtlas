@@ -1,8 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import { hasRecoverableAutonomousWork, shouldQueueEvidenceRefresh } from "@convex/autonomyMaintenanceLogic";
 import { recoverFailedWork } from "@convex/autonomyMaintenance";
+import { shouldAutomaticallyRecoverFailedWork } from "@convex/workOrchestratorLogic";
 
 describe("unattended autonomy recovery", () => {
+  it("treats canonical prerequisite synthesis as recoverable autonomous work", () => {
+    expect(shouldAutomaticallyRecoverFailedWork("development_risks", { department: "canonical" }, 3, 3)).toBe(true);
+    expect(shouldAutomaticallyRecoverFailedWork("engineering_handoff", { department: "canonical" }, 3, 3)).toBe(true);
+    expect(shouldAutomaticallyRecoverFailedWork("evidence_verification", { department: "canonical" }, 3, 3)).toBe(true);
+  });
+
   it("resumes queued work and expired leases without touching healthy or human-blocked work", () => {
     expect(hasRecoverableAutonomousWork([{ status: "queued" }], 100)).toBe(true);
     expect(hasRecoverableAutonomousWork([{ status: "running", leaseExpiresAt: 99 }], 100)).toBe(true);

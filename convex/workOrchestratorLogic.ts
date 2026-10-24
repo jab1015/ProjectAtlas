@@ -32,6 +32,9 @@ const AUTOMATICALLY_RECOVERABLE_KINDS = new Set([
   "materials_manufacturing", "regulatory_screening", "evidence_verification",
   "materials_manufacturing_assessment", "manufacturing_research", "materials_manufacturing_research",
   "preliminary_bom_cost", "concept_image_generation", "product_render_generation",
+  // Canonical synthesis work must also recover automatically; otherwise a
+  // failed prerequisite can strand the Legal handoff indefinitely.
+  "development_risks", "engineering_handoff", "feasibility_recommendation", "package_assembly",
 ]);
 
 function normalizeWorkKind(kind: string | undefined): string | undefined {
