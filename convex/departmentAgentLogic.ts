@@ -90,6 +90,12 @@ const WORK_KIND_DEPARTMENT: Readonly<Record<string, DepartmentAgentKey>> = {
   patent_design_handoff: "patent_readiness",
   ip_readiness: "patent_readiness",
   regulatory_screening: "regulatory",
+  // These synthesis and handoff jobs are part of the canonical plan but were
+  // omitted from the retry router. Keep legacy snapshots recoverable when
+  // their declared department is the umbrella "canonical" assignment.
+  development_risks: "canonical",
+  engineering_handoff: "canonical",
+  evidence_verification: "canonical",
 };
 
 export function resolveDepartmentAgent(inputSnapshot: unknown, workKind?: string): DepartmentAgentProfile {

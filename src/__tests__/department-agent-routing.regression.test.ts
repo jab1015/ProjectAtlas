@@ -65,6 +65,9 @@ describe("dedicated department agent routing", () => {
     expect(resolveDepartmentAgent({ department: "unknown" }, "technical_feasibility").department).toBe("canonical");
     expect(resolveDepartmentAgent({ department: "canonical" }, "patent_design_handoff").department).toBe("patent_readiness");
     expect(resolveDepartmentAgent({ department: "canonical" }, "regulatory_screening").department).toBe("regulatory");
+    expect(resolveDepartmentAgent({ department: "canonical" }, "development_risks").department).toBe("canonical");
+    expect(resolveDepartmentAgent({ department: "canonical" }, "engineering_handoff").department).toBe("canonical");
+    expect(resolveDepartmentAgent({ department: "canonical" }, "evidence_verification").department).toBe("canonical");
     expect(resolveDepartmentAgent({ department: "unknown" }, "materials manufacturing").department).toBe("manufacturing");
     expect(resolveDepartmentAgent({ department: "unknown" }, "preliminary bom cost").department).toBe("manufacturing");
   });
