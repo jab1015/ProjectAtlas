@@ -90,6 +90,22 @@ describe("InventSmith financial model structured export", () => {
     expect(workbook).toContain('ss:Name="Research report"');
   });
 
+  it("populates the competitor worksheet from narrative research when no Markdown table exists", () => {
+    const narrative = [
+      "## Commercial alternatives already on shelf",
+      "- Target lists **Jif Squeeze Creamy Peanut Butter** at **$3.69**. https://www.target.com/s/squeeze%2Bpeanut%2Bbutter",
+      "- Target lists **Skippy Regular Creamy Squeeze Pouch** at **$2.69**. https://www.target.com/s/squeeze%2Bpeanut%2Bbutter",
+      "- A patent record US8079499B2 describes a dispensing jar for viscous food product. https://patents.google.com/patent/US8079499B2/en",
+    ].join("\n");
+    const workbook = competitorResearchMarkdownToSpreadsheetXml(narrative, "RiseJar");
+    expect(workbook).toContain("Jif Squeeze Creamy Peanut Butter");
+    expect(workbook).toContain("Skippy Regular Creamy Squeeze Pouch");
+    expect(workbook).toContain("3.69");
+    expect(workbook).toContain("US8079499B2");
+    expect(workbook).toContain("Prior-art patent");
+    expect(workbook).not.toContain("No structured competitor records were identified");
+  });
+
   it("exposes both CSV and Excel-readable financial_model downloads through the normal artifact service", () => {
     const source = readFileSync(join(process.cwd(), "convex/deliverableDownloads.ts"), "utf8");
     expect(source).toContain('item.kind === "financial_model"');
