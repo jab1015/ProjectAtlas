@@ -710,3 +710,16 @@ Use **running**, **queued**, **blocked**, **failed**, **recovery available**, or
 - Newest Ready Vercel Preview: `https://inventsmith-8uqfp8qzq-inventors-os.vercel.app` from the same branch commit.
 - The fresh preview requires a new inventor sign-in; the existing authenticated browser session is on an older Preview hostname. Therefore the new current-work card is deployed but not yet accepted by a fresh authenticated Rise Jar browser check.
 - No patent-gate completion is claimed: Rise Jar still needs a visibly recorded Internal Legal disposition and audit trail.
+
+
+# Latest verified continuation — 2026-10-24
+
+- Newest Vercel Preview from commit `aa747852da5e1a6e0bff42f223f17e008a472b98` is Ready: https://inventsmith-8t7qifxc5-inventors-os.vercel.app
+- Inventor authentication was verified for `jerry@modernmethods.it.com` on the newest preview.
+- Live Market Research verification passed for Rise Jar: Market deliverables now show **6**, autonomous progress is **100% / 2 of 2 work items complete**, and the competitor landscape is visible. This repairs the prior mismatch where work was complete but the page reported zero market deliverables.
+- The repaired `Save competitor research to Excel` control was exercised on the authenticated preview and produced no visible export or request-ID error. Automated export regression coverage remains green.
+- Full local verification passed: **145 test files / 771 tests**, TypeScript, lint with 0 errors and 10 existing warnings, production build, and whitespace checks.
+- Inventor route smoke verification passed for dashboard, Journey Center, Patent Readiness, review, Product Design, Work Library, department, organizations, account, data export, and support routes with no raw application errors or request IDs.
+- Internal Legal remains the active Stage 4 gate for Rise Jar. The UI correctly shows 4/5 preparation tasks complete, Internal Legal disposition pending, Product Design paused, expected timing after worker claim, and no inventor action required.
+- The patent gate is **not** claimed complete: no accepted or redesign Internal Legal disposition and audit result has yet been visibly recorded. No new Convex production deployment was required for this UI-only repair; the latest verified production backend remains Convex Run #41.
+- Remaining acceptance work: record and verify the automated Internal Legal disposition/audit trail and downstream handoff; complete administrator-session acceptance separately; continue broader exhaustive action coverage where production-safe fixtures permit.
